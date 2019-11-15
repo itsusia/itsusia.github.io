@@ -1,0 +1,1264 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/proj/io.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/proj</a> - io.hpp<span style="font-size: 80%;"> (source / <a href="io.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntry">32</td>
+            <td class="headerCovTableEntryLo">68.8 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /******************************************************************************</a>
+<span class="lineNum">       2 </span>            :  *
+<span class="lineNum">       3 </span>            :  * Project:  PROJ
+<span class="lineNum">       4 </span>            :  * Purpose:  ISO19111:2019 implementation
+<span class="lineNum">       5 </span>            :  * Author:   Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  ******************************************************************************
+<span class="lineNum">       8 </span>            :  * Copyright (c) 2018, Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      11 </span>            :  * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      12 </span>            :  * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      13 </span>            :  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      14 </span>            :  * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      15 </span>            :  * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      16 </span>            :  *
+<span class="lineNum">      17 </span>            :  * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      18 </span>            :  * in all copies or substantial portions of the Software.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      21 </span>            :  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      22 </span>            :  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      23 </span>            :  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      24 </span>            :  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      25 </span>            :  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      26 </span>            :  * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      27 </span>            :  ****************************************************************************/
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #ifndef IO_HH_INCLUDED
+<span class="lineNum">      30 </span>            : #define IO_HH_INCLUDED
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #include &lt;list&gt;
+<span class="lineNum">      33 </span>            : #include &lt;memory&gt;
+<span class="lineNum">      34 </span>            : #include &lt;set&gt;
+<span class="lineNum">      35 </span>            : #include &lt;string&gt;
+<span class="lineNum">      36 </span>            : #include &lt;utility&gt;
+<span class="lineNum">      37 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : #include &quot;proj.h&quot;
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : #include &quot;proj_json_streaming_writer.hpp&quot;
+<span class="lineNum">      42 </span>            : #include &quot;util.hpp&quot;
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            : NS_PROJ_START
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : namespace common {
+<span class="lineNum">      47 </span>            : class UnitOfMeasure;
+<span class="lineNum">      48 </span>            : using UnitOfMeasurePtr = std::shared_ptr&lt;UnitOfMeasure&gt;;
+<span class="lineNum">      49 </span>            : using UnitOfMeasureNNPtr = util::nn&lt;UnitOfMeasurePtr&gt;;
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : class IdentifiedObject;
+<span class="lineNum">      52 </span>            : using IdentifiedObjectPtr = std::shared_ptr&lt;IdentifiedObject&gt;;
+<span class="lineNum">      53 </span>            : using IdentifiedObjectNNPtr = util::nn&lt;IdentifiedObjectPtr&gt;;
+<span class="lineNum">      54 </span>            : } // namespace common
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            : namespace cs {
+<span class="lineNum">      57 </span>            : class CoordinateSystem;
+<span class="lineNum">      58 </span>            : using CoordinateSystemPtr = std::shared_ptr&lt;CoordinateSystem&gt;;
+<span class="lineNum">      59 </span>            : using CoordinateSystemNNPtr = util::nn&lt;CoordinateSystemPtr&gt;;
+<span class="lineNum">      60 </span>            : } // namespace cs
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : namespace metadata {
+<span class="lineNum">      63 </span>            : class Extent;
+<span class="lineNum">      64 </span>            : using ExtentPtr = std::shared_ptr&lt;Extent&gt;;
+<span class="lineNum">      65 </span>            : using ExtentNNPtr = util::nn&lt;ExtentPtr&gt;;
+<span class="lineNum">      66 </span>            : } // namespace metadata
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            : namespace datum {
+<span class="lineNum">      69 </span>            : class Datum;
+<span class="lineNum">      70 </span>            : using DatumPtr = std::shared_ptr&lt;Datum&gt;;
+<span class="lineNum">      71 </span>            : using DatumNNPtr = util::nn&lt;DatumPtr&gt;;
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            : class Ellipsoid;
+<span class="lineNum">      74 </span>            : using EllipsoidPtr = std::shared_ptr&lt;Ellipsoid&gt;;
+<span class="lineNum">      75 </span>            : using EllipsoidNNPtr = util::nn&lt;EllipsoidPtr&gt;;
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            : class PrimeMeridian;
+<span class="lineNum">      78 </span>            : using PrimeMeridianPtr = std::shared_ptr&lt;PrimeMeridian&gt;;
+<span class="lineNum">      79 </span>            : using PrimeMeridianNNPtr = util::nn&lt;PrimeMeridianPtr&gt;;
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            : class GeodeticReferenceFrame;
+<span class="lineNum">      82 </span>            : using GeodeticReferenceFramePtr = std::shared_ptr&lt;GeodeticReferenceFrame&gt;;
+<span class="lineNum">      83 </span>            : using GeodeticReferenceFrameNNPtr = util::nn&lt;GeodeticReferenceFramePtr&gt;;
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            : class VerticalReferenceFrame;
+<span class="lineNum">      86 </span>            : using VerticalReferenceFramePtr = std::shared_ptr&lt;VerticalReferenceFrame&gt;;
+<span class="lineNum">      87 </span>            : using VerticalReferenceFrameNNPtr = util::nn&lt;VerticalReferenceFramePtr&gt;;
+<span class="lineNum">      88 </span>            : } // namespace datum
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            : namespace crs {
+<span class="lineNum">      91 </span>            : class CRS;
+<span class="lineNum">      92 </span>            : using CRSPtr = std::shared_ptr&lt;CRS&gt;;
+<span class="lineNum">      93 </span>            : using CRSNNPtr = util::nn&lt;CRSPtr&gt;;
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            : class GeodeticCRS;
+<span class="lineNum">      96 </span>            : using GeodeticCRSPtr = std::shared_ptr&lt;GeodeticCRS&gt;;
+<span class="lineNum">      97 </span>            : using GeodeticCRSNNPtr = util::nn&lt;GeodeticCRSPtr&gt;;
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            : class GeographicCRS;
+<span class="lineNum">     100 </span>            : using GeographicCRSPtr = std::shared_ptr&lt;GeographicCRS&gt;;
+<span class="lineNum">     101 </span>            : using GeographicCRSNNPtr = util::nn&lt;GeographicCRSPtr&gt;;
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            : class VerticalCRS;
+<span class="lineNum">     104 </span>            : using VerticalCRSPtr = std::shared_ptr&lt;VerticalCRS&gt;;
+<span class="lineNum">     105 </span>            : using VerticalCRSNNPtr = util::nn&lt;VerticalCRSPtr&gt;;
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            : class ProjectedCRS;
+<span class="lineNum">     108 </span>            : using ProjectedCRSPtr = std::shared_ptr&lt;ProjectedCRS&gt;;
+<span class="lineNum">     109 </span>            : using ProjectedCRSNNPtr = util::nn&lt;ProjectedCRSPtr&gt;;
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            : class CompoundCRS;
+<span class="lineNum">     112 </span>            : using CompoundCRSPtr = std::shared_ptr&lt;CompoundCRS&gt;;
+<span class="lineNum">     113 </span>            : using CompoundCRSNNPtr = util::nn&lt;CompoundCRSPtr&gt;;
+<span class="lineNum">     114 </span>            : } // namespace crs
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            : namespace operation {
+<span class="lineNum">     117 </span>            : class Conversion;
+<span class="lineNum">     118 </span>            : using ConversionPtr = std::shared_ptr&lt;Conversion&gt;;
+<span class="lineNum">     119 </span>            : using ConversionNNPtr = util::nn&lt;ConversionPtr&gt;;
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            : class CoordinateOperation;
+<span class="lineNum">     122 </span>            : using CoordinateOperationPtr = std::shared_ptr&lt;CoordinateOperation&gt;;
+<span class="lineNum">     123 </span>            : using CoordinateOperationNNPtr = util::nn&lt;CoordinateOperationPtr&gt;;
+<span class="lineNum">     124 </span>            : } // namespace operation
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            : /** osgeo.proj.io namespace.
+<span class="lineNum">     127 </span>            :  *
+<span class="lineNum">     128 </span>            :  * \brief I/O classes
+<span class="lineNum">     129 </span>            :  */
+<span class="lineNum">     130 </span>            : namespace io {
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            : class DatabaseContext;
+<span class="lineNum">     133 </span>            : /** Shared pointer of DatabaseContext. */
+<span class="lineNum">     134 </span>            : using DatabaseContextPtr = std::shared_ptr&lt;DatabaseContext&gt;;
+<span class="lineNum">     135 </span>            : /** Non-null shared pointer of DatabaseContext. */
+<span class="lineNum">     136 </span>            : using DatabaseContextNNPtr = util::nn&lt;DatabaseContextPtr&gt;;
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span>            : class WKTNode;
+<span class="lineNum">     141 </span>            : /** Unique pointer of WKTNode. */
+<span class="lineNum">     142 </span>            : using WKTNodePtr = std::unique_ptr&lt;WKTNode&gt;;
+<span class="lineNum">     143 </span>            : /** Non-null unique pointer of WKTNode. */
+<span class="lineNum">     144 </span>            : using WKTNodeNNPtr = util::nn&lt;WKTNodePtr&gt;;
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            : class WKTFormatter;
+<span class="lineNum">     149 </span>            : /** WKTFormatter unique pointer. */
+<span class="lineNum">     150 </span>            : using WKTFormatterPtr = std::unique_ptr&lt;WKTFormatter&gt;;
+<span class="lineNum">     151 </span>            : /** Non-null WKTFormatter unique pointer. */
+<span class="lineNum">     152 </span>            : using WKTFormatterNNPtr = util::nn&lt;WKTFormatterPtr&gt;;
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            : /** \brief Formatter to WKT strings.
+<span class="lineNum">     155 </span>            :  *
+<span class="lineNum">     156 </span>            :  * An instance of this class can only be used by a single
+<a name="157"><span class="lineNum">     157 </span>            :  * thread at a time.</a>
+<span class="lineNum">     158 </span>            :  */
+<span class="lineNum">     159 </span><span class="lineCov">        529 : class PROJ_GCC_DLL WKTFormatter {</span>
+<span class="lineNum">     160 </span>            :   public:
+<span class="lineNum">     161 </span>            :     /** WKT variant. */
+<span class="lineNum">     162 </span>            :     enum class PROJ_MSVC_DLL Convention {
+<span class="lineNum">     163 </span>            :         /** Full WKT2 string, conforming to ISO 19162:2015(E) / OGC 12-063r5
+<span class="lineNum">     164 </span>            :          * (\ref WKT2_2015) with all possible nodes and new keyword names.
+<span class="lineNum">     165 </span>            :          */
+<span class="lineNum">     166 </span>            :         WKT2,
+<span class="lineNum">     167 </span>            :         WKT2_2015 = WKT2,
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :         /** Same as WKT2 with the following exceptions:
+<span class="lineNum">     170 </span>            :          * &lt;ul&gt;
+<span class="lineNum">     171 </span>            :          *      &lt;li&gt;UNIT keyword used.&lt;/li&gt;
+<span class="lineNum">     172 </span>            :          *      &lt;li&gt;ID node only on top element.&lt;/li&gt;
+<span class="lineNum">     173 </span>            :          *      &lt;li&gt;No ORDER element in AXIS element.&lt;/li&gt;
+<span class="lineNum">     174 </span>            :          *      &lt;li&gt;PRIMEM node omitted if it is Greenwich.&lt;/li&gt;
+<span class="lineNum">     175 </span>            :          *      &lt;li&gt;ELLIPSOID.UNIT node omitted if it is
+<span class="lineNum">     176 </span>            :          * UnitOfMeasure::METRE.&lt;/li&gt;
+<span class="lineNum">     177 </span>            :          *      &lt;li&gt;PARAMETER.UNIT / PRIMEM.UNIT omitted if same as AXIS.&lt;/li&gt;
+<span class="lineNum">     178 </span>            :          *      &lt;li&gt;AXIS.UNIT omitted and replaced by a common GEODCRS.UNIT if
+<span class="lineNum">     179 </span>            :          * they are all the same on all axis.&lt;/li&gt;
+<span class="lineNum">     180 </span>            :          * &lt;/ul&gt;
+<span class="lineNum">     181 </span>            :          */
+<span class="lineNum">     182 </span>            :         WKT2_SIMPLIFIED,
+<span class="lineNum">     183 </span>            :         WKT2_2015_SIMPLIFIED = WKT2_SIMPLIFIED,
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span>            :         /** Full WKT2 string, conforming to ISO 19162:2019 / OGC 18-010, with
+<span class="lineNum">     186 </span>            :          * (\ref WKT2_2019) all possible nodes and new keyword names.
+<span class="lineNum">     187 </span>            :          * Non-normative list of differences:
+<span class="lineNum">     188 </span>            :          * &lt;ul&gt;
+<span class="lineNum">     189 </span>            :          *      &lt;li&gt;WKT2_2019 uses GEOGCRS / BASEGEOGCRS keywords for
+<span class="lineNum">     190 </span>            :          * GeographicCRS.&lt;/li&gt;
+<span class="lineNum">     191 </span>            :          * &lt;/ul&gt;
+<span class="lineNum">     192 </span>            :          */
+<span class="lineNum">     193 </span>            :         WKT2_2019,
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span>            :         /** Deprecated alias for WKT2_2019 */
+<span class="lineNum">     196 </span>            :         WKT2_2018 = WKT2_2019,
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            :         /** WKT2_2019 with the simplification rule of WKT2_SIMPLIFIED */
+<span class="lineNum">     199 </span>            :         WKT2_2019_SIMPLIFIED,
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            :         /** Deprecated alias for WKT2_2019_SIMPLIFIED */
+<span class="lineNum">     202 </span>            :         WKT2_2018_SIMPLIFIED = WKT2_2019_SIMPLIFIED,
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :         /** WKT1 as traditionally output by GDAL, deriving from OGC 01-009.
+<span class="lineNum">     205 </span>            :             A notable departure from WKT1_GDAL with respect to OGC 01-009 is
+<span class="lineNum">     206 </span>            :             that in WKT1_GDAL, the unit of the PRIMEM value is always degrees.
+<span class="lineNum">     207 </span>            :            */
+<span class="lineNum">     208 </span>            :         WKT1_GDAL,
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            :         /** WKT1 as traditionally output by ESRI software,
+<span class="lineNum">     211 </span>            :          * deriving from OGC 99-049. */
+<span class="lineNum">     212 </span>            :         WKT1_ESRI,
+<span class="lineNum">     213 </span>            :     };
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            :     PROJ_DLL static WKTFormatterNNPtr
+<span class="lineNum">     216 </span>            :     create(Convention convention = Convention::WKT2,
+<span class="lineNum">     217 </span>            :            DatabaseContextPtr dbContext = nullptr);
+<span class="lineNum">     218 </span>            :     PROJ_DLL static WKTFormatterNNPtr create(const WKTFormatterNNPtr &amp;other);
+<span class="lineNum">     219 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     220 </span>            :     PROJ_DLL ~WKTFormatter();
+<span class="lineNum">     221 </span>            :     //! @endcond
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            :     PROJ_DLL WKTFormatter &amp;setMultiLine(bool multiLine) noexcept;
+<span class="lineNum">     224 </span>            :     PROJ_DLL WKTFormatter &amp;setIndentationWidth(int width) noexcept;
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            :     /** Rule for output AXIS nodes */
+<span class="lineNum">     227 </span>            :     enum class OutputAxisRule {
+<span class="lineNum">     228 </span>            :         /** Always include AXIS nodes */
+<span class="lineNum">     229 </span>            :         YES,
+<span class="lineNum">     230 </span>            :         /** Never include AXIS nodes */
+<span class="lineNum">     231 </span>            :         NO,
+<span class="lineNum">     232 </span>            :         /** Includes them only on PROJCS node if it uses Easting/Northing
+<span class="lineNum">     233 </span>            :          *ordering. Typically used for WKT1_GDAL */
+<span class="lineNum">     234 </span>            :         WKT1_GDAL_EPSG_STYLE,
+<span class="lineNum">     235 </span>            :     };
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            :     PROJ_DLL WKTFormatter &amp;setOutputAxis(OutputAxisRule outputAxis) noexcept;
+<span class="lineNum">     238 </span>            :     PROJ_DLL WKTFormatter &amp;setStrict(bool strict) noexcept;
+<span class="lineNum">     239 </span>            :     PROJ_DLL bool isStrict() const noexcept;
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            :     PROJ_DLL const std::string &amp;toString() const;
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     244 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     245 </span>            :         PROJ_DLL WKTFormatter &amp;
+<span class="lineNum">     246 </span>            :         setOutputId(bool outputIdIn);
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span>            :     PROJ_INTERNAL void enter();
+<span class="lineNum">     249 </span>            :     PROJ_INTERNAL void leave();
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span>            :     PROJ_INTERNAL void startNode(const std::string &amp;keyword, bool hasId);
+<span class="lineNum">     252 </span>            :     PROJ_INTERNAL void endNode();
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span>            :     PROJ_DLL WKTFormatter &amp;simulCurNodeHasId();
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            :     PROJ_INTERNAL void addQuotedString(const char *str);
+<span class="lineNum">     257 </span>            :     PROJ_INTERNAL void addQuotedString(const std::string &amp;str);
+<span class="lineNum">     258 </span>            :     PROJ_INTERNAL void add(const std::string &amp;str);
+<span class="lineNum">     259 </span>            :     PROJ_INTERNAL void add(int number);
+<span class="lineNum">     260 </span>            :     PROJ_INTERNAL void add(size_t number) = delete;
+<span class="lineNum">     261 </span>            :     PROJ_INTERNAL void add(double number, int precision = 15);
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span>            :     PROJ_INTERNAL void pushOutputUnit(bool outputUnitIn);
+<span class="lineNum">     264 </span>            :     PROJ_INTERNAL void popOutputUnit();
+<span class="lineNum">     265 </span>            :     PROJ_INTERNAL bool outputUnit() const;
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span>            :     PROJ_INTERNAL void pushOutputId(bool outputIdIn);
+<span class="lineNum">     268 </span>            :     PROJ_INTERNAL void popOutputId();
+<span class="lineNum">     269 </span>            :     PROJ_INTERNAL bool outputId() const;
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            :     PROJ_INTERNAL void pushHasId(bool hasId);
+<span class="lineNum">     272 </span>            :     PROJ_INTERNAL void popHasId();
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            :     PROJ_INTERNAL void pushDisableUsage();
+<span class="lineNum">     275 </span>            :     PROJ_INTERNAL void popDisableUsage();
+<span class="lineNum">     276 </span>            :     PROJ_INTERNAL bool outputUsage() const;
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span>            :     PROJ_INTERNAL void
+<span class="lineNum">     279 </span>            :     pushAxisLinearUnit(const common::UnitOfMeasureNNPtr &amp;unit);
+<span class="lineNum">     280 </span>            :     PROJ_INTERNAL void popAxisLinearUnit();
+<span class="lineNum">     281 </span>            :     PROJ_INTERNAL const common::UnitOfMeasureNNPtr &amp;axisLinearUnit() const;
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span>            :     PROJ_INTERNAL void
+<span class="lineNum">     284 </span>            :     pushAxisAngularUnit(const common::UnitOfMeasureNNPtr &amp;unit);
+<span class="lineNum">     285 </span>            :     PROJ_INTERNAL void popAxisAngularUnit();
+<span class="lineNum">     286 </span>            :     PROJ_INTERNAL const common::UnitOfMeasureNNPtr &amp;axisAngularUnit() const;
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span>            :     PROJ_INTERNAL void setAbridgedTransformation(bool abriged);
+<span class="lineNum">     289 </span>            :     PROJ_INTERNAL bool abridgedTransformation() const;
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span>            :     PROJ_INTERNAL void setUseDerivingConversion(bool useDerivingConversionIn);
+<span class="lineNum">     292 </span>            :     PROJ_INTERNAL bool useDerivingConversion() const;
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            :     PROJ_INTERNAL void setTOWGS84Parameters(const std::vector&lt;double&gt; &amp;params);
+<span class="lineNum">     295 </span>            :     PROJ_INTERNAL const std::vector&lt;double&gt; &amp;getTOWGS84Parameters() const;
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            :     PROJ_INTERNAL void setVDatumExtension(const std::string &amp;filename);
+<span class="lineNum">     298 </span>            :     PROJ_INTERNAL const std::string &amp;getVDatumExtension() const;
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :     PROJ_INTERNAL void setHDatumExtension(const std::string &amp;filename);
+<span class="lineNum">     301 </span>            :     PROJ_INTERNAL const std::string &amp;getHDatumExtension() const;
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span>            :     PROJ_INTERNAL static std::string morphNameToESRI(const std::string &amp;name);
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            : #ifdef unused
+<span class="lineNum">     306 </span>            :     PROJ_INTERNAL void startInversion();
+<span class="lineNum">     307 </span>            :     PROJ_INTERNAL void stopInversion();
+<span class="lineNum">     308 </span>            :     PROJ_INTERNAL bool isInverted() const;
+<span class="lineNum">     309 </span>            : #endif
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            :     PROJ_INTERNAL OutputAxisRule outputAxis() const;
+<span class="lineNum">     312 </span>            :     PROJ_INTERNAL bool outputAxisOrder() const;
+<span class="lineNum">     313 </span>            :     PROJ_INTERNAL bool primeMeridianOmittedIfGreenwich() const;
+<span class="lineNum">     314 </span>            :     PROJ_INTERNAL bool ellipsoidUnitOmittedIfMetre() const;
+<span class="lineNum">     315 </span>            :     PROJ_INTERNAL bool forceUNITKeyword() const;
+<span class="lineNum">     316 </span>            :     PROJ_INTERNAL bool primeMeridianOrParameterUnitOmittedIfSameAsAxis() const;
+<span class="lineNum">     317 </span>            :     PROJ_INTERNAL bool primeMeridianInDegree() const;
+<span class="lineNum">     318 </span>            :     PROJ_INTERNAL bool outputCSUnitOnlyOnceIfSame() const;
+<span class="lineNum">     319 </span>            :     PROJ_INTERNAL bool idOnTopLevelOnly() const;
+<span class="lineNum">     320 </span>            :     PROJ_INTERNAL bool topLevelHasId() const;
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            :     /** WKT version. */
+<span class="lineNum">     323 </span>            :     enum class Version {
+<span class="lineNum">     324 </span>            :         /** WKT1 */
+<span class="lineNum">     325 </span>            :         WKT1,
+<span class="lineNum">     326 </span>            :         /** WKT2 / ISO 19162 */
+<span class="lineNum">     327 </span>            :         WKT2
+<span class="lineNum">     328 </span>            :     };
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span>            :     PROJ_INTERNAL Version version() const;
+<span class="lineNum">     331 </span>            :     PROJ_INTERNAL bool use2019Keywords() const;
+<span class="lineNum">     332 </span>            :     PROJ_INTERNAL bool useESRIDialect() const;
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span>            :     PROJ_INTERNAL const DatabaseContextPtr &amp;databaseContext() const;
+<span class="lineNum">     335 </span>            : 
+<span class="lineNum">     336 </span>            :     PROJ_INTERNAL void ingestWKTNode(const WKTNodeNNPtr &amp;node);
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            :     //! @endcond
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span>            :   protected:
+<span class="lineNum">     341 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     342 </span>            :     PROJ_INTERNAL explicit WKTFormatter(Convention convention);
+<a name="343"><span class="lineNum">     343 </span>            :     WKTFormatter(const WKTFormatter &amp;other) = delete;</a>
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span><span class="lineCov">       1058 :     INLINED_MAKE_UNIQUE</span>
+<span class="lineNum">     346 </span>            :     //! @endcond
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            :   private:
+<span class="lineNum">     349 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     350 </span>            : };
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span>            : class PROJStringFormatter;
+<span class="lineNum">     355 </span>            : /** PROJStringFormatter unique pointer. */
+<span class="lineNum">     356 </span>            : using PROJStringFormatterPtr = std::unique_ptr&lt;PROJStringFormatter&gt;;
+<span class="lineNum">     357 </span>            : /** Non-null PROJStringFormatter unique pointer. */
+<span class="lineNum">     358 </span>            : using PROJStringFormatterNNPtr = util::nn&lt;PROJStringFormatterPtr&gt;;
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span>            : /** \brief Formatter to PROJ strings.
+<span class="lineNum">     361 </span>            :  *
+<span class="lineNum">     362 </span>            :  * An instance of this class can only be used by a single
+<a name="363"><span class="lineNum">     363 </span>            :  * thread at a time.</a>
+<span class="lineNum">     364 </span>            :  */
+<span class="lineNum">     365 </span><span class="lineCov">      34623 : class PROJ_GCC_DLL PROJStringFormatter {</span>
+<span class="lineNum">     366 </span>            :   public:
+<span class="lineNum">     367 </span>            :     /** PROJ variant. */
+<span class="lineNum">     368 </span>            :     enum class PROJ_MSVC_DLL Convention {
+<span class="lineNum">     369 </span>            :         /** PROJ v5 (or later versions) string. */
+<span class="lineNum">     370 </span>            :         PROJ_5,
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span>            :         /** PROJ v4 string as output by GDAL exportToProj4() */
+<span class="lineNum">     373 </span>            :         PROJ_4
+<span class="lineNum">     374 </span>            :     };
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            :     PROJ_DLL static PROJStringFormatterNNPtr
+<span class="lineNum">     377 </span>            :     create(Convention conventionIn = Convention::PROJ_5,
+<span class="lineNum">     378 </span>            :            DatabaseContextPtr dbContext = nullptr);
+<span class="lineNum">     379 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     380 </span>            :     PROJ_DLL ~PROJStringFormatter();
+<span class="lineNum">     381 </span>            :     //! @endcond
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            :     PROJ_DLL void setUseApproxTMerc(bool flag);
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span>            :     PROJ_DLL const std::string &amp;toString() const;
+<span class="lineNum">     386 </span>            : 
+<span class="lineNum">     387 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     388 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span>            :         PROJ_DLL void
+<span class="lineNum">     391 </span>            :         setCRSExport(bool b);
+<span class="lineNum">     392 </span>            :     PROJ_INTERNAL bool getCRSExport() const;
+<span class="lineNum">     393 </span>            :     PROJ_DLL void startInversion();
+<span class="lineNum">     394 </span>            :     PROJ_DLL void stopInversion();
+<span class="lineNum">     395 </span>            :     PROJ_INTERNAL bool isInverted() const;
+<span class="lineNum">     396 </span>            :     PROJ_INTERNAL bool getUseApproxTMerc() const;
+<span class="lineNum">     397 </span>            :     PROJ_INTERNAL void setCoordinateOperationOptimizations(bool enable);
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span>            :     PROJ_DLL void
+<span class="lineNum">     400 </span>            :     ingestPROJString(const std::string &amp;str); // throw ParsingException
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span>            :     PROJ_DLL void addStep(const char *step);
+<span class="lineNum">     403 </span>            :     PROJ_DLL void addStep(const std::string &amp;step);
+<span class="lineNum">     404 </span>            :     PROJ_DLL void setCurrentStepInverted(bool inverted);
+<span class="lineNum">     405 </span>            :     PROJ_DLL void addParam(const std::string &amp;paramName);
+<span class="lineNum">     406 </span>            :     PROJ_DLL void addParam(const char *paramName, double val);
+<span class="lineNum">     407 </span>            :     PROJ_DLL void addParam(const std::string &amp;paramName, double val);
+<span class="lineNum">     408 </span>            :     PROJ_DLL void addParam(const char *paramName, int val);
+<span class="lineNum">     409 </span>            :     PROJ_DLL void addParam(const std::string &amp;paramName, int val);
+<span class="lineNum">     410 </span>            :     PROJ_DLL void addParam(const char *paramName, const char *val);
+<span class="lineNum">     411 </span>            :     PROJ_DLL void addParam(const char *paramName, const std::string &amp;val);
+<span class="lineNum">     412 </span>            :     PROJ_DLL void addParam(const std::string &amp;paramName, const char *val);
+<span class="lineNum">     413 </span>            :     PROJ_DLL void addParam(const std::string &amp;paramName,
+<span class="lineNum">     414 </span>            :                            const std::string &amp;val);
+<span class="lineNum">     415 </span>            :     PROJ_DLL void addParam(const char *paramName,
+<span class="lineNum">     416 </span>            :                            const std::vector&lt;double&gt; &amp;vals);
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span>            :     PROJ_INTERNAL bool hasParam(const char *paramName) const;
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span>            :     PROJ_INTERNAL void addNoDefs(bool b);
+<span class="lineNum">     421 </span>            :     PROJ_INTERNAL bool getAddNoDefs() const;
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span>            :     PROJ_INTERNAL std::set&lt;std::string&gt; getUsedGridNames() const;
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span>            :     PROJ_INTERNAL void setTOWGS84Parameters(const std::vector&lt;double&gt; &amp;params);
+<span class="lineNum">     426 </span>            :     PROJ_INTERNAL const std::vector&lt;double&gt; &amp;getTOWGS84Parameters() const;
+<span class="lineNum">     427 </span>            : 
+<span class="lineNum">     428 </span>            :     PROJ_INTERNAL void setVDatumExtension(const std::string &amp;filename);
+<span class="lineNum">     429 </span>            :     PROJ_INTERNAL const std::string &amp;getVDatumExtension() const;
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span>            :     PROJ_INTERNAL void setHDatumExtension(const std::string &amp;filename);
+<span class="lineNum">     432 </span>            :     PROJ_INTERNAL const std::string &amp;getHDatumExtension() const;
+<span class="lineNum">     433 </span>            : 
+<span class="lineNum">     434 </span>            :     PROJ_INTERNAL void setOmitProjLongLatIfPossible(bool omit);
+<span class="lineNum">     435 </span>            :     PROJ_INTERNAL bool omitProjLongLatIfPossible() const;
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            :     PROJ_INTERNAL void pushOmitZUnitConversion();
+<span class="lineNum">     438 </span>            :     PROJ_INTERNAL void popOmitZUnitConversion();
+<span class="lineNum">     439 </span>            :     PROJ_INTERNAL bool omitZUnitConversion() const;
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span>            :     PROJ_INTERNAL void setLegacyCRSToCRSContext(bool legacyContext);
+<span class="lineNum">     442 </span>            :     PROJ_INTERNAL bool getLegacyCRSToCRSContext() const;
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span>            :     PROJ_INTERNAL const DatabaseContextPtr &amp;databaseContext() const;
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span>            :     PROJ_INTERNAL Convention convention() const;
+<span class="lineNum">     447 </span>            : 
+<span class="lineNum">     448 </span>            :     //! @endcond
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span>            :   protected:
+<span class="lineNum">     451 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     452 </span>            :     PROJ_INTERNAL explicit PROJStringFormatter(
+<span class="lineNum">     453 </span>            :         Convention conventionIn, const DatabaseContextPtr &amp;dbContext);
+<a name="454"><span class="lineNum">     454 </span>            :     PROJStringFormatter(const PROJStringFormatter &amp;other) = delete;</a>
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span><span class="lineCov">      69246 :     INLINED_MAKE_UNIQUE</span>
+<span class="lineNum">     457 </span>            :     //! @endcond
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span>            :   private:
+<span class="lineNum">     460 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     461 </span>            : };
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     464 </span>            : 
+<span class="lineNum">     465 </span>            : class JSONFormatter;
+<span class="lineNum">     466 </span>            : /** JSONFormatter unique pointer. */
+<span class="lineNum">     467 </span>            : using JSONFormatterPtr = std::unique_ptr&lt;JSONFormatter&gt;;
+<span class="lineNum">     468 </span>            : /** Non-null JSONFormatter unique pointer. */
+<span class="lineNum">     469 </span>            : using JSONFormatterNNPtr = util::nn&lt;JSONFormatterPtr&gt;;
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span>            : /** \brief Formatter to JSON strings.
+<span class="lineNum">     472 </span>            :  *
+<span class="lineNum">     473 </span>            :  * An instance of this class can only be used by a single
+<a name="474"><span class="lineNum">     474 </span>            :  * thread at a time.</a>
+<span class="lineNum">     475 </span>            :  */
+<span class="lineNum">     476 </span><span class="lineCov">         45 : class PROJ_GCC_DLL JSONFormatter {</span>
+<span class="lineNum">     477 </span>            :   public:
+<span class="lineNum">     478 </span>            :     PROJ_DLL static JSONFormatterNNPtr
+<span class="lineNum">     479 </span>            :     create(DatabaseContextPtr dbContext = nullptr);
+<span class="lineNum">     480 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     481 </span>            :     PROJ_DLL ~JSONFormatter();
+<span class="lineNum">     482 </span>            :     //! @endcond
+<span class="lineNum">     483 </span>            : 
+<span class="lineNum">     484 </span>            :     PROJ_DLL JSONFormatter &amp;setMultiLine(bool multiLine) noexcept;
+<span class="lineNum">     485 </span>            :     PROJ_DLL JSONFormatter &amp;setIndentationWidth(int width) noexcept;
+<span class="lineNum">     486 </span>            :     PROJ_DLL JSONFormatter &amp;setSchema(const std::string &amp;schema) noexcept;
+<span class="lineNum">     487 </span>            : 
+<span class="lineNum">     488 </span>            :     PROJ_DLL const std::string &amp;toString() const;
+<span class="lineNum">     489 </span>            : 
+<span class="lineNum">     490 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     491 </span>            : 
+<span class="lineNum">     492 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     493 </span>            :         PROJ_INTERNAL CPLJSonStreamingWriter &amp;
+<span class="lineNum">     494 </span>            :         writer() const;
+<span class="lineNum">     495 </span>            : 
+<span class="lineNum">     496 </span>            :     struct ObjectContext {
+<span class="lineNum">     497 </span>            :         JSONFormatter &amp;m_formatter;
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span>            :         ObjectContext(const ObjectContext &amp;) = delete;
+<span class="lineNum">     500 </span>            :         ObjectContext(ObjectContext &amp;&amp;) = default;
+<span class="lineNum">     501 </span>            : 
+<span class="lineNum">     502 </span>            :         explicit ObjectContext(JSONFormatter &amp;formatter, const char *objectType,
+<span class="lineNum">     503 </span>            :                                bool hasId);
+<span class="lineNum">     504 </span>            :         ~ObjectContext();
+<span class="lineNum">     505 </span>            :     };
+<span class="lineNum">     506 </span>            :     PROJ_INTERNAL inline ObjectContext MakeObjectContext(const char *objectType,
+<span class="lineNum">     507 </span>            :                                                          bool hasId) {
+<span class="lineNum">     508 </span><span class="lineCov">        405 :         return ObjectContext(*this, objectType, hasId);</span>
+<span class="lineNum">     509 </span>            :     }
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span>            :     PROJ_INTERNAL void setAllowIDInImmediateChild();
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span>            :     PROJ_INTERNAL void setOmitTypeInImmediateChild();
+<span class="lineNum">     514 </span>            : 
+<span class="lineNum">     515 </span>            :     PROJ_INTERNAL void setAbridgedTransformation(bool abriged);
+<span class="lineNum">     516 </span>            :     PROJ_INTERNAL bool abridgedTransformation() const;
+<span class="lineNum">     517 </span>            : 
+<span class="lineNum">     518 </span>            :     // cppcheck-suppress functionStatic
+<span class="lineNum">     519 </span>            :     PROJ_INTERNAL bool outputId() const;
+<span class="lineNum">     520 </span>            : 
+<span class="lineNum">     521 </span>            :     PROJ_INTERNAL bool outputUsage() const;
+<span class="lineNum">     522 </span>            : 
+<span class="lineNum">     523 </span>            :     //! @endcond
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span>            :   protected:
+<span class="lineNum">     526 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     527 </span>            :     PROJ_INTERNAL explicit JSONFormatter();
+<a name="528"><span class="lineNum">     528 </span>            :     JSONFormatter(const JSONFormatter &amp;other) = delete;</a>
+<span class="lineNum">     529 </span>            : 
+<span class="lineNum">     530 </span><span class="lineCov">         90 :     INLINED_MAKE_UNIQUE</span>
+<span class="lineNum">     531 </span>            :     //! @endcond
+<span class="lineNum">     532 </span>            : 
+<span class="lineNum">     533 </span>            :   private:
+<span class="lineNum">     534 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     535 </span>            : };
+<span class="lineNum">     536 </span>            : 
+<span class="lineNum">     537 </span>            : // ---------------------------------------------------------------------------
+<a name="538"><span class="lineNum">     538 </span>            : </a>
+<span class="lineNum">     539 </span>            : /** \brief Interface for an object that can be exported to JSON. */
+<span class="lineNum">     540 </span><span class="lineCov">     728768 : class PROJ_GCC_DLL IJSONExportable {</span>
+<span class="lineNum">     541 </span>            :   public:
+<span class="lineNum">     542 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     543 </span>            :     PROJ_DLL virtual ~IJSONExportable();
+<span class="lineNum">     544 </span>            :     //! @endcond
+<span class="lineNum">     545 </span>            : 
+<span class="lineNum">     546 </span>            :     /** Builds a JSON representation. May throw a FormattingException */
+<span class="lineNum">     547 </span>            :     PROJ_DLL std::string
+<span class="lineNum">     548 </span>            :     exportToJSON(JSONFormatter *formatter) const; // throw(FormattingException)
+<span class="lineNum">     549 </span>            : 
+<span class="lineNum">     550 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     551 </span>            : 
+<span class="lineNum">     552 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     553 </span>            :         PROJ_INTERNAL virtual void
+<span class="lineNum">     554 </span>            :         _exportToJSON(
+<span class="lineNum">     555 </span>            :             JSONFormatter *formatter) const = 0; // throw(FormattingException)
+<span class="lineNum">     556 </span>            :     //! @endcond
+<span class="lineNum">     557 </span>            : };
+<span class="lineNum">     558 </span>            : 
+<span class="lineNum">     559 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     560 </span>            : 
+<a name="561"><span class="lineNum">     561 </span>            : /** \brief Exception possibly thrown by IWKTExportable::exportToWKT() or</a>
+<span class="lineNum">     562 </span>            :  * IPROJStringExportable::exportToPROJString(). */
+<span class="lineNum">     563 </span><span class="lineCov">        485 : class PROJ_GCC_DLL FormattingException : public util::Exception {</span>
+<span class="lineNum">     564 </span>            :   public:
+<span class="lineNum">     565 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     566 </span>            :     PROJ_INTERNAL explicit FormattingException(const char *message);
+<span class="lineNum">     567 </span>            :     PROJ_INTERNAL explicit FormattingException(const std::string &amp;message);
+<span class="lineNum">     568 </span>            :     PROJ_DLL FormattingException(const FormattingException &amp;other);
+<span class="lineNum">     569 </span>            :     PROJ_DLL virtual ~FormattingException() override;
+<span class="lineNum">     570 </span>            : 
+<span class="lineNum">     571 </span>            :     PROJ_INTERNAL static void Throw(const char *msg) PROJ_NO_RETURN;
+<span class="lineNum">     572 </span>            :     PROJ_INTERNAL static void Throw(const std::string &amp;msg) PROJ_NO_RETURN;
+<span class="lineNum">     573 </span>            :     //! @endcond
+<span class="lineNum">     574 </span>            : };
+<span class="lineNum">     575 </span>            : 
+<span class="lineNum">     576 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     577 </span>            : 
+<a name="578"><span class="lineNum">     578 </span>            : /** \brief Exception possibly thrown by WKTNode::createFrom() or</a>
+<span class="lineNum">     579 </span>            :  * WKTParser::createFromWKT(). */
+<span class="lineNum">     580 </span><span class="lineCov">        317 : class PROJ_GCC_DLL ParsingException : public util::Exception {</span>
+<span class="lineNum">     581 </span>            :   public:
+<span class="lineNum">     582 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     583 </span>            :     PROJ_INTERNAL explicit ParsingException(const char *message);
+<span class="lineNum">     584 </span>            :     PROJ_INTERNAL explicit ParsingException(const std::string &amp;message);
+<span class="lineNum">     585 </span>            :     PROJ_DLL ParsingException(const ParsingException &amp;other);
+<span class="lineNum">     586 </span>            :     PROJ_DLL virtual ~ParsingException() override;
+<span class="lineNum">     587 </span>            :     //! @endcond
+<span class="lineNum">     588 </span>            : };
+<span class="lineNum">     589 </span>            : 
+<span class="lineNum">     590 </span>            : // ---------------------------------------------------------------------------
+<a name="591"><span class="lineNum">     591 </span>            : </a>
+<span class="lineNum">     592 </span>            : /** \brief Interface for an object that can be exported to WKT. */
+<span class="lineNum">     593 </span><span class="lineCov">     849911 : class PROJ_GCC_DLL IWKTExportable {</span>
+<span class="lineNum">     594 </span>            :   public:
+<span class="lineNum">     595 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     596 </span>            :     PROJ_DLL virtual ~IWKTExportable();
+<span class="lineNum">     597 </span>            :     //! @endcond
+<span class="lineNum">     598 </span>            : 
+<span class="lineNum">     599 </span>            :     /** Builds a WKT representation. May throw a FormattingException */
+<span class="lineNum">     600 </span>            :     PROJ_DLL std::string
+<span class="lineNum">     601 </span>            :     exportToWKT(WKTFormatter *formatter) const; // throw(FormattingException)
+<span class="lineNum">     602 </span>            : 
+<span class="lineNum">     603 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     604 </span>            : 
+<span class="lineNum">     605 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     606 </span>            :         PROJ_INTERNAL virtual void
+<span class="lineNum">     607 </span>            :         _exportToWKT(
+<span class="lineNum">     608 </span>            :             WKTFormatter *formatter) const = 0; // throw(FormattingException)
+<span class="lineNum">     609 </span>            :     //! @endcond
+<span class="lineNum">     610 </span>            : };
+<span class="lineNum">     611 </span>            : 
+<span class="lineNum">     612 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     613 </span>            : 
+<span class="lineNum">     614 </span>            : class IPROJStringExportable;
+<span class="lineNum">     615 </span>            : /** Shared pointer of IPROJStringExportable. */
+<span class="lineNum">     616 </span>            : using IPROJStringExportablePtr = std::shared_ptr&lt;IPROJStringExportable&gt;;
+<span class="lineNum">     617 </span>            : /** Non-null shared pointer of IPROJStringExportable. */
+<span class="lineNum">     618 </span>            : using IPROJStringExportableNNPtr = util::nn&lt;IPROJStringExportablePtr&gt;;
+<a name="619"><span class="lineNum">     619 </span>            : </a>
+<span class="lineNum">     620 </span>            : /** \brief Interface for an object that can be exported to a PROJ string. */
+<span class="lineNum">     621 </span><span class="lineCov">     109737 : class PROJ_GCC_DLL IPROJStringExportable {</span>
+<span class="lineNum">     622 </span>            :   public:
+<span class="lineNum">     623 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     624 </span>            :     PROJ_DLL virtual ~IPROJStringExportable();
+<span class="lineNum">     625 </span>            :     //! @endcond
+<span class="lineNum">     626 </span>            : 
+<span class="lineNum">     627 </span>            :     /** \brief Builds a PROJ string representation.
+<span class="lineNum">     628 </span>            :      *
+<span class="lineNum">     629 </span>            :      * &lt;ul&gt;
+<span class="lineNum">     630 </span>            :      * &lt;li&gt;For PROJStringFormatter::Convention::PROJ_5 (the default),
+<span class="lineNum">     631 </span>            :      * &lt;ul&gt;
+<span class="lineNum">     632 </span>            :      * &lt;li&gt;For a crs::CRS, returns the same as
+<span class="lineNum">     633 </span>            :      * PROJStringFormatter::Convention::PROJ_4. It should be noted that the
+<span class="lineNum">     634 </span>            :      * export of a CRS as a PROJ string may cause loss of many important aspects
+<span class="lineNum">     635 </span>            :      * of a CRS definition. Consequently it is discouraged to use it for
+<span class="lineNum">     636 </span>            :      * interoperability in newer projects. The choice of a WKT representation
+<span class="lineNum">     637 </span>            :      * will be a better option.&lt;/li&gt;
+<span class="lineNum">     638 </span>            :      * &lt;li&gt;For operation::CoordinateOperation, returns a PROJ
+<span class="lineNum">     639 </span>            :      * pipeline.&lt;/li&gt;
+<span class="lineNum">     640 </span>            :      * &lt;/ul&gt;
+<span class="lineNum">     641 </span>            :      *
+<span class="lineNum">     642 </span>            :      * &lt;li&gt;For PROJStringFormatter::Convention::PROJ_4, format a string
+<span class="lineNum">     643 </span>            :      * compatible with the OGRSpatialReference::exportToProj4() of GDAL
+<span class="lineNum">     644 </span>            :      * &amp;lt;=2.3. It is only compatible of a few CRS objects. The PROJ string
+<span class="lineNum">     645 </span>            :      * will also contain a +type=crs parameter to disambiguish the nature of
+<span class="lineNum">     646 </span>            :      * the string from a CoordinateOperation.
+<span class="lineNum">     647 </span>            :      * &lt;ul&gt;
+<span class="lineNum">     648 </span>            :      * &lt;li&gt;For a crs::GeographicCRS, returns a proj=longlat string, with
+<span class="lineNum">     649 </span>            :      * ellipsoid / datum / prime meridian information, ignoring axis order
+<span class="lineNum">     650 </span>            :      * and unit information.&lt;/li&gt;
+<span class="lineNum">     651 </span>            :      * &lt;li&gt;For a geocentric crs::GeodeticCRS, returns the transformation from
+<span class="lineNum">     652 </span>            :      * geographic coordinates into geocentric coordinates.&lt;/li&gt;
+<span class="lineNum">     653 </span>            :      * &lt;li&gt;For a crs::ProjectedCRS, returns the projection method, ignoring
+<span class="lineNum">     654 </span>            :      * axis order.&lt;/li&gt;
+<span class="lineNum">     655 </span>            :      * &lt;li&gt;For a crs::BoundCRS, returns the PROJ string of its source/base CRS,
+<span class="lineNum">     656 </span>            :      * amended with towgs84 / nadgrids parameter when the deriving conversion
+<span class="lineNum">     657 </span>            :      * can be expressed in that way.&lt;/li&gt;
+<span class="lineNum">     658 </span>            :      * &lt;/ul&gt;
+<span class="lineNum">     659 </span>            :      * &lt;/li&gt;
+<span class="lineNum">     660 </span>            :      *
+<span class="lineNum">     661 </span>            :      * &lt;/ul&gt;
+<span class="lineNum">     662 </span>            :      *
+<span class="lineNum">     663 </span>            :      * @param formatter PROJ string formatter.
+<span class="lineNum">     664 </span>            :      * @return a PROJ string.
+<span class="lineNum">     665 </span>            :      * @throw FormattingException */
+<span class="lineNum">     666 </span>            :     PROJ_DLL std::string exportToPROJString(
+<span class="lineNum">     667 </span>            :         PROJStringFormatter *formatter) const; // throw(FormattingException)
+<span class="lineNum">     668 </span>            : 
+<span class="lineNum">     669 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     670 </span>            : 
+<span class="lineNum">     671 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     672 </span>            :         PROJ_INTERNAL virtual void
+<span class="lineNum">     673 </span>            :         _exportToPROJString(PROJStringFormatter *formatter)
+<span class="lineNum">     674 </span>            :             const = 0; // throw(FormattingException)
+<span class="lineNum">     675 </span>            :     //! @endcond
+<span class="lineNum">     676 </span>            : };
+<span class="lineNum">     677 </span>            : 
+<span class="lineNum">     678 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     679 </span>            : 
+<a name="680"><span class="lineNum">     680 </span>            : /** \brief Node in the tree-splitted WKT representation.</a>
+<span class="lineNum">     681 </span>            :  */
+<span class="lineNum">     682 </span><span class="lineCov">      18857 : class PROJ_GCC_DLL WKTNode {</span>
+<span class="lineNum">     683 </span>            :   public:
+<span class="lineNum">     684 </span>            :     PROJ_DLL explicit WKTNode(const std::string &amp;valueIn);
+<span class="lineNum">     685 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     686 </span>            :     PROJ_DLL ~WKTNode();
+<span class="lineNum">     687 </span>            :     //! @endcond
+<span class="lineNum">     688 </span>            : 
+<span class="lineNum">     689 </span>            :     PROJ_DLL const std::string &amp;value() const;
+<span class="lineNum">     690 </span>            :     PROJ_DLL const std::vector&lt;WKTNodeNNPtr&gt; &amp;children() const;
+<span class="lineNum">     691 </span>            : 
+<span class="lineNum">     692 </span>            :     PROJ_DLL void addChild(WKTNodeNNPtr &amp;&amp;child);
+<span class="lineNum">     693 </span>            :     PROJ_DLL const WKTNodePtr &amp;lookForChild(const std::string &amp;childName,
+<span class="lineNum">     694 </span>            :                                             int occurrence = 0) const noexcept;
+<span class="lineNum">     695 </span>            :     PROJ_DLL int countChildrenOfName(const std::string &amp;childName) const
+<span class="lineNum">     696 </span>            :         noexcept;
+<span class="lineNum">     697 </span>            : 
+<span class="lineNum">     698 </span>            :     PROJ_DLL std::string toString() const;
+<span class="lineNum">     699 </span>            : 
+<span class="lineNum">     700 </span>            :     PROJ_DLL static WKTNodeNNPtr createFrom(const std::string &amp;wkt,
+<span class="lineNum">     701 </span>            :                                             size_t indexStart = 0);
+<span class="lineNum">     702 </span>            : 
+<span class="lineNum">     703 </span>            :   protected:
+<span class="lineNum">     704 </span>            :     PROJ_INTERNAL static WKTNodeNNPtr
+<span class="lineNum">     705 </span>            :     createFrom(const std::string &amp;wkt, size_t indexStart, int recLevel,
+<span class="lineNum">     706 </span>            :                size_t &amp;indexEnd); // throw(ParsingException)
+<span class="lineNum">     707 </span>            : 
+<span class="lineNum">     708 </span>            :   private:
+<span class="lineNum">     709 </span>            :     friend class WKTParser;
+<span class="lineNum">     710 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     711 </span>            : };
+<span class="lineNum">     712 </span>            : 
+<span class="lineNum">     713 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     714 </span>            : 
+<span class="lineNum">     715 </span>            : PROJ_DLL util::BaseObjectNNPtr
+<span class="lineNum">     716 </span>            : createFromUserInput(const std::string &amp;text,
+<span class="lineNum">     717 </span>            :                     const DatabaseContextPtr &amp;dbContext,
+<span class="lineNum">     718 </span>            :                     bool usePROJ4InitRules = false);
+<span class="lineNum">     719 </span>            : 
+<span class="lineNum">     720 </span>            : PROJ_DLL util::BaseObjectNNPtr createFromUserInput(const std::string &amp;text,
+<span class="lineNum">     721 </span>            :                                                    PJ_CONTEXT *ctx);
+<span class="lineNum">     722 </span>            : 
+<span class="lineNum">     723 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     724 </span>            : 
+<a name="725"><span class="lineNum">     725 </span>            : /** \brief Parse a WKT string into the appropriate suclass of util::BaseObject.</a>
+<span class="lineNum">     726 </span>            :  */
+<span class="lineNum">     727 </span><span class="lineCov">        498 : class PROJ_GCC_DLL WKTParser {</span>
+<span class="lineNum">     728 </span>            :   public:
+<span class="lineNum">     729 </span>            :     PROJ_DLL WKTParser();
+<span class="lineNum">     730 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     731 </span>            :     PROJ_DLL ~WKTParser();
+<span class="lineNum">     732 </span>            :     //! @endcond
+<span class="lineNum">     733 </span>            : 
+<span class="lineNum">     734 </span>            :     PROJ_DLL WKTParser &amp;
+<span class="lineNum">     735 </span>            :     attachDatabaseContext(const DatabaseContextPtr &amp;dbContext);
+<span class="lineNum">     736 </span>            : 
+<span class="lineNum">     737 </span>            :     PROJ_DLL WKTParser &amp;setStrict(bool strict);
+<span class="lineNum">     738 </span>            :     PROJ_DLL std::list&lt;std::string&gt; warningList() const;
+<span class="lineNum">     739 </span>            : 
+<span class="lineNum">     740 </span>            :     PROJ_DLL util::BaseObjectNNPtr
+<span class="lineNum">     741 </span>            :     createFromWKT(const std::string &amp;wkt); // throw(ParsingException)
+<span class="lineNum">     742 </span>            : 
+<span class="lineNum">     743 </span>            :     /** Guessed WKT &quot;dialect&quot; */
+<span class="lineNum">     744 </span>            :     enum class PROJ_MSVC_DLL WKTGuessedDialect {
+<span class="lineNum">     745 </span>            :         /** \ref WKT2_2019 */
+<span class="lineNum">     746 </span>            :         WKT2_2019,
+<span class="lineNum">     747 </span>            :         /** Deprecated alias for WKT2_2019 */
+<span class="lineNum">     748 </span>            :         WKT2_2018 = WKT2_2019,
+<span class="lineNum">     749 </span>            :         /** \ref WKT2_2015 */
+<span class="lineNum">     750 </span>            :         WKT2_2015,
+<span class="lineNum">     751 </span>            :         /** \ref WKT1 */
+<span class="lineNum">     752 </span>            :         WKT1_GDAL,
+<span class="lineNum">     753 </span>            :         /** ESRI variant of WKT1 */
+<span class="lineNum">     754 </span>            :         WKT1_ESRI,
+<span class="lineNum">     755 </span>            :         /** Not WKT / unrecognized */
+<span class="lineNum">     756 </span>            :         NOT_WKT
+<span class="lineNum">     757 </span>            :     };
+<span class="lineNum">     758 </span>            : 
+<span class="lineNum">     759 </span>            :     // cppcheck-suppress functionStatic
+<span class="lineNum">     760 </span>            :     PROJ_DLL WKTGuessedDialect guessDialect(const std::string &amp;wkt) noexcept;
+<span class="lineNum">     761 </span>            : 
+<span class="lineNum">     762 </span>            :   private:
+<span class="lineNum">     763 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     764 </span>            : };
+<span class="lineNum">     765 </span>            : 
+<span class="lineNum">     766 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     767 </span>            : 
+<a name="768"><span class="lineNum">     768 </span>            : /** \brief Parse a PROJ string into the appropriate suclass of util::BaseObject.</a>
+<span class="lineNum">     769 </span>            :  */
+<span class="lineNum">     770 </span><span class="lineCov">       1182 : class PROJ_GCC_DLL PROJStringParser {</span>
+<span class="lineNum">     771 </span>            :   public:
+<span class="lineNum">     772 </span>            :     PROJ_DLL PROJStringParser();
+<span class="lineNum">     773 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     774 </span>            :     PROJ_DLL ~PROJStringParser();
+<span class="lineNum">     775 </span>            :     //! @endcond
+<span class="lineNum">     776 </span>            : 
+<span class="lineNum">     777 </span>            :     PROJ_DLL PROJStringParser &amp;
+<span class="lineNum">     778 </span>            :     attachDatabaseContext(const DatabaseContextPtr &amp;dbContext);
+<span class="lineNum">     779 </span>            : 
+<span class="lineNum">     780 </span>            :     PROJ_DLL PROJStringParser &amp;setUsePROJ4InitRules(bool enable);
+<span class="lineNum">     781 </span>            : 
+<span class="lineNum">     782 </span>            :     PROJ_DLL std::vector&lt;std::string&gt; warningList() const;
+<span class="lineNum">     783 </span>            : 
+<span class="lineNum">     784 </span>            :     PROJ_DLL util::BaseObjectNNPtr createFromPROJString(
+<span class="lineNum">     785 </span>            :         const std::string &amp;projString); // throw(ParsingException)
+<span class="lineNum">     786 </span>            : 
+<span class="lineNum">     787 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     788 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     789 </span>            :         PROJStringParser &amp;
+<span class="lineNum">     790 </span>            :         attachContext(PJ_CONTEXT *ctx);
+<span class="lineNum">     791 </span>            :     //! @endcond
+<span class="lineNum">     792 </span>            :   private:
+<span class="lineNum">     793 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     794 </span>            : };
+<span class="lineNum">     795 </span>            : 
+<span class="lineNum">     796 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     797 </span>            : 
+<span class="lineNum">     798 </span>            : /** \brief Database context.
+<span class="lineNum">     799 </span>            :  *
+<a name="800"><span class="lineNum">     800 </span>            :  * A database context should be used only by one thread at a time.</a>
+<span class="lineNum">     801 </span>            :  */
+<span class="lineNum">     802 </span><span class="lineCov">        515 : class PROJ_GCC_DLL DatabaseContext {</span>
+<span class="lineNum">     803 </span>            :   public:
+<span class="lineNum">     804 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     805 </span>            :     PROJ_DLL ~DatabaseContext();
+<span class="lineNum">     806 </span>            :     //! @endcond
+<span class="lineNum">     807 </span>            : 
+<span class="lineNum">     808 </span>            :     PROJ_DLL static DatabaseContextNNPtr
+<span class="lineNum">     809 </span>            :     create(const std::string &amp;databasePath = std::string(),
+<span class="lineNum">     810 </span>            :            const std::vector&lt;std::string&gt; &amp;auxiliaryDatabasePaths =
+<span class="lineNum">     811 </span>            :                std::vector&lt;std::string&gt;(),
+<span class="lineNum">     812 </span>            :            PJ_CONTEXT *ctx = nullptr);
+<span class="lineNum">     813 </span>            : 
+<span class="lineNum">     814 </span>            :     PROJ_DLL const std::string &amp;getPath() const;
+<span class="lineNum">     815 </span>            : 
+<span class="lineNum">     816 </span>            :     PROJ_DLL const char *getMetadata(const char *key) const;
+<span class="lineNum">     817 </span>            : 
+<span class="lineNum">     818 </span>            :     PROJ_DLL std::set&lt;std::string&gt; getAuthorities() const;
+<span class="lineNum">     819 </span>            : 
+<span class="lineNum">     820 </span>            :     PROJ_DLL std::vector&lt;std::string&gt; getDatabaseStructure() const;
+<span class="lineNum">     821 </span>            : 
+<span class="lineNum">     822 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     823 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     824 </span>            :         PROJ_DLL void *
+<span class="lineNum">     825 </span>            :         getSqliteHandle() const;
+<span class="lineNum">     826 </span>            : 
+<span class="lineNum">     827 </span>            :     PROJ_DLL static DatabaseContextNNPtr create(void *sqlite_handle);
+<span class="lineNum">     828 </span>            : 
+<span class="lineNum">     829 </span>            :     PROJ_INTERNAL bool lookForGridAlternative(const std::string &amp;officialName,
+<span class="lineNum">     830 </span>            :                                               std::string &amp;projFilename,
+<span class="lineNum">     831 </span>            :                                               std::string &amp;projFormat,
+<span class="lineNum">     832 </span>            :                                               bool &amp;inverse) const;
+<span class="lineNum">     833 </span>            : 
+<span class="lineNum">     834 </span>            :     PROJ_DLL bool lookForGridInfo(const std::string &amp;projFilename,
+<span class="lineNum">     835 </span>            :                                   std::string &amp;fullFilename,
+<span class="lineNum">     836 </span>            :                                   std::string &amp;packageName, std::string &amp;url,
+<span class="lineNum">     837 </span>            :                                   bool &amp;directDownload, bool &amp;openLicense,
+<span class="lineNum">     838 </span>            :                                   bool &amp;gridAvailable) const;
+<span class="lineNum">     839 </span>            : 
+<span class="lineNum">     840 </span>            :     PROJ_INTERNAL std::string
+<span class="lineNum">     841 </span>            :     getAliasFromOfficialName(const std::string &amp;officialName,
+<span class="lineNum">     842 </span>            :                              const std::string &amp;tableName,
+<span class="lineNum">     843 </span>            :                              const std::string &amp;source) const;
+<span class="lineNum">     844 </span>            : 
+<span class="lineNum">     845 </span>            :     PROJ_INTERNAL bool isKnownName(const std::string &amp;name,
+<span class="lineNum">     846 </span>            :                                    const std::string &amp;tableName) const;
+<span class="lineNum">     847 </span>            : 
+<span class="lineNum">     848 </span>            :     PROJ_INTERNAL std::string getTextDefinition(const std::string &amp;tableName,
+<span class="lineNum">     849 </span>            :                                                 const std::string &amp;authName,
+<span class="lineNum">     850 </span>            :                                                 const std::string &amp;code) const;
+<span class="lineNum">     851 </span>            : 
+<span class="lineNum">     852 </span>            :     PROJ_INTERNAL std::vector&lt;std::string&gt;
+<span class="lineNum">     853 </span>            :     getAllowedAuthorities(const std::string &amp;sourceAuthName,
+<span class="lineNum">     854 </span>            :                           const std::string &amp;targetAuthName) const;
+<span class="lineNum">     855 </span>            : 
+<span class="lineNum">     856 </span>            :     PROJ_INTERNAL std::list&lt;std::pair&lt;std::string, std::string&gt;&gt;
+<span class="lineNum">     857 </span>            :     getNonDeprecated(const std::string &amp;tableName, const std::string &amp;authName,
+<span class="lineNum">     858 </span>            :                      const std::string &amp;code) const;
+<span class="lineNum">     859 </span>            : 
+<span class="lineNum">     860 </span>            :     //! @endcond
+<span class="lineNum">     861 </span>            : 
+<a name="862"><span class="lineNum">     862 </span>            :   protected:</a>
+<span class="lineNum">     863 </span>            :     PROJ_INTERNAL DatabaseContext();
+<span class="lineNum">     864 </span><span class="lineCov">       1036 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     865 </span>            :     PROJ_FRIEND(AuthorityFactory);
+<span class="lineNum">     866 </span>            : 
+<span class="lineNum">     867 </span>            :   private:
+<span class="lineNum">     868 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     869 </span>            :     DatabaseContext(const DatabaseContext &amp;) = delete;
+<span class="lineNum">     870 </span>            :     DatabaseContext &amp;operator=(const DatabaseContext &amp;other) = delete;
+<span class="lineNum">     871 </span>            : };
+<span class="lineNum">     872 </span>            : 
+<span class="lineNum">     873 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     874 </span>            : 
+<span class="lineNum">     875 </span>            : class AuthorityFactory;
+<span class="lineNum">     876 </span>            : /** Shared pointer of AuthorityFactory. */
+<span class="lineNum">     877 </span>            : using AuthorityFactoryPtr = std::shared_ptr&lt;AuthorityFactory&gt;;
+<span class="lineNum">     878 </span>            : /** Non-null shared pointer of AuthorityFactory. */
+<span class="lineNum">     879 </span>            : using AuthorityFactoryNNPtr = util::nn&lt;AuthorityFactoryPtr&gt;;
+<span class="lineNum">     880 </span>            : 
+<span class="lineNum">     881 </span>            : /** \brief Builds object from an authority database.
+<span class="lineNum">     882 </span>            :  *
+<span class="lineNum">     883 </span>            :  * A AuthorityFactory should be used only by one thread at a time.
+<span class="lineNum">     884 </span>            :  *
+<span class="lineNum">     885 </span>            :  * \remark Implements [AuthorityFactory]
+<span class="lineNum">     886 </span>            :  * (http://www.geoapi.org/3.0/javadoc/org/opengis/referencing/AuthorityFactory.html)
+<a name="887"><span class="lineNum">     887 </span>            :  * from \ref GeoAPI</a>
+<span class="lineNum">     888 </span>            :  */
+<span class="lineNum">     889 </span><span class="lineCov">       6809 : class PROJ_GCC_DLL AuthorityFactory {</span>
+<span class="lineNum">     890 </span>            :   public:
+<span class="lineNum">     891 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     892 </span>            :     PROJ_DLL ~AuthorityFactory();
+<span class="lineNum">     893 </span>            :     //! @endcond
+<span class="lineNum">     894 </span>            : 
+<span class="lineNum">     895 </span>            :     PROJ_DLL util::BaseObjectNNPtr createObject(const std::string &amp;code) const;
+<span class="lineNum">     896 </span>            : 
+<span class="lineNum">     897 </span>            :     PROJ_DLL common::UnitOfMeasureNNPtr
+<span class="lineNum">     898 </span>            :     createUnitOfMeasure(const std::string &amp;code) const;
+<span class="lineNum">     899 </span>            : 
+<span class="lineNum">     900 </span>            :     PROJ_DLL metadata::ExtentNNPtr createExtent(const std::string &amp;code) const;
+<span class="lineNum">     901 </span>            : 
+<span class="lineNum">     902 </span>            :     PROJ_DLL datum::PrimeMeridianNNPtr
+<span class="lineNum">     903 </span>            :     createPrimeMeridian(const std::string &amp;code) const;
+<span class="lineNum">     904 </span>            : 
+<span class="lineNum">     905 </span>            :     PROJ_DLL std::string identifyBodyFromSemiMajorAxis(double a,
+<span class="lineNum">     906 </span>            :                                                        double tolerance) const;
+<span class="lineNum">     907 </span>            : 
+<span class="lineNum">     908 </span>            :     PROJ_DLL datum::EllipsoidNNPtr
+<span class="lineNum">     909 </span>            :     createEllipsoid(const std::string &amp;code) const;
+<span class="lineNum">     910 </span>            : 
+<span class="lineNum">     911 </span>            :     PROJ_DLL datum::DatumNNPtr createDatum(const std::string &amp;code) const;
+<span class="lineNum">     912 </span>            : 
+<span class="lineNum">     913 </span>            :     PROJ_DLL datum::GeodeticReferenceFrameNNPtr
+<span class="lineNum">     914 </span>            :     createGeodeticDatum(const std::string &amp;code) const;
+<span class="lineNum">     915 </span>            : 
+<span class="lineNum">     916 </span>            :     PROJ_DLL datum::VerticalReferenceFrameNNPtr
+<span class="lineNum">     917 </span>            :     createVerticalDatum(const std::string &amp;code) const;
+<span class="lineNum">     918 </span>            : 
+<span class="lineNum">     919 </span>            :     PROJ_DLL cs::CoordinateSystemNNPtr
+<span class="lineNum">     920 </span>            :     createCoordinateSystem(const std::string &amp;code) const;
+<span class="lineNum">     921 </span>            : 
+<span class="lineNum">     922 </span>            :     PROJ_DLL crs::GeodeticCRSNNPtr
+<span class="lineNum">     923 </span>            :     createGeodeticCRS(const std::string &amp;code) const;
+<span class="lineNum">     924 </span>            : 
+<span class="lineNum">     925 </span>            :     PROJ_DLL crs::GeographicCRSNNPtr
+<span class="lineNum">     926 </span>            :     createGeographicCRS(const std::string &amp;code) const;
+<span class="lineNum">     927 </span>            : 
+<span class="lineNum">     928 </span>            :     PROJ_DLL crs::VerticalCRSNNPtr
+<span class="lineNum">     929 </span>            :     createVerticalCRS(const std::string &amp;code) const;
+<span class="lineNum">     930 </span>            : 
+<span class="lineNum">     931 </span>            :     PROJ_DLL operation::ConversionNNPtr
+<span class="lineNum">     932 </span>            :     createConversion(const std::string &amp;code) const;
+<span class="lineNum">     933 </span>            : 
+<span class="lineNum">     934 </span>            :     PROJ_DLL crs::ProjectedCRSNNPtr
+<span class="lineNum">     935 </span>            :     createProjectedCRS(const std::string &amp;code) const;
+<span class="lineNum">     936 </span>            : 
+<span class="lineNum">     937 </span>            :     PROJ_DLL crs::CompoundCRSNNPtr
+<span class="lineNum">     938 </span>            :     createCompoundCRS(const std::string &amp;code) const;
+<span class="lineNum">     939 </span>            : 
+<span class="lineNum">     940 </span>            :     PROJ_DLL crs::CRSNNPtr
+<span class="lineNum">     941 </span>            :     createCoordinateReferenceSystem(const std::string &amp;code) const;
+<span class="lineNum">     942 </span>            : 
+<span class="lineNum">     943 </span>            :     PROJ_DLL operation::CoordinateOperationNNPtr
+<span class="lineNum">     944 </span>            :     createCoordinateOperation(const std::string &amp;code,
+<span class="lineNum">     945 </span>            :                               bool usePROJAlternativeGridNames) const;
+<span class="lineNum">     946 </span>            : 
+<span class="lineNum">     947 </span>            :     PROJ_DLL std::vector&lt;operation::CoordinateOperationNNPtr&gt;
+<span class="lineNum">     948 </span>            :     createFromCoordinateReferenceSystemCodes(
+<span class="lineNum">     949 </span>            :         const std::string &amp;sourceCRSCode,
+<span class="lineNum">     950 </span>            :         const std::string &amp;targetCRSCode) const;
+<span class="lineNum">     951 </span>            : 
+<span class="lineNum">     952 </span>            :     PROJ_DLL const std::string &amp;getAuthority() PROJ_PURE_DECL;
+<span class="lineNum">     953 </span>            : 
+<span class="lineNum">     954 </span>            :     /** Object type. */
+<span class="lineNum">     955 </span>            :     enum class ObjectType {
+<span class="lineNum">     956 </span>            :         /** Object of type datum::PrimeMeridian */
+<span class="lineNum">     957 </span>            :         PRIME_MERIDIAN,
+<span class="lineNum">     958 </span>            :         /** Object of type datum::Ellipsoid */
+<span class="lineNum">     959 </span>            :         ELLIPSOID,
+<span class="lineNum">     960 </span>            :         /** Object of type datum::Datum (and derived classes) */
+<span class="lineNum">     961 </span>            :         DATUM,
+<span class="lineNum">     962 </span>            :         /** Object of type datum::GeodeticReferenceFrame (and derived
+<span class="lineNum">     963 </span>            :            classes) */
+<span class="lineNum">     964 </span>            :         GEODETIC_REFERENCE_FRAME,
+<span class="lineNum">     965 </span>            :         /** Object of type datum::VerticalReferenceFrame (and derived
+<span class="lineNum">     966 </span>            :            classes) */
+<span class="lineNum">     967 </span>            :         VERTICAL_REFERENCE_FRAME,
+<span class="lineNum">     968 </span>            :         /** Object of type crs::CRS (and derived classes) */
+<span class="lineNum">     969 </span>            :         CRS,
+<span class="lineNum">     970 </span>            :         /** Object of type crs::GeodeticCRS (and derived classes) */
+<span class="lineNum">     971 </span>            :         GEODETIC_CRS,
+<span class="lineNum">     972 </span>            :         /** GEODETIC_CRS of type geocentric */
+<span class="lineNum">     973 </span>            :         GEOCENTRIC_CRS,
+<span class="lineNum">     974 </span>            :         /** Object of type crs::GeographicCRS (and derived classes) */
+<span class="lineNum">     975 </span>            :         GEOGRAPHIC_CRS,
+<span class="lineNum">     976 </span>            :         /** GEOGRAPHIC_CRS of type Geographic 2D */
+<span class="lineNum">     977 </span>            :         GEOGRAPHIC_2D_CRS,
+<span class="lineNum">     978 </span>            :         /** GEOGRAPHIC_CRS of type Geographic 3D */
+<span class="lineNum">     979 </span>            :         GEOGRAPHIC_3D_CRS,
+<span class="lineNum">     980 </span>            :         /** Object of type crs::ProjectedCRS (and derived classes) */
+<span class="lineNum">     981 </span>            :         PROJECTED_CRS,
+<span class="lineNum">     982 </span>            :         /** Object of type crs::VerticalCRS (and derived classes) */
+<span class="lineNum">     983 </span>            :         VERTICAL_CRS,
+<span class="lineNum">     984 </span>            :         /** Object of type crs::CompoundCRS (and derived classes) */
+<span class="lineNum">     985 </span>            :         COMPOUND_CRS,
+<span class="lineNum">     986 </span>            :         /** Object of type operation::CoordinateOperation (and derived
+<span class="lineNum">     987 </span>            :            classes) */
+<span class="lineNum">     988 </span>            :         COORDINATE_OPERATION,
+<span class="lineNum">     989 </span>            :         /** Object of type operation::Conversion (and derived classes) */
+<span class="lineNum">     990 </span>            :         CONVERSION,
+<span class="lineNum">     991 </span>            :         /** Object of type operation::Transformation (and derived classes)
+<span class="lineNum">     992 </span>            :          */
+<span class="lineNum">     993 </span>            :         TRANSFORMATION,
+<span class="lineNum">     994 </span>            :         /** Object of type operation::ConcatenatedOperation (and derived
+<span class="lineNum">     995 </span>            :            classes) */
+<span class="lineNum">     996 </span>            :         CONCATENATED_OPERATION,
+<span class="lineNum">     997 </span>            :     };
+<span class="lineNum">     998 </span>            : 
+<span class="lineNum">     999 </span>            :     PROJ_DLL std::set&lt;std::string&gt;
+<span class="lineNum">    1000 </span>            :     getAuthorityCodes(const ObjectType &amp;type,
+<span class="lineNum">    1001 </span>            :                       bool allowDeprecated = true) const;
+<span class="lineNum">    1002 </span>            : 
+<span class="lineNum">    1003 </span>            :     PROJ_DLL std::string getDescriptionText(const std::string &amp;code) const;
+<a name="1004"><span class="lineNum">    1004 </span>            : </a>
+<span class="lineNum">    1005 </span>            :     /** CRS information */
+<span class="lineNum">    1006 </span><span class="lineCov">     658510 :     struct CRSInfo {</span>
+<span class="lineNum">    1007 </span>            :         /** Authority name */
+<span class="lineNum">    1008 </span>            :         std::string authName;
+<span class="lineNum">    1009 </span>            :         /** Code */
+<span class="lineNum">    1010 </span>            :         std::string code;
+<span class="lineNum">    1011 </span>            :         /** Name */
+<span class="lineNum">    1012 </span>            :         std::string name;
+<span class="lineNum">    1013 </span>            :         /** Type */
+<span class="lineNum">    1014 </span>            :         ObjectType type;
+<span class="lineNum">    1015 </span>            :         /** Whether the object is deprecated */
+<span class="lineNum">    1016 </span>            :         bool deprecated;
+<span class="lineNum">    1017 </span>            :         /** Whereas the west_lon_degree, south_lat_degree, east_lon_degree and
+<span class="lineNum">    1018 </span>            :          * north_lat_degree fields are valid. */
+<span class="lineNum">    1019 </span>            :         bool bbox_valid;
+<span class="lineNum">    1020 </span>            :         /** Western-most longitude of the area of use, in degrees. */
+<span class="lineNum">    1021 </span>            :         double west_lon_degree;
+<span class="lineNum">    1022 </span>            :         /** Southern-most latitude of the area of use, in degrees. */
+<span class="lineNum">    1023 </span>            :         double south_lat_degree;
+<span class="lineNum">    1024 </span>            :         /** Eastern-most longitude of the area of use, in degrees. */
+<span class="lineNum">    1025 </span>            :         double east_lon_degree;
+<span class="lineNum">    1026 </span>            :         /** Northern-most latitude of the area of use, in degrees. */
+<span class="lineNum">    1027 </span>            :         double north_lat_degree;
+<span class="lineNum">    1028 </span>            :         /** Name of the area of use. */
+<span class="lineNum">    1029 </span>            :         std::string areaName;
+<span class="lineNum">    1030 </span>            :         /** Name of the projection method for a projected CRS. Might be empty
+<span class="lineNum">    1031 </span>            :          * even for projected CRS in some cases. */
+<span class="lineNum">    1032 </span>            :         std::string projectionMethodName;
+<span class="lineNum">    1033 </span>            : 
+<span class="lineNum">    1034 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">    1035 </span>            :         CRSInfo();
+<span class="lineNum">    1036 </span>            :         //! @endcond
+<span class="lineNum">    1037 </span>            :     };
+<span class="lineNum">    1038 </span>            : 
+<span class="lineNum">    1039 </span>            :     PROJ_DLL std::list&lt;CRSInfo&gt; getCRSInfoList() const;
+<span class="lineNum">    1040 </span>            : 
+<span class="lineNum">    1041 </span>            :     // non-standard
+<span class="lineNum">    1042 </span>            :     PROJ_DLL static AuthorityFactoryNNPtr
+<span class="lineNum">    1043 </span>            :     create(const DatabaseContextNNPtr &amp;context,
+<span class="lineNum">    1044 </span>            :            const std::string &amp;authorityName);
+<span class="lineNum">    1045 </span>            : 
+<span class="lineNum">    1046 </span>            :     PROJ_DLL const DatabaseContextNNPtr &amp;databaseContext() const;
+<span class="lineNum">    1047 </span>            : 
+<span class="lineNum">    1048 </span>            :     PROJ_DLL std::vector&lt;operation::CoordinateOperationNNPtr&gt;
+<span class="lineNum">    1049 </span>            :     createFromCoordinateReferenceSystemCodes(
+<span class="lineNum">    1050 </span>            :         const std::string &amp;sourceCRSAuthName, const std::string &amp;sourceCRSCode,
+<span class="lineNum">    1051 </span>            :         const std::string &amp;targetCRSAuthName, const std::string &amp;targetCRSCode,
+<span class="lineNum">    1052 </span>            :         bool usePROJAlternativeGridNames, bool discardIfMissingGrid,
+<span class="lineNum">    1053 </span>            :         bool discardSuperseded, bool tryReverseOrder = false,
+<span class="lineNum">    1054 </span>            :         bool reportOnlyIntersectingTransformations = false,
+<span class="lineNum">    1055 </span>            :         const metadata::ExtentPtr &amp;intersectingExtent1 = nullptr,
+<span class="lineNum">    1056 </span>            :         const metadata::ExtentPtr &amp;intersectingExtent2 = nullptr) const;
+<span class="lineNum">    1057 </span>            : 
+<span class="lineNum">    1058 </span>            :     PROJ_DLL std::vector&lt;operation::CoordinateOperationNNPtr&gt;
+<span class="lineNum">    1059 </span>            :     createFromCRSCodesWithIntermediates(
+<span class="lineNum">    1060 </span>            :         const std::string &amp;sourceCRSAuthName, const std::string &amp;sourceCRSCode,
+<span class="lineNum">    1061 </span>            :         const std::string &amp;targetCRSAuthName, const std::string &amp;targetCRSCode,
+<span class="lineNum">    1062 </span>            :         bool usePROJAlternativeGridNames, bool discardIfMissingGrid,
+<span class="lineNum">    1063 </span>            :         bool discardSuperseded,
+<span class="lineNum">    1064 </span>            :         const std::vector&lt;std::pair&lt;std::string, std::string&gt;&gt;
+<span class="lineNum">    1065 </span>            :             &amp;intermediateCRSAuthCodes,
+<span class="lineNum">    1066 </span>            :         ObjectType allowedIntermediateObjectType = ObjectType::CRS,
+<span class="lineNum">    1067 </span>            :         const metadata::ExtentPtr &amp;intersectingExtent1 = nullptr,
+<span class="lineNum">    1068 </span>            :         const metadata::ExtentPtr &amp;intersectingExtent2 = nullptr) const;
+<span class="lineNum">    1069 </span>            : 
+<span class="lineNum">    1070 </span>            :     PROJ_DLL std::string getOfficialNameFromAlias(
+<span class="lineNum">    1071 </span>            :         const std::string &amp;aliasedName, const std::string &amp;tableName,
+<span class="lineNum">    1072 </span>            :         const std::string &amp;source, bool tryEquivalentNameSpelling,
+<span class="lineNum">    1073 </span>            :         std::string &amp;outTableName, std::string &amp;outAuthName,
+<span class="lineNum">    1074 </span>            :         std::string &amp;outCode) const;
+<span class="lineNum">    1075 </span>            : 
+<span class="lineNum">    1076 </span>            :     PROJ_DLL std::list&lt;common::IdentifiedObjectNNPtr&gt;
+<span class="lineNum">    1077 </span>            :     createObjectsFromName(const std::string &amp;name,
+<span class="lineNum">    1078 </span>            :                           const std::vector&lt;ObjectType&gt; &amp;allowedObjectTypes =
+<span class="lineNum">    1079 </span>            :                               std::vector&lt;ObjectType&gt;(),
+<span class="lineNum">    1080 </span>            :                           bool approximateMatch = true,
+<span class="lineNum">    1081 </span>            :                           size_t limitResultCount = 0) const;
+<span class="lineNum">    1082 </span>            : 
+<span class="lineNum">    1083 </span>            :     PROJ_DLL std::list&lt;std::pair&lt;std::string, std::string&gt;&gt;
+<span class="lineNum">    1084 </span>            :     listAreaOfUseFromName(const std::string &amp;name, bool approximateMatch) const;
+<span class="lineNum">    1085 </span>            : 
+<span class="lineNum">    1086 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">    1087 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">    1088 </span>            : 
+<span class="lineNum">    1089 </span>            :         PROJ_INTERNAL std::list&lt;datum::EllipsoidNNPtr&gt;
+<span class="lineNum">    1090 </span>            :         createEllipsoidFromExisting(
+<span class="lineNum">    1091 </span>            :             const datum::EllipsoidNNPtr &amp;ellipsoid) const;
+<span class="lineNum">    1092 </span>            : 
+<span class="lineNum">    1093 </span>            :     PROJ_INTERNAL std::list&lt;crs::GeodeticCRSNNPtr&gt;
+<span class="lineNum">    1094 </span>            :     createGeodeticCRSFromDatum(const std::string &amp;datum_auth_name,
+<span class="lineNum">    1095 </span>            :                                const std::string &amp;datum_code,
+<span class="lineNum">    1096 </span>            :                                const std::string &amp;geodetic_crs_type) const;
+<span class="lineNum">    1097 </span>            : 
+<span class="lineNum">    1098 </span>            :     PROJ_INTERNAL std::list&lt;crs::VerticalCRSNNPtr&gt;
+<span class="lineNum">    1099 </span>            :     createVerticalCRSFromDatum(const std::string &amp;datum_auth_name,
+<span class="lineNum">    1100 </span>            :                                const std::string &amp;datum_code) const;
+<span class="lineNum">    1101 </span>            : 
+<span class="lineNum">    1102 </span>            :     PROJ_INTERNAL std::list&lt;crs::GeodeticCRSNNPtr&gt;
+<span class="lineNum">    1103 </span>            :     createGeodeticCRSFromEllipsoid(const std::string &amp;ellipsoid_auth_name,
+<span class="lineNum">    1104 </span>            :                                    const std::string &amp;ellipsoid_code,
+<span class="lineNum">    1105 </span>            :                                    const std::string &amp;geodetic_crs_type) const;
+<span class="lineNum">    1106 </span>            : 
+<span class="lineNum">    1107 </span>            :     PROJ_INTERNAL std::list&lt;crs::ProjectedCRSNNPtr&gt;
+<span class="lineNum">    1108 </span>            :     createProjectedCRSFromExisting(const crs::ProjectedCRSNNPtr &amp;crs) const;
+<span class="lineNum">    1109 </span>            : 
+<span class="lineNum">    1110 </span>            :     PROJ_INTERNAL std::list&lt;crs::CompoundCRSNNPtr&gt;
+<span class="lineNum">    1111 </span>            :     createCompoundCRSFromExisting(const crs::CompoundCRSNNPtr &amp;crs) const;
+<span class="lineNum">    1112 </span>            : 
+<span class="lineNum">    1113 </span>            :     PROJ_INTERNAL crs::CRSNNPtr
+<span class="lineNum">    1114 </span>            :     createCoordinateReferenceSystem(const std::string &amp;code,
+<span class="lineNum">    1115 </span>            :                                     bool allowCompound) const;
+<span class="lineNum">    1116 </span>            : 
+<span class="lineNum">    1117 </span>            :     PROJ_INTERNAL std::list&lt;datum::GeodeticReferenceFrameNNPtr&gt;
+<span class="lineNum">    1118 </span>            :     getPreferredHubGeodeticReferenceFrames(
+<span class="lineNum">    1119 </span>            :         const std::string &amp;geodeticReferenceFrameCode) const;
+<span class="lineNum">    1120 </span>            : 
+<span class="lineNum">    1121 </span>            :     PROJ_INTERNAL std::vector&lt;operation::CoordinateOperationNNPtr&gt;
+<span class="lineNum">    1122 </span>            :     getTransformationsForGeoid(const std::string &amp;geoidName,
+<span class="lineNum">    1123 </span>            :                                bool usePROJAlternativeGridNames) const;
+<span class="lineNum">    1124 </span>            : 
+<span class="lineNum">    1125 </span>            :     //! @endcond
+<span class="lineNum">    1126 </span>            : 
+<span class="lineNum">    1127 </span>            :   protected:
+<span class="lineNum">    1128 </span>            :     PROJ_INTERNAL AuthorityFactory(const DatabaseContextNNPtr &amp;context,
+<span class="lineNum">    1129 </span>            :                                    const std::string &amp;authorityName);
+<span class="lineNum">    1130 </span>            : 
+<span class="lineNum">    1131 </span>            :     PROJ_INTERNAL crs::GeodeticCRSNNPtr
+<span class="lineNum">    1132 </span>            :     createGeodeticCRS(const std::string &amp;code, bool geographicOnly) const;
+<span class="lineNum">    1133 </span>            : 
+<span class="lineNum">    1134 </span>            :     PROJ_INTERNAL operation::CoordinateOperationNNPtr
+<span class="lineNum">    1135 </span>            :     createCoordinateOperation(const std::string &amp;code, bool allowConcatenated,
+<span class="lineNum">    1136 </span>            :                               bool usePROJAlternativeGridNames,
+<a name="1137"><span class="lineNum">    1137 </span>            :                               const std::string &amp;type) const;</a>
+<span class="lineNum">    1138 </span>            : 
+<span class="lineNum">    1139 </span><span class="lineCov">      13622 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">    1140 </span>            : 
+<span class="lineNum">    1141 </span>            :   private:
+<span class="lineNum">    1142 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">    1143 </span>            : };
+<span class="lineNum">    1144 </span>            : 
+<span class="lineNum">    1145 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">    1146 </span>            : 
+<span class="lineNum">    1147 </span>            : /** \brief Exception thrown when a factory can't create an instance of the
+<a name="1148"><span class="lineNum">    1148 </span>            :  * requested object.</a>
+<span class="lineNum">    1149 </span>            :  */
+<span class="lineNum">    1150 </span><span class="lineCov">       1247 : class PROJ_GCC_DLL FactoryException : public util::Exception {</span>
+<span class="lineNum">    1151 </span>            :   public:
+<span class="lineNum">    1152 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">    1153 </span>            :     PROJ_DLL explicit FactoryException(const char *message);
+<span class="lineNum">    1154 </span>            :     PROJ_DLL explicit FactoryException(const std::string &amp;message);
+<span class="lineNum">    1155 </span>            :     PROJ_DLL
+<span class="lineNum">    1156 </span>            :     FactoryException(const FactoryException &amp;other);
+<span class="lineNum">    1157 </span>            :     PROJ_DLL ~FactoryException() override;
+<span class="lineNum">    1158 </span>            :     //! @endcond
+<span class="lineNum">    1159 </span>            : };
+<span class="lineNum">    1160 </span>            : 
+<span class="lineNum">    1161 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">    1162 </span>            : 
+<span class="lineNum">    1163 </span>            : /** \brief Exception thrown when an authority factory can't find the requested
+<a name="1164"><span class="lineNum">    1164 </span>            :  * authority code.</a>
+<span class="lineNum">    1165 </span>            :  */
+<span class="lineNum">    1166 </span><span class="lineCov">       1125 : class PROJ_GCC_DLL NoSuchAuthorityCodeException : public FactoryException {</span>
+<span class="lineNum">    1167 </span>            :   public:
+<span class="lineNum">    1168 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">    1169 </span>            :     PROJ_DLL explicit NoSuchAuthorityCodeException(const std::string &amp;message,
+<span class="lineNum">    1170 </span>            :                                                    const std::string &amp;authority,
+<span class="lineNum">    1171 </span>            :                                                    const std::string &amp;code);
+<span class="lineNum">    1172 </span>            :     PROJ_DLL
+<span class="lineNum">    1173 </span>            :     NoSuchAuthorityCodeException(const NoSuchAuthorityCodeException &amp;other);
+<span class="lineNum">    1174 </span>            :     PROJ_DLL ~NoSuchAuthorityCodeException() override;
+<span class="lineNum">    1175 </span>            :     //! @endcond
+<span class="lineNum">    1176 </span>            : 
+<span class="lineNum">    1177 </span>            :     PROJ_DLL const std::string &amp;getAuthority() const;
+<span class="lineNum">    1178 </span>            :     PROJ_DLL const std::string &amp;getAuthorityCode() const;
+<span class="lineNum">    1179 </span>            : 
+<span class="lineNum">    1180 </span>            :   private:
+<span class="lineNum">    1181 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">    1182 </span>            : };
+<span class="lineNum">    1183 </span>            : 
+<span class="lineNum">    1184 </span>            : } // namespace io
+<span class="lineNum">    1185 </span>            : 
+<span class="lineNum">    1186 </span>            : NS_PROJ_END
+<span class="lineNum">    1187 </span>            : 
+<span class="lineNum">    1188 </span>            : #endif // IO_HH_INCLUDED
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

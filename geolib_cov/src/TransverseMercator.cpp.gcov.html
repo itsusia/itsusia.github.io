@@ -1,0 +1,672 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/TransverseMercator.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - TransverseMercator.cpp<span style="font-size: 80%;"> (source / <a href="TransverseMercator.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">103</td>
+            <td class="headerCovTableEntry">112</td>
+            <td class="headerCovTableEntryHi">92.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file TransverseMercator.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::TransverseMercator class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2008-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  *
+<span class="lineNum">       9 </span>            :  * This implementation follows closely JHS 154, ETRS89 -
+<span class="lineNum">      10 </span>            :  * j&amp;auml;rjestelm&amp;auml;&amp;auml;n liittyv&amp;auml;t karttaprojektiot,
+<span class="lineNum">      11 </span>            :  * tasokoordinaatistot ja karttalehtijako&lt;/a&gt; (Map projections, plane
+<span class="lineNum">      12 </span>            :  * coordinates, and map sheet index for ETRS89), published by JUHTA, Finnish
+<span class="lineNum">      13 </span>            :  * Geodetic Institute, and the National Land Survey of Finland (2006).
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  * The relevant section is available as the 2008 PDF file
+<span class="lineNum">      16 </span>            :  * http://docs.jhs-suositukset.fi/jhs-suositukset/JHS154/JHS154_liite1.pdf
+<span class="lineNum">      17 </span>            :  *
+<span class="lineNum">      18 </span>            :  * This is a straight transcription of the formulas in this paper with the
+<span class="lineNum">      19 </span>            :  * following exceptions:
+<span class="lineNum">      20 </span>            :  *  - use of 6th order series instead of 4th order series.  This reduces the
+<span class="lineNum">      21 </span>            :  *    error to about 5nm for the UTM range of coordinates (instead of 200nm),
+<span class="lineNum">      22 </span>            :  *    with a speed penalty of only 1%;
+<span class="lineNum">      23 </span>            :  *  - use Newton's method instead of plain iteration to solve for latitude in
+<span class="lineNum">      24 </span>            :  *    terms of isometric latitude in the Reverse method;
+<span class="lineNum">      25 </span>            :  *  - use of Horner's representation for evaluating polynomials and Clenshaw's
+<span class="lineNum">      26 </span>            :  *    method for summing trigonometric series;
+<span class="lineNum">      27 </span>            :  *  - several modifications of the formulas to improve the numerical accuracy;
+<span class="lineNum">      28 </span>            :  *  - evaluating the convergence and scale using the expression for the
+<span class="lineNum">      29 </span>            :  *    projection or its inverse.
+<span class="lineNum">      30 </span>            :  *
+<span class="lineNum">      31 </span>            :  * If the preprocessor variable GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER is set
+<span class="lineNum">      32 </span>            :  * to an integer between 4 and 8, then this specifies the order of the series
+<span class="lineNum">      33 </span>            :  * used for the forward and reverse transformations.  The default value is 6.
+<span class="lineNum">      34 </span>            :  * (The series accurate to 12th order is given in \ref tmseries.)
+<span class="lineNum">      35 </span>            :  **********************************************************************/
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">      38 </span>            : #include &lt;complex&gt;
+<span class="lineNum">      39 </span>            : #include &lt;GeographicLib/TransverseMercator.hpp&gt;
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : namespace GeographicLib {
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            :   using namespace std;
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineCov">         63 :   TransverseMercator::TransverseMercator(real a, real f, real k0)</span>
+<span class="lineNum">      46 </span>            :     : _a(a)
+<span class="lineNum">      47 </span>            :     , _f(f)
+<span class="lineNum">      48 </span>            :     , _k0(k0)
+<span class="lineNum">      49 </span><span class="lineCov">         63 :     , _e2(_f * (2 - _f))</span>
+<span class="lineNum">      50 </span><span class="lineCov">        126 :     , _es((f &lt; 0 ? -1 : 1) * sqrt(abs(_e2)))</span>
+<span class="lineNum">      51 </span><span class="lineCov">         63 :     , _e2m(1 - _e2)</span>
+<span class="lineNum">      52 </span>            :       // _c = sqrt( pow(1 + _e, 1 + _e) * pow(1 - _e, 1 - _e) ) )
+<span class="lineNum">      53 </span>            :       // See, for example, Lee (1976), p 100.
+<span class="lineNum">      54 </span><span class="lineCov">         63 :     , _c( sqrt(_e2m) * exp(Math::eatanhe(real(1), _es)) )</span>
+<span class="lineNum">      55 </span><span class="lineCov">        315 :     , _n(_f / (2 - _f))</span>
+<span class="lineNum">      56 </span>            :   {
+<span class="lineNum">      57 </span><span class="lineCov">        126 :     if (!(Math::isfinite(_a) &amp;&amp; _a &gt; 0))</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Equatorial radius is not positive&quot;);</span>
+<span class="lineNum">      59 </span><span class="lineCov">        126 :     if (!(Math::isfinite(_f) &amp;&amp; _f &lt; 1))</span>
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Polar semi-axis is not positive&quot;);</span>
+<span class="lineNum">      61 </span><span class="lineCov">        189 :     if (!(Math::isfinite(_k0) &amp;&amp; _k0 &gt; 0))</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale is not positive&quot;);</span>
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            :     // Generated by Maxima on 2015-05-14 22:55:13-04:00
+<span class="lineNum">      65 </span>            : #if GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER/2 == 2
+<span class="lineNum">      66 </span>            :     static const real b1coeff[] = {
+<span class="lineNum">      67 </span>            :       // b1*(n+1), polynomial in n2 of order 2
+<span class="lineNum">      68 </span>            :       1, 16, 64, 64,
+<span class="lineNum">      69 </span>            :     };  // count = 4
+<span class="lineNum">      70 </span>            : #elif GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER/2 == 3
+<span class="lineNum">      71 </span>            :     static const real b1coeff[] = {
+<span class="lineNum">      72 </span>            :       // b1*(n+1), polynomial in n2 of order 3
+<span class="lineNum">      73 </span>            :       1, 4, 64, 256, 256,
+<span class="lineNum">      74 </span>            :     };  // count = 5
+<span class="lineNum">      75 </span>            : #elif GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER/2 == 4
+<span class="lineNum">      76 </span>            :     static const real b1coeff[] = {
+<span class="lineNum">      77 </span>            :       // b1*(n+1), polynomial in n2 of order 4
+<span class="lineNum">      78 </span>            :       25, 64, 256, 4096, 16384, 16384,
+<span class="lineNum">      79 </span>            :     };  // count = 6
+<span class="lineNum">      80 </span>            : #else
+<span class="lineNum">      81 </span>            : #error &quot;Bad value for GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER&quot;
+<span class="lineNum">      82 </span>            : #endif
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            : #if GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER == 4
+<span class="lineNum">      85 </span>            :     static const real alpcoeff[] = {
+<span class="lineNum">      86 </span>            :       // alp[1]/n^1, polynomial in n of order 3
+<span class="lineNum">      87 </span>            :       164, 225, -480, 360, 720,
+<span class="lineNum">      88 </span>            :       // alp[2]/n^2, polynomial in n of order 2
+<span class="lineNum">      89 </span>            :       557, -864, 390, 1440,
+<span class="lineNum">      90 </span>            :       // alp[3]/n^3, polynomial in n of order 1
+<span class="lineNum">      91 </span>            :       -1236, 427, 1680,
+<span class="lineNum">      92 </span>            :       // alp[4]/n^4, polynomial in n of order 0
+<span class="lineNum">      93 </span>            :       49561, 161280,
+<span class="lineNum">      94 </span>            :     };  // count = 14
+<span class="lineNum">      95 </span>            : #elif GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER == 5
+<span class="lineNum">      96 </span>            :     static const real alpcoeff[] = {
+<span class="lineNum">      97 </span>            :       // alp[1]/n^1, polynomial in n of order 4
+<span class="lineNum">      98 </span>            :       -635, 328, 450, -960, 720, 1440,
+<span class="lineNum">      99 </span>            :       // alp[2]/n^2, polynomial in n of order 3
+<span class="lineNum">     100 </span>            :       4496, 3899, -6048, 2730, 10080,
+<span class="lineNum">     101 </span>            :       // alp[3]/n^3, polynomial in n of order 2
+<span class="lineNum">     102 </span>            :       15061, -19776, 6832, 26880,
+<span class="lineNum">     103 </span>            :       // alp[4]/n^4, polynomial in n of order 1
+<span class="lineNum">     104 </span>            :       -171840, 49561, 161280,
+<span class="lineNum">     105 </span>            :       // alp[5]/n^5, polynomial in n of order 0
+<span class="lineNum">     106 </span>            :       34729, 80640,
+<span class="lineNum">     107 </span>            :     };  // count = 20
+<span class="lineNum">     108 </span>            : #elif GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER == 6
+<span class="lineNum">     109 </span>            :     static const real alpcoeff[] = {
+<span class="lineNum">     110 </span>            :       // alp[1]/n^1, polynomial in n of order 5
+<span class="lineNum">     111 </span>            :       31564, -66675, 34440, 47250, -100800, 75600, 151200,
+<span class="lineNum">     112 </span>            :       // alp[2]/n^2, polynomial in n of order 4
+<span class="lineNum">     113 </span>            :       -1983433, 863232, 748608, -1161216, 524160, 1935360,
+<span class="lineNum">     114 </span>            :       // alp[3]/n^3, polynomial in n of order 3
+<span class="lineNum">     115 </span>            :       670412, 406647, -533952, 184464, 725760,
+<span class="lineNum">     116 </span>            :       // alp[4]/n^4, polynomial in n of order 2
+<span class="lineNum">     117 </span>            :       6601661, -7732800, 2230245, 7257600,
+<span class="lineNum">     118 </span>            :       // alp[5]/n^5, polynomial in n of order 1
+<span class="lineNum">     119 </span>            :       -13675556, 3438171, 7983360,
+<span class="lineNum">     120 </span>            :       // alp[6]/n^6, polynomial in n of order 0
+<span class="lineNum">     121 </span>            :       212378941, 319334400,
+<span class="lineNum">     122 </span>            :     };  // count = 27
+<span class="lineNum">     123 </span>            : #elif GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER == 7
+<span class="lineNum">     124 </span>            :     static const real alpcoeff[] = {
+<span class="lineNum">     125 </span>            :       // alp[1]/n^1, polynomial in n of order 6
+<span class="lineNum">     126 </span>            :       1804025, 2020096, -4267200, 2204160, 3024000, -6451200, 4838400, 9676800,
+<span class="lineNum">     127 </span>            :       // alp[2]/n^2, polynomial in n of order 5
+<span class="lineNum">     128 </span>            :       4626384, -9917165, 4316160, 3743040, -5806080, 2620800, 9676800,
+<span class="lineNum">     129 </span>            :       // alp[3]/n^3, polynomial in n of order 4
+<span class="lineNum">     130 </span>            :       -67102379, 26816480, 16265880, -21358080, 7378560, 29030400,
+<span class="lineNum">     131 </span>            :       // alp[4]/n^4, polynomial in n of order 3
+<span class="lineNum">     132 </span>            :       155912000, 72618271, -85060800, 24532695, 79833600,
+<span class="lineNum">     133 </span>            :       // alp[5]/n^5, polynomial in n of order 2
+<span class="lineNum">     134 </span>            :       102508609, -109404448, 27505368, 63866880,
+<span class="lineNum">     135 </span>            :       // alp[6]/n^6, polynomial in n of order 1
+<span class="lineNum">     136 </span>            :       -12282192400LL, 2760926233LL, 4151347200LL,
+<span class="lineNum">     137 </span>            :       // alp[7]/n^7, polynomial in n of order 0
+<span class="lineNum">     138 </span>            :       1522256789, 1383782400,
+<span class="lineNum">     139 </span>            :     };  // count = 35
+<span class="lineNum">     140 </span>            : #elif GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER == 8
+<span class="lineNum">     141 </span>            :     static const real alpcoeff[] = {
+<span class="lineNum">     142 </span>            :       // alp[1]/n^1, polynomial in n of order 7
+<span class="lineNum">     143 </span>            :       -75900428, 37884525, 42422016, -89611200, 46287360, 63504000, -135475200,
+<span class="lineNum">     144 </span>            :       101606400, 203212800,
+<span class="lineNum">     145 </span>            :       // alp[2]/n^2, polynomial in n of order 6
+<span class="lineNum">     146 </span>            :       148003883, 83274912, -178508970, 77690880, 67374720, -104509440,
+<span class="lineNum">     147 </span>            :       47174400, 174182400,
+<span class="lineNum">     148 </span>            :       // alp[3]/n^3, polynomial in n of order 5
+<span class="lineNum">     149 </span>            :       318729724, -738126169, 294981280, 178924680, -234938880, 81164160,
+<span class="lineNum">     150 </span>            :       319334400,
+<span class="lineNum">     151 </span>            :       // alp[4]/n^4, polynomial in n of order 4
+<span class="lineNum">     152 </span>            :       -40176129013LL, 14967552000LL, 6971354016LL, -8165836800LL, 2355138720LL,
+<span class="lineNum">     153 </span>            :       7664025600LL,
+<span class="lineNum">     154 </span>            :       // alp[5]/n^5, polynomial in n of order 3
+<span class="lineNum">     155 </span>            :       10421654396LL, 3997835751LL, -4266773472LL, 1072709352, 2490808320LL,
+<span class="lineNum">     156 </span>            :       // alp[6]/n^6, polynomial in n of order 2
+<span class="lineNum">     157 </span>            :       175214326799LL, -171950693600LL, 38652967262LL, 58118860800LL,
+<span class="lineNum">     158 </span>            :       // alp[7]/n^7, polynomial in n of order 1
+<span class="lineNum">     159 </span>            :       -67039739596LL, 13700311101LL, 12454041600LL,
+<span class="lineNum">     160 </span>            :       // alp[8]/n^8, polynomial in n of order 0
+<span class="lineNum">     161 </span>            :       1424729850961LL, 743921418240LL,
+<span class="lineNum">     162 </span>            :     };  // count = 44
+<span class="lineNum">     163 </span>            : #else
+<span class="lineNum">     164 </span>            : #error &quot;Bad value for GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER&quot;
+<span class="lineNum">     165 </span>            : #endif
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            : #if GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER == 4
+<span class="lineNum">     168 </span>            :     static const real betcoeff[] = {
+<span class="lineNum">     169 </span>            :       // bet[1]/n^1, polynomial in n of order 3
+<span class="lineNum">     170 </span>            :       -4, 555, -960, 720, 1440,
+<span class="lineNum">     171 </span>            :       // bet[2]/n^2, polynomial in n of order 2
+<span class="lineNum">     172 </span>            :       -437, 96, 30, 1440,
+<span class="lineNum">     173 </span>            :       // bet[3]/n^3, polynomial in n of order 1
+<span class="lineNum">     174 </span>            :       -148, 119, 3360,
+<span class="lineNum">     175 </span>            :       // bet[4]/n^4, polynomial in n of order 0
+<span class="lineNum">     176 </span>            :       4397, 161280,
+<span class="lineNum">     177 </span>            :     };  // count = 14
+<span class="lineNum">     178 </span>            : #elif GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER == 5
+<span class="lineNum">     179 </span>            :     static const real betcoeff[] = {
+<span class="lineNum">     180 </span>            :       // bet[1]/n^1, polynomial in n of order 4
+<span class="lineNum">     181 </span>            :       -3645, -64, 8880, -15360, 11520, 23040,
+<span class="lineNum">     182 </span>            :       // bet[2]/n^2, polynomial in n of order 3
+<span class="lineNum">     183 </span>            :       4416, -3059, 672, 210, 10080,
+<span class="lineNum">     184 </span>            :       // bet[3]/n^3, polynomial in n of order 2
+<span class="lineNum">     185 </span>            :       -627, -592, 476, 13440,
+<span class="lineNum">     186 </span>            :       // bet[4]/n^4, polynomial in n of order 1
+<span class="lineNum">     187 </span>            :       -3520, 4397, 161280,
+<span class="lineNum">     188 </span>            :       // bet[5]/n^5, polynomial in n of order 0
+<span class="lineNum">     189 </span>            :       4583, 161280,
+<span class="lineNum">     190 </span>            :     };  // count = 20
+<span class="lineNum">     191 </span>            : #elif GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER == 6
+<span class="lineNum">     192 </span>            :     static const real betcoeff[] = {
+<span class="lineNum">     193 </span>            :       // bet[1]/n^1, polynomial in n of order 5
+<span class="lineNum">     194 </span>            :       384796, -382725, -6720, 932400, -1612800, 1209600, 2419200,
+<span class="lineNum">     195 </span>            :       // bet[2]/n^2, polynomial in n of order 4
+<span class="lineNum">     196 </span>            :       -1118711, 1695744, -1174656, 258048, 80640, 3870720,
+<span class="lineNum">     197 </span>            :       // bet[3]/n^3, polynomial in n of order 3
+<span class="lineNum">     198 </span>            :       22276, -16929, -15984, 12852, 362880,
+<span class="lineNum">     199 </span>            :       // bet[4]/n^4, polynomial in n of order 2
+<span class="lineNum">     200 </span>            :       -830251, -158400, 197865, 7257600,
+<span class="lineNum">     201 </span>            :       // bet[5]/n^5, polynomial in n of order 1
+<span class="lineNum">     202 </span>            :       -435388, 453717, 15966720,
+<span class="lineNum">     203 </span>            :       // bet[6]/n^6, polynomial in n of order 0
+<span class="lineNum">     204 </span>            :       20648693, 638668800,
+<span class="lineNum">     205 </span>            :     };  // count = 27
+<span class="lineNum">     206 </span>            : #elif GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER == 7
+<span class="lineNum">     207 </span>            :     static const real betcoeff[] = {
+<span class="lineNum">     208 </span>            :       // bet[1]/n^1, polynomial in n of order 6
+<span class="lineNum">     209 </span>            :       -5406467, 6156736, -6123600, -107520, 14918400, -25804800, 19353600,
+<span class="lineNum">     210 </span>            :       38707200,
+<span class="lineNum">     211 </span>            :       // bet[2]/n^2, polynomial in n of order 5
+<span class="lineNum">     212 </span>            :       829456, -5593555, 8478720, -5873280, 1290240, 403200, 19353600,
+<span class="lineNum">     213 </span>            :       // bet[3]/n^3, polynomial in n of order 4
+<span class="lineNum">     214 </span>            :       9261899, 3564160, -2708640, -2557440, 2056320, 58060800,
+<span class="lineNum">     215 </span>            :       // bet[4]/n^4, polynomial in n of order 3
+<span class="lineNum">     216 </span>            :       14928352, -9132761, -1742400, 2176515, 79833600,
+<span class="lineNum">     217 </span>            :       // bet[5]/n^5, polynomial in n of order 2
+<span class="lineNum">     218 </span>            :       -8005831, -1741552, 1814868, 63866880,
+<span class="lineNum">     219 </span>            :       // bet[6]/n^6, polynomial in n of order 1
+<span class="lineNum">     220 </span>            :       -261810608, 268433009, 8302694400LL,
+<span class="lineNum">     221 </span>            :       // bet[7]/n^7, polynomial in n of order 0
+<span class="lineNum">     222 </span>            :       219941297, 5535129600LL,
+<span class="lineNum">     223 </span>            :     };  // count = 35
+<span class="lineNum">     224 </span>            : #elif GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER == 8
+<span class="lineNum">     225 </span>            :     static const real betcoeff[] = {
+<span class="lineNum">     226 </span>            :       // bet[1]/n^1, polynomial in n of order 7
+<span class="lineNum">     227 </span>            :       31777436, -37845269, 43097152, -42865200, -752640, 104428800, -180633600,
+<span class="lineNum">     228 </span>            :       135475200, 270950400,
+<span class="lineNum">     229 </span>            :       // bet[2]/n^2, polynomial in n of order 6
+<span class="lineNum">     230 </span>            :       24749483, 14930208, -100683990, 152616960, -105719040, 23224320, 7257600,
+<span class="lineNum">     231 </span>            :       348364800,
+<span class="lineNum">     232 </span>            :       // bet[3]/n^3, polynomial in n of order 5
+<span class="lineNum">     233 </span>            :       -232468668, 101880889, 39205760, -29795040, -28131840, 22619520,
+<span class="lineNum">     234 </span>            :       638668800,
+<span class="lineNum">     235 </span>            :       // bet[4]/n^4, polynomial in n of order 4
+<span class="lineNum">     236 </span>            :       324154477, 1433121792, -876745056, -167270400, 208945440, 7664025600LL,
+<span class="lineNum">     237 </span>            :       // bet[5]/n^5, polynomial in n of order 3
+<span class="lineNum">     238 </span>            :       457888660, -312227409, -67920528, 70779852, 2490808320LL,
+<span class="lineNum">     239 </span>            :       // bet[6]/n^6, polynomial in n of order 2
+<span class="lineNum">     240 </span>            :       -19841813847LL, -3665348512LL, 3758062126LL, 116237721600LL,
+<span class="lineNum">     241 </span>            :       // bet[7]/n^7, polynomial in n of order 1
+<span class="lineNum">     242 </span>            :       -1989295244, 1979471673, 49816166400LL,
+<span class="lineNum">     243 </span>            :       // bet[8]/n^8, polynomial in n of order 0
+<span class="lineNum">     244 </span>            :       191773887257LL, 3719607091200LL,
+<span class="lineNum">     245 </span>            :     };  // count = 44
+<span class="lineNum">     246 </span>            : #else
+<span class="lineNum">     247 </span>            : #error &quot;Bad value for GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER&quot;
+<span class="lineNum">     248 </span>            : #endif
+<span class="lineNum">     249 </span>            : 
+<span class="lineNum">     250 </span>            :     GEOGRAPHICLIB_STATIC_ASSERT(sizeof(b1coeff) / sizeof(real) ==
+<span class="lineNum">     251 </span>            :                                 maxpow_/2 + 2,
+<span class="lineNum">     252 </span>            :                                 &quot;Coefficient array size mismatch for b1&quot;);
+<span class="lineNum">     253 </span>            :     GEOGRAPHICLIB_STATIC_ASSERT(sizeof(alpcoeff) / sizeof(real) ==
+<span class="lineNum">     254 </span>            :                                 (maxpow_ * (maxpow_ + 3))/2,
+<span class="lineNum">     255 </span>            :                                 &quot;Coefficient array size mismatch for alp&quot;);
+<span class="lineNum">     256 </span>            :     GEOGRAPHICLIB_STATIC_ASSERT(sizeof(betcoeff) / sizeof(real) ==
+<span class="lineNum">     257 </span>            :                                 (maxpow_ * (maxpow_ + 3))/2,
+<span class="lineNum">     258 </span>            :                                 &quot;Coefficient array size mismatch for bet&quot;);
+<span class="lineNum">     259 </span>            :     int m = maxpow_/2;
+<span class="lineNum">     260 </span><span class="lineCov">         63 :     _b1 = Math::polyval(m, b1coeff, Math::sq(_n)) / (b1coeff[m + 1] * (1+_n));</span>
+<span class="lineNum">     261 </span>            :     // _a1 is the equivalent radius for computing the circumference of
+<span class="lineNum">     262 </span>            :     // ellipse.
+<span class="lineNum">     263 </span><span class="lineCov">         63 :     _a1 = _b1 * _a;</span>
+<span class="lineNum">     264 </span>            :     int o = 0;
+<span class="lineNum">     265 </span>            :     real d = _n;
+<span class="lineNum">     266 </span><span class="lineCov">        819 :     for (int l = 1; l &lt;= maxpow_; ++l) {</span>
+<span class="lineNum">     267 </span><span class="lineCov">        378 :       m = maxpow_ - l;</span>
+<span class="lineNum">     268 </span><span class="lineCov">        756 :       _alp[l] = d * Math::polyval(m, alpcoeff + o, _n) / alpcoeff[o + m + 1];</span>
+<span class="lineNum">     269 </span><span class="lineCov">        756 :       _bet[l] = d * Math::polyval(m, betcoeff + o, _n) / betcoeff[o + m + 1];</span>
+<span class="lineNum">     270 </span><span class="lineCov">        378 :       o += m + 2;</span>
+<span class="lineNum">     271 </span><span class="lineCov">        378 :       d *= _n;</span>
+<span class="lineNum">     272 </span>            :     }
+<span class="lineNum">     273 </span>            :     // Post condition: o == sizeof(alpcoeff) / sizeof(real) &amp;&amp;
+<span class="lineNum">     274 </span>            :     // o == sizeof(betcoeff) / sizeof(real)
+<a name="275"><span class="lineNum">     275 </span><span class="lineCov">         63 :   }</span></a>
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span><span class="lineCov">         93 :   const TransverseMercator&amp; TransverseMercator::UTM() {</span>
+<span class="lineNum">     278 </span>            :     static const TransverseMercator utm(Constants::WGS84_a(),
+<span class="lineNum">     279 </span>            :                                         Constants::WGS84_f(),
+<span class="lineNum">     280 </span><span class="lineCov">         93 :                                         Constants::UTM_k0());</span>
+<span class="lineNum">     281 </span><span class="lineCov">         93 :     return utm;</span>
+<span class="lineNum">     282 </span>            :   }
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span>            :   // Engsager and Poder (2007) use trigonometric series to convert between phi
+<span class="lineNum">     285 </span>            :   // and phip.  Here are the series...
+<span class="lineNum">     286 </span>            :   //
+<span class="lineNum">     287 </span>            :   // Conversion from phi to phip:
+<span class="lineNum">     288 </span>            :   //
+<span class="lineNum">     289 </span>            :   //     phip = phi + sum(c[j] * sin(2*j*phi), j, 1, 6)
+<span class="lineNum">     290 </span>            :   //
+<span class="lineNum">     291 </span>            :   //       c[1] = - 2 * n
+<span class="lineNum">     292 </span>            :   //              + 2/3 * n^2
+<span class="lineNum">     293 </span>            :   //              + 4/3 * n^3
+<span class="lineNum">     294 </span>            :   //              - 82/45 * n^4
+<span class="lineNum">     295 </span>            :   //              + 32/45 * n^5
+<span class="lineNum">     296 </span>            :   //              + 4642/4725 * n^6;
+<span class="lineNum">     297 </span>            :   //       c[2] =   5/3 * n^2
+<span class="lineNum">     298 </span>            :   //              - 16/15 * n^3
+<span class="lineNum">     299 </span>            :   //              - 13/9 * n^4
+<span class="lineNum">     300 </span>            :   //              + 904/315 * n^5
+<span class="lineNum">     301 </span>            :   //              - 1522/945 * n^6;
+<span class="lineNum">     302 </span>            :   //       c[3] = - 26/15 * n^3
+<span class="lineNum">     303 </span>            :   //              + 34/21 * n^4
+<span class="lineNum">     304 </span>            :   //              + 8/5 * n^5
+<span class="lineNum">     305 </span>            :   //              - 12686/2835 * n^6;
+<span class="lineNum">     306 </span>            :   //       c[4] =   1237/630 * n^4
+<span class="lineNum">     307 </span>            :   //              - 12/5 * n^5
+<span class="lineNum">     308 </span>            :   //              - 24832/14175 * n^6;
+<span class="lineNum">     309 </span>            :   //       c[5] = - 734/315 * n^5
+<span class="lineNum">     310 </span>            :   //              + 109598/31185 * n^6;
+<span class="lineNum">     311 </span>            :   //       c[6] =   444337/155925 * n^6;
+<span class="lineNum">     312 </span>            :   //
+<span class="lineNum">     313 </span>            :   // Conversion from phip to phi:
+<span class="lineNum">     314 </span>            :   //
+<span class="lineNum">     315 </span>            :   //     phi = phip + sum(d[j] * sin(2*j*phip), j, 1, 6)
+<span class="lineNum">     316 </span>            :   //
+<span class="lineNum">     317 </span>            :   //       d[1] =   2 * n
+<span class="lineNum">     318 </span>            :   //              - 2/3 * n^2
+<span class="lineNum">     319 </span>            :   //              - 2 * n^3
+<span class="lineNum">     320 </span>            :   //              + 116/45 * n^4
+<span class="lineNum">     321 </span>            :   //              + 26/45 * n^5
+<span class="lineNum">     322 </span>            :   //              - 2854/675 * n^6;
+<span class="lineNum">     323 </span>            :   //       d[2] =   7/3 * n^2
+<span class="lineNum">     324 </span>            :   //              - 8/5 * n^3
+<span class="lineNum">     325 </span>            :   //              - 227/45 * n^4
+<span class="lineNum">     326 </span>            :   //              + 2704/315 * n^5
+<span class="lineNum">     327 </span>            :   //              + 2323/945 * n^6;
+<span class="lineNum">     328 </span>            :   //       d[3] =   56/15 * n^3
+<span class="lineNum">     329 </span>            :   //              - 136/35 * n^4
+<span class="lineNum">     330 </span>            :   //              - 1262/105 * n^5
+<span class="lineNum">     331 </span>            :   //              + 73814/2835 * n^6;
+<span class="lineNum">     332 </span>            :   //       d[4] =   4279/630 * n^4
+<span class="lineNum">     333 </span>            :   //              - 332/35 * n^5
+<span class="lineNum">     334 </span>            :   //              - 399572/14175 * n^6;
+<span class="lineNum">     335 </span>            :   //       d[5] =   4174/315 * n^5
+<span class="lineNum">     336 </span>            :   //              - 144838/6237 * n^6;
+<span class="lineNum">     337 </span>            :   //       d[6] =   601676/22275 * n^6;
+<span class="lineNum">     338 </span>            :   //
+<span class="lineNum">     339 </span>            :   // In order to maintain sufficient relative accuracy close to the pole use
+<span class="lineNum">     340 </span>            :   //
+<span class="lineNum">     341 </span>            :   //     S = sum(c[i]*sin(2*i*phi),i,1,6)
+<span class="lineNum">     342 </span>            :   //     taup = (tau + tan(S)) / (1 - tau * tan(S))
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            :   // In Math::taupf and Math::tauf we evaluate the forward transform explicitly
+<span class="lineNum">     345 </span>            :   // and solve the reverse one by Newton's method.
+<span class="lineNum">     346 </span>            :   //
+<span class="lineNum">     347 </span>            :   // There are adapted from TransverseMercatorExact (taup and taupinv).  tau =
+<span class="lineNum">     348 </span>            :   // tan(phi), taup = sinh(psi)
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span><span class="lineCov">         40 :   void TransverseMercator::Forward(real lon0, real lat, real lon,</span>
+<span class="lineNum">     351 </span>            :                                    real&amp; x, real&amp; y,
+<span class="lineNum">     352 </span>            :                                    real&amp; gamma, real&amp; k) const {
+<span class="lineNum">     353 </span>            :     lat = Math::LatFix(lat);
+<span class="lineNum">     354 </span>            :     lon = Math::AngDiff(lon0, lon);
+<span class="lineNum">     355 </span>            :     // Explicitly enforce the parity
+<span class="lineNum">     356 </span>            :     int
+<span class="lineNum">     357 </span><span class="lineCov">         40 :       latsign = (lat &lt; 0) ? -1 : 1,</span>
+<span class="lineNum">     358 </span><span class="lineCov">         40 :       lonsign = (lon &lt; 0) ? -1 : 1;</span>
+<span class="lineNum">     359 </span><span class="lineCov">         40 :     lon *= lonsign;</span>
+<span class="lineNum">     360 </span><span class="lineCov">         40 :     lat *= latsign;</span>
+<span class="lineNum">     361 </span>            :     bool backside = lon &gt; 90;
+<span class="lineNum">     362 </span><span class="lineCov">         40 :     if (backside) {</span>
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :       if (lat == 0)</span>
+<span class="lineNum">     364 </span>            :         latsign = -1;
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :       lon = 180 - lon;</span>
+<span class="lineNum">     366 </span>            :     }
+<span class="lineNum">     367 </span>            :     real sphi, cphi, slam, clam;
+<span class="lineNum">     368 </span><span class="lineCov">         40 :     Math::sincosd(lat, sphi, cphi);</span>
+<span class="lineNum">     369 </span><span class="lineCov">         40 :     Math::sincosd(lon, slam, clam);</span>
+<span class="lineNum">     370 </span>            :     // phi = latitude
+<span class="lineNum">     371 </span>            :     // phi' = conformal latitude
+<span class="lineNum">     372 </span>            :     // psi = isometric latitude
+<span class="lineNum">     373 </span>            :     // tau = tan(phi)
+<span class="lineNum">     374 </span>            :     // tau' = tan(phi')
+<span class="lineNum">     375 </span>            :     // [xi', eta'] = Gauss-Schreiber TM coordinates
+<span class="lineNum">     376 </span>            :     // [xi, eta] = Gauss-Krueger TM coordinates
+<span class="lineNum">     377 </span>            :     //
+<span class="lineNum">     378 </span>            :     // We use
+<span class="lineNum">     379 </span>            :     //   tan(phi') = sinh(psi)
+<span class="lineNum">     380 </span>            :     //   sin(phi') = tanh(psi)
+<span class="lineNum">     381 </span>            :     //   cos(phi') = sech(psi)
+<span class="lineNum">     382 </span>            :     //   denom^2    = 1-cos(phi')^2*sin(lam)^2 = 1-sech(psi)^2*sin(lam)^2
+<span class="lineNum">     383 </span>            :     //   sin(xip)   = sin(phi')/denom          = tanh(psi)/denom
+<span class="lineNum">     384 </span>            :     //   cos(xip)   = cos(phi')*cos(lam)/denom = sech(psi)*cos(lam)/denom
+<span class="lineNum">     385 </span>            :     //   cosh(etap) = 1/denom                  = 1/denom
+<span class="lineNum">     386 </span>            :     //   sinh(etap) = cos(phi')*sin(lam)/denom = sech(psi)*sin(lam)/denom
+<span class="lineNum">     387 </span>            :     real etap, xip;
+<span class="lineNum">     388 </span><span class="lineCov">         40 :     if (lat != 90) {</span>
+<span class="lineNum">     389 </span>            :       real
+<span class="lineNum">     390 </span><span class="lineCov">         39 :         tau = sphi / cphi,</span>
+<span class="lineNum">     391 </span><span class="lineCov">         39 :         taup = Math::taupf(tau, _es);</span>
+<span class="lineNum">     392 </span><span class="lineCov">         39 :       xip = atan2(taup, clam);</span>
+<span class="lineNum">     393 </span>            :       // Used to be
+<span class="lineNum">     394 </span>            :       //   etap = Math::atanh(sin(lam) / cosh(psi));
+<span class="lineNum">     395 </span><span class="lineCov">         78 :       etap = Math::asinh(slam / Math::hypot(taup, clam));</span>
+<span class="lineNum">     396 </span>            :       // convergence and scale for Gauss-Schreiber TM (xip, etap) -- gamma0 =
+<span class="lineNum">     397 </span>            :       // atan(tan(xip) * tanh(etap)) = atan(tan(lam) * sin(phi'));
+<span class="lineNum">     398 </span>            :       // sin(phi') = tau'/sqrt(1 + tau'^2)
+<span class="lineNum">     399 </span>            :       // Krueger p 22 (44)
+<span class="lineNum">     400 </span><span class="lineCov">         39 :       gamma = Math::atan2d(slam * taup, clam * Math::hypot(real(1), taup));</span>
+<span class="lineNum">     401 </span>            :       // k0 = sqrt(1 - _e2 * sin(phi)^2) * (cos(phi') / cos(phi)) * cosh(etap)
+<span class="lineNum">     402 </span>            :       // Note 1/cos(phi) = cosh(psip);
+<span class="lineNum">     403 </span>            :       // and cos(phi') * cosh(etap) = 1/hypot(sinh(psi), cos(lam))
+<span class="lineNum">     404 </span>            :       //
+<span class="lineNum">     405 </span>            :       // This form has cancelling errors.  This property is lost if cosh(psip)
+<span class="lineNum">     406 </span>            :       // is replaced by 1/cos(phi), even though it's using &quot;primary&quot; data (phi
+<span class="lineNum">     407 </span>            :       // instead of psip).
+<span class="lineNum">     408 </span><span class="lineCov">        156 :       k = sqrt(_e2m + _e2 * Math::sq(cphi)) * Math::hypot(real(1), tau)</span>
+<span class="lineNum">     409 </span><span class="lineCov">         78 :         / Math::hypot(taup, clam);</span>
+<span class="lineNum">     410 </span>            :     } else {
+<span class="lineNum">     411 </span>            :       xip = Math::pi()/2;
+<span class="lineNum">     412 </span>            :       etap = 0;
+<span class="lineNum">     413 </span><span class="lineCov">          1 :       gamma = lon;</span>
+<span class="lineNum">     414 </span><span class="lineCov">          1 :       k = _c;</span>
+<span class="lineNum">     415 </span>            :     }
+<span class="lineNum">     416 </span>            :     // {xi',eta'} is {northing,easting} for Gauss-Schreiber transverse Mercator
+<span class="lineNum">     417 </span>            :     // (for eta' = 0, xi' = bet). {xi,eta} is {northing,easting} for transverse
+<span class="lineNum">     418 </span>            :     // Mercator with constant scale on the central meridian (for eta = 0, xip =
+<span class="lineNum">     419 </span>            :     // rectifying latitude).  Define
+<span class="lineNum">     420 </span>            :     //
+<span class="lineNum">     421 </span>            :     //   zeta = xi + i*eta
+<span class="lineNum">     422 </span>            :     //   zeta' = xi' + i*eta'
+<span class="lineNum">     423 </span>            :     //
+<span class="lineNum">     424 </span>            :     // The conversion from conformal to rectifying latitude can be expressed as
+<span class="lineNum">     425 </span>            :     // a series in _n:
+<span class="lineNum">     426 </span>            :     //
+<span class="lineNum">     427 </span>            :     //   zeta = zeta' + sum(h[j-1]' * sin(2 * j * zeta'), j = 1..maxpow_)
+<span class="lineNum">     428 </span>            :     //
+<span class="lineNum">     429 </span>            :     // where h[j]' = O(_n^j).  The reversion of this series gives
+<span class="lineNum">     430 </span>            :     //
+<span class="lineNum">     431 </span>            :     //   zeta' = zeta - sum(h[j-1] * sin(2 * j * zeta), j = 1..maxpow_)
+<span class="lineNum">     432 </span>            :     //
+<span class="lineNum">     433 </span>            :     // which is used in Reverse.
+<span class="lineNum">     434 </span>            :     //
+<span class="lineNum">     435 </span>            :     // Evaluate sums via Clenshaw method.  See
+<span class="lineNum">     436 </span>            :     //    https://en.wikipedia.org/wiki/Clenshaw_algorithm
+<span class="lineNum">     437 </span>            :     //
+<span class="lineNum">     438 </span>            :     // Let
+<span class="lineNum">     439 </span>            :     //
+<span class="lineNum">     440 </span>            :     //    S = sum(a[k] * phi[k](x), k = 0..n)
+<span class="lineNum">     441 </span>            :     //    phi[k+1](x) = alpha[k](x) * phi[k](x) + beta[k](x) * phi[k-1](x)
+<span class="lineNum">     442 </span>            :     //
+<span class="lineNum">     443 </span>            :     // Evaluate S with
+<span class="lineNum">     444 </span>            :     //
+<span class="lineNum">     445 </span>            :     //    b[n+2] = b[n+1] = 0
+<span class="lineNum">     446 </span>            :     //    b[k] = alpha[k](x) * b[k+1] + beta[k+1](x) * b[k+2] + a[k]
+<span class="lineNum">     447 </span>            :     //    S = (a[0] + beta[1](x) * b[2]) * phi[0](x) + b[1] * phi[1](x)
+<span class="lineNum">     448 </span>            :     //
+<span class="lineNum">     449 </span>            :     // Here we have
+<span class="lineNum">     450 </span>            :     //
+<span class="lineNum">     451 </span>            :     //    x = 2 * zeta'
+<span class="lineNum">     452 </span>            :     //    phi[k](x) = sin(k * x)
+<span class="lineNum">     453 </span>            :     //    alpha[k](x) = 2 * cos(x)
+<span class="lineNum">     454 </span>            :     //    beta[k](x) = -1
+<span class="lineNum">     455 </span>            :     //    [ sin(A+B) - 2*cos(B)*sin(A) + sin(A-B) = 0, A = k*x, B = x ]
+<span class="lineNum">     456 </span>            :     //    n = maxpow_
+<span class="lineNum">     457 </span>            :     //    a[k] = _alp[k]
+<span class="lineNum">     458 </span>            :     //    S = b[1] * sin(x)
+<span class="lineNum">     459 </span>            :     //
+<span class="lineNum">     460 </span>            :     // For the derivative we have
+<span class="lineNum">     461 </span>            :     //
+<span class="lineNum">     462 </span>            :     //    x = 2 * zeta'
+<span class="lineNum">     463 </span>            :     //    phi[k](x) = cos(k * x)
+<span class="lineNum">     464 </span>            :     //    alpha[k](x) = 2 * cos(x)
+<span class="lineNum">     465 </span>            :     //    beta[k](x) = -1
+<span class="lineNum">     466 </span>            :     //    [ cos(A+B) - 2*cos(B)*cos(A) + cos(A-B) = 0, A = k*x, B = x ]
+<span class="lineNum">     467 </span>            :     //    a[0] = 1; a[k] = 2*k*_alp[k]
+<span class="lineNum">     468 </span>            :     //    S = (a[0] - b[2]) + b[1] * cos(x)
+<span class="lineNum">     469 </span>            :     //
+<span class="lineNum">     470 </span>            :     // Matrix formulation (not used here):
+<span class="lineNum">     471 </span>            :     //    phi[k](x) = [sin(k * x); k * cos(k * x)]
+<span class="lineNum">     472 </span>            :     //    alpha[k](x) = 2 * [cos(x), 0; -sin(x), cos(x)]
+<span class="lineNum">     473 </span>            :     //    beta[k](x) = -1 * [1, 0; 0, 1]
+<span class="lineNum">     474 </span>            :     //    a[k] = _alp[k] * [1, 0; 0, 1]
+<span class="lineNum">     475 </span>            :     //    b[n+2] = b[n+1] = [0, 0; 0, 0]
+<span class="lineNum">     476 </span>            :     //    b[k] = alpha[k](x) * b[k+1] + beta[k+1](x) * b[k+2] + a[k]
+<span class="lineNum">     477 </span>            :     //    N.B., for all k: b[k](1,2) = 0; b[k](1,1) = b[k](2,2)
+<span class="lineNum">     478 </span>            :     //    S = (a[0] + beta[1](x) * b[2]) * phi[0](x) + b[1] * phi[1](x)
+<span class="lineNum">     479 </span>            :     //    phi[0](x) = [0; 0]
+<span class="lineNum">     480 </span>            :     //    phi[1](x) = [sin(x); cos(x)]
+<span class="lineNum">     481 </span>            :     real
+<span class="lineNum">     482 </span><span class="lineCov">         40 :       c0 = cos(2 * xip), ch0 = cosh(2 * etap),</span>
+<span class="lineNum">     483 </span><span class="lineCov">         40 :       s0 = sin(2 * xip), sh0 = sinh(2 * etap);</span>
+<span class="lineNum">     484 </span><span class="lineCov">         40 :     complex&lt;real&gt; a(2 * c0 * ch0, -2 * s0 * sh0); // 2 * cos(2*zeta')</span>
+<span class="lineNum">     485 </span>            :     int n = maxpow_;
+<span class="lineNum">     486 </span>            :     complex&lt;real&gt;
+<span class="lineNum">     487 </span>            :       y0(n &amp; 1 ?       _alp[n] : 0), y1, // default initializer is 0+i0
+<span class="lineNum">     488 </span>            :       z0(n &amp; 1 ? 2*n * _alp[n] : 0), z1;
+<span class="lineNum">     489 </span>            :     if (n &amp; 1) --n;
+<span class="lineNum">     490 </span><span class="lineCov">        280 :     while (n) {</span>
+<span class="lineNum">     491 </span><span class="lineCov">        120 :       y1 = a * y0 - y1 +       _alp[n];</span>
+<span class="lineNum">     492 </span><span class="lineCov">        120 :       z1 = a * z0 - z1 + 2*n * _alp[n];</span>
+<span class="lineNum">     493 </span><span class="lineCov">        120 :       --n;</span>
+<span class="lineNum">     494 </span><span class="lineCov">        240 :       y0 = a * y1 - y0 +       _alp[n];</span>
+<span class="lineNum">     495 </span><span class="lineCov">        240 :       z0 = a * z1 - z0 + 2*n * _alp[n];</span>
+<span class="lineNum">     496 </span><span class="lineCov">        120 :       --n;</span>
+<span class="lineNum">     497 </span>            :     }
+<span class="lineNum">     498 </span>            :     a /= real(2);               // cos(2*zeta')
+<span class="lineNum">     499 </span>            :     z1 = real(1) - z1 + a * z0;
+<span class="lineNum">     500 </span><span class="lineCov">         80 :     a = complex&lt;real&gt;(s0 * ch0, c0 * sh0); // sin(2*zeta')</span>
+<span class="lineNum">     501 </span>            :     y1 = complex&lt;real&gt;(xip, etap) + a * y0;
+<span class="lineNum">     502 </span>            :     // Fold in change in convergence and scale for Gauss-Schreiber TM to
+<span class="lineNum">     503 </span>            :     // Gauss-Krueger TM.
+<span class="lineNum">     504 </span><span class="lineCov">         40 :     gamma -= Math::atan2d(z1.imag(), z1.real());</span>
+<span class="lineNum">     505 </span><span class="lineCov">         80 :     k *= _b1 * abs(z1);</span>
+<span class="lineNum">     506 </span>            :     real xi = y1.real(), eta = y1.imag();
+<span class="lineNum">     507 </span><span class="lineCov">         40 :     y = _a1 * _k0 * (backside ? Math::pi() - xi : xi) * latsign;</span>
+<span class="lineNum">     508 </span><span class="lineCov">         40 :     x = _a1 * _k0 * eta * lonsign;</span>
+<span class="lineNum">     509 </span><span class="lineCov">         40 :     if (backside)</span>
+<span class="lineNum">     510 </span><span class="lineNoCov">          0 :       gamma = 180 - gamma;</span>
+<span class="lineNum">     511 </span><span class="lineCov">         40 :     gamma *= latsign * lonsign;</span>
+<span class="lineNum">     512 </span><span class="lineCov">         40 :     gamma = Math::AngNormalize(gamma);</span>
+<span class="lineNum">     513 </span><span class="lineCov">         40 :     k *= _k0;</span>
+<span class="lineNum">     514 </span><span class="lineCov">         40 :   }</span>
+<span class="lineNum">     515 </span>            : 
+<span class="lineNum">     516 </span><span class="lineCov">         57 :   void TransverseMercator::Reverse(real lon0, real x, real y,</span>
+<span class="lineNum">     517 </span>            :                                    real&amp; lat, real&amp; lon,
+<span class="lineNum">     518 </span>            :                                    real&amp; gamma, real&amp; k) const {
+<span class="lineNum">     519 </span>            :     // This undoes the steps in Forward.  The wrinkles are: (1) Use of the
+<span class="lineNum">     520 </span>            :     // reverted series to express zeta' in terms of zeta. (2) Newton's method
+<span class="lineNum">     521 </span>            :     // to solve for phi in terms of tan(phi).
+<span class="lineNum">     522 </span>            :     real
+<span class="lineNum">     523 </span><span class="lineCov">         57 :       xi = y / (_a1 * _k0),</span>
+<span class="lineNum">     524 </span><span class="lineCov">         57 :       eta = x / (_a1 * _k0);</span>
+<span class="lineNum">     525 </span>            :     // Explicitly enforce the parity
+<span class="lineNum">     526 </span>            :     int
+<span class="lineNum">     527 </span><span class="lineCov">         57 :       xisign = (xi &lt; 0) ? -1 : 1,</span>
+<span class="lineNum">     528 </span><span class="lineCov">         57 :       etasign = (eta &lt; 0) ? -1 : 1;</span>
+<span class="lineNum">     529 </span><span class="lineCov">         57 :     xi *= xisign;</span>
+<span class="lineNum">     530 </span><span class="lineCov">         57 :     eta *= etasign;</span>
+<span class="lineNum">     531 </span>            :     bool backside = xi &gt; Math::pi()/2;
+<span class="lineNum">     532 </span><span class="lineCov">         57 :     if (backside)</span>
+<span class="lineNum">     533 </span><span class="lineCov">          1 :       xi = Math::pi() - xi;</span>
+<span class="lineNum">     534 </span>            :     real
+<span class="lineNum">     535 </span><span class="lineCov">         57 :       c0 = cos(2 * xi), ch0 = cosh(2 * eta),</span>
+<span class="lineNum">     536 </span><span class="lineCov">         57 :       s0 = sin(2 * xi), sh0 = sinh(2 * eta);</span>
+<span class="lineNum">     537 </span><span class="lineCov">         57 :     complex&lt;real&gt; a(2 * c0 * ch0, -2 * s0 * sh0); // 2 * cos(2*zeta)</span>
+<span class="lineNum">     538 </span>            :     int n = maxpow_;
+<span class="lineNum">     539 </span>            :     complex&lt;real&gt;
+<span class="lineNum">     540 </span>            :       y0(n &amp; 1 ?       -_bet[n] : 0), y1, // default initializer is 0+i0
+<span class="lineNum">     541 </span>            :       z0(n &amp; 1 ? -2*n * _bet[n] : 0), z1;
+<span class="lineNum">     542 </span>            :     if (n &amp; 1) --n;
+<span class="lineNum">     543 </span><span class="lineCov">        399 :     while (n) {</span>
+<span class="lineNum">     544 </span><span class="lineCov">        171 :       y1 = a * y0 - y1 -       _bet[n];</span>
+<span class="lineNum">     545 </span><span class="lineCov">        171 :       z1 = a * z0 - z1 - 2*n * _bet[n];</span>
+<span class="lineNum">     546 </span><span class="lineCov">        171 :       --n;</span>
+<span class="lineNum">     547 </span><span class="lineCov">        342 :       y0 = a * y1 - y0 -       _bet[n];</span>
+<span class="lineNum">     548 </span><span class="lineCov">        342 :       z0 = a * z1 - z0 - 2*n * _bet[n];</span>
+<span class="lineNum">     549 </span><span class="lineCov">        171 :       --n;</span>
+<span class="lineNum">     550 </span>            :     }
+<span class="lineNum">     551 </span>            :     a /= real(2);               // cos(2*zeta)
+<span class="lineNum">     552 </span>            :     z1 = real(1) - z1 + a * z0;
+<span class="lineNum">     553 </span><span class="lineCov">        114 :     a = complex&lt;real&gt;(s0 * ch0, c0 * sh0); // sin(2*zeta)</span>
+<span class="lineNum">     554 </span>            :     y1 = complex&lt;real&gt;(xi, eta) + a * y0;
+<span class="lineNum">     555 </span>            :     // Convergence and scale for Gauss-Schreiber TM to Gauss-Krueger TM.
+<span class="lineNum">     556 </span><span class="lineCov">         57 :     gamma = Math::atan2d(z1.imag(), z1.real());</span>
+<span class="lineNum">     557 </span><span class="lineCov">        114 :     k = _b1 / abs(z1);</span>
+<span class="lineNum">     558 </span>            :     // JHS 154 has
+<span class="lineNum">     559 </span>            :     //
+<span class="lineNum">     560 </span>            :     //   phi' = asin(sin(xi') / cosh(eta')) (Krueger p 17 (25))
+<span class="lineNum">     561 </span>            :     //   lam = asin(tanh(eta') / cos(phi')
+<span class="lineNum">     562 </span>            :     //   psi = asinh(tan(phi'))
+<span class="lineNum">     563 </span>            :     real
+<span class="lineNum">     564 </span>            :       xip = y1.real(), etap = y1.imag(),
+<span class="lineNum">     565 </span><span class="lineCov">         57 :       s = sinh(etap),</span>
+<span class="lineNum">     566 </span><span class="lineCov">        114 :       c = max(real(0), cos(xip)), // cos(pi/2) might be negative</span>
+<span class="lineNum">     567 </span>            :       r = Math::hypot(s, c);
+<span class="lineNum">     568 </span><span class="lineCov">         57 :     if (r != 0) {</span>
+<span class="lineNum">     569 </span><span class="lineCov">         57 :       lon = Math::atan2d(s, c); // Krueger p 17 (25)</span>
+<span class="lineNum">     570 </span>            :       // Use Newton's method to solve for tau
+<span class="lineNum">     571 </span>            :       real
+<span class="lineNum">     572 </span><span class="lineCov">         57 :         sxip = sin(xip),</span>
+<span class="lineNum">     573 </span><span class="lineCov">         57 :         tau = Math::tauf(sxip/r, _es);</span>
+<span class="lineNum">     574 </span><span class="lineCov">         57 :       gamma += Math::atan2d(sxip * tanh(etap), c); // Krueger p 19 (31)</span>
+<span class="lineNum">     575 </span><span class="lineCov">         57 :       lat = Math::atand(tau);</span>
+<span class="lineNum">     576 </span>            :       // Note cos(phi') * cosh(eta') = r
+<span class="lineNum">     577 </span><span class="lineCov">        228 :       k *= sqrt(_e2m + _e2 / (1 + Math::sq(tau))) *</span>
+<span class="lineNum">     578 </span><span class="lineCov">         57 :         Math::hypot(real(1), tau) * r;</span>
+<span class="lineNum">     579 </span>            :     } else {
+<span class="lineNum">     580 </span><span class="lineNoCov">          0 :       lat = 90;</span>
+<span class="lineNum">     581 </span><span class="lineNoCov">          0 :       lon = 0;</span>
+<span class="lineNum">     582 </span><span class="lineNoCov">          0 :       k *= _c;</span>
+<span class="lineNum">     583 </span>            :     }
+<span class="lineNum">     584 </span><span class="lineCov">         57 :     lat *= xisign;</span>
+<span class="lineNum">     585 </span><span class="lineCov">         57 :     if (backside)</span>
+<span class="lineNum">     586 </span><span class="lineCov">          1 :       lon = 180 - lon;</span>
+<span class="lineNum">     587 </span><span class="lineCov">         57 :     lon *= etasign;</span>
+<span class="lineNum">     588 </span><span class="lineCov">        114 :     lon = Math::AngNormalize(lon + lon0);</span>
+<span class="lineNum">     589 </span><span class="lineCov">         57 :     if (backside)</span>
+<span class="lineNum">     590 </span><span class="lineCov">          1 :       gamma = 180 - gamma;</span>
+<span class="lineNum">     591 </span><span class="lineCov">         57 :     gamma *= xisign * etasign;</span>
+<span class="lineNum">     592 </span><span class="lineCov">         57 :     gamma = Math::AngNormalize(gamma);</span>
+<span class="lineNum">     593 </span><span class="lineCov">         57 :     k *= _k0;</span>
+<a name="594"><span class="lineNum">     594 </span><span class="lineCov">         57 :   }</span></a>
+<span class="lineNum">     595 </span>            : 
+<span class="lineNum">     596 </span><span class="lineCov">        272 : } // namespace GeographicLib</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,665 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/projections/tmerc.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/projections</a> - tmerc.cpp<span style="font-size: 80%;"> (source / <a href="tmerc.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">236</td>
+            <td class="headerCovTableEntry">261</td>
+            <td class="headerCovTableEntryHi">90.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            : *                   Transverse Mercator implementations
+<span class="lineNum">       3 </span>            : *
+<span class="lineNum">       4 </span>            : * In this file two transverse mercator implementations are found. One of Gerald
+<span class="lineNum">       5 </span>            : * Evenden/John Snyder origin and one of Knud Poder/Karsten Engsager origin. The
+<span class="lineNum">       6 </span>            : * former is regarded as &quot;approximate&quot; in the following and the latter is &quot;exact&quot;.
+<span class="lineNum">       7 </span>            : * This word choice has been made to distinguish between the two algorithms, where
+<span class="lineNum">       8 </span>            : * the Evenden/Snyder implementation is the faster, less accurate implementation
+<span class="lineNum">       9 </span>            : * and the Poder/Engsager algorithm is a slightly slower, but more accurate
+<span class="lineNum">      10 </span>            : * implementation.
+<span class="lineNum">      11 </span>            : */
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #define PJ_LIB__
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      16 </span>            : #include &lt;math.h&gt;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : #include &quot;proj.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;proj_internal.h&quot;
+<span class="lineNum">      20 </span>            : #include &lt;math.h&gt;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : PROJ_HEAD(tmerc, &quot;Transverse Mercator&quot;) &quot;\n\tCyl, Sph&amp;Ell\n\tapprox&quot;;
+<span class="lineNum">      24 </span>            : PROJ_HEAD(etmerc, &quot;Extended Transverse Mercator&quot;) &quot;\n\tCyl, Sph&quot;;
+<span class="lineNum">      25 </span>            : PROJ_HEAD(utm, &quot;Universal Transverse Mercator (UTM)&quot;) &quot;\n\tCyl, Sph\n\tzone= south approx&quot;;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : namespace { // anonymous namespace
+<span class="lineNum">      28 </span>            : struct pj_opaque_approx {
+<span class="lineNum">      29 </span>            :     double  esp;
+<span class="lineNum">      30 </span>            :     double  ml0;
+<span class="lineNum">      31 </span>            :     double  *en;
+<span class="lineNum">      32 </span>            : };
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : struct pj_opaque_exact {
+<span class="lineNum">      35 </span>            :     double    Qn;     /* Merid. quad., scaled to the projection */
+<span class="lineNum">      36 </span>            :     double    Zb;     /* Radius vector in polar coord. systems  */
+<span class="lineNum">      37 </span>            :     double    cgb[6]; /* Constants for Gauss -&gt; Geo lat */
+<span class="lineNum">      38 </span>            :     double    cbg[6]; /* Constants for Geo lat -&gt; Gauss */
+<span class="lineNum">      39 </span>            :     double    utg[6]; /* Constants for transv. merc. -&gt; geo */
+<span class="lineNum">      40 </span>            :     double    gtu[6]; /* Constants for geo -&gt; transv. merc. */
+<span class="lineNum">      41 </span>            : };
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : } // anonymous namespace
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : /* Constants for &quot;approximate&quot; transverse mercator */
+<span class="lineNum">      46 </span>            : #define EPS10   1.e-10
+<span class="lineNum">      47 </span>            : #define FC1 1.
+<span class="lineNum">      48 </span>            : #define FC2 .5
+<span class="lineNum">      49 </span>            : #define FC3 .16666666666666666666
+<span class="lineNum">      50 </span>            : #define FC4 .08333333333333333333
+<span class="lineNum">      51 </span>            : #define FC5 .05
+<span class="lineNum">      52 </span>            : #define FC6 .03333333333333333333
+<span class="lineNum">      53 </span>            : #define FC7 .02380952380952380952
+<span class="lineNum">      54 </span>            : #define FC8 .01785714285714285714
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            : /* Constant for &quot;exact&quot; transverse mercator */
+<span class="lineNum">      57 </span>            : #define PROJ_ETMERC_ORDER 6
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            : /*****************************************************************************/
+<span class="lineNum">      60 </span>            : //
+<span class="lineNum">      61 </span>            : //                  Approximate Transverse Mercator functions
+<span class="lineNum">      62 </span>            : //
+<a name="63"><span class="lineNum">      63 </span>            : /*****************************************************************************/</a>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineCov">          6 : static PJ_XY approx_e_fwd (PJ_LP lp, PJ *P) {</span>
+<span class="lineNum">      66 </span>            :     PJ_XY xy = {0.0, 0.0};
+<span class="lineNum">      67 </span><span class="lineCov">          6 :     struct pj_opaque_approx *Q = static_cast&lt;struct pj_opaque_approx*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">      68 </span>            :     double al, als, n, cosphi, sinphi, t;
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :     /*
+<span class="lineNum">      71 </span>            :      * Fail if our longitude is more than 90 degrees from the
+<span class="lineNum">      72 </span>            :      * central meridian since the results are essentially garbage.
+<span class="lineNum">      73 </span>            :      * Is error -20 really an appropriate return value?
+<span class="lineNum">      74 </span>            :      *
+<span class="lineNum">      75 </span>            :      *  http://trac.osgeo.org/proj/ticket/5
+<span class="lineNum">      76 </span>            :      */
+<span class="lineNum">      77 </span><span class="lineCov">          6 :     if( lp.lam &lt; -M_HALFPI || lp.lam &gt; M_HALFPI ) {</span>
+<span class="lineNum">      78 </span>            :         xy.x = HUGE_VAL;
+<span class="lineNum">      79 </span>            :         xy.y = HUGE_VAL;
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :         pj_ctx_set_errno( P-&gt;ctx, PJD_ERR_LAT_OR_LON_EXCEED_LIMIT );</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :         return xy;</span>
+<span class="lineNum">      82 </span>            :     }
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineCov">          6 :     sinphi = sin (lp.phi);</span>
+<span class="lineNum">      85 </span><span class="lineCov">          6 :     cosphi = cos (lp.phi);</span>
+<span class="lineNum">      86 </span><span class="lineCov">          6 :     t = fabs (cosphi) &gt; 1e-10 ? sinphi/cosphi : 0.;</span>
+<span class="lineNum">      87 </span><span class="lineCov">          6 :     t *= t;</span>
+<span class="lineNum">      88 </span><span class="lineCov">          6 :     al = cosphi * lp.lam;</span>
+<span class="lineNum">      89 </span><span class="lineCov">          6 :     als = al * al;</span>
+<span class="lineNum">      90 </span><span class="lineCov">          6 :     al /= sqrt (1. - P-&gt;es * sinphi * sinphi);</span>
+<span class="lineNum">      91 </span><span class="lineCov">          6 :     n = Q-&gt;esp * cosphi * cosphi;</span>
+<span class="lineNum">      92 </span><span class="lineCov">         12 :     xy.x = P-&gt;k0 * al * (FC1 +</span>
+<span class="lineNum">      93 </span><span class="lineCov">         12 :         FC3 * als * (1. - t + n +</span>
+<span class="lineNum">      94 </span><span class="lineCov">         12 :         FC5 * als * (5. + t * (t - 18.) + n * (14. - 58. * t)</span>
+<span class="lineNum">      95 </span><span class="lineCov">          6 :         + FC7 * als * (61. + t * ( t * (179. - t) - 479. ) )</span>
+<span class="lineNum">      96 </span>            :         )));
+<span class="lineNum">      97 </span><span class="lineCov">         12 :     xy.y = P-&gt;k0 * (pj_mlfn(lp.phi, sinphi, cosphi, Q-&gt;en) - Q-&gt;ml0 +</span>
+<span class="lineNum">      98 </span><span class="lineCov">         12 :         sinphi * al * lp.lam * FC2 * ( 1. +</span>
+<span class="lineNum">      99 </span><span class="lineCov">         12 :         FC4 * als * (5. - t + n * (9. + 4. * n) +</span>
+<span class="lineNum">     100 </span><span class="lineCov">         12 :         FC6 * als * (61. + t * (t - 58.) + n * (270. - 330 * t)</span>
+<span class="lineNum">     101 </span><span class="lineCov">          6 :         + FC8 * als * (1385. + t * ( t * (543. - t) - 3111.) )</span>
+<span class="lineNum">     102 </span>            :         ))));
+<span class="lineNum">     103 </span><span class="lineCov">          6 :     return (xy);</span>
+<span class="lineNum">     104 </span>            : }
+<a name="105"><span class="lineNum">     105 </span>            : </a>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">          4 : static PJ_XY approx_s_fwd (PJ_LP lp, PJ *P) {</span>
+<span class="lineNum">     108 </span>            :     PJ_XY xy = {0.0,0.0};
+<span class="lineNum">     109 </span>            :     double b, cosphi;
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :     /*
+<span class="lineNum">     112 </span>            :      * Fail if our longitude is more than 90 degrees from the
+<span class="lineNum">     113 </span>            :      * central meridian since the results are essentially garbage.
+<span class="lineNum">     114 </span>            :      * Is error -20 really an appropriate return value?
+<span class="lineNum">     115 </span>            :      *
+<span class="lineNum">     116 </span>            :      *  http://trac.osgeo.org/proj/ticket/5
+<span class="lineNum">     117 </span>            :      */
+<span class="lineNum">     118 </span><span class="lineCov">          4 :     if( lp.lam &lt; -M_HALFPI || lp.lam &gt; M_HALFPI ) {</span>
+<span class="lineNum">     119 </span>            :         xy.x = HUGE_VAL;
+<span class="lineNum">     120 </span>            :         xy.y = HUGE_VAL;
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :         pj_ctx_set_errno( P-&gt;ctx, PJD_ERR_LAT_OR_LON_EXCEED_LIMIT );</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :         return xy;</span>
+<span class="lineNum">     123 </span>            :     }
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span><span class="lineCov">          4 :     cosphi = cos(lp.phi);</span>
+<span class="lineNum">     126 </span><span class="lineCov">          4 :     b = cosphi * sin (lp.lam);</span>
+<span class="lineNum">     127 </span><span class="lineCov">          4 :     if (fabs (fabs (b) - 1.) &lt;= EPS10) {</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :         proj_errno_set(P, PJD_ERR_TOLERANCE_CONDITION);</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :         return xy;</span>
+<span class="lineNum">     130 </span>            :     }
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span><span class="lineCov">          4 :     xy.x = static_cast&lt;struct pj_opaque_approx*&gt;(P-&gt;opaque)-&gt;ml0 * log ((1. + b) / (1. - b));</span>
+<span class="lineNum">     133 </span><span class="lineCov">          4 :     xy.y = cosphi * cos (lp.lam) / sqrt (1. - b * b);</span>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineCov">          4 :     b = fabs ( xy.y );</span>
+<span class="lineNum">     136 </span><span class="lineCov">          4 :     if (b &gt;= 1.) {</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :         if ((b - 1.) &gt; EPS10) {</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :             proj_errno_set(P, PJD_ERR_TOLERANCE_CONDITION);</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :             return xy;</span>
+<span class="lineNum">     140 </span>            :         }
+<span class="lineNum">     141 </span>            :         else xy.y = 0.;
+<span class="lineNum">     142 </span>            :     } else
+<span class="lineNum">     143 </span><span class="lineCov">          4 :         xy.y = acos (xy.y);</span>
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span><span class="lineCov">          4 :     if (lp.phi &lt; 0.)</span>
+<span class="lineNum">     146 </span><span class="lineCov">          2 :         xy.y = -xy.y;</span>
+<span class="lineNum">     147 </span><span class="lineCov">          4 :     xy.y = static_cast&lt;struct pj_opaque_approx*&gt;(P-&gt;opaque)-&gt;esp * (xy.y - P-&gt;phi0);</span>
+<span class="lineNum">     148 </span><span class="lineCov">          4 :     return xy;</span>
+<span class="lineNum">     149 </span>            : }
+<a name="150"><span class="lineNum">     150 </span>            : </a>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span><span class="lineCov">          5 : static PJ_LP approx_e_inv (PJ_XY xy, PJ *P) {</span>
+<span class="lineNum">     153 </span>            :     PJ_LP lp = {0.0,0.0};
+<span class="lineNum">     154 </span><span class="lineCov">          5 :     struct pj_opaque_approx *Q = static_cast&lt;struct pj_opaque_approx*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">     155 </span>            :     double n, con, cosphi, d, ds, sinphi, t;
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span><span class="lineCov">          5 :     lp.phi = pj_inv_mlfn(P-&gt;ctx, Q-&gt;ml0 + xy.y / P-&gt;k0, P-&gt;es, Q-&gt;en);</span>
+<span class="lineNum">     158 </span><span class="lineCov">          5 :     if (fabs(lp.phi) &gt;= M_HALFPI) {</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :         lp.phi = xy.y &lt; 0. ? -M_HALFPI : M_HALFPI;</span>
+<span class="lineNum">     160 </span>            :         lp.lam = 0.;
+<span class="lineNum">     161 </span>            :     } else {
+<span class="lineNum">     162 </span><span class="lineCov">          5 :         sinphi = sin(lp.phi);</span>
+<span class="lineNum">     163 </span><span class="lineCov">          5 :         cosphi = cos(lp.phi);</span>
+<span class="lineNum">     164 </span><span class="lineCov">          5 :         t = fabs (cosphi) &gt; 1e-10 ? sinphi/cosphi : 0.;</span>
+<span class="lineNum">     165 </span><span class="lineCov">          5 :         n = Q-&gt;esp * cosphi * cosphi;</span>
+<span class="lineNum">     166 </span><span class="lineCov">          5 :         d = xy.x * sqrt (con = 1. - P-&gt;es * sinphi * sinphi) / P-&gt;k0;</span>
+<span class="lineNum">     167 </span><span class="lineCov">          5 :         con *= t;</span>
+<span class="lineNum">     168 </span><span class="lineCov">          5 :         t *= t;</span>
+<span class="lineNum">     169 </span><span class="lineCov">          5 :         ds = d * d;</span>
+<span class="lineNum">     170 </span><span class="lineCov">         10 :         lp.phi -= (con * ds / (1.-P-&gt;es)) * FC2 * (1. -</span>
+<span class="lineNum">     171 </span><span class="lineCov">         10 :             ds * FC4 * (5. + t * (3. - 9. *  n) + n * (1. - 4 * n) -</span>
+<span class="lineNum">     172 </span><span class="lineCov">         15 :             ds * FC6 * (61. + t * (90. - 252. * n +</span>
+<span class="lineNum">     173 </span><span class="lineCov">         10 :                 45. * t) + 46. * n</span>
+<span class="lineNum">     174 </span><span class="lineCov">          5 :            - ds * FC8 * (1385. + t * (3633. + t * (4095. + 1575. * t)) )</span>
+<span class="lineNum">     175 </span>            :             )));
+<span class="lineNum">     176 </span><span class="lineCov">          5 :         lp.lam = d*(FC1 -</span>
+<span class="lineNum">     177 </span><span class="lineCov">         10 :             ds*FC3*( 1. + 2.*t + n -</span>
+<span class="lineNum">     178 </span><span class="lineCov">         10 :             ds*FC5*(5. + t*(28. + 24.*t + 8.*n) + 6.*n</span>
+<span class="lineNum">     179 </span><span class="lineCov">          5 :            - ds * FC7 * (61. + t * (662. + t * (1320. + 720. * t)) )</span>
+<span class="lineNum">     180 </span><span class="lineCov">          5 :         ))) / cosphi;</span>
+<span class="lineNum">     181 </span>            :     }
+<span class="lineNum">     182 </span><span class="lineCov">          5 :     return lp;</span>
+<span class="lineNum">     183 </span>            : }
+<a name="184"><span class="lineNum">     184 </span>            : </a>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineCov">          5 : static PJ_LP approx_s_inv (PJ_XY xy, PJ *P) {</span>
+<span class="lineNum">     187 </span>            :     PJ_LP lp = {0.0, 0.0};
+<span class="lineNum">     188 </span>            :     double h, g;
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span><span class="lineCov">          5 :     h = exp(xy.x / static_cast&lt;struct pj_opaque_approx*&gt;(P-&gt;opaque)-&gt;esp);</span>
+<span class="lineNum">     191 </span><span class="lineCov">          5 :     if( h == 0 ) {</span>
+<span class="lineNum">     192 </span><span class="lineCov">          1 :         proj_errno_set(P, PJD_ERR_INVALID_X_OR_Y);</span>
+<span class="lineNum">     193 </span><span class="lineCov">          1 :         return proj_coord_error().lp;</span>
+<span class="lineNum">     194 </span>            :     }
+<span class="lineNum">     195 </span><span class="lineCov">          4 :     g = .5 * (h - 1. / h);</span>
+<span class="lineNum">     196 </span><span class="lineCov">          4 :     h = cos (P-&gt;phi0 + xy.y / static_cast&lt;struct pj_opaque_approx*&gt;(P-&gt;opaque)-&gt;esp);</span>
+<span class="lineNum">     197 </span><span class="lineCov">          4 :     lp.phi = asin(sqrt((1. - h * h) / (1. + g * g)));</span>
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span>            :     /* Make sure that phi is on the correct hemisphere when false northing is used */
+<span class="lineNum">     200 </span><span class="lineCov">          4 :     if (xy.y &lt; 0. &amp;&amp; -lp.phi+P-&gt;phi0 &lt; 0.0) lp.phi = -lp.phi;</span>
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span><span class="lineCov">          4 :     lp.lam = (g != 0.0 || h != 0.0) ? atan2 (g, h) : 0.;</span>
+<span class="lineNum">     203 </span><span class="lineCov">          4 :     return lp;</span>
+<span class="lineNum">     204 </span>            : }
+<a name="205"><span class="lineNum">     205 </span>            : </a>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span><span class="lineCov">         13 : static PJ *destructor_approx(PJ *P, int errlev) {</span>
+<span class="lineNum">     208 </span><span class="lineCov">         13 :     if (nullptr==P)</span>
+<span class="lineNum">     209 </span>            :         return nullptr;
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span><span class="lineCov">         13 :     if (nullptr==P-&gt;opaque)</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :         return pj_default_destructor(P, errlev);</span>
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span><span class="lineCov">         13 :     pj_dealloc (static_cast&lt;struct pj_opaque_approx*&gt;(P-&gt;opaque)-&gt;en);</span>
+<span class="lineNum">     215 </span><span class="lineCov">         13 :     return pj_default_destructor(P, errlev);</span>
+<span class="lineNum">     216 </span>            : }
+<a name="217"><span class="lineNum">     217 </span>            : </a>
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineCov">         13 : static PJ *setup_approx(PJ *P) {</span>
+<span class="lineNum">     220 </span><span class="lineCov">         13 :     struct pj_opaque_approx *Q = static_cast&lt;struct pj_opaque_approx*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span><span class="lineCov">         13 :     P-&gt;destructor = destructor_approx;</span>
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span><span class="lineCov">         13 :     if (P-&gt;es != 0.0) {</span>
+<span class="lineNum">     225 </span><span class="lineCov">          9 :         if (!(Q-&gt;en = pj_enfn(P-&gt;es)))</span>
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :             return pj_default_destructor(P, ENOMEM);</span>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">          9 :         Q-&gt;ml0 = pj_mlfn(P-&gt;phi0, sin(P-&gt;phi0), cos(P-&gt;phi0), Q-&gt;en);</span>
+<span class="lineNum">     229 </span><span class="lineCov">          9 :         Q-&gt;esp = P-&gt;es / (1. - P-&gt;es);</span>
+<span class="lineNum">     230 </span><span class="lineCov">          9 :         P-&gt;inv = approx_e_inv;</span>
+<span class="lineNum">     231 </span><span class="lineCov">          9 :         P-&gt;fwd = approx_e_fwd;</span>
+<span class="lineNum">     232 </span>            :     } else {
+<span class="lineNum">     233 </span><span class="lineCov">          4 :         Q-&gt;esp = P-&gt;k0;</span>
+<span class="lineNum">     234 </span><span class="lineCov">          4 :         Q-&gt;ml0 = .5 * Q-&gt;esp;</span>
+<span class="lineNum">     235 </span><span class="lineCov">          4 :         P-&gt;inv = approx_s_inv;</span>
+<span class="lineNum">     236 </span><span class="lineCov">          4 :         P-&gt;fwd = approx_s_fwd;</span>
+<span class="lineNum">     237 </span>            :     }
+<span class="lineNum">     238 </span>            :     return P;
+<span class="lineNum">     239 </span>            : }
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            : /*****************************************************************************/
+<span class="lineNum">     244 </span>            : //
+<span class="lineNum">     245 </span>            : //                  Exact Transverse Mercator functions
+<span class="lineNum">     246 </span>            : //
+<span class="lineNum">     247 </span>            : //
+<span class="lineNum">     248 </span>            : // The code in this file is largly based upon procedures:
+<span class="lineNum">     249 </span>            : //
+<span class="lineNum">     250 </span>            : // Written by: Knud Poder and Karsten Engsager
+<span class="lineNum">     251 </span>            : //
+<span class="lineNum">     252 </span>            : // Based on math from: R.Koenig and K.H. Weise, &quot;Mathematische
+<span class="lineNum">     253 </span>            : // Grundlagen der hoeheren Geodaesie und Kartographie,
+<span class="lineNum">     254 </span>            : // Springer-Verlag, Berlin/Goettingen&quot; Heidelberg, 1951.
+<span class="lineNum">     255 </span>            : //
+<span class="lineNum">     256 </span>            : // Modified and used here by permission of Reference Networks
+<span class="lineNum">     257 </span>            : // Division, Kort og Matrikelstyrelsen (KMS), Copenhagen, Denmark
+<span class="lineNum">     258 </span>            : //
+<span class="lineNum">     259 </span>            : /*****************************************************************************/
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span>            : /* Helper functios for &quot;exact&quot; transverse mercator */
+<span class="lineNum">     262 </span>            : #ifdef _GNU_SOURCE
+<a name="263"><span class="lineNum">     263 </span>            :     inline</a>
+<span class="lineNum">     264 </span>            : #endif
+<span class="lineNum">     265 </span><span class="lineCov">     268171 : static double gatg(double *p1, int len_p1, double B) {</span>
+<span class="lineNum">     266 </span>            :     double *p;
+<span class="lineNum">     267 </span>            :     double h = 0, h1, h2 = 0, cos_2B;
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span><span class="lineCov">     268171 :     cos_2B = 2*cos(2*B);</span>
+<span class="lineNum">     270 </span><span class="lineCov">     268171 :     p = p1 + len_p1;</span>
+<span class="lineNum">     271 </span><span class="lineCov">     268171 :     h1 = *--p;</span>
+<span class="lineNum">     272 </span><span class="lineCov">    2949881 :     while (p - p1) {</span>
+<span class="lineNum">     273 </span><span class="lineCov">    1340855 :         h = -h2 + cos_2B*h1 + *--p;</span>
+<span class="lineNum">     274 </span>            :         h2 = h1;
+<span class="lineNum">     275 </span>            :         h1 = h;
+<span class="lineNum">     276 </span>            :     }
+<span class="lineNum">     277 </span><span class="lineCov">     268171 :     return (B + h*sin(2*B));</span>
+<span class="lineNum">     278 </span>            : }
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span>            : /* Complex Clenshaw summation */
+<span class="lineNum">     281 </span>            : #ifdef _GNU_SOURCE
+<a name="282"><span class="lineNum">     282 </span>            :     inline</a>
+<span class="lineNum">     283 </span>            : #endif
+<span class="lineNum">     284 </span><span class="lineCov">     267734 : static double clenS(double *a, int size, double arg_r, double arg_i, double *R, double *I) {</span>
+<span class="lineNum">     285 </span>            :     double      *p, r, i, hr, hr1, hr2, hi, hi1, hi2;
+<span class="lineNum">     286 </span>            :     double      sin_arg_r, cos_arg_r, sinh_arg_i, cosh_arg_i;
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span>            :     /* arguments */
+<span class="lineNum">     289 </span><span class="lineCov">     267734 :     p = a + size;</span>
+<span class="lineNum">     290 </span>            : #ifdef _GNU_SOURCE
+<span class="lineNum">     291 </span><span class="lineCov">     267734 :     sincos(arg_r, &amp;sin_arg_r, &amp;cos_arg_r);</span>
+<span class="lineNum">     292 </span>            : #else
+<span class="lineNum">     293 </span>            :     sin_arg_r  = sin(arg_r);
+<span class="lineNum">     294 </span>            :     cos_arg_r  = cos(arg_r);
+<span class="lineNum">     295 </span>            : #endif
+<span class="lineNum">     296 </span><span class="lineCov">     267734 :     sinh_arg_i = sinh(arg_i);</span>
+<span class="lineNum">     297 </span><span class="lineCov">     267734 :     cosh_arg_i = cosh(arg_i);</span>
+<span class="lineNum">     298 </span><span class="lineCov">     267734 :     r          =  2*cos_arg_r*cosh_arg_i;</span>
+<span class="lineNum">     299 </span><span class="lineCov">     267734 :     i          = -2*sin_arg_r*sinh_arg_i;</span>
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span>            :     /* summation loop */
+<span class="lineNum">     302 </span>            :     hi1 = hr1 = hi = 0;
+<span class="lineNum">     303 </span><span class="lineCov">     267734 :     hr = *--p;</span>
+<span class="lineNum">     304 </span><span class="lineCov">    2945074 :     for (; a - p;) {</span>
+<span class="lineNum">     305 </span>            :         hr2 = hr1;
+<span class="lineNum">     306 </span>            :         hi2 = hi1;
+<span class="lineNum">     307 </span>            :         hr1 = hr;
+<span class="lineNum">     308 </span>            :         hi1 = hi;
+<span class="lineNum">     309 </span><span class="lineCov">    1338670 :         hr  = -hr2 + r*hr1 - i*hi1 + *--p;</span>
+<span class="lineNum">     310 </span><span class="lineCov">    1338670 :         hi  = -hi2 + i*hr1 + r*hi1;</span>
+<span class="lineNum">     311 </span>            :     }
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span><span class="lineCov">     267734 :     r   = sin_arg_r*cosh_arg_i;</span>
+<span class="lineNum">     314 </span><span class="lineCov">     267734 :     i   = cos_arg_r*sinh_arg_i;</span>
+<span class="lineNum">     315 </span><span class="lineCov">     267734 :     *R  = r*hr - i*hi;</span>
+<span class="lineNum">     316 </span><span class="lineCov">     267734 :     *I  = r*hi + i*hr;</span>
+<span class="lineNum">     317 </span><span class="lineCov">     267734 :     return *R;</span>
+<span class="lineNum">     318 </span>            : }
+<span class="lineNum">     319 </span>            : 
+<a name="320"><span class="lineNum">     320 </span>            : </a>
+<span class="lineNum">     321 </span>            : /* Real Clenshaw summation */
+<span class="lineNum">     322 </span><span class="lineCov">        437 : static double clens(double *a, int size, double arg_r) {</span>
+<span class="lineNum">     323 </span>            :     double      *p, r, hr, hr1, hr2, cos_arg_r;
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span><span class="lineCov">        437 :     p = a + size;</span>
+<span class="lineNum">     326 </span><span class="lineCov">        437 :     cos_arg_r  = cos(arg_r);</span>
+<span class="lineNum">     327 </span><span class="lineCov">        437 :     r          =  2*cos_arg_r;</span>
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span>            :     /* summation loop */
+<span class="lineNum">     330 </span>            :     hr1 = 0;
+<span class="lineNum">     331 </span><span class="lineCov">        437 :     hr = *--p;</span>
+<span class="lineNum">     332 </span><span class="lineCov">       4807 :     for (; a - p;) {</span>
+<span class="lineNum">     333 </span>            :         hr2 = hr1;
+<span class="lineNum">     334 </span>            :         hr1 = hr;
+<span class="lineNum">     335 </span><span class="lineCov">       2185 :         hr  = -hr2 + r*hr1 + *--p;</span>
+<span class="lineNum">     336 </span>            :     }
+<span class="lineNum">     337 </span><span class="lineCov">        437 :     return sin (arg_r)*hr;</span>
+<span class="lineNum">     338 </span>            : }
+<a name="339"><span class="lineNum">     339 </span>            : </a>
+<span class="lineNum">     340 </span>            : /* Ellipsoidal, forward */
+<span class="lineNum">     341 </span><span class="lineCov">     134522 : static PJ_XY exact_e_fwd (PJ_LP lp, PJ *P) {</span>
+<span class="lineNum">     342 </span>            :     PJ_XY xy = {0.0,0.0};
+<span class="lineNum">     343 </span><span class="lineCov">     134522 :     struct pj_opaque_exact *Q = static_cast&lt;struct pj_opaque_exact*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">     344 </span>            :     double sin_Cn, cos_Cn, cos_Ce, sin_Ce, dCn, dCe;
+<span class="lineNum">     345 </span><span class="lineCov">     134522 :     double Cn = lp.phi, Ce = lp.lam;</span>
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span>            :     /* ell. LAT, LNG -&gt; Gaussian LAT, LNG */
+<span class="lineNum">     348 </span><span class="lineCov">     134522 :     Cn  = gatg (Q-&gt;cbg, PROJ_ETMERC_ORDER, Cn);</span>
+<span class="lineNum">     349 </span>            :     /* Gaussian LAT, LNG -&gt; compl. sph. LAT */
+<span class="lineNum">     350 </span>            : #ifdef _GNU_SOURCE
+<span class="lineNum">     351 </span><span class="lineCov">     134522 :     sincos (Cn, &amp;sin_Cn, &amp;cos_Cn);</span>
+<span class="lineNum">     352 </span><span class="lineCov">     134522 :     sincos (Ce, &amp;sin_Ce, &amp;cos_Ce);</span>
+<span class="lineNum">     353 </span>            : #else
+<span class="lineNum">     354 </span>            :     sin_Cn = sin (Cn);
+<span class="lineNum">     355 </span>            :     cos_Cn = cos (Cn);
+<span class="lineNum">     356 </span>            :     sin_Ce = sin (Ce);
+<span class="lineNum">     357 </span>            :     cos_Ce = cos (Ce);
+<span class="lineNum">     358 </span>            : #endif
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span><span class="lineCov">     134522 :     Cn     = atan2 (sin_Cn, cos_Ce*cos_Cn);</span>
+<span class="lineNum">     361 </span><span class="lineCov">     134522 :     Ce     = atan2 (sin_Ce*cos_Cn,  hypot (sin_Cn, cos_Cn*cos_Ce));</span>
+<span class="lineNum">     362 </span>            : 
+<span class="lineNum">     363 </span>            :     /* compl. sph. N, E -&gt; ell. norm. N, E */
+<span class="lineNum">     364 </span><span class="lineCov">     134522 :     Ce  = asinh ( tan (Ce) );     /* Replaces: Ce  = log(tan(FORTPI + Ce*0.5)); */</span>
+<span class="lineNum">     365 </span><span class="lineCov">     134522 :     Cn += clenS (Q-&gt;gtu, PROJ_ETMERC_ORDER, 2*Cn, 2*Ce, &amp;dCn, &amp;dCe);</span>
+<span class="lineNum">     366 </span><span class="lineCov">     134522 :     Ce += dCe;</span>
+<span class="lineNum">     367 </span><span class="lineCov">     134522 :     if (fabs (Ce) &lt;= 2.623395162778) {</span>
+<span class="lineNum">     368 </span><span class="lineCov">     134522 :         xy.y  = Q-&gt;Qn * Cn + Q-&gt;Zb;  /* Northing */</span>
+<span class="lineNum">     369 </span><span class="lineCov">     134522 :         xy.x  = Q-&gt;Qn * Ce;          /* Easting  */</span>
+<span class="lineNum">     370 </span>            :     } else
+<span class="lineNum">     371 </span>            :         xy.x = xy.y = HUGE_VAL;
+<span class="lineNum">     372 </span><span class="lineCov">     134522 :     return xy;</span>
+<span class="lineNum">     373 </span>            : }
+<span class="lineNum">     374 </span>            : 
+<a name="375"><span class="lineNum">     375 </span>            : </a>
+<span class="lineNum">     376 </span>            : /* Ellipsoidal, inverse */
+<span class="lineNum">     377 </span><span class="lineCov">     133212 : static PJ_LP exact_e_inv (PJ_XY xy, PJ *P) {</span>
+<span class="lineNum">     378 </span>            :     PJ_LP lp = {0.0,0.0};
+<span class="lineNum">     379 </span><span class="lineCov">     133212 :     struct pj_opaque_exact *Q = static_cast&lt;struct pj_opaque_exact*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">     380 </span>            :     double sin_Cn, cos_Cn, cos_Ce, sin_Ce, dCn, dCe;
+<span class="lineNum">     381 </span><span class="lineCov">     133212 :     double Cn = xy.y, Ce = xy.x;</span>
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            :     /* normalize N, E */
+<span class="lineNum">     384 </span><span class="lineCov">     133212 :     Cn = (Cn - Q-&gt;Zb)/Q-&gt;Qn;</span>
+<span class="lineNum">     385 </span><span class="lineCov">     133212 :     Ce = Ce/Q-&gt;Qn;</span>
+<span class="lineNum">     386 </span>            : 
+<span class="lineNum">     387 </span><span class="lineCov">     133212 :     if (fabs(Ce) &lt;= 2.623395162778) { /* 150 degrees */</span>
+<span class="lineNum">     388 </span>            :         /* norm. N, E -&gt; compl. sph. LAT, LNG */
+<span class="lineNum">     389 </span><span class="lineCov">     133212 :         Cn += clenS(Q-&gt;utg, PROJ_ETMERC_ORDER, 2*Cn, 2*Ce, &amp;dCn, &amp;dCe);</span>
+<span class="lineNum">     390 </span><span class="lineCov">     133212 :         Ce += dCe;</span>
+<span class="lineNum">     391 </span><span class="lineCov">     133212 :         Ce = atan (sinh (Ce)); /* Replaces: Ce = 2*(atan(exp(Ce)) - FORTPI); */</span>
+<span class="lineNum">     392 </span>            :         /* compl. sph. LAT -&gt; Gaussian LAT, LNG */
+<span class="lineNum">     393 </span>            : #ifdef _GNU_SOURCE
+<span class="lineNum">     394 </span><span class="lineCov">     133212 :         sincos (Cn, &amp;sin_Cn, &amp;cos_Cn);</span>
+<span class="lineNum">     395 </span><span class="lineCov">     133212 :         sincos (Ce, &amp;sin_Ce, &amp;cos_Ce);</span>
+<span class="lineNum">     396 </span>            : #else
+<span class="lineNum">     397 </span>            :         sin_Cn = sin (Cn);
+<span class="lineNum">     398 </span>            :         cos_Cn = cos (Cn);
+<span class="lineNum">     399 </span>            :         sin_Ce = sin (Ce);
+<span class="lineNum">     400 </span>            :         cos_Ce = cos (Ce);
+<span class="lineNum">     401 </span>            : #endif
+<span class="lineNum">     402 </span><span class="lineCov">     133212 :         Ce     = atan2 (sin_Ce, cos_Ce*cos_Cn);</span>
+<span class="lineNum">     403 </span><span class="lineCov">     133212 :         Cn     = atan2 (sin_Cn*cos_Ce,  hypot (sin_Ce, cos_Ce*cos_Cn));</span>
+<span class="lineNum">     404 </span>            :         /* Gaussian LAT, LNG -&gt; ell. LAT, LNG */
+<span class="lineNum">     405 </span><span class="lineCov">     133212 :         lp.phi = gatg (Q-&gt;cgb,  PROJ_ETMERC_ORDER, Cn);</span>
+<span class="lineNum">     406 </span>            :         lp.lam = Ce;
+<span class="lineNum">     407 </span>            :     }
+<span class="lineNum">     408 </span>            :     else
+<span class="lineNum">     409 </span>            :         lp.phi = lp.lam = HUGE_VAL;
+<span class="lineNum">     410 </span><span class="lineCov">     133212 :     return lp;</span>
+<a name="411"><span class="lineNum">     411 </span>            : }</a>
+<span class="lineNum">     412 </span>            : 
+<span class="lineNum">     413 </span><span class="lineCov">        437 : static PJ *setup_exact(PJ *P) {</span>
+<span class="lineNum">     414 </span>            :     double f, n, np, Z;
+<span class="lineNum">     415 </span><span class="lineCov">        437 :     struct pj_opaque_exact *Q = static_cast&lt;struct pj_opaque_exact*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span><span class="lineCov">        437 :     if (P-&gt;es &lt;= 0) {</span>
+<span class="lineNum">     418 </span><span class="lineNoCov">          0 :         return pj_default_destructor(P, PJD_ERR_ELLIPSOID_USE_REQUIRED);</span>
+<span class="lineNum">     419 </span>            :     }
+<span class="lineNum">     420 </span>            : 
+<span class="lineNum">     421 </span>            :     /* flattening */
+<span class="lineNum">     422 </span><span class="lineCov">        437 :     f = P-&gt;es / (1 + sqrt (1 -  P-&gt;es)); /* Replaces: f = 1 - sqrt(1-P-&gt;es); */</span>
+<span class="lineNum">     423 </span>            : 
+<span class="lineNum">     424 </span>            :     /* third flattening */
+<span class="lineNum">     425 </span><span class="lineCov">        437 :     np = n = f/(2 - f);</span>
+<span class="lineNum">     426 </span>            : 
+<span class="lineNum">     427 </span>            :     /* COEF. OF TRIG SERIES GEO &lt;-&gt; GAUSS */
+<span class="lineNum">     428 </span>            :     /* cgb := Gaussian -&gt; Geodetic, KW p190 - 191 (61) - (62) */
+<span class="lineNum">     429 </span>            :     /* cbg := Geodetic -&gt; Gaussian, KW p186 - 187 (51) - (52) */
+<span class="lineNum">     430 </span>            :     /* PROJ_ETMERC_ORDER = 6th degree : Engsager and Poder: ICC2007 */
+<span class="lineNum">     431 </span>            : 
+<span class="lineNum">     432 </span><span class="lineCov">        437 :     Q-&gt;cgb[0] = n*( 2 + n*(-2/3.0  + n*(-2      + n*(116/45.0 + n*(26/45.0 +</span>
+<span class="lineNum">     433 </span><span class="lineCov">        437 :                 n*(-2854/675.0 ))))));</span>
+<span class="lineNum">     434 </span><span class="lineCov">        437 :     Q-&gt;cbg[0] = n*(-2 + n*( 2/3.0  + n*( 4/3.0  + n*(-82/45.0 + n*(32/45.0 +</span>
+<span class="lineNum">     435 </span><span class="lineCov">        437 :                 n*( 4642/4725.0))))));</span>
+<span class="lineNum">     436 </span><span class="lineCov">        437 :     np     *= n;</span>
+<span class="lineNum">     437 </span><span class="lineCov">        437 :     Q-&gt;cgb[1] = np*(7/3.0 + n*( -8/5.0  + n*(-227/45.0 + n*(2704/315.0 +</span>
+<span class="lineNum">     438 </span><span class="lineCov">        437 :                 n*( 2323/945.0)))));</span>
+<span class="lineNum">     439 </span><span class="lineCov">        437 :     Q-&gt;cbg[1] = np*(5/3.0 + n*(-16/15.0 + n*( -13/9.0  + n*( 904/315.0 +</span>
+<span class="lineNum">     440 </span><span class="lineCov">        437 :                 n*(-1522/945.0)))));</span>
+<span class="lineNum">     441 </span><span class="lineCov">        437 :     np     *= n;</span>
+<span class="lineNum">     442 </span>            :     /* n^5 coeff corrected from 1262/105 -&gt; -1262/105 */
+<span class="lineNum">     443 </span><span class="lineCov">        437 :     Q-&gt;cgb[2] = np*( 56/15.0  + n*(-136/35.0 + n*(-1262/105.0 +</span>
+<span class="lineNum">     444 </span><span class="lineCov">        437 :                 n*( 73814/2835.0))));</span>
+<span class="lineNum">     445 </span><span class="lineCov">        437 :     Q-&gt;cbg[2] = np*(-26/15.0  + n*(  34/21.0 + n*(    8/5.0   +</span>
+<span class="lineNum">     446 </span><span class="lineCov">        437 :                 n*(-12686/2835.0))));</span>
+<span class="lineNum">     447 </span><span class="lineCov">        437 :     np     *= n;</span>
+<span class="lineNum">     448 </span>            :     /* n^5 coeff corrected from 322/35 -&gt; 332/35 */
+<span class="lineNum">     449 </span><span class="lineCov">        437 :     Q-&gt;cgb[3] = np*(4279/630.0 + n*(-332/35.0 + n*(-399572/14175.0)));</span>
+<span class="lineNum">     450 </span><span class="lineCov">        437 :     Q-&gt;cbg[3] = np*(1237/630.0 + n*( -12/5.0  + n*( -24832/14175.0)));</span>
+<span class="lineNum">     451 </span><span class="lineCov">        437 :     np     *= n;</span>
+<span class="lineNum">     452 </span><span class="lineCov">        437 :     Q-&gt;cgb[4] = np*(4174/315.0 + n*(-144838/6237.0 ));</span>
+<span class="lineNum">     453 </span><span class="lineCov">        437 :     Q-&gt;cbg[4] = np*(-734/315.0 + n*( 109598/31185.0));</span>
+<span class="lineNum">     454 </span><span class="lineCov">        437 :     np     *= n;</span>
+<span class="lineNum">     455 </span><span class="lineCov">        437 :     Q-&gt;cgb[5] = np*(601676/22275.0 );</span>
+<span class="lineNum">     456 </span><span class="lineCov">        437 :     Q-&gt;cbg[5] = np*(444337/155925.0);</span>
+<span class="lineNum">     457 </span>            : 
+<span class="lineNum">     458 </span>            :     /* Constants of the projections */
+<span class="lineNum">     459 </span>            :     /* Transverse Mercator (UTM, ITM, etc) */
+<span class="lineNum">     460 </span>            :     np = n*n;
+<span class="lineNum">     461 </span>            :     /* Norm. mer. quad, K&amp;W p.50 (96), p.19 (38b), p.5 (2) */
+<span class="lineNum">     462 </span><span class="lineCov">        437 :     Q-&gt;Qn = P-&gt;k0/(1 + n) * (1 + np*(1/4.0 + np*(1/64.0 + np/256.0)));</span>
+<span class="lineNum">     463 </span>            :     /* coef of trig series */
+<span class="lineNum">     464 </span>            :     /* utg := ell. N, E -&gt; sph. N, E,  KW p194 (65) */
+<span class="lineNum">     465 </span>            :     /* gtu := sph. N, E -&gt; ell. N, E,  KW p196 (69) */
+<span class="lineNum">     466 </span><span class="lineCov">        437 :     Q-&gt;utg[0] = n*(-0.5  + n*( 2/3.0 + n*(-37/96.0 + n*( 1/360.0 +</span>
+<span class="lineNum">     467 </span><span class="lineCov">        437 :                 n*(  81/512.0 + n*(-96199/604800.0))))));</span>
+<span class="lineNum">     468 </span><span class="lineCov">        437 :     Q-&gt;gtu[0] = n*( 0.5  + n*(-2/3.0 + n*(  5/16.0 + n*(41/180.0 +</span>
+<span class="lineNum">     469 </span><span class="lineCov">        437 :                 n*(-127/288.0 + n*(  7891/37800.0 ))))));</span>
+<span class="lineNum">     470 </span><span class="lineCov">        437 :     Q-&gt;utg[1] = np*(-1/48.0 + n*(-1/15.0 + n*(437/1440.0 + n*(-46/105.0 +</span>
+<span class="lineNum">     471 </span><span class="lineCov">        437 :                 n*( 1118711/3870720.0)))));</span>
+<span class="lineNum">     472 </span><span class="lineCov">        437 :     Q-&gt;gtu[1] = np*(13/48.0 + n*(-3/5.0  + n*(557/1440.0 + n*(281/630.0 +</span>
+<span class="lineNum">     473 </span><span class="lineCov">        437 :                 n*(-1983433/1935360.0)))));</span>
+<span class="lineNum">     474 </span>            :     np      *= n;
+<span class="lineNum">     475 </span><span class="lineCov">        437 :     Q-&gt;utg[2] = np*(-17/480.0 + n*(  37/840.0 + n*(  209/4480.0  +</span>
+<span class="lineNum">     476 </span><span class="lineCov">        437 :                 n*( -5569/90720.0 ))));</span>
+<span class="lineNum">     477 </span><span class="lineCov">        437 :     Q-&gt;gtu[2] = np*( 61/240.0 + n*(-103/140.0 + n*(15061/26880.0 +</span>
+<span class="lineNum">     478 </span><span class="lineCov">        437 :                 n*(167603/181440.0))));</span>
+<span class="lineNum">     479 </span>            :     np      *= n;
+<span class="lineNum">     480 </span><span class="lineCov">        437 :     Q-&gt;utg[3] = np*(-4397/161280.0 + n*(  11/504.0 + n*( 830251/7257600.0)));</span>
+<span class="lineNum">     481 </span><span class="lineCov">        437 :     Q-&gt;gtu[3] = np*(49561/161280.0 + n*(-179/168.0 + n*(6601661/7257600.0)));</span>
+<span class="lineNum">     482 </span>            :     np     *= n;
+<span class="lineNum">     483 </span><span class="lineCov">        437 :     Q-&gt;utg[4] = np*(-4583/161280.0 + n*(  108847/3991680.0));</span>
+<span class="lineNum">     484 </span><span class="lineCov">        437 :     Q-&gt;gtu[4] = np*(34729/80640.0  + n*(-3418889/1995840.0));</span>
+<span class="lineNum">     485 </span>            :     np     *= n;
+<span class="lineNum">     486 </span><span class="lineCov">        437 :     Q-&gt;utg[5] = np*(-20648693/638668800.0);</span>
+<span class="lineNum">     487 </span><span class="lineCov">        437 :     Q-&gt;gtu[5] = np*(212378941/319334400.0);</span>
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span>            :     /* Gaussian latitude value of the origin latitude */
+<span class="lineNum">     490 </span><span class="lineCov">        437 :     Z = gatg (Q-&gt;cbg, PROJ_ETMERC_ORDER, P-&gt;phi0);</span>
+<span class="lineNum">     491 </span>            : 
+<span class="lineNum">     492 </span>            :     /* Origin northing minus true northing at the origin latitude */
+<span class="lineNum">     493 </span>            :     /* i.e. true northing = N - P-&gt;Zb                         */
+<span class="lineNum">     494 </span><span class="lineCov">        437 :     Q-&gt;Zb  = - Q-&gt;Qn*(Z + clens(Q-&gt;gtu, PROJ_ETMERC_ORDER, 2*Z));</span>
+<span class="lineNum">     495 </span><span class="lineCov">        437 :     P-&gt;inv = exact_e_inv;</span>
+<span class="lineNum">     496 </span><span class="lineCov">        437 :     P-&gt;fwd = exact_e_fwd;</span>
+<span class="lineNum">     497 </span><span class="lineCov">        437 :     return P;</span>
+<span class="lineNum">     498 </span>            : }
+<span class="lineNum">     499 </span>            : 
+<span class="lineNum">     500 </span>            : 
+<span class="lineNum">     501 </span>            : 
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span>            : /*****************************************************************************/
+<span class="lineNum">     504 </span>            : //
+<span class="lineNum">     505 </span>            : //                                Operation Setups
+<span class="lineNum">     506 </span>            : //
+<a name="507"><span class="lineNum">     507 </span>            : /*****************************************************************************/</a>
+<span class="lineNum">     508 </span>            : 
+<span class="lineNum">     509 </span><span class="lineCov">        792 : PJ *PROJECTION(tmerc) {</span>
+<span class="lineNum">     510 </span>            :     /* exact transverse mercator only exists in ellipsoidal form, */
+<span class="lineNum">     511 </span>            :     /* use approximate version if +a sphere is requested          */
+<span class="lineNum">     512 </span><span class="lineCov">        263 :     if (pj_param (P-&gt;ctx, P-&gt;params, &quot;bapprox&quot;).i || P-&gt;es &lt;= 0) {</span>
+<span class="lineNum">     513 </span><span class="lineCov">         11 :         struct pj_opaque_approx *Q = static_cast&lt;struct pj_opaque_approx*&gt;(pj_calloc (1, sizeof (struct pj_opaque_approx)));</span>
+<span class="lineNum">     514 </span><span class="lineCov">         11 :         if (nullptr==Q)</span>
+<span class="lineNum">     515 </span><span class="lineNoCov">          0 :             return pj_default_destructor (P, ENOMEM);</span>
+<span class="lineNum">     516 </span>            : 
+<span class="lineNum">     517 </span><span class="lineCov">         11 :         P-&gt;opaque = Q;</span>
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span><span class="lineCov">         11 :         return setup_approx(P);</span>
+<span class="lineNum">     520 </span>            :     } else {
+<span class="lineNum">     521 </span><span class="lineCov">        252 :         struct pj_opaque_exact *Q = static_cast&lt;struct pj_opaque_exact*&gt;(pj_calloc (1, sizeof (struct pj_opaque_exact)));</span>
+<span class="lineNum">     522 </span><span class="lineCov">        252 :         if (nullptr==Q)</span>
+<span class="lineNum">     523 </span><span class="lineNoCov">          0 :             return pj_default_destructor (P, ENOMEM);</span>
+<span class="lineNum">     524 </span><span class="lineCov">        252 :         P-&gt;opaque = Q;</span>
+<span class="lineNum">     525 </span><span class="lineCov">        252 :        return setup_exact (P);</span>
+<span class="lineNum">     526 </span>            :     }
+<span class="lineNum">     527 </span>            : }
+<a name="528"><span class="lineNum">     528 </span>            : </a>
+<span class="lineNum">     529 </span>            : 
+<span class="lineNum">     530 </span><span class="lineCov">         63 : PJ *PROJECTION(etmerc) {</span>
+<span class="lineNum">     531 </span><span class="lineCov">         21 :     struct pj_opaque_exact *Q = static_cast&lt;struct pj_opaque_exact*&gt;(pj_calloc (1, sizeof (struct pj_opaque_exact)));</span>
+<span class="lineNum">     532 </span><span class="lineCov">         21 :     if (nullptr==Q)</span>
+<span class="lineNum">     533 </span><span class="lineNoCov">          0 :         return pj_default_destructor (P, ENOMEM);</span>
+<span class="lineNum">     534 </span><span class="lineCov">         21 :     P-&gt;opaque = Q;</span>
+<span class="lineNum">     535 </span><span class="lineCov">         21 :    return setup_exact (P);</span>
+<span class="lineNum">     536 </span>            : }
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span>            : 
+<a name="539"><span class="lineNum">     539 </span>            : /* UTM uses the Poder/Engsager implementation for the underlying projection      */</a>
+<span class="lineNum">     540 </span>            : /* UNLESS +approx is set in which case the Evenden/Snyder implemenation is used. */
+<span class="lineNum">     541 </span><span class="lineCov">        507 : PJ *PROJECTION(utm) {</span>
+<span class="lineNum">     542 </span>            :     long zone;
+<span class="lineNum">     543 </span><span class="lineCov">        166 :     if (P-&gt;es == 0.0) {</span>
+<span class="lineNum">     544 </span><span class="lineNoCov">          0 :         proj_errno_set(P, PJD_ERR_ELLIPSOID_USE_REQUIRED);</span>
+<span class="lineNum">     545 </span><span class="lineNoCov">          0 :         return pj_default_destructor(P, ENOMEM);</span>
+<span class="lineNum">     546 </span>            :     }
+<span class="lineNum">     547 </span><span class="lineCov">        166 :     if (P-&gt;lam0 &lt; -1000.0 || P-&gt;lam0 &gt; 1000.0) {</span>
+<span class="lineNum">     548 </span><span class="lineNoCov">          0 :         return pj_default_destructor(P, PJD_ERR_INVALID_UTM_ZONE);</span>
+<span class="lineNum">     549 </span>            :     }
+<span class="lineNum">     550 </span>            : 
+<span class="lineNum">     551 </span><span class="lineCov">        166 :     P-&gt;y0 = pj_param (P-&gt;ctx, P-&gt;params, &quot;bsouth&quot;).i ? 10000000. : 0.;</span>
+<span class="lineNum">     552 </span><span class="lineCov">        166 :     P-&gt;x0 = 500000.;</span>
+<span class="lineNum">     553 </span><span class="lineCov">        166 :     if (pj_param (P-&gt;ctx, P-&gt;params, &quot;tzone&quot;).i) /* zone input ? */</span>
+<span class="lineNum">     554 </span>            :     {
+<span class="lineNum">     555 </span><span class="lineCov">        166 :         zone = pj_param(P-&gt;ctx, P-&gt;params, &quot;izone&quot;).i;</span>
+<span class="lineNum">     556 </span><span class="lineCov">        166 :         if (zone &gt; 0 &amp;&amp; zone &lt;= 60)</span>
+<span class="lineNum">     557 </span><span class="lineCov">        166 :             --zone;</span>
+<span class="lineNum">     558 </span>            :         else {
+<span class="lineNum">     559 </span><span class="lineNoCov">          0 :             return pj_default_destructor(P, PJD_ERR_INVALID_UTM_ZONE);</span>
+<span class="lineNum">     560 </span>            :         }
+<span class="lineNum">     561 </span>            :     }
+<span class="lineNum">     562 </span>            :     else /* nearest central meridian input */
+<span class="lineNum">     563 </span>            :     {
+<span class="lineNum">     564 </span><span class="lineNoCov">          0 :         zone = lround((floor ((adjlon (P-&gt;lam0) + M_PI) * 30. / M_PI)));</span>
+<span class="lineNum">     565 </span><span class="lineNoCov">          0 :         if (zone &lt; 0)</span>
+<span class="lineNum">     566 </span>            :             zone = 0;
+<span class="lineNum">     567 </span><span class="lineNoCov">          0 :         else if (zone &gt;= 60)</span>
+<span class="lineNum">     568 </span>            :             zone = 59;
+<span class="lineNum">     569 </span>            :     }
+<span class="lineNum">     570 </span><span class="lineCov">        166 :     P-&gt;lam0 = (zone + .5) * M_PI / 30. - M_PI;</span>
+<span class="lineNum">     571 </span><span class="lineCov">        166 :     P-&gt;k0 = 0.9996;</span>
+<span class="lineNum">     572 </span><span class="lineCov">        166 :     P-&gt;phi0 = 0.;</span>
+<span class="lineNum">     573 </span>            : 
+<span class="lineNum">     574 </span><span class="lineCov">        166 :     if (pj_param(P-&gt;ctx, P-&gt;params, &quot;bapprox&quot;).i) {</span>
+<span class="lineNum">     575 </span><span class="lineCov">          2 :         struct pj_opaque_approx *Q = static_cast&lt;struct pj_opaque_approx*&gt;(pj_calloc (1, sizeof (struct pj_opaque_approx)));</span>
+<span class="lineNum">     576 </span><span class="lineCov">          2 :         if (nullptr==Q)</span>
+<span class="lineNum">     577 </span><span class="lineNoCov">          0 :             return pj_default_destructor (P, ENOMEM);</span>
+<span class="lineNum">     578 </span><span class="lineCov">          2 :         P-&gt;opaque = Q;</span>
+<span class="lineNum">     579 </span>            : 
+<span class="lineNum">     580 </span><span class="lineCov">          2 :         return setup_approx(P);</span>
+<span class="lineNum">     581 </span>            :     } else {
+<span class="lineNum">     582 </span><span class="lineCov">        164 :         struct pj_opaque_exact *Q = static_cast&lt;struct pj_opaque_exact*&gt;(pj_calloc (1, sizeof (struct pj_opaque_exact)));</span>
+<span class="lineNum">     583 </span><span class="lineCov">        164 :         if (nullptr==Q)</span>
+<span class="lineNum">     584 </span><span class="lineNoCov">          0 :             return pj_default_destructor (P, ENOMEM);</span>
+<span class="lineNum">     585 </span><span class="lineCov">        164 :         P-&gt;opaque = Q;</span>
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span><span class="lineCov">        164 :         return setup_exact(P);</span>
+<span class="lineNum">     588 </span>            :     }
+<span class="lineNum">     589 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

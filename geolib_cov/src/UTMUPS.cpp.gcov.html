@@ -1,0 +1,376 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/UTMUPS.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - UTMUPS.cpp<span style="font-size: 80%;"> (source / <a href="UTMUPS.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">72</td>
+            <td class="headerCovTableEntry">173</td>
+            <td class="headerCovTableEntryLo">41.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryLo">60.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file UTMUPS.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::UTMUPS class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2008-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;GeographicLib/UTMUPS.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;GeographicLib/MGRS.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;GeographicLib/PolarStereographic.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/TransverseMercator.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/Utility.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : namespace GeographicLib {
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            :   using namespace std;
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            :   const int UTMUPS::falseeasting_[] =
+<span class="lineNum">      21 </span>            :     { MGRS::upseasting_ * MGRS::tile_, MGRS::upseasting_ * MGRS::tile_,
+<span class="lineNum">      22 </span>            :       MGRS::utmeasting_ * MGRS::tile_, MGRS::utmeasting_ * MGRS::tile_ };
+<span class="lineNum">      23 </span>            :   const int UTMUPS::falsenorthing_[] =
+<span class="lineNum">      24 </span>            :     { MGRS::upseasting_ * MGRS::tile_, MGRS::upseasting_ * MGRS::tile_,
+<span class="lineNum">      25 </span>            :       MGRS::maxutmSrow_ * MGRS::tile_, MGRS::minutmNrow_ * MGRS::tile_ };
+<span class="lineNum">      26 </span>            :   const int UTMUPS::mineasting_[] =
+<span class="lineNum">      27 </span>            :     { MGRS::minupsSind_ * MGRS::tile_, MGRS::minupsNind_ * MGRS::tile_,
+<span class="lineNum">      28 </span>            :       MGRS::minutmcol_ * MGRS::tile_, MGRS::minutmcol_ * MGRS::tile_ };
+<span class="lineNum">      29 </span>            :   const int UTMUPS::maxeasting_[] =
+<span class="lineNum">      30 </span>            :     { MGRS::maxupsSind_ * MGRS::tile_, MGRS::maxupsNind_ * MGRS::tile_,
+<span class="lineNum">      31 </span>            :       MGRS::maxutmcol_ * MGRS::tile_, MGRS::maxutmcol_ * MGRS::tile_ };
+<span class="lineNum">      32 </span>            :   const int UTMUPS::minnorthing_[] =
+<span class="lineNum">      33 </span>            :     { MGRS::minupsSind_ * MGRS::tile_, MGRS::minupsNind_ * MGRS::tile_,
+<span class="lineNum">      34 </span>            :       MGRS::minutmSrow_ * MGRS::tile_,
+<span class="lineNum">      35 </span>            :       (MGRS::minutmNrow_ + MGRS::minutmSrow_ - MGRS::maxutmSrow_)
+<span class="lineNum">      36 </span>            :       * MGRS::tile_ };
+<span class="lineNum">      37 </span>            :   const int UTMUPS::maxnorthing_[] =
+<span class="lineNum">      38 </span>            :     { MGRS::maxupsSind_ * MGRS::tile_, MGRS::maxupsNind_ * MGRS::tile_,
+<span class="lineNum">      39 </span>            :       (MGRS::maxutmSrow_ + MGRS::maxutmNrow_ - MGRS::minutmNrow_) *
+<span class="lineNum">      40 </span>            :       MGRS::tile_,
+<span class="lineNum">      41 </span>            :       MGRS::maxutmNrow_ * MGRS::tile_ };
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span><span class="lineCov">         64 :   int UTMUPS::StandardZone(real lat, real lon, int setzone) {</span>
+<span class="lineNum">      44 </span><span class="lineCov">         64 :     if (!(setzone &gt;= MINPSEUDOZONE &amp;&amp; setzone &lt;= MAXZONE))</span>
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Illegal zone requested &quot; + Utility::str(setzone));</span>
+<span class="lineNum">      46 </span><span class="lineCov">         64 :     if (setzone &gt;= MINZONE || setzone == INVALID)</span>
+<span class="lineNum">      47 </span>            :       return setzone;
+<span class="lineNum">      48 </span>            :     if (Math::isnan(lat) || Math::isnan(lon)) // Check if lat or lon is a NaN
+<span class="lineNum">      49 </span>            :       return INVALID;
+<span class="lineNum">      50 </span><span class="lineCov">         62 :     if (setzone == UTM || (lat &gt;= -80 &amp;&amp; lat &lt; 84)) {</span>
+<span class="lineNum">      51 </span><span class="lineCov">         36 :       int ilon = int(floor(fmod(lon, real(360))));</span>
+<span class="lineNum">      52 </span><span class="lineCov">         36 :       if (ilon &gt;= 180)</span>
+<span class="lineNum">      53 </span><span class="lineCov">          6 :         ilon -= 360;</span>
+<span class="lineNum">      54 </span><span class="lineCov">         30 :       else if (ilon &lt; -180)</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :         ilon += 360;</span>
+<span class="lineNum">      56 </span><span class="lineCov">         36 :       int zone = (ilon + 186)/6;</span>
+<span class="lineNum">      57 </span><span class="lineCov">         36 :       int band = MGRS::LatitudeBand(lat);</span>
+<span class="lineNum">      58 </span><span class="lineCov">         36 :       if (band == 7 &amp;&amp; zone == 31 &amp;&amp; ilon &gt;= 3) // The Norway exception</span>
+<span class="lineNum">      59 </span>            :         zone = 32;
+<span class="lineNum">      60 </span><span class="lineCov">         36 :       else if (band == 9 &amp;&amp; ilon &gt;= 0 &amp;&amp; ilon &lt; 42) // The Svalbard exception</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :         zone = 2 * ((ilon + 183)/12) + 1;</span>
+<span class="lineNum">      62 </span>            :       return zone;
+<span class="lineNum">      63 </span>            :     } else
+<span class="lineNum">      64 </span>            :       return UPS;
+<span class="lineNum">      65 </span>            :   }
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span><span class="lineCov">         64 :   void UTMUPS::Forward(real lat, real lon,</span>
+<span class="lineNum">      68 </span>            :                        int&amp; zone, bool&amp; northp, real&amp; x, real&amp; y,
+<span class="lineNum">      69 </span>            :                        real&amp; gamma, real&amp; k,
+<span class="lineNum">      70 </span>            :                        int setzone, bool mgrslimits) {
+<span class="lineNum">      71 </span>            :     if (abs(lat) &gt; 90)
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Latitude &quot; + Utility::str(lat)</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :                           + &quot;d not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">      74 </span><span class="lineCov">         64 :     bool northp1 = lat &gt;= 0;</span>
+<span class="lineNum">      75 </span><span class="lineCov">         64 :     int zone1 = StandardZone(lat, lon, setzone);</span>
+<span class="lineNum">      76 </span><span class="lineCov">         64 :     if (zone1 == INVALID) {</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :       zone = zone1;</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :       northp = northp1;</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :       x = y = gamma = k = Math::NaN();</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :       return;</span>
+<span class="lineNum">      81 </span>            :     }
+<span class="lineNum">      82 </span>            :     real x1, y1, gamma1, k1;
+<span class="lineNum">      83 </span>            :     bool utmp = zone1 != UPS;
+<span class="lineNum">      84 </span><span class="lineCov">         64 :     if (utmp) {</span>
+<span class="lineNum">      85 </span>            :       real
+<span class="lineNum">      86 </span>            :         lon0 = CentralMeridian(zone1),
+<span class="lineNum">      87 </span><span class="lineCov">         38 :         dlon = lon - lon0;</span>
+<span class="lineNum">      88 </span><span class="lineCov">         38 :       dlon = abs(dlon - 360 * floor((dlon + 180)/360));</span>
+<span class="lineNum">      89 </span><span class="lineCov">         38 :       if (!(dlon &lt;= 60))</span>
+<span class="lineNum">      90 </span>            :         // Check isn't really necessary because CheckCoords catches this case.
+<span class="lineNum">      91 </span>            :         // But this allows a more meaningful error message to be given.
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Longitude &quot; + Utility::str(lon)</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :                             + &quot;d more than 60d from center of UTM zone &quot;</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :                             + Utility::str(zone1));</span>
+<span class="lineNum">      95 </span><span class="lineCov">         38 :       TransverseMercator::UTM().Forward(lon0, lat, lon, x1, y1, gamma1, k1);</span>
+<span class="lineNum">      96 </span>            :     } else {
+<span class="lineNum">      97 </span><span class="lineCov">         26 :       if (abs(lat) &lt; 70)</span>
+<span class="lineNum">      98 </span>            :         // Check isn't really necessary ... (see above).
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Latitude &quot; + Utility::str(lat)</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :                             + &quot;d more than 20d from &quot;</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :                             + (northp1 ? &quot;N&quot; : &quot;S&quot;) + &quot; pole&quot;);</span>
+<span class="lineNum">     102 </span><span class="lineCov">         26 :       PolarStereographic::UPS().Forward(northp1, lat, lon, x1, y1, gamma1, k1);</span>
+<span class="lineNum">     103 </span>            :     }
+<span class="lineNum">     104 </span><span class="lineCov">         64 :     int ind = (utmp ? 2 : 0) + (northp1 ? 1 : 0);</span>
+<span class="lineNum">     105 </span><span class="lineCov">         64 :     x1 += falseeasting_[ind];</span>
+<span class="lineNum">     106 </span><span class="lineCov">         64 :     y1 += falsenorthing_[ind];</span>
+<span class="lineNum">     107 </span><span class="lineCov">         64 :     if (! CheckCoords(zone1 != UPS, northp1, x1, y1, mgrslimits, false) )</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Latitude &quot; + Utility::str(lat)</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :                           + &quot;, longitude &quot; + Utility::str(lon)</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :                           + &quot; out of legal range for &quot;</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :                           + (utmp ? &quot;UTM zone &quot; + Utility::str(zone1) :</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :                              &quot;UPS&quot;));</span>
+<span class="lineNum">     113 </span><span class="lineCov">         64 :     zone = zone1;</span>
+<span class="lineNum">     114 </span><span class="lineCov">         64 :     northp = northp1;</span>
+<span class="lineNum">     115 </span><span class="lineCov">         64 :     x = x1;</span>
+<span class="lineNum">     116 </span><span class="lineCov">         64 :     y = y1;</span>
+<span class="lineNum">     117 </span><span class="lineCov">         64 :     gamma = gamma1;</span>
+<span class="lineNum">     118 </span><span class="lineCov">         64 :     k = k1;</span>
+<span class="lineNum">     119 </span>            :   }
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span><span class="lineCov">         57 :   void UTMUPS::Reverse(int zone, bool northp, real x, real y,</span>
+<span class="lineNum">     122 </span>            :                        real&amp; lat, real&amp; lon, real&amp; gamma, real&amp; k,
+<span class="lineNum">     123 </span>            :                        bool mgrslimits) {
+<span class="lineNum">     124 </span><span class="lineCov">         57 :     if (zone == INVALID || Math::isnan(x) || Math::isnan(y)) {</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :       lat = lon = gamma = k = Math::NaN();</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :       return;</span>
+<span class="lineNum">     127 </span>            :     }
+<span class="lineNum">     128 </span><span class="lineCov">         57 :     if (!(zone &gt;= MINZONE &amp;&amp; zone &lt;= MAXZONE))</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Zone &quot; + Utility::str(zone)</span>
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :                           + &quot; not in range [0, 60]&quot;);</span>
+<span class="lineNum">     131 </span><span class="lineCov">         57 :     bool utmp = zone != UPS;</span>
+<span class="lineNum">     132 </span><span class="lineCov">         57 :     CheckCoords(utmp, northp, x, y, mgrslimits);</span>
+<span class="lineNum">     133 </span><span class="lineCov">         57 :     int ind = (utmp ? 2 : 0) + (northp ? 1 : 0);</span>
+<span class="lineNum">     134 </span><span class="lineCov">         57 :     x -= falseeasting_[ind];</span>
+<span class="lineNum">     135 </span><span class="lineCov">         57 :     y -= falsenorthing_[ind];</span>
+<span class="lineNum">     136 </span><span class="lineCov">         57 :     if (utmp)</span>
+<span class="lineNum">     137 </span><span class="lineCov">        110 :       TransverseMercator::UTM().Reverse(CentralMeridian(zone),</span>
+<span class="lineNum">     138 </span>            :                                         x, y, lat, lon, gamma, k);
+<span class="lineNum">     139 </span>            :     else
+<span class="lineNum">     140 </span><span class="lineCov">          2 :       PolarStereographic::UPS().Reverse(northp, x, y, lat, lon, gamma, k);</span>
+<span class="lineNum">     141 </span>            :   }
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span><span class="lineCov">        121 :   bool UTMUPS::CheckCoords(bool utmp, bool northp, real x, real y,</span>
+<span class="lineNum">     144 </span>            :                            bool mgrslimits, bool throwp) {
+<span class="lineNum">     145 </span>            :     // Limits are all multiples of 100km and are all closed on the both ends.
+<span class="lineNum">     146 </span>            :     // Failure tests are such that NaNs succeed.
+<span class="lineNum">     147 </span><span class="lineCov">        121 :     real slop = mgrslimits ? 0 : MGRS::tile_;</span>
+<span class="lineNum">     148 </span><span class="lineCov">        121 :     int ind = (utmp ? 2 : 0) + (northp ? 1 : 0);</span>
+<span class="lineNum">     149 </span><span class="lineCov">        121 :     if (x &lt; mineasting_[ind] - slop || x &gt; maxeasting_[ind] + slop) {</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :       if (!throwp) return false;</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Easting &quot; + Utility::str(x/1000) + &quot;km not in &quot;</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :                           + (mgrslimits ? &quot;MGRS/&quot; : &quot;&quot;)</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :                           + (utmp ? &quot;UTM&quot; : &quot;UPS&quot;) + &quot; range for &quot;</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :                           + (northp ? &quot;N&quot; : &quot;S&quot; ) + &quot; hemisphere [&quot;</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :                           + Utility::str((mineasting_[ind] - slop)/1000)</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :                           + &quot;km, &quot;</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :                           + Utility::str((maxeasting_[ind] + slop)/1000)</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :                           + &quot;km]&quot;);</span>
+<span class="lineNum">     159 </span>            :     }
+<span class="lineNum">     160 </span><span class="lineCov">        121 :     if (y &lt; minnorthing_[ind] - slop || y &gt; maxnorthing_[ind] + slop) {</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :       if (!throwp) return false;</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Northing &quot; + Utility::str(y/1000) + &quot;km not in &quot;</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :                           + (mgrslimits ? &quot;MGRS/&quot; : &quot;&quot;)</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :                           + (utmp ? &quot;UTM&quot; : &quot;UPS&quot;) + &quot; range for &quot;</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :                           + (northp ? &quot;N&quot; : &quot;S&quot; ) + &quot; hemisphere [&quot;</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :                           + Utility::str((minnorthing_[ind] - slop)/1000)</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :                           + &quot;km, &quot;</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                           + Utility::str((maxnorthing_[ind] + slop)/1000)</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :                           + &quot;km]&quot;);</span>
+<span class="lineNum">     170 </span>            :     }
+<span class="lineNum">     171 </span>            :     return true;
+<span class="lineNum">     172 </span>            :   }
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :   void UTMUPS::Transfer(int zonein, bool northpin, real xin, real yin,</span>
+<span class="lineNum">     175 </span>            :                         int zoneout, bool northpout, real&amp; xout, real&amp; yout,
+<span class="lineNum">     176 </span>            :                         int&amp; zone) {
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :     bool northp = northpin;</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :     if (zonein != zoneout) {</span>
+<span class="lineNum">     179 </span>            :       // Determine lat, lon
+<span class="lineNum">     180 </span>            :       real lat, lon;
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :       GeographicLib::UTMUPS::Reverse(zonein, northpin, xin, yin, lat, lon);</span>
+<span class="lineNum">     182 </span>            :       // Try converting to zoneout
+<span class="lineNum">     183 </span>            :       real x, y;
+<span class="lineNum">     184 </span>            :       int zone1;
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :       GeographicLib::UTMUPS::Forward(lat, lon, zone1, northp, x, y,</span>
+<span class="lineNum">     186 </span>            :                                      zoneout == UTMUPS::MATCH
+<span class="lineNum">     187 </span>            :                                      ? zonein : zoneout);
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :       if (zone1 == 0 &amp;&amp; northp != northpout)</span>
+<span class="lineNum">     189 </span>            :         throw GeographicErr
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :           (&quot;Attempt to transfer UPS coordinates between hemispheres&quot;);</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :       zone = zone1;</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :       xout = x;</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :       yout = y;</span>
+<span class="lineNum">     194 </span>            :     } else {
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :       if (zoneout == 0 &amp;&amp; northp != northpout)</span>
+<span class="lineNum">     196 </span>            :         throw GeographicErr
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :           (&quot;Attempt to transfer UPS coordinates between hemispheres&quot;);</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :       zone = zoneout;</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :       xout = xin;</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :       yout = yin;</span>
+<span class="lineNum">     201 </span>            :     }
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :     if (northp != northpout)</span>
+<span class="lineNum">     203 </span>            :       // Can't get here if UPS
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :       yout += (northpout ? -1 : 1) * MGRS::utmNshift_;</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     206 </span>            :   }
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span><span class="lineCov">          3 :   void UTMUPS::DecodeZone(const std::string&amp; zonestr, int&amp; zone, bool&amp; northp)</span>
+<span class="lineNum">     209 </span>            :   {
+<span class="lineNum">     210 </span><span class="lineCov">          3 :     unsigned zlen = unsigned(zonestr.size());</span>
+<span class="lineNum">     211 </span><span class="lineCov">          3 :     if (zlen == 0)</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Empty zone specification&quot;);</span>
+<span class="lineNum">     213 </span>            :     // Longest zone spec is 32north, 42south, invalid = 7
+<span class="lineNum">     214 </span><span class="lineCov">          3 :     if (zlen &gt; 7)</span>
+<span class="lineNum">     215 </span>            :       throw GeographicErr(&quot;More than 7 characters in zone specification &quot;
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :                           + zonestr);</span>
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            :     const char* c = zonestr.c_str();
+<span class="lineNum">     219 </span>            :     char* q;
+<span class="lineNum">     220 </span><span class="lineCov">          3 :     int zone1 = strtol(c, &amp;q, 10);</span>
+<span class="lineNum">     221 </span>            :     // if (zone1 == 0) zone1 = UPS; (not necessary)
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span><span class="lineCov">          3 :     if (zone1 == UPS) {</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :       if (!(q == c))</span>
+<span class="lineNum">     225 </span>            :         // Don't allow 0n as an alternative to n for UPS coordinates
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Illegal zone 0 in &quot; + zonestr +</span>
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :                             &quot;, use just the hemisphere for UPS&quot;);</span>
+<span class="lineNum">     228 </span><span class="lineCov">          3 :     } else if (!(zone1 &gt;= MINUTMZONE &amp;&amp; zone1 &lt;= MAXUTMZONE))</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Zone &quot; + Utility::str(zone1)</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :                           + &quot; not in range [1, 60]&quot;);</span>
+<span class="lineNum">     231 </span><span class="lineCov">          3 :     else if (!isdigit(zonestr[0]))</span>
+<span class="lineNum">     232 </span>            :       throw GeographicErr(&quot;Must use unsigned number for zone &quot;
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :                           + Utility::str(zone1));</span>
+<span class="lineNum">     234 </span><span class="lineCov">          3 :     else if (q - c &gt; 2)</span>
+<span class="lineNum">     235 </span>            :       throw GeographicErr(&quot;More than 2 digits use to specify zone &quot;
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :                           + Utility::str(zone1));</span>
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span><span class="lineCov">          3 :     string hemi(zonestr, q - c);</span>
+<span class="lineNum">     239 </span><span class="lineCov">          6 :     for (std::string::iterator p = hemi.begin(); p != hemi.end(); ++p)</span>
+<span class="lineNum">     240 </span><span class="lineCov">          3 :       *p = char(std::tolower(*p));</span>
+<span class="lineNum">     241 </span><span class="lineCov">          3 :     if (q == c &amp;&amp; (hemi == &quot;inv&quot; || hemi == &quot;invalid&quot;)) {</span>
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :       zone = INVALID;</span>
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :       northp = false;</span>
+<span class="lineNum">     244 </span>            :       return;
+<span class="lineNum">     245 </span>            :     }
+<span class="lineNum">     246 </span><span class="lineCov">          6 :     bool northp1 = hemi == &quot;north&quot; || hemi == &quot;n&quot;;</span>
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :     if (!(northp1 || hemi == &quot;south&quot; || hemi == &quot;s&quot;))</span>
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :       throw GeographicErr(string(&quot;Illegal hemisphere &quot;) + hemi + &quot; in &quot;</span>
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :                           + zonestr + &quot;, specify north or south&quot;);</span>
+<span class="lineNum">     250 </span><span class="lineCov">          3 :     zone = zone1;</span>
+<span class="lineNum">     251 </span><span class="lineCov">          3 :     northp = northp1;</span>
+<span class="lineNum">     252 </span>            :   }
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span><span class="lineCov">          1 :   std::string UTMUPS::EncodeZone(int zone, bool northp, bool abbrev) {</span>
+<span class="lineNum">     255 </span><span class="lineCov">          1 :     if (zone == INVALID)</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :       return string(abbrev ? &quot;inv&quot; : &quot;invalid&quot;);</span>
+<span class="lineNum">     257 </span><span class="lineCov">          1 :     if (!(zone &gt;= MINZONE &amp;&amp; zone &lt;= MAXZONE))</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Zone &quot; + Utility::str(zone)</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :                           + &quot; not in range [0, 60]&quot;);</span>
+<span class="lineNum">     260 </span><span class="lineCov">          2 :     ostringstream os;</span>
+<span class="lineNum">     261 </span><span class="lineCov">          1 :     if (zone != UPS)</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :       os &lt;&lt; setfill('0') &lt;&lt; setw(2) &lt;&lt; zone;</span>
+<span class="lineNum">     263 </span><span class="lineCov">          1 :     if (abbrev)</span>
+<span class="lineNum">     264 </span><span class="lineCov">          1 :       os &lt;&lt; (northp ? 'n' : 's');</span>
+<span class="lineNum">     265 </span>            :     else
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :       os &lt;&lt; (northp ? &quot;north&quot; : &quot;south&quot;);</span>
+<span class="lineNum">     267 </span>            :     return os.str();
+<a name="268"><span class="lineNum">     268 </span>            :   }</a>
+<span class="lineNum">     269 </span>            : 
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :   void UTMUPS::DecodeEPSG(int epsg, int&amp; zone, bool&amp; northp) {</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :     northp = false;</span>
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :     if (epsg &gt;= epsg01N &amp;&amp; epsg &lt;= epsg60N) {</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :       zone = (epsg - epsg01N) + MINUTMZONE;</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :       northp = true;</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :     } else if (epsg == epsgN) {</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :       zone = UPS;</span>
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :       northp = true;</span>
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :     } else if (epsg &gt;= epsg01S &amp;&amp; epsg &lt;= epsg60S) {</span>
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :       zone = (epsg - epsg01S) + MINUTMZONE;</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :     } else if (epsg == epsgS) {</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :       zone = UPS;</span>
+<span class="lineNum">     282 </span>            :     } else {
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :       zone = INVALID;</span>
+<span class="lineNum">     284 </span>            :     }
+<a name="285"><span class="lineNum">     285 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :   int UTMUPS::EncodeEPSG(int zone, bool northp) {</span>
+<span class="lineNum">     288 </span>            :     int epsg = -1;
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :     if (zone == UPS)</span>
+<span class="lineNum">     290 </span>            :       epsg = epsgS;
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :     else if (zone &gt;= MINUTMZONE &amp;&amp; zone &lt;= MAXUTMZONE)</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :       epsg = (zone - MINUTMZONE) + epsg01S;</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :     if (epsg &gt;= 0 &amp;&amp; northp)</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :       epsg += epsgN - epsgS;</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :     return epsg;</span>
+<a name="296"><span class="lineNum">     296 </span>            :   }</a>
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :   Math::real UTMUPS::UTMShift() { return real(MGRS::utmNshift_); }</span>
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

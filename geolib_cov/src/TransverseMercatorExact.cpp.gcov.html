@@ -1,0 +1,538 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/TransverseMercatorExact.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - TransverseMercatorExact.cpp<span style="font-size: 80%;"> (source / <a href="TransverseMercatorExact.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">159</td>
+            <td class="headerCovTableEntry">207</td>
+            <td class="headerCovTableEntryMed">76.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntryHi">92.3 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file TransverseMercatorExact.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::TransverseMercatorExact class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2008-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  *
+<span class="lineNum">       9 </span>            :  * The relevant section of Lee's paper is part V, pp 67--101,
+<span class="lineNum">      10 </span>            :  * &lt;a href=&quot;https://doi.org/10.3138/X687-1574-4325-WM62&quot;&gt;Conformal
+<span class="lineNum">      11 </span>            :  * Projections Based On Jacobian Elliptic Functions&lt;/a&gt;.
+<span class="lineNum">      12 </span>            :  *
+<span class="lineNum">      13 </span>            :  * The method entails using the Thompson Transverse Mercator as an
+<span class="lineNum">      14 </span>            :  * intermediate projection.  The projections from the intermediate
+<span class="lineNum">      15 </span>            :  * coordinates to [\e phi, \e lam] and [\e x, \e y] are given by elliptic
+<span class="lineNum">      16 </span>            :  * functions.  The inverse of these projections are found by Newton's method
+<span class="lineNum">      17 </span>            :  * with a suitable starting guess.
+<span class="lineNum">      18 </span>            :  *
+<span class="lineNum">      19 </span>            :  * This implementation and notation closely follows Lee, with the following
+<span class="lineNum">      20 </span>            :  * exceptions:
+<span class="lineNum">      21 </span>            :  * &lt;center&gt;&lt;table&gt;
+<span class="lineNum">      22 </span>            :  * &lt;tr&gt;&lt;th&gt;Lee    &lt;th&gt;here    &lt;th&gt;Description
+<span class="lineNum">      23 </span>            :  * &lt;tr&gt;&lt;td&gt;x/a    &lt;td&gt;xi      &lt;td&gt;Northing (unit Earth)
+<span class="lineNum">      24 </span>            :  * &lt;tr&gt;&lt;td&gt;y/a    &lt;td&gt;eta     &lt;td&gt;Easting (unit Earth)
+<span class="lineNum">      25 </span>            :  * &lt;tr&gt;&lt;td&gt;s/a    &lt;td&gt;sigma   &lt;td&gt;xi + i * eta
+<span class="lineNum">      26 </span>            :  * &lt;tr&gt;&lt;td&gt;y      &lt;td&gt;x       &lt;td&gt;Easting
+<span class="lineNum">      27 </span>            :  * &lt;tr&gt;&lt;td&gt;x      &lt;td&gt;y       &lt;td&gt;Northing
+<span class="lineNum">      28 </span>            :  * &lt;tr&gt;&lt;td&gt;k      &lt;td&gt;e       &lt;td&gt;eccentricity
+<span class="lineNum">      29 </span>            :  * &lt;tr&gt;&lt;td&gt;k^2    &lt;td&gt;mu      &lt;td&gt;elliptic function parameter
+<span class="lineNum">      30 </span>            :  * &lt;tr&gt;&lt;td&gt;k'^2   &lt;td&gt;mv      &lt;td&gt;elliptic function complementary parameter
+<span class="lineNum">      31 </span>            :  * &lt;tr&gt;&lt;td&gt;m      &lt;td&gt;k       &lt;td&gt;scale
+<span class="lineNum">      32 </span>            :  * &lt;tr&gt;&lt;td&gt;zeta   &lt;td&gt;zeta    &lt;td&gt;complex longitude = Mercator = chi in paper
+<span class="lineNum">      33 </span>            :  * &lt;tr&gt;&lt;td&gt;s      &lt;td&gt;sigma   &lt;td&gt;complex GK = zeta in paper
+<span class="lineNum">      34 </span>            :  * &lt;/table&gt;&lt;/center&gt;
+<span class="lineNum">      35 </span>            :  *
+<span class="lineNum">      36 </span>            :  * Minor alterations have been made in some of Lee's expressions in an
+<span class="lineNum">      37 </span>            :  * attempt to control round-off.  For example atanh(sin(phi)) is replaced by
+<span class="lineNum">      38 </span>            :  * asinh(tan(phi)) which maintains accuracy near phi = pi/2.  Such changes
+<span class="lineNum">      39 </span>            :  * are noted in the code.
+<span class="lineNum">      40 </span>            :  **********************************************************************/
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : #include &lt;GeographicLib/TransverseMercatorExact.hpp&gt;
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      45 </span>            : // Squelch warnings about constant conditional expressions
+<span class="lineNum">      46 </span>            : #  pragma warning (disable: 4127)
+<span class="lineNum">      47 </span>            : #endif
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : namespace GeographicLib {
+<span class="lineNum">      50 </span>            : 
+<a name="51"><span class="lineNum">      51 </span>            :   using namespace std;</a>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineCov">          8 :   TransverseMercatorExact::TransverseMercatorExact(real a, real f, real k0,</span>
+<span class="lineNum">      54 </span><span class="lineCov">          8 :                                                    bool extendp)</span>
+<span class="lineNum">      55 </span>            :     : tol_(numeric_limits&lt;real&gt;::epsilon())
+<span class="lineNum">      56 </span>            :     , tol2_(real(0.1) * tol_)
+<span class="lineNum">      57 </span>            :     , taytol_(pow(tol_, real(0.6)))
+<span class="lineNum">      58 </span>            :     , _a(a)
+<span class="lineNum">      59 </span>            :     , _f(f)
+<span class="lineNum">      60 </span>            :     , _k0(k0)
+<span class="lineNum">      61 </span><span class="lineCov">          8 :     , _mu(_f * (2 - _f))        // e^2</span>
+<span class="lineNum">      62 </span><span class="lineCov">          8 :     , _mv(1 - _mu)              // 1 - e^2</span>
+<span class="lineNum">      63 </span><span class="lineCov">          8 :     , _e(sqrt(_mu))</span>
+<span class="lineNum">      64 </span>            :     , _extendp(extendp)
+<span class="lineNum">      65 </span>            :     , _Eu(_mu)
+<span class="lineNum">      66 </span><span class="lineCov">         40 :     , _Ev(_mv)</span>
+<span class="lineNum">      67 </span>            :   {
+<span class="lineNum">      68 </span><span class="lineCov">         16 :     if (!(Math::isfinite(_a) &amp;&amp; _a &gt; 0))</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Equatorial radius is not positive&quot;);</span>
+<span class="lineNum">      70 </span><span class="lineCov">          8 :     if (!(_f &gt; 0))</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Flattening is not positive&quot;);</span>
+<span class="lineNum">      72 </span><span class="lineCov">          8 :     if (!(_f &lt; 1))</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Polar semi-axis is not positive&quot;);</span>
+<span class="lineNum">      74 </span><span class="lineCov">         16 :     if (!(Math::isfinite(_k0) &amp;&amp; _k0 &gt; 0))</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale is not positive&quot;);</span>
+<a name="76"><span class="lineNum">      76 </span><span class="lineCov">          8 :   }</span></a>
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :   const TransverseMercatorExact&amp; TransverseMercatorExact::UTM() {</span>
+<span class="lineNum">      79 </span>            :     static const TransverseMercatorExact utm(Constants::WGS84_a(),
+<span class="lineNum">      80 </span>            :                                              Constants::WGS84_f(),
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :                                              Constants::UTM_k0());</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :     return utm;</span>
+<span class="lineNum">      83 </span>            :   }
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span><span class="lineCov">          6 :   void TransverseMercatorExact::zeta(real /*u*/, real snu, real cnu, real dnu,</span>
+<span class="lineNum">      86 </span>            :                                      real /*v*/, real snv, real cnv, real dnv,
+<span class="lineNum">      87 </span>            :                                      real&amp; taup, real&amp; lam) const {
+<span class="lineNum">      88 </span>            :     // Lee 54.17 but write
+<span class="lineNum">      89 </span>            :     // atanh(snu * dnv) = asinh(snu * dnv / sqrt(cnu^2 + _mv * snu^2 * snv^2))
+<span class="lineNum">      90 </span>            :     // atanh(_e * snu / dnv) =
+<span class="lineNum">      91 </span>            :     //         asinh(_e * snu / sqrt(_mu * cnu^2 + _mv * cnv^2))
+<span class="lineNum">      92 </span>            :     // Overflow value s.t. atan(overflow) = pi/2
+<span class="lineNum">      93 </span>            :     static const real
+<span class="lineNum">      94 </span><span class="lineCov">          6 :       overflow = 1 / Math::sq(std::numeric_limits&lt;real&gt;::epsilon());</span>
+<span class="lineNum">      95 </span>            :     real
+<span class="lineNum">      96 </span><span class="lineCov">         12 :       d1 = sqrt(Math::sq(cnu) + _mv * Math::sq(snu * snv)),</span>
+<span class="lineNum">      97 </span><span class="lineCov">         12 :       d2 = sqrt(_mu * Math::sq(cnu) + _mv * Math::sq(cnv)),</span>
+<span class="lineNum">      98 </span><span class="lineCov">          6 :       t1 = (d1 != 0 ? snu * dnv / d1 : (snu &lt; 0 ? -overflow : overflow)),</span>
+<span class="lineNum">      99 </span><span class="lineCov">         12 :       t2 = (d2 != 0 ? sinh( _e * Math::asinh(_e * snu / d2) ) :</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :             (snu &lt; 0 ? -overflow : overflow));</span>
+<span class="lineNum">     101 </span>            :     // psi = asinh(t1) - asinh(t2)
+<span class="lineNum">     102 </span>            :     // taup = sinh(psi)
+<span class="lineNum">     103 </span><span class="lineCov">         12 :     taup = t1 * Math::hypot(real(1), t2) - t2 * Math::hypot(real(1), t1);</span>
+<span class="lineNum">     104 </span><span class="lineCov">         12 :     lam = (d1 != 0 &amp;&amp; d2 != 0) ?</span>
+<span class="lineNum">     105 </span><span class="lineCov">          6 :       atan2(dnu * snv, cnu * cnv) - _e * atan2(_e * cnu * snv, dnu * cnv) :</span>
+<span class="lineNum">     106 </span>            :       0;
+<span class="lineNum">     107 </span><span class="lineCov">          6 :   }</span>
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span><span class="lineCov">          4 :   void TransverseMercatorExact::dwdzeta(real /*u*/,</span>
+<span class="lineNum">     110 </span>            :                                         real snu, real cnu, real dnu,
+<span class="lineNum">     111 </span>            :                                         real /*v*/,
+<span class="lineNum">     112 </span>            :                                         real snv, real cnv, real dnv,
+<span class="lineNum">     113 </span>            :                                         real&amp; du, real&amp; dv) const {
+<span class="lineNum">     114 </span>            :     // Lee 54.21 but write (1 - dnu^2 * snv^2) = (cnv^2 + _mu * snu^2 * snv^2)
+<span class="lineNum">     115 </span>            :     // (see A+S 16.21.4)
+<span class="lineNum">     116 </span><span class="lineCov">         16 :     real d = _mv * Math::sq(Math::sq(cnv) + _mu * Math::sq(snu * snv));</span>
+<span class="lineNum">     117 </span><span class="lineCov">          4 :     du =  cnu * dnu * dnv * (Math::sq(cnv) - _mu * Math::sq(snu * snv)) / d;</span>
+<span class="lineNum">     118 </span><span class="lineCov">         12 :     dv = -snu * snv * cnv * (Math::sq(dnu * dnv) + _mu * Math::sq(cnu)) / d;</span>
+<span class="lineNum">     119 </span><span class="lineCov">          4 :   }</span>
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            :   // Starting point for zetainv
+<span class="lineNum">     122 </span><span class="lineCov">          1 :   bool TransverseMercatorExact::zetainv0(real psi, real lam,</span>
+<span class="lineNum">     123 </span>            :                                          real&amp; u, real&amp; v) const {
+<span class="lineNum">     124 </span>            :     bool retval = false;
+<span class="lineNum">     125 </span><span class="lineCov">          1 :     if (psi &lt; -_e * Math::pi()/4 &amp;&amp;</span>
+<span class="lineNum">     126 </span><span class="lineCov">          1 :         lam &gt; (1 - 2 * _e) * Math::pi()/2 &amp;&amp;</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :         psi &lt; lam - (1 - _e) * Math::pi()/2) {</span>
+<span class="lineNum">     128 </span>            :       // N.B. this branch is normally not taken because psi &lt; 0 is converted
+<span class="lineNum">     129 </span>            :       // psi &gt; 0 by Forward.
+<span class="lineNum">     130 </span>            :       //
+<span class="lineNum">     131 </span>            :       // There's a log singularity at w = w0 = Eu.K() + i * Ev.K(),
+<span class="lineNum">     132 </span>            :       // corresponding to the south pole, where we have, approximately
+<span class="lineNum">     133 </span>            :       //
+<span class="lineNum">     134 </span>            :       //   psi = _e + i * pi/2 - _e * atanh(cos(i * (w - w0)/(1 + _mu/2)))
+<span class="lineNum">     135 </span>            :       //
+<span class="lineNum">     136 </span>            :       // Inverting this gives:
+<span class="lineNum">     137 </span>            :       real
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :         psix = 1 - psi / _e,</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :         lamx = (Math::pi()/2 - lam) / _e;</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :       u = Math::asinh(sin(lamx) / Math::hypot(cos(lamx), sinh(psix))) *</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :         (1 + _mu/2);</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :       v = atan2(cos(lamx), sinh(psix)) * (1 + _mu/2);</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :       u = _Eu.K() - u;</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :       v = _Ev.K() - v;</span>
+<span class="lineNum">     145 </span><span class="lineCov">          1 :     } else if (psi &lt; _e * Math::pi()/2 &amp;&amp;</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :                lam &gt; (1 - 2 * _e) * Math::pi()/2) {</span>
+<span class="lineNum">     147 </span>            :       // At w = w0 = i * Ev.K(), we have
+<span class="lineNum">     148 </span>            :       //
+<span class="lineNum">     149 </span>            :       //     zeta = zeta0 = i * (1 - _e) * pi/2
+<span class="lineNum">     150 </span>            :       //     zeta' = zeta'' = 0
+<span class="lineNum">     151 </span>            :       //
+<span class="lineNum">     152 </span>            :       // including the next term in the Taylor series gives:
+<span class="lineNum">     153 </span>            :       //
+<span class="lineNum">     154 </span>            :       // zeta = zeta0 - (_mv * _e) / 3 * (w - w0)^3
+<span class="lineNum">     155 </span>            :       //
+<span class="lineNum">     156 </span>            :       // When inverting this, we map arg(w - w0) = [-90, 0] to
+<span class="lineNum">     157 </span>            :       // arg(zeta - zeta0) = [-90, 180]
+<span class="lineNum">     158 </span>            :       real
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :         dlam = lam - (1 - _e) * Math::pi()/2,</span>
+<span class="lineNum">     160 </span>            :         rad = Math::hypot(psi, dlam),
+<span class="lineNum">     161 </span>            :         // atan2(dlam-psi, psi+dlam) + 45d gives arg(zeta - zeta0) in range
+<span class="lineNum">     162 </span>            :         // [-135, 225).  Subtracting 180 (since multiplier is negative) makes
+<span class="lineNum">     163 </span>            :         // range [-315, 45).  Multiplying by 1/3 (for cube root) gives range
+<span class="lineNum">     164 </span>            :         // [-105, 15).  In particular the range [-90, 180] in zeta space maps
+<span class="lineNum">     165 </span>            :         // to [-90, 0] in w space as required.
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :         ang = atan2(dlam-psi, psi+dlam) - real(0.75) * Math::pi();</span>
+<span class="lineNum">     167 </span>            :       // Error using this guess is about 0.21 * (rad/e)^(5/3)
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :       retval = rad &lt; _e * taytol_;</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :       rad = Math::cbrt(3 / (_mv * _e) * rad);</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :       ang /= 3;</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :       u = rad * cos(ang);</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :       v = rad * sin(ang) + _Ev.K();</span>
+<span class="lineNum">     173 </span>            :     } else {
+<span class="lineNum">     174 </span>            :       // Use spherical TM, Lee 12.6 -- writing atanh(sin(lam) / cosh(psi)) =
+<span class="lineNum">     175 </span>            :       // asinh(sin(lam) / hypot(cos(lam), sinh(psi))).  This takes care of the
+<span class="lineNum">     176 </span>            :       // log singularity at zeta = Eu.K() (corresponding to the north pole)
+<span class="lineNum">     177 </span><span class="lineCov">          3 :       v = Math::asinh(sin(lam) / Math::hypot(cos(lam), sinh(psi)));</span>
+<span class="lineNum">     178 </span><span class="lineCov">          1 :       u = atan2(sinh(psi), cos(lam));</span>
+<span class="lineNum">     179 </span>            :       // But scale to put 90,0 on the right place
+<span class="lineNum">     180 </span><span class="lineCov">          1 :       u *= _Eu.K() / (Math::pi()/2);</span>
+<span class="lineNum">     181 </span><span class="lineCov">          1 :       v *= _Eu.K() / (Math::pi()/2);</span>
+<span class="lineNum">     182 </span>            :     }
+<span class="lineNum">     183 </span><span class="lineCov">          1 :     return retval;</span>
+<span class="lineNum">     184 </span>            :   }
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span>            :   // Invert zeta using Newton's method
+<span class="lineNum">     187 </span><span class="lineCov">          1 :   void TransverseMercatorExact::zetainv(real taup, real lam,</span>
+<span class="lineNum">     188 </span>            :                                         real&amp; u, real&amp; v) const  {
+<span class="lineNum">     189 </span>            :     real
+<span class="lineNum">     190 </span><span class="lineCov">          1 :       psi = Math::asinh(taup),</span>
+<span class="lineNum">     191 </span><span class="lineCov">          1 :       scal = 1/Math::hypot(real(1), taup);</span>
+<span class="lineNum">     192 </span><span class="lineCov">          1 :     if (zetainv0(psi, lam, u, v))</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :       return;</span>
+<span class="lineNum">     194 </span><span class="lineCov">          3 :     real stol2 = tol2_ / Math::sq(max(psi, real(1)));</span>
+<span class="lineNum">     195 </span>            :     // min iterations = 2, max iterations = 6; mean = 4.0
+<span class="lineNum">     196 </span><span class="lineCov">          7 :     for (int i = 0, trip = 0; i &lt; numit_ || GEOGRAPHICLIB_PANIC; ++i) {</span>
+<span class="lineNum">     197 </span>            :       real snu, cnu, dnu, snv, cnv, dnv;
+<span class="lineNum">     198 </span><span class="lineCov">          4 :       _Eu.sncndn(u, snu, cnu, dnu);</span>
+<span class="lineNum">     199 </span><span class="lineCov">          4 :       _Ev.sncndn(v, snv, cnv, dnv);</span>
+<span class="lineNum">     200 </span>            :       real tau1, lam1, du1, dv1;
+<span class="lineNum">     201 </span><span class="lineCov">          4 :       zeta(u, snu, cnu, dnu, v, snv, cnv, dnv, tau1, lam1);</span>
+<span class="lineNum">     202 </span><span class="lineCov">          4 :       dwdzeta(u, snu, cnu, dnu, v, snv, cnv, dnv, du1, dv1);</span>
+<span class="lineNum">     203 </span><span class="lineCov">          4 :       tau1 -= taup;</span>
+<span class="lineNum">     204 </span><span class="lineCov">          4 :       lam1 -= lam;</span>
+<span class="lineNum">     205 </span><span class="lineCov">          4 :       tau1 *= scal;</span>
+<span class="lineNum">     206 </span>            :       real
+<span class="lineNum">     207 </span><span class="lineCov">          4 :         delu = tau1 * du1 - lam1 * dv1,</span>
+<span class="lineNum">     208 </span><span class="lineCov">          4 :         delv = tau1 * dv1 + lam1 * du1;</span>
+<span class="lineNum">     209 </span><span class="lineCov">          4 :       u -= delu;</span>
+<span class="lineNum">     210 </span><span class="lineCov">          4 :       v -= delv;</span>
+<span class="lineNum">     211 </span><span class="lineCov">          4 :       if (trip)</span>
+<span class="lineNum">     212 </span>            :         break;
+<span class="lineNum">     213 </span><span class="lineCov">          3 :       real delw2 = Math::sq(delu) + Math::sq(delv);</span>
+<span class="lineNum">     214 </span><span class="lineCov">          3 :       if (!(delw2 &gt;= stol2))</span>
+<span class="lineNum">     215 </span>            :         ++trip;
+<span class="lineNum">     216 </span>            :     }
+<span class="lineNum">     217 </span>            :   }
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineCov">          8 :   void TransverseMercatorExact::sigma(real /*u*/, real snu, real cnu, real dnu,</span>
+<span class="lineNum">     220 </span>            :                                       real v, real snv, real cnv, real dnv,
+<span class="lineNum">     221 </span>            :                                       real&amp; xi, real&amp; eta) const {
+<span class="lineNum">     222 </span>            :     // Lee 55.4 writing
+<span class="lineNum">     223 </span>            :     // dnu^2 + dnv^2 - 1 = _mu * cnu^2 + _mv * cnv^2
+<span class="lineNum">     224 </span><span class="lineCov">         24 :     real d = _mu * Math::sq(cnu) + _mv * Math::sq(cnv);</span>
+<span class="lineNum">     225 </span><span class="lineCov">          8 :     xi = _Eu.E(snu, cnu, dnu) - _mu * snu * cnu * dnu / d;</span>
+<span class="lineNum">     226 </span><span class="lineCov">          8 :     eta = v - _Ev.E(snv, cnv, dnv) + _mv * snv * cnv * dnv / d;</span>
+<span class="lineNum">     227 </span><span class="lineCov">          8 :   }</span>
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span><span class="lineCov">          6 :   void TransverseMercatorExact::dwdsigma(real /*u*/,</span>
+<span class="lineNum">     230 </span>            :                                          real snu, real cnu, real dnu,
+<span class="lineNum">     231 </span>            :                                          real /*v*/,
+<span class="lineNum">     232 </span>            :                                          real snv, real cnv, real dnv,
+<span class="lineNum">     233 </span>            :                                          real&amp; du, real&amp; dv) const {
+<span class="lineNum">     234 </span>            :     // Reciprocal of 55.9: dw/ds = dn(w)^2/_mv, expanding complex dn(w) using
+<span class="lineNum">     235 </span>            :     // A+S 16.21.4
+<span class="lineNum">     236 </span><span class="lineCov">         24 :     real d = _mv * Math::sq(Math::sq(cnv) + _mu * Math::sq(snu * snv));</span>
+<span class="lineNum">     237 </span>            :     real
+<span class="lineNum">     238 </span><span class="lineCov">          6 :       dnr = dnu * cnv * dnv,</span>
+<span class="lineNum">     239 </span><span class="lineCov">          6 :       dni = - _mu * snu * cnu * snv;</span>
+<span class="lineNum">     240 </span><span class="lineCov">          6 :     du = (Math::sq(dnr) - Math::sq(dni)) / d;</span>
+<span class="lineNum">     241 </span><span class="lineCov">          6 :     dv = 2 * dnr * dni / d;</span>
+<span class="lineNum">     242 </span><span class="lineCov">          6 :   }</span>
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            :   // Starting point for sigmainv
+<span class="lineNum">     245 </span><span class="lineCov">          2 :   bool TransverseMercatorExact::sigmainv0(real xi, real eta,</span>
+<span class="lineNum">     246 </span>            :                                           real&amp; u, real&amp; v) const {
+<span class="lineNum">     247 </span>            :     bool retval = false;
+<span class="lineNum">     248 </span><span class="lineCov">          6 :     if (eta &gt; real(1.25) * _Ev.KE() ||</span>
+<span class="lineNum">     249 </span><span class="lineCov">          2 :         (xi &lt; -real(0.25) * _Eu.E() &amp;&amp; xi &lt; eta - _Ev.KE())) {</span>
+<span class="lineNum">     250 </span>            :       // sigma as a simple pole at w = w0 = Eu.K() + i * Ev.K() and sigma is
+<span class="lineNum">     251 </span>            :       // approximated by
+<span class="lineNum">     252 </span>            :       //
+<span class="lineNum">     253 </span>            :       // sigma = (Eu.E() + i * Ev.KE()) + 1/(w - w0)
+<span class="lineNum">     254 </span>            :       real
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :         x = xi - _Eu.E(),</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :         y = eta - _Ev.KE(),</span>
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :         r2 = Math::sq(x) + Math::sq(y);</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :       u = _Eu.K() + x/r2;</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :       v = _Ev.K() - y/r2;</span>
+<span class="lineNum">     260 </span><span class="lineCov">          2 :     } else if ((eta &gt; real(0.75) * _Ev.KE() &amp;&amp; xi &lt; real(0.25) * _Eu.E())</span>
+<span class="lineNum">     261 </span><span class="lineCov">          4 :                || eta &gt; _Ev.KE()) {</span>
+<span class="lineNum">     262 </span>            :       // At w = w0 = i * Ev.K(), we have
+<span class="lineNum">     263 </span>            :       //
+<span class="lineNum">     264 </span>            :       //     sigma = sigma0 = i * Ev.KE()
+<span class="lineNum">     265 </span>            :       //     sigma' = sigma'' = 0
+<span class="lineNum">     266 </span>            :       //
+<span class="lineNum">     267 </span>            :       // including the next term in the Taylor series gives:
+<span class="lineNum">     268 </span>            :       //
+<span class="lineNum">     269 </span>            :       // sigma = sigma0 - _mv / 3 * (w - w0)^3
+<span class="lineNum">     270 </span>            :       //
+<span class="lineNum">     271 </span>            :       // When inverting this, we map arg(w - w0) = [-pi/2, -pi/6] to
+<span class="lineNum">     272 </span>            :       // arg(sigma - sigma0) = [-pi/2, pi/2]
+<span class="lineNum">     273 </span>            :       // mapping arg = [-pi/2, -pi/6] to [-pi/2, pi/2]
+<span class="lineNum">     274 </span>            :       real
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :         deta = eta - _Ev.KE(),</span>
+<span class="lineNum">     276 </span>            :         rad = Math::hypot(xi, deta),
+<span class="lineNum">     277 </span>            :         // Map the range [-90, 180] in sigma space to [-90, 0] in w space.  See
+<span class="lineNum">     278 </span>            :         // discussion in zetainv0 on the cut for ang.
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :         ang = atan2(deta-xi, xi+deta) - real(0.75) * Math::pi();</span>
+<span class="lineNum">     280 </span>            :       // Error using this guess is about 0.068 * rad^(5/3)
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :       retval = rad &lt; 2 * taytol_;</span>
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :       rad = Math::cbrt(3 / _mv * rad);</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :       ang /= 3;</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :       u = rad * cos(ang);</span>
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :       v = rad * sin(ang) + _Ev.K();</span>
+<span class="lineNum">     286 </span>            :     } else {
+<span class="lineNum">     287 </span>            :       // Else use w = sigma * Eu.K/Eu.E (which is correct in the limit _e -&gt; 0)
+<span class="lineNum">     288 </span><span class="lineCov">          2 :       u = xi * _Eu.K()/_Eu.E();</span>
+<span class="lineNum">     289 </span><span class="lineCov">          2 :       v = eta * _Eu.K()/_Eu.E();</span>
+<span class="lineNum">     290 </span>            :     }
+<span class="lineNum">     291 </span><span class="lineCov">          2 :     return retval;</span>
+<span class="lineNum">     292 </span>            :   }
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            :   // Invert sigma using Newton's method
+<span class="lineNum">     295 </span><span class="lineCov">          2 :   void TransverseMercatorExact::sigmainv(real xi, real eta,</span>
+<span class="lineNum">     296 </span>            :                                          real&amp; u, real&amp; v) const {
+<span class="lineNum">     297 </span><span class="lineCov">          2 :     if (sigmainv0(xi, eta, u, v))</span>
+<span class="lineNum">     298 </span>            :       return;
+<span class="lineNum">     299 </span>            :     // min iterations = 2, max iterations = 7; mean = 3.9
+<span class="lineNum">     300 </span><span class="lineCov">         10 :     for (int i = 0, trip = 0; i &lt; numit_ || GEOGRAPHICLIB_PANIC; ++i) {</span>
+<span class="lineNum">     301 </span>            :       real snu, cnu, dnu, snv, cnv, dnv;
+<span class="lineNum">     302 </span><span class="lineCov">          6 :       _Eu.sncndn(u, snu, cnu, dnu);</span>
+<span class="lineNum">     303 </span><span class="lineCov">          6 :       _Ev.sncndn(v, snv, cnv, dnv);</span>
+<span class="lineNum">     304 </span>            :       real xi1, eta1, du1, dv1;
+<span class="lineNum">     305 </span><span class="lineCov">          6 :       sigma(u, snu, cnu, dnu, v, snv, cnv, dnv, xi1, eta1);</span>
+<span class="lineNum">     306 </span><span class="lineCov">          6 :       dwdsigma(u, snu, cnu, dnu, v, snv, cnv, dnv, du1, dv1);</span>
+<span class="lineNum">     307 </span><span class="lineCov">          6 :       xi1 -= xi;</span>
+<span class="lineNum">     308 </span><span class="lineCov">          6 :       eta1 -= eta;</span>
+<span class="lineNum">     309 </span>            :       real
+<span class="lineNum">     310 </span><span class="lineCov">          6 :         delu = xi1 * du1 - eta1 * dv1,</span>
+<span class="lineNum">     311 </span><span class="lineCov">          6 :         delv = xi1 * dv1 + eta1 * du1;</span>
+<span class="lineNum">     312 </span><span class="lineCov">          6 :       u -= delu;</span>
+<span class="lineNum">     313 </span><span class="lineCov">          6 :       v -= delv;</span>
+<span class="lineNum">     314 </span><span class="lineCov">          6 :       if (trip)</span>
+<span class="lineNum">     315 </span>            :         break;
+<span class="lineNum">     316 </span><span class="lineCov">          4 :       real delw2 = Math::sq(delu) + Math::sq(delv);</span>
+<span class="lineNum">     317 </span><span class="lineCov">          4 :       if (!(delw2 &gt;= tol2_))</span>
+<span class="lineNum">     318 </span>            :         ++trip;
+<span class="lineNum">     319 </span>            :     }
+<span class="lineNum">     320 </span>            :   }
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span><span class="lineCov">          2 :   void TransverseMercatorExact::Scale(real tau, real /*lam*/,</span>
+<span class="lineNum">     323 </span>            :                                       real snu, real cnu, real dnu,
+<span class="lineNum">     324 </span>            :                                       real snv, real cnv, real dnv,
+<span class="lineNum">     325 </span>            :                                       real&amp; gamma, real&amp; k) const {
+<span class="lineNum">     326 </span><span class="lineCov">          2 :     real sec2 = 1 + Math::sq(tau);    // sec(phi)^2</span>
+<span class="lineNum">     327 </span>            :     // Lee 55.12 -- negated for our sign convention.  gamma gives the bearing
+<span class="lineNum">     328 </span>            :     // (clockwise from true north) of grid north
+<span class="lineNum">     329 </span><span class="lineCov">          2 :     gamma = atan2(_mv * snu * snv * cnv, cnu * dnu * dnv);</span>
+<span class="lineNum">     330 </span>            :     // Lee 55.13 with nu given by Lee 9.1 -- in sqrt change the numerator
+<span class="lineNum">     331 </span>            :     // from
+<span class="lineNum">     332 </span>            :     //
+<span class="lineNum">     333 </span>            :     //    (1 - snu^2 * dnv^2) to (_mv * snv^2 + cnu^2 * dnv^2)
+<span class="lineNum">     334 </span>            :     //
+<span class="lineNum">     335 </span>            :     // to maintain accuracy near phi = 90 and change the denomintor from
+<span class="lineNum">     336 </span>            :     //
+<span class="lineNum">     337 </span>            :     //    (dnu^2 + dnv^2 - 1) to (_mu * cnu^2 + _mv * cnv^2)
+<span class="lineNum">     338 </span>            :     //
+<span class="lineNum">     339 </span>            :     // to maintain accuracy near phi = 0, lam = 90 * (1 - e).  Similarly
+<span class="lineNum">     340 </span>            :     // rewrite sqrt term in 9.1 as
+<span class="lineNum">     341 </span>            :     //
+<span class="lineNum">     342 </span>            :     //    _mv + _mu * c^2 instead of 1 - _mu * sin(phi)^2
+<span class="lineNum">     343 </span><span class="lineCov">          4 :     k = sqrt(_mv + _mu / sec2) * sqrt(sec2) *</span>
+<span class="lineNum">     344 </span><span class="lineCov">          8 :       sqrt( (_mv * Math::sq(snv) + Math::sq(cnu * dnv)) /</span>
+<span class="lineNum">     345 </span><span class="lineCov">          6 :             (_mu * Math::sq(cnu) + _mv * Math::sq(cnv)) );</span>
+<span class="lineNum">     346 </span><span class="lineCov">          2 :   }</span>
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span><span class="lineCov">          2 :   void TransverseMercatorExact::Forward(real lon0, real lat, real lon,</span>
+<span class="lineNum">     349 </span>            :                                         real&amp; x, real&amp; y,
+<span class="lineNum">     350 </span>            :                                         real&amp; gamma, real&amp; k) const {
+<span class="lineNum">     351 </span>            :     lat = Math::LatFix(lat);
+<span class="lineNum">     352 </span>            :     lon = Math::AngDiff(lon0, lon);
+<span class="lineNum">     353 </span>            :     // Explicitly enforce the parity
+<span class="lineNum">     354 </span>            :     int
+<span class="lineNum">     355 </span><span class="lineCov">          2 :       latsign = (!_extendp &amp;&amp; lat &lt; 0) ? -1 : 1,</span>
+<span class="lineNum">     356 </span><span class="lineCov">          2 :       lonsign = (!_extendp &amp;&amp; lon &lt; 0) ? -1 : 1;</span>
+<span class="lineNum">     357 </span><span class="lineCov">          2 :     lon *= lonsign;</span>
+<span class="lineNum">     358 </span><span class="lineCov">          2 :     lat *= latsign;</span>
+<span class="lineNum">     359 </span><span class="lineCov">          2 :     bool backside = !_extendp &amp;&amp; lon &gt; 90;</span>
+<span class="lineNum">     360 </span>            :     if (backside) {
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :       if (lat == 0)</span>
+<span class="lineNum">     362 </span>            :         latsign = -1;
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :       lon = 180 - lon;</span>
+<span class="lineNum">     364 </span>            :     }
+<span class="lineNum">     365 </span>            :     real
+<span class="lineNum">     366 </span><span class="lineCov">          2 :       lam = lon * Math::degree(),</span>
+<span class="lineNum">     367 </span><span class="lineCov">          2 :       tau = Math::tand(lat);</span>
+<span class="lineNum">     368 </span>            : 
+<span class="lineNum">     369 </span>            :     // u,v = coordinates for the Thompson TM, Lee 54
+<span class="lineNum">     370 </span>            :     real u, v;
+<span class="lineNum">     371 </span><span class="lineCov">          2 :     if (lat == 90) {</span>
+<span class="lineNum">     372 </span><span class="lineCov">          1 :       u = _Eu.K();</span>
+<span class="lineNum">     373 </span><span class="lineCov">          1 :       v = 0;</span>
+<span class="lineNum">     374 </span><span class="lineCov">          1 :     } else if (lat == 0 &amp;&amp; lon == 90 * (1 - _e)) {</span>
+<span class="lineNum">     375 </span><span class="lineNoCov">          0 :       u = 0;</span>
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :       v = _Ev.K();</span>
+<span class="lineNum">     377 </span>            :     } else
+<span class="lineNum">     378 </span>            :       // tau = tan(phi), taup = sinh(psi)
+<span class="lineNum">     379 </span><span class="lineCov">          1 :       zetainv(Math::taupf(tau, _e), lam, u, v);</span>
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span>            :     real snu, cnu, dnu, snv, cnv, dnv;
+<span class="lineNum">     382 </span><span class="lineCov">          2 :     _Eu.sncndn(u, snu, cnu, dnu);</span>
+<span class="lineNum">     383 </span><span class="lineCov">          2 :     _Ev.sncndn(v, snv, cnv, dnv);</span>
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span>            :     real xi, eta;
+<span class="lineNum">     386 </span><span class="lineCov">          2 :     sigma(u, snu, cnu, dnu, v, snv, cnv, dnv, xi, eta);</span>
+<span class="lineNum">     387 </span><span class="lineCov">          2 :     if (backside)</span>
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :       xi = 2 * _Eu.E() - xi;</span>
+<span class="lineNum">     389 </span><span class="lineCov">          2 :     y = xi * _a * _k0 * latsign;</span>
+<span class="lineNum">     390 </span><span class="lineCov">          2 :     x = eta * _a * _k0 * lonsign;</span>
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span><span class="lineCov">          2 :     if (lat == 90) {</span>
+<span class="lineNum">     393 </span><span class="lineCov">          1 :       gamma = lon;</span>
+<span class="lineNum">     394 </span><span class="lineCov">          1 :       k = 1;</span>
+<span class="lineNum">     395 </span>            :     } else {
+<span class="lineNum">     396 </span>            :       // Recompute (tau, lam) from (u, v) to improve accuracy of Scale
+<span class="lineNum">     397 </span><span class="lineCov">          1 :       zeta(u, snu, cnu, dnu, v, snv, cnv, dnv, tau, lam);</span>
+<span class="lineNum">     398 </span><span class="lineCov">          1 :       tau = Math::tauf(tau, _e);</span>
+<span class="lineNum">     399 </span><span class="lineCov">          1 :       Scale(tau, lam, snu, cnu, dnu, snv, cnv, dnv, gamma, k);</span>
+<span class="lineNum">     400 </span><span class="lineCov">          1 :       gamma /= Math::degree();</span>
+<span class="lineNum">     401 </span>            :     }
+<span class="lineNum">     402 </span><span class="lineCov">          2 :     if (backside)</span>
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :       gamma = 180 - gamma;</span>
+<span class="lineNum">     404 </span><span class="lineCov">          2 :     gamma *= latsign * lonsign;</span>
+<span class="lineNum">     405 </span><span class="lineCov">          2 :     k *= _k0;</span>
+<span class="lineNum">     406 </span><span class="lineCov">          2 :   }</span>
+<span class="lineNum">     407 </span>            : 
+<span class="lineNum">     408 </span><span class="lineCov">          2 :   void TransverseMercatorExact::Reverse(real lon0, real x, real y,</span>
+<span class="lineNum">     409 </span>            :                                         real&amp; lat, real&amp; lon,
+<span class="lineNum">     410 </span>            :                                         real&amp; gamma, real&amp; k) const {
+<span class="lineNum">     411 </span>            :     // This undoes the steps in Forward.
+<span class="lineNum">     412 </span>            :     real
+<span class="lineNum">     413 </span><span class="lineCov">          2 :       xi = y / (_a * _k0),</span>
+<span class="lineNum">     414 </span><span class="lineCov">          2 :       eta = x / (_a * _k0);</span>
+<span class="lineNum">     415 </span>            :     // Explicitly enforce the parity
+<span class="lineNum">     416 </span>            :     int
+<span class="lineNum">     417 </span><span class="lineCov">          2 :       latsign = !_extendp &amp;&amp; y &lt; 0 ? -1 : 1,</span>
+<span class="lineNum">     418 </span><span class="lineCov">          2 :       lonsign = !_extendp &amp;&amp; x &lt; 0 ? -1 : 1;</span>
+<span class="lineNum">     419 </span><span class="lineCov">          2 :     xi *= latsign;</span>
+<span class="lineNum">     420 </span><span class="lineCov">          2 :     eta *= lonsign;</span>
+<span class="lineNum">     421 </span><span class="lineCov">          2 :     bool backside = !_extendp &amp;&amp; xi &gt; _Eu.E();</span>
+<span class="lineNum">     422 </span>            :     if (backside)
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :       xi = 2 * _Eu.E()- xi;</span>
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span>            :     // u,v = coordinates for the Thompson TM, Lee 54
+<span class="lineNum">     426 </span>            :     real u, v;
+<span class="lineNum">     427 </span><span class="lineCov">          2 :     if (xi == 0 &amp;&amp; eta == _Ev.KE()) {</span>
+<span class="lineNum">     428 </span><span class="lineNoCov">          0 :       u = 0;</span>
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :       v = _Ev.K();</span>
+<span class="lineNum">     430 </span>            :     } else
+<span class="lineNum">     431 </span><span class="lineCov">          2 :       sigmainv(xi, eta, u, v);</span>
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span>            :     real snu, cnu, dnu, snv, cnv, dnv;
+<span class="lineNum">     434 </span><span class="lineCov">          2 :     _Eu.sncndn(u, snu, cnu, dnu);</span>
+<span class="lineNum">     435 </span><span class="lineCov">          2 :     _Ev.sncndn(v, snv, cnv, dnv);</span>
+<span class="lineNum">     436 </span>            :     real phi, lam, tau;
+<span class="lineNum">     437 </span><span class="lineCov">          2 :     if (v != 0 || u != _Eu.K()) {</span>
+<span class="lineNum">     438 </span><span class="lineCov">          1 :       zeta(u, snu, cnu, dnu, v, snv, cnv, dnv, tau, lam);</span>
+<span class="lineNum">     439 </span><span class="lineCov">          1 :       tau = Math::tauf(tau, _e);</span>
+<span class="lineNum">     440 </span><span class="lineCov">          1 :       phi = atan(tau);</span>
+<span class="lineNum">     441 </span><span class="lineCov">          1 :       lat = phi / Math::degree();</span>
+<span class="lineNum">     442 </span><span class="lineCov">          2 :       lon = lam / Math::degree();</span>
+<span class="lineNum">     443 </span><span class="lineCov">          1 :       Scale(tau, lam, snu, cnu, dnu, snv, cnv, dnv, gamma, k);</span>
+<span class="lineNum">     444 </span><span class="lineCov">          1 :       gamma /= Math::degree();</span>
+<span class="lineNum">     445 </span>            :     } else {
+<span class="lineNum">     446 </span><span class="lineCov">          1 :       lat = 90;</span>
+<span class="lineNum">     447 </span><span class="lineCov">          1 :       lon = lam = gamma = 0;</span>
+<span class="lineNum">     448 </span><span class="lineCov">          1 :       k = 1;</span>
+<span class="lineNum">     449 </span>            :     }
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span><span class="lineCov">          2 :     if (backside)</span>
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :       lon = 180 - lon;</span>
+<span class="lineNum">     453 </span><span class="lineCov">          2 :     lon *= lonsign;</span>
+<span class="lineNum">     454 </span><span class="lineCov">          4 :     lon = Math::AngNormalize(lon + Math::AngNormalize(lon0));</span>
+<span class="lineNum">     455 </span><span class="lineCov">          2 :     lat *= latsign;</span>
+<span class="lineNum">     456 </span><span class="lineCov">          2 :     if (backside)</span>
+<span class="lineNum">     457 </span><span class="lineNoCov">          0 :       gamma = 180 - gamma;</span>
+<span class="lineNum">     458 </span><span class="lineCov">          2 :     gamma *= latsign * lonsign;</span>
+<span class="lineNum">     459 </span><span class="lineCov">          2 :     k *= _k0;</span>
+<span class="lineNum">     460 </span><span class="lineCov">          2 :   }</span>
+<span class="lineNum">     461 </span>            : 
+<span class="lineNum">     462 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

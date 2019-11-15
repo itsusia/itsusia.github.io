@@ -1,0 +1,225 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - build/man/ConicProj.usage</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">build/man</a> - ConicProj.usage<span style="font-size: 80%;"> (source / <a href="ConicProj.usage.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span><span class="lineNoCov">          0 : int usage(int retval, bool brief) {</span></a>
+<span class="lineNum">       2 </span><span class="lineNoCov">          0 :   if (brief)</span>
+<span class="lineNum">       3 </span><span class="lineNoCov">          0 :     ( retval ? std::cerr : std::cout ) &lt;&lt; &quot;Usage:\n&quot;</span>
+<span class="lineNum">       4 </span>            : &quot;    ConicProj ( -c | -a ) lat1 lat2 [ -l lon0 ] [ -k k1 ] [ -r ] [ -e a f ]\n&quot;
+<span class="lineNum">       5 </span>            : &quot;    [ -w ] [ -p prec ] [ --comment-delimiter commentdelim ] [ --version |\n&quot;
+<span class="lineNum">       6 </span>            : &quot;    -h | --help ] [ --input-file infile | --input-string instring ] [\n&quot;
+<span class="lineNum">       7 </span>            : &quot;    --line-separator linesep ] [ --output-file outfile ]\n&quot;
+<span class="lineNum">       8 </span>            : &quot;\n&quot;
+<span class="lineNum">       9 </span>            : &quot;For full documentation type:\n&quot;
+<span class="lineNum">      10 </span>            : &quot;    ConicProj --help\n&quot;
+<span class="lineNum">      11 </span>            : &quot;or visit:\n&quot;
+<span class="lineNum">      12 </span><span class="lineNoCov">          0 : &quot;    https://geographiclib.sourceforge.io/1.49/ConicProj.1.html\n&quot;;</span>
+<span class="lineNum">      13 </span>            :   else
+<span class="lineNum">      14 </span><span class="lineNoCov">          0 :     ( retval ? std::cerr : std::cout ) &lt;&lt; &quot;Man page:\n&quot;</span>
+<span class="lineNum">      15 </span>            : &quot;NAME\n&quot;
+<span class="lineNum">      16 </span>            : &quot;       ConicProj -- perform conic projections\n&quot;
+<span class="lineNum">      17 </span>            : &quot;\n&quot;
+<span class="lineNum">      18 </span>            : &quot;SYNOPSIS\n&quot;
+<span class="lineNum">      19 </span>            : &quot;       ConicProj ( -c | -a ) lat1 lat2 [ -l lon0 ] [ -k k1 ] [ -r ] [ -e a f ]\n&quot;
+<span class="lineNum">      20 </span>            : &quot;       [ -w ] [ -p prec ] [ --comment-delimiter commentdelim ] [ --version |\n&quot;
+<span class="lineNum">      21 </span>            : &quot;       -h | --help ] [ --input-file infile | --input-string instring ] [\n&quot;
+<span class="lineNum">      22 </span>            : &quot;       --line-separator linesep ] [ --output-file outfile ]\n&quot;
+<span class="lineNum">      23 </span>            : &quot;\n&quot;
+<span class="lineNum">      24 </span>            : &quot;DESCRIPTION\n&quot;
+<span class="lineNum">      25 </span>            : &quot;       Perform one of two conic projections geodesics.  Convert geodetic\n&quot;
+<span class="lineNum">      26 </span>            : &quot;       coordinates to either Lambert conformal conic or Albers equal area\n&quot;
+<span class="lineNum">      27 </span>            : &quot;       coordinates.  The standard latitudes lat1 and lat2 are specified by\n&quot;
+<span class="lineNum">      28 </span>            : &quot;       that the -c option (for Lambert conformal conic) or the -a option (for\n&quot;
+<span class="lineNum">      29 </span>            : &quot;       Albers equal area).  At least one of these options must be given (the\n&quot;
+<span class="lineNum">      30 </span>            : &quot;       last one given is used).  Specify lat1 = lat2, to obtain the case with\n&quot;
+<span class="lineNum">      31 </span>            : &quot;       a single standard parallel.  The central meridian is given by lon0.\n&quot;
+<span class="lineNum">      32 </span>            : &quot;       The longitude of origin is given by the latitude of minimum (azimuthal)\n&quot;
+<span class="lineNum">      33 </span>            : &quot;       scale for Lambert conformal conic (Albers equal area).  The (azimuthal)\n&quot;
+<span class="lineNum">      34 </span>            : &quot;       scale on the standard parallels is k1.\n&quot;
+<span class="lineNum">      35 </span>            : &quot;\n&quot;
+<span class="lineNum">      36 </span>            : &quot;       Geodetic coordinates are provided on standard input as a set of lines\n&quot;
+<span class="lineNum">      37 </span>            : &quot;       containing (blank separated) latitude and longitude (decimal degrees or\n&quot;
+<span class="lineNum">      38 </span>            : &quot;       degrees, minutes, seconds);  for details on the allowed formats for\n&quot;
+<span class="lineNum">      39 </span>            : &quot;       latitude and longitude, see the \&quot;GEOGRAPHIC COORDINATES\&quot; section of\n&quot;
+<span class="lineNum">      40 </span>            : &quot;       GeoConvert(1).  For each set of geodetic coordinates, the corresponding\n&quot;
+<span class="lineNum">      41 </span>            : &quot;       projected easting, x, and northing, y, (meters) are printed on standard\n&quot;
+<span class="lineNum">      42 </span>            : &quot;       output together with the meridian convergence gamma (degrees) and\n&quot;
+<span class="lineNum">      43 </span>            : &quot;       (azimuthal) scale k.  For Albers equal area, the radial scale is 1/k.\n&quot;
+<span class="lineNum">      44 </span>            : &quot;       The meridian convergence is the bearing of the y axis measured\n&quot;
+<span class="lineNum">      45 </span>            : &quot;       clockwise from true north.\n&quot;
+<span class="lineNum">      46 </span>            : &quot;\n&quot;
+<span class="lineNum">      47 </span>            : &quot;       Special cases of the Lambert conformal projection are the Mercator\n&quot;
+<span class="lineNum">      48 </span>            : &quot;       projection (the standard latitudes equal and opposite) and the polar\n&quot;
+<span class="lineNum">      49 </span>            : &quot;       stereographic projection (both standard latitudes correspond to the\n&quot;
+<span class="lineNum">      50 </span>            : &quot;       same pole).  Special cases of the Albers equal area projection are the\n&quot;
+<span class="lineNum">      51 </span>            : &quot;       cylindrical equal area projection (the standard latitudes equal and\n&quot;
+<span class="lineNum">      52 </span>            : &quot;       opposite), the Lambert azimuthal equal area projection (both standard\n&quot;
+<span class="lineNum">      53 </span>            : &quot;       latitude corresponds to the same pole), and the Lambert equal area\n&quot;
+<span class="lineNum">      54 </span>            : &quot;       conic projection (one standard parallel is at a pole).\n&quot;
+<span class="lineNum">      55 </span>            : &quot;\n&quot;
+<span class="lineNum">      56 </span>            : &quot;OPTIONS\n&quot;
+<span class="lineNum">      57 </span>            : &quot;       -c lat1 lat2\n&quot;
+<span class="lineNum">      58 </span>            : &quot;           use the Lambert conformal conic projection with standard parallels\n&quot;
+<span class="lineNum">      59 </span>            : &quot;           lat1 and lat2.\n&quot;
+<span class="lineNum">      60 </span>            : &quot;\n&quot;
+<span class="lineNum">      61 </span>            : &quot;       -a lat1 lat2\n&quot;
+<span class="lineNum">      62 </span>            : &quot;           use the Albers equal area projection with standard parallels lat1\n&quot;
+<span class="lineNum">      63 </span>            : &quot;           and lat2.\n&quot;
+<span class="lineNum">      64 </span>            : &quot;\n&quot;
+<span class="lineNum">      65 </span>            : &quot;       -l lon0\n&quot;
+<span class="lineNum">      66 </span>            : &quot;           specify the longitude of origin lon0 (degrees, default 0).\n&quot;
+<span class="lineNum">      67 </span>            : &quot;\n&quot;
+<span class="lineNum">      68 </span>            : &quot;       -k k1\n&quot;
+<span class="lineNum">      69 </span>            : &quot;           specify the (azimuthal) scale k1 on the standard parallels (default\n&quot;
+<span class="lineNum">      70 </span>            : &quot;           1).\n&quot;
+<span class="lineNum">      71 </span>            : &quot;\n&quot;
+<span class="lineNum">      72 </span>            : &quot;       -r  perform the reverse projection.  x and y are given on standard\n&quot;
+<span class="lineNum">      73 </span>            : &quot;           input and each line of standard output gives latitude, longitude,\n&quot;
+<span class="lineNum">      74 </span>            : &quot;           gamma, and k.\n&quot;
+<span class="lineNum">      75 </span>            : &quot;\n&quot;
+<span class="lineNum">      76 </span>            : &quot;       -e a f\n&quot;
+<span class="lineNum">      77 </span>            : &quot;           specify the ellipsoid via the equatorial radius, a and the\n&quot;
+<span class="lineNum">      78 </span>            : &quot;           flattening, f.  Setting f = 0 results in a sphere.  Specify f &lt; 0\n&quot;
+<span class="lineNum">      79 </span>            : &quot;           for a prolate ellipsoid.  A simple fraction, e.g., 1/297, is\n&quot;
+<span class="lineNum">      80 </span>            : &quot;           allowed for f.  By default, the WGS84 ellipsoid is used, a =\n&quot;
+<span class="lineNum">      81 </span>            : &quot;           6378137 m, f = 1/298.257223563.\n&quot;
+<span class="lineNum">      82 </span>            : &quot;\n&quot;
+<span class="lineNum">      83 </span>            : &quot;       -w  toggle the longitude first flag (it starts off); if the flag is on,\n&quot;
+<span class="lineNum">      84 </span>            : &quot;           then on input and output, longitude precedes latitude (except that,\n&quot;
+<span class="lineNum">      85 </span>            : &quot;           on input, this can be overridden by a hemisphere designator, N, S,\n&quot;
+<span class="lineNum">      86 </span>            : &quot;           E, W).\n&quot;
+<span class="lineNum">      87 </span>            : &quot;\n&quot;
+<span class="lineNum">      88 </span>            : &quot;       -p prec\n&quot;
+<span class="lineNum">      89 </span>            : &quot;           set the output precision to prec (default 6).  prec is the number\n&quot;
+<span class="lineNum">      90 </span>            : &quot;           of digits after the decimal point for lengths (in meters).  For\n&quot;
+<span class="lineNum">      91 </span>            : &quot;           latitudes and longitudes (in degrees), the number of digits after\n&quot;
+<span class="lineNum">      92 </span>            : &quot;           the decimal point is prec + 5.  For the convergence (in degrees)\n&quot;
+<span class="lineNum">      93 </span>            : &quot;           and scale, the number of digits after the decimal point is prec +\n&quot;
+<span class="lineNum">      94 </span>            : &quot;           6.\n&quot;
+<span class="lineNum">      95 </span>            : &quot;\n&quot;
+<span class="lineNum">      96 </span>            : &quot;       --comment-delimiter commentdelim\n&quot;
+<span class="lineNum">      97 </span>            : &quot;           set the comment delimiter to commentdelim (e.g., \&quot;#\&quot; or \&quot;//\&quot;).  If\n&quot;
+<span class="lineNum">      98 </span>            : &quot;           set, the input lines will be scanned for this delimiter and, if\n&quot;
+<span class="lineNum">      99 </span>            : &quot;           found, the delimiter and the rest of the line will be removed prior\n&quot;
+<span class="lineNum">     100 </span>            : &quot;           to processing and subsequently appended to the output line\n&quot;
+<span class="lineNum">     101 </span>            : &quot;           (separated by a space).\n&quot;
+<span class="lineNum">     102 </span>            : &quot;\n&quot;
+<span class="lineNum">     103 </span>            : &quot;       --version\n&quot;
+<span class="lineNum">     104 </span>            : &quot;           print version and exit.\n&quot;
+<span class="lineNum">     105 </span>            : &quot;\n&quot;
+<span class="lineNum">     106 </span>            : &quot;       -h  print usage and exit.\n&quot;
+<span class="lineNum">     107 </span>            : &quot;\n&quot;
+<span class="lineNum">     108 </span>            : &quot;       --help\n&quot;
+<span class="lineNum">     109 </span>            : &quot;           print full documentation and exit.\n&quot;
+<span class="lineNum">     110 </span>            : &quot;\n&quot;
+<span class="lineNum">     111 </span>            : &quot;       --input-file infile\n&quot;
+<span class="lineNum">     112 </span>            : &quot;           read input from the file infile instead of from standard input; a\n&quot;
+<span class="lineNum">     113 </span>            : &quot;           file name of \&quot;-\&quot; stands for standard input.\n&quot;
+<span class="lineNum">     114 </span>            : &quot;\n&quot;
+<span class="lineNum">     115 </span>            : &quot;       --input-string instring\n&quot;
+<span class="lineNum">     116 </span>            : &quot;           read input from the string instring instead of from standard input.\n&quot;
+<span class="lineNum">     117 </span>            : &quot;           All occurrences of the line separator character (default is a\n&quot;
+<span class="lineNum">     118 </span>            : &quot;           semicolon) in instring are converted to newlines before the reading\n&quot;
+<span class="lineNum">     119 </span>            : &quot;           begins.\n&quot;
+<span class="lineNum">     120 </span>            : &quot;\n&quot;
+<span class="lineNum">     121 </span>            : &quot;       --line-separator linesep\n&quot;
+<span class="lineNum">     122 </span>            : &quot;           set the line separator character to linesep.  By default this is a\n&quot;
+<span class="lineNum">     123 </span>            : &quot;           semicolon.\n&quot;
+<span class="lineNum">     124 </span>            : &quot;\n&quot;
+<span class="lineNum">     125 </span>            : &quot;       --output-file outfile\n&quot;
+<span class="lineNum">     126 </span>            : &quot;           write output to the file outfile instead of to standard output; a\n&quot;
+<span class="lineNum">     127 </span>            : &quot;           file name of \&quot;-\&quot; stands for standard output.\n&quot;
+<span class="lineNum">     128 </span>            : &quot;\n&quot;
+<span class="lineNum">     129 </span>            : &quot;EXAMPLES\n&quot;
+<span class="lineNum">     130 </span>            : &quot;          echo 39.95N 75.17W | ConicProj -c 40d58 39d56 -l 77d45W\n&quot;
+<span class="lineNum">     131 </span>            : &quot;          =&gt; 220445 -52372 1.67 1.0\n&quot;
+<span class="lineNum">     132 </span>            : &quot;          echo 220445 -52372 | ConicProj -c 40d58 39d56 -l 77d45W -r\n&quot;
+<span class="lineNum">     133 </span>            : &quot;          =&gt; 39.95 -75.17 1.67 1.0\n&quot;
+<span class="lineNum">     134 </span>            : &quot;\n&quot;
+<span class="lineNum">     135 </span>            : &quot;ERRORS\n&quot;
+<span class="lineNum">     136 </span>            : &quot;       An illegal line of input will print an error message to standard output\n&quot;
+<span class="lineNum">     137 </span>            : &quot;       beginning with \&quot;ERROR:\&quot; and causes ConicProj to return an exit code of\n&quot;
+<span class="lineNum">     138 </span>            : &quot;       1.  However, an error does not cause ConicProj to terminate; following\n&quot;
+<span class="lineNum">     139 </span>            : &quot;       lines will be converted.\n&quot;
+<span class="lineNum">     140 </span>            : &quot;\n&quot;
+<span class="lineNum">     141 </span>            : &quot;AUTHOR\n&quot;
+<span class="lineNum">     142 </span>            : &quot;       ConicProj was written by Charles Karney.\n&quot;
+<span class="lineNum">     143 </span>            : &quot;\n&quot;
+<span class="lineNum">     144 </span>            : &quot;HISTORY\n&quot;
+<span class="lineNum">     145 </span>            : &quot;       ConicProj was added to GeographicLib,\n&quot;
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 : &quot;       &lt;https://geographiclib.sourceforge.io&gt;, in version 1.9.\n&quot;</span>
+<span class="lineNum">     147 </span>            : ;
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :   return retval;</span>
+<span class="lineNum">     149 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

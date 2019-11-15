@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/projections/wag7.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/projections</a> - wag7.cpp<span style="font-size: 80%;"> (source / <a href="wag7.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntryHi">90.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">66.7 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #define PJ_LIB__</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            : #include &lt;math.h&gt;
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : #include &quot;proj.h&quot;
+<span class="lineNum">       6 </span>            : #include &quot;proj_internal.h&quot;
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : PROJ_HEAD(wag7, &quot;Wagner VII&quot;) &quot;\n\tMisc Sph, no inv&quot;;
+<span class="lineNum">       9 </span>            : 
+<a name="10"><span class="lineNum">      10 </span>            : </a>
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span><span class="lineCov">          4 : static PJ_XY wag7_s_forward (PJ_LP lp, PJ *P) {           /* Spheroidal, forward */</span>
+<span class="lineNum">      13 </span>            :     PJ_XY xy = {0.0, 0.0};
+<span class="lineNum">      14 </span>            :         double theta, ct, D;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :         (void) P; /* Shut up compiler warnnings about unused P */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span><span class="lineCov">          4 :         theta = asin (xy.y = 0.90630778703664996 * sin(lp.phi));</span>
+<span class="lineNum">      19 </span><span class="lineCov">          4 :         xy.x  = 2.66723 * (ct = cos (theta)) * sin (lp.lam /= 3.);</span>
+<span class="lineNum">      20 </span><span class="lineCov">          4 :         xy.y *= 1.24104 * (D = 1/(sqrt (0.5 * (1 + ct * cos (lp.lam)))));</span>
+<span class="lineNum">      21 </span><span class="lineCov">          4 :         xy.x *= D;</span>
+<span class="lineNum">      22 </span><span class="lineCov">          4 :         return (xy);</span>
+<span class="lineNum">      23 </span>            : }
+<a name="24"><span class="lineNum">      24 </span>            : </a>
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span><span class="lineCov">          9 : PJ *PROJECTION(wag7) {</span>
+<span class="lineNum">      27 </span><span class="lineCov">          3 :     P-&gt;fwd = wag7_s_forward;</span>
+<span class="lineNum">      28 </span><span class="lineCov">          3 :     P-&gt;inv = nullptr;</span>
+<span class="lineNum">      29 </span><span class="lineCov">          3 :     P-&gt;es = 0.;</span>
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :     return P;</span>
+<span class="lineNum">      31 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - tools/GeodesicProj.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">tools</a> - GeodesicProj.cpp<span style="font-size: 80%;"> (source / <a href="GeodesicProj.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">54</td>
+            <td class="headerCovTableEntry">115</td>
+            <td class="headerCovTableEntryLo">47.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file GeodesicProj.cpp
+<span class="lineNum">       3 </span>            :  * \brief Command line utility for geodesic projections
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2009-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  *
+<span class="lineNum">       9 </span>            :  * See the &lt;a href=&quot;GeodesicProj.1.html&quot;&gt;man page&lt;/a&gt; for usage information.
+<span class="lineNum">      10 </span>            :  **********************************************************************/
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">      13 </span>            : #include &lt;string&gt;
+<span class="lineNum">      14 </span>            : #include &lt;sstream&gt;
+<span class="lineNum">      15 </span>            : #include &lt;fstream&gt;
+<span class="lineNum">      16 </span>            : #include &lt;GeographicLib/Geodesic.hpp&gt;
+<span class="lineNum">      17 </span>            : #include &lt;GeographicLib/AzimuthalEquidistant.hpp&gt;
+<span class="lineNum">      18 </span>            : #include &lt;GeographicLib/CassiniSoldner.hpp&gt;
+<span class="lineNum">      19 </span>            : #include &lt;GeographicLib/Gnomonic.hpp&gt;
+<span class="lineNum">      20 </span>            : #include &lt;GeographicLib/DMS.hpp&gt;
+<span class="lineNum">      21 </span>            : #include &lt;GeographicLib/Utility.hpp&gt;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      24 </span>            : // Squelch warnings about constant conditional expressions and potentially
+<span class="lineNum">      25 </span>            : // uninitialized local variables
+<span class="lineNum">      26 </span>            : #  pragma warning (disable: 4127 4701)
+<span class="lineNum">      27 </span>            : #endif
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #include &quot;GeodesicProj.usage&quot;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineCov">          1 : int main(int argc, const char* const argv[]) {</span>
+<span class="lineNum">      32 </span>            :   try {
+<span class="lineNum">      33 </span>            :     using namespace GeographicLib;
+<span class="lineNum">      34 </span>            :     typedef Math::real real;
+<span class="lineNum">      35 </span><span class="lineCov">          1 :     Utility::set_digits();</span>
+<span class="lineNum">      36 </span>            :     bool azimuthal = false, cassini = false, gnomonic = false, reverse = false,
+<span class="lineNum">      37 </span>            :       longfirst = false;
+<span class="lineNum">      38 </span><span class="lineCov">          1 :     real lat0 = 0, lon0 = 0;</span>
+<span class="lineNum">      39 </span>            :     real
+<span class="lineNum">      40 </span>            :       a = Constants::WGS84_a(),
+<span class="lineNum">      41 </span>            :       f = Constants::WGS84_f();
+<span class="lineNum">      42 </span><span class="lineCov">          1 :     int prec = 6;</span>
+<span class="lineNum">      43 </span>            :     std::string istring, ifile, ofile, cdelim;
+<span class="lineNum">      44 </span>            :     char lsep = ';';
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span><span class="lineCov">          7 :     for (int m = 1; m &lt; argc; ++m) {</span>
+<span class="lineNum">      47 </span><span class="lineCov">          3 :       std::string arg(argv[m]);</span>
+<span class="lineNum">      48 </span><span class="lineCov">          3 :       if (arg == &quot;-r&quot;)</span>
+<span class="lineNum">      49 </span>            :         reverse = true;
+<span class="lineNum">      50 </span><span class="lineCov">          7 :       else if (arg == &quot;-c&quot; || arg == &quot;-z&quot; || arg == &quot;-g&quot;) {</span>
+<span class="lineNum">      51 </span>            :         cassini = azimuthal =  gnomonic = false;
+<span class="lineNum">      52 </span>            :         cassini = arg == &quot;-c&quot;;
+<span class="lineNum">      53 </span>            :         azimuthal = arg == &quot;-z&quot;;
+<span class="lineNum">      54 </span>            :         gnomonic = arg == &quot;-g&quot;;
+<span class="lineNum">      55 </span><span class="lineCov">          1 :         if (m + 2 &gt;= argc) return usage(1, true);</span>
+<span class="lineNum">      56 </span>            :         try {
+<span class="lineNum">      57 </span><span class="lineCov">          3 :           DMS::DecodeLatLon(std::string(argv[m + 1]), std::string(argv[m + 2]),</span>
+<span class="lineNum">      58 </span>            :                             lat0, lon0, longfirst);
+<span class="lineNum">      59 </span>            :         }
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :         catch (const std::exception&amp; e) {</span>
+<span class="lineNum">      61 </span>            :           std::cerr &lt;&lt; &quot;Error decoding arguments of &quot; &lt;&lt; arg &lt;&lt; &quot;: &quot;
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :                     &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">      63 </span>            :           return 1;
+<span class="lineNum">      64 </span>            :         }
+<span class="lineNum">      65 </span>            :         m += 2;
+<span class="lineNum">      66 </span><span class="lineCov">          2 :       } else if (arg == &quot;-e&quot;) {</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :         if (m + 2 &gt;= argc) return usage(1, true);</span>
+<span class="lineNum">      68 </span>            :         try {
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :           a = Utility::val&lt;real&gt;(std::string(argv[m + 1]));</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :           f = Utility::fract&lt;real&gt;(std::string(argv[m + 2]));</span>
+<span class="lineNum">      71 </span>            :         }
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :         catch (const std::exception&amp; e) {</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :           std::cerr &lt;&lt; &quot;Error decoding arguments of -e: &quot; &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">      74 </span>            :           return 1;
+<span class="lineNum">      75 </span>            :         }
+<span class="lineNum">      76 </span>            :         m += 2;
+<span class="lineNum">      77 </span><span class="lineCov">          2 :       } else if (arg == &quot;-w&quot;)</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :         longfirst = !longfirst;</span>
+<span class="lineNum">      79 </span><span class="lineCov">          2 :       else if (arg == &quot;-p&quot;) {</span>
+<span class="lineNum">      80 </span><span class="lineCov">          1 :         if (++m == argc) return usage(1, true);</span>
+<span class="lineNum">      81 </span>            :         try {
+<span class="lineNum">      82 </span><span class="lineCov">          2 :           prec = Utility::val&lt;int&gt;(std::string(argv[m]));</span>
+<span class="lineNum">      83 </span>            :         }
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :         catch (const std::exception&amp;) {</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :           std::cerr &lt;&lt; &quot;Precision &quot; &lt;&lt; argv[m] &lt;&lt; &quot; is not a number\n&quot;;</span>
+<span class="lineNum">      86 </span>            :           return 1;
+<span class="lineNum">      87 </span>            :         }
+<span class="lineNum">      88 </span><span class="lineCov">          1 :       } else if (arg == &quot;--input-string&quot;) {</span>
+<span class="lineNum">      89 </span><span class="lineCov">          1 :         if (++m == argc) return usage(1, true);</span>
+<span class="lineNum">      90 </span><span class="lineCov">          1 :         istring = argv[m];</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :       } else if (arg == &quot;--input-file&quot;) {</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :         if (++m == argc) return usage(1, true);</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :         ifile = argv[m];</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :       } else if (arg == &quot;--output-file&quot;) {</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :         if (++m == argc) return usage(1, true);</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :         ofile = argv[m];</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :       } else if (arg == &quot;--line-separator&quot;) {</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :         if (++m == argc) return usage(1, true);</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :         if (std::string(argv[m]).size() != 1) {</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :           std::cerr &lt;&lt; &quot;Line separator must be a single character\n&quot;;</span>
+<span class="lineNum">     101 </span>            :           return 1;
+<span class="lineNum">     102 </span>            :         }
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :         lsep = argv[m][0];</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :       } else if (arg == &quot;--comment-delimiter&quot;) {</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :         if (++m == argc) return usage(1, true);</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :         cdelim = argv[m];</span>
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :       } else if (arg == &quot;--version&quot;) {</span>
+<span class="lineNum">     108 </span>            :         std::cout &lt;&lt; argv[0] &lt;&lt; &quot;: GeographicLib version &quot;
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :                   &lt;&lt; GEOGRAPHICLIB_VERSION_STRING &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     110 </span>            :         return 0;
+<span class="lineNum">     111 </span>            :       } else
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :         return usage(!(arg == &quot;-h&quot; || arg == &quot;--help&quot;), arg != &quot;--help&quot;);</span>
+<span class="lineNum">     113 </span>            :     }
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineCov">          1 :     if (!ifile.empty() &amp;&amp; !istring.empty()) {</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :       std::cerr &lt;&lt; &quot;Cannot specify --input-string and --input-file together\n&quot;;</span>
+<span class="lineNum">     117 </span>            :       return 1;
+<span class="lineNum">     118 </span>            :     }
+<span class="lineNum">     119 </span><span class="lineCov">          1 :     if (ifile == &quot;-&quot;) ifile.clear();</span>
+<span class="lineNum">     120 </span><span class="lineCov">          2 :     std::ifstream infile;</span>
+<span class="lineNum">     121 </span><span class="lineCov">          2 :     std::istringstream instring;</span>
+<span class="lineNum">     122 </span><span class="lineCov">          1 :     if (!ifile.empty()) {</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :       infile.open(ifile.c_str());</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :       if (!infile.is_open()) {</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :         std::cerr &lt;&lt; &quot;Cannot open &quot; &lt;&lt; ifile &lt;&lt; &quot; for reading\n&quot;;</span>
+<span class="lineNum">     126 </span>            :         return 1;
+<span class="lineNum">     127 </span>            :       }
+<span class="lineNum">     128 </span><span class="lineCov">          1 :     } else if (!istring.empty()) {</span>
+<span class="lineNum">     129 </span>            :       std::string::size_type m = 0;
+<span class="lineNum">     130 </span>            :       while (true) {
+<span class="lineNum">     131 </span><span class="lineCov">          1 :         m = istring.find(lsep, m);</span>
+<span class="lineNum">     132 </span><span class="lineCov">          1 :         if (m == std::string::npos)</span>
+<span class="lineNum">     133 </span>            :           break;
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :         istring[m] = '\n';</span>
+<span class="lineNum">     135 </span>            :       }
+<span class="lineNum">     136 </span>            :       instring.str(istring);
+<span class="lineNum">     137 </span>            :     }
+<span class="lineNum">     138 </span><span class="lineCov">          1 :     std::istream* input = !ifile.empty() ? &amp;infile :</span>
+<span class="lineNum">     139 </span><span class="lineCov">          1 :       (!istring.empty() ? &amp;instring : &amp;std::cin);</span>
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span><span class="lineCov">          2 :     std::ofstream outfile;</span>
+<span class="lineNum">     142 </span><span class="lineCov">          1 :     if (ofile == &quot;-&quot;) ofile.clear();</span>
+<span class="lineNum">     143 </span><span class="lineCov">          1 :     if (!ofile.empty()) {</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :       outfile.open(ofile.c_str());</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :       if (!outfile.is_open()) {</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :         std::cerr &lt;&lt; &quot;Cannot open &quot; &lt;&lt; ofile &lt;&lt; &quot; for writing\n&quot;;</span>
+<span class="lineNum">     147 </span>            :         return 1;
+<span class="lineNum">     148 </span>            :       }
+<span class="lineNum">     149 </span>            :     }
+<span class="lineNum">     150 </span><span class="lineCov">          1 :     std::ostream* output = !ofile.empty() ? &amp;outfile : &amp;std::cout;</span>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span><span class="lineCov">          1 :     if (!(azimuthal || cassini || gnomonic)) {</span>
+<span class="lineNum">     153 </span>            :       std::cerr &lt;&lt; &quot;Must specify \&quot;-z lat0 lon0\&quot; or &quot;
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :                 &lt;&lt; &quot;\&quot;-c lat0 lon0\&quot; or \&quot;-g lat0 lon0\&quot;\n&quot;;</span>
+<span class="lineNum">     155 </span>            :       return 1;
+<span class="lineNum">     156 </span>            :     }
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span><span class="lineCov">          1 :     const Geodesic geod(a, f);</span>
+<span class="lineNum">     159 </span>            :     const CassiniSoldner cs = cassini ?
+<span class="lineNum">     160 </span><span class="lineCov">          1 :       CassiniSoldner(lat0, lon0, geod) : CassiniSoldner(geod);</span>
+<span class="lineNum">     161 </span><span class="lineCov">          1 :     const AzimuthalEquidistant az(geod);</span>
+<span class="lineNum">     162 </span><span class="lineCov">          1 :     const Gnomonic gn(geod);</span>
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            :     // Max precision = 10: 0.1 nm in distance, 10^-15 deg (= 0.11 nm),
+<span class="lineNum">     165 </span>            :     // 10^-11 sec (= 0.3 nm).
+<span class="lineNum">     166 </span><span class="lineCov">          3 :     prec = std::min(10 + Math::extra_digits(), std::max(0, prec));</span>
+<span class="lineNum">     167 </span>            :     std::string s, eol, stra, strb, strc;
+<span class="lineNum">     168 </span><span class="lineCov">          2 :     std::istringstream str;</span>
+<span class="lineNum">     169 </span>            :     int retval = 0;
+<span class="lineNum">     170 </span>            :     std::cout &lt;&lt; std::fixed;
+<span class="lineNum">     171 </span><span class="lineCov">          4 :     while (std::getline(*input, s)) {</span>
+<span class="lineNum">     172 </span>            :       try {
+<span class="lineNum">     173 </span>            :         eol = &quot;\n&quot;;
+<span class="lineNum">     174 </span><span class="lineCov">          1 :         if (!cdelim.empty()) {</span>
+<span class="lineNum">     175 </span>            :           std::string::size_type m = s.find(cdelim);
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :           if (m != std::string::npos) {</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :             eol = &quot; &quot; + s.substr(m) + &quot;\n&quot;;</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :             s = s.substr(0, m);</span>
+<span class="lineNum">     179 </span>            :           }
+<span class="lineNum">     180 </span>            :         }
+<span class="lineNum">     181 </span><span class="lineCov">          1 :         str.clear(); str.str(s);</span>
+<span class="lineNum">     182 </span>            :         real lat, lon, x, y, azi, rk;
+<span class="lineNum">     183 </span><span class="lineCov">          2 :         if (!(str &gt;&gt; stra &gt;&gt; strb))</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;Incomplete input: &quot; + s);</span>
+<span class="lineNum">     185 </span><span class="lineCov">          1 :         if (reverse) {</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :           x = Utility::val&lt;real&gt;(stra);</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :           y = Utility::val&lt;real&gt;(strb);</span>
+<span class="lineNum">     188 </span>            :         } else
+<span class="lineNum">     189 </span><span class="lineCov">          1 :           DMS::DecodeLatLon(stra, strb, lat, lon, longfirst);</span>
+<span class="lineNum">     190 </span><span class="lineCov">          2 :         if (str &gt;&gt; strc)</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;Extraneous input: &quot; + strc);</span>
+<span class="lineNum">     192 </span><span class="lineCov">          1 :         if (reverse) {</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :           if (cassini)</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :             cs.Reverse(x, y, lat, lon, azi, rk);</span>
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :           else if (azimuthal)</span>
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :             az.Reverse(lat0, lon0, x, y, lat, lon, azi, rk);</span>
+<span class="lineNum">     197 </span>            :           else
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :             gn.Reverse(lat0, lon0, x, y, lat, lon, azi, rk);</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :           *output &lt;&lt; Utility::str(longfirst ? lon : lat, prec + 5) &lt;&lt; &quot; &quot;</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :                   &lt;&lt; Utility::str(longfirst ? lat : lon, prec + 5) &lt;&lt; &quot; &quot;</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :                   &lt;&lt; Utility::str(azi, prec + 5) &lt;&lt; &quot; &quot;</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :                   &lt;&lt; Utility::str(rk, prec + 6) &lt;&lt; eol;</span>
+<span class="lineNum">     203 </span>            :         } else {
+<span class="lineNum">     204 </span><span class="lineCov">          1 :           if (cassini)</span>
+<span class="lineNum">     205 </span><span class="lineCov">          1 :             cs.Forward(lat, lon, x, y, azi, rk);</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :           else if (azimuthal)</span>
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :             az.Forward(lat0, lon0, lat, lon, x, y, azi, rk);</span>
+<span class="lineNum">     208 </span>            :           else
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :             gn.Forward(lat0, lon0, lat, lon, x, y, azi, rk);</span>
+<span class="lineNum">     210 </span><span class="lineCov">          2 :           *output &lt;&lt; Utility::str(x, prec) &lt;&lt; &quot; &quot;</span>
+<span class="lineNum">     211 </span><span class="lineCov">          2 :                   &lt;&lt; Utility::str(y, prec) &lt;&lt; &quot; &quot;</span>
+<span class="lineNum">     212 </span><span class="lineCov">          2 :                   &lt;&lt; Utility::str(azi, prec + 5) &lt;&lt; &quot; &quot;</span>
+<span class="lineNum">     213 </span><span class="lineCov">          2 :                   &lt;&lt; Utility::str(rk, prec + 6) &lt;&lt; eol;</span>
+<span class="lineNum">     214 </span>            :         }
+<span class="lineNum">     215 </span>            :       }
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :       catch (const std::exception&amp; e) {</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :         *output &lt;&lt; &quot;ERROR: &quot; &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     218 </span>            :         retval = 1;
+<span class="lineNum">     219 </span>            :       }
+<span class="lineNum">     220 </span>            :     }
+<span class="lineNum">     221 </span>            :     return retval;
+<span class="lineNum">     222 </span>            :   }
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :   catch (const std::exception&amp; e) {</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :     std::cerr &lt;&lt; &quot;Caught exception: &quot; &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     225 </span>            :     return 1;
+<span class="lineNum">     226 </span>            :   }
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :   catch (...) {</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :     std::cerr &lt;&lt; &quot;Caught unknown exception\n&quot;;</span>
+<a name="229"><span class="lineNum">     229 </span>            :     return 1;</a>
+<span class="lineNum">     230 </span>            :   }
+<span class="lineNum">     231 </span><span class="lineCov">          2 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

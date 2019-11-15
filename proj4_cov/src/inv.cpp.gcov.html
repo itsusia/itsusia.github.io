@@ -1,0 +1,313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/inv.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - inv.cpp<span style="font-size: 80%;"> (source / <a href="inv.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">105</td>
+            <td class="headerCovTableEntry">120</td>
+            <td class="headerCovTableEntryMed">87.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /******************************************************************************</a>
+<span class="lineNum">       2 </span>            :  * Project:  PROJ.4
+<span class="lineNum">       3 </span>            :  * Purpose:  Inverse operation invocation
+<span class="lineNum">       4 </span>            :  * Author:   Thomas Knudsen,  thokn@sdfe.dk,  2018-01-02
+<span class="lineNum">       5 </span>            :  *           Based on material from Gerald Evenden (original pj_inv)
+<span class="lineNum">       6 </span>            :  *           and Piyush Agram (original pj_inv3d)
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  ******************************************************************************
+<span class="lineNum">       9 </span>            :  * Copyright (c) 2000, Frank Warmerdam
+<span class="lineNum">      10 </span>            :  * Copyright (c) 2018, Thomas Knudsen / SDFE
+<span class="lineNum">      11 </span>            :  *
+<span class="lineNum">      12 </span>            :  * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      13 </span>            :  * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      14 </span>            :  * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      15 </span>            :  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      16 </span>            :  * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      17 </span>            :  * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      18 </span>            :  *
+<span class="lineNum">      19 </span>            :  * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      20 </span>            :  * in all copies or substantial portions of the Software.
+<span class="lineNum">      21 </span>            :  *
+<span class="lineNum">      22 </span>            :  * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      23 </span>            :  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      24 </span>            :  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      25 </span>            :  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      26 </span>            :  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      27 </span>            :  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      28 </span>            :  * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      29 </span>            :  *****************************************************************************/
+<span class="lineNum">      30 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      31 </span>            : #include &lt;math.h&gt;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #include &quot;proj_internal.h&quot;
+<span class="lineNum">      34 </span>            : #include &lt;math.h&gt;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : #define INPUT_UNITS  P-&gt;right
+<a name="37"><span class="lineNum">      37 </span>            : #define OUTPUT_UNITS P-&gt;left</a>
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span><span class="lineCov">     701262 : static PJ_COORD inv_prepare (PJ *P, PJ_COORD coo) {</span>
+<span class="lineNum">      40 </span><span class="lineCov">     701262 :     if (coo.v[0] == HUGE_VAL || coo.v[1] == HUGE_VAL || coo.v[2] == HUGE_VAL) {</span>
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :         proj_errno_set (P, PJD_ERR_INVALID_X_OR_Y);</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :         return proj_coord_error ();</span>
+<span class="lineNum">      43 </span>            :     }
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :     /* The helmert datum shift will choke unless it gets a sensible 4D coordinate */
+<span class="lineNum">      46 </span>            :     if (HUGE_VAL==coo.v[2] &amp;&amp; P-&gt;helmert) coo.v[2] = 0.0;
+<span class="lineNum">      47 </span><span class="lineCov">     701262 :     if (HUGE_VAL==coo.v[3] &amp;&amp; P-&gt;helmert) coo.v[3] = 0.0;</span>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span><span class="lineCov">     701262 :     if (P-&gt;axisswap)</span>
+<span class="lineNum">      50 </span><span class="lineCov">       5005 :         coo = proj_trans (P-&gt;axisswap, PJ_INV, coo);</span>
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            :     /* Handle remaining possible input types */
+<span class="lineNum">      53 </span><span class="lineCov">     701262 :     switch (INPUT_UNITS) {</span>
+<span class="lineNum">      54 </span><span class="lineCov">         16 :     case PJ_IO_UNITS_WHATEVER:</span>
+<span class="lineNum">      55 </span><span class="lineCov">         16 :         return coo;</span>
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :     /* de-scale and de-offset */
+<span class="lineNum">      58 </span><span class="lineCov">      47075 :     case PJ_IO_UNITS_CARTESIAN:</span>
+<span class="lineNum">      59 </span><span class="lineCov">      47075 :         coo.xyz.x *= P-&gt;to_meter;</span>
+<span class="lineNum">      60 </span><span class="lineCov">      47075 :         coo.xyz.y *= P-&gt;to_meter;</span>
+<span class="lineNum">      61 </span><span class="lineCov">      47075 :         coo.xyz.z *= P-&gt;to_meter;</span>
+<span class="lineNum">      62 </span><span class="lineCov">      47075 :         if (P-&gt;is_geocent) {</span>
+<span class="lineNum">      63 </span><span class="lineCov">      27031 :             coo = proj_trans (P-&gt;cart, PJ_INV, coo);</span>
+<span class="lineNum">      64 </span>            :         }
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineCov">      47075 :         return coo;</span>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineCov">     304527 :     case PJ_IO_UNITS_PROJECTED:</span>
+<span class="lineNum">      69 </span>            :     case PJ_IO_UNITS_CLASSIC:
+<span class="lineNum">      70 </span><span class="lineCov">     304527 :         coo.xyz.x = P-&gt;to_meter  * coo.xyz.x - P-&gt;x0;</span>
+<span class="lineNum">      71 </span><span class="lineCov">     304527 :         coo.xyz.y = P-&gt;to_meter  * coo.xyz.y - P-&gt;y0;</span>
+<span class="lineNum">      72 </span><span class="lineCov">     304527 :         coo.xyz.z = P-&gt;vto_meter * coo.xyz.z - P-&gt;z0;</span>
+<span class="lineNum">      73 </span><span class="lineCov">     304527 :         if (INPUT_UNITS==PJ_IO_UNITS_PROJECTED)</span>
+<span class="lineNum">      74 </span><span class="lineCov">          3 :             return coo;</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :         /* Classic proj.4 functions expect plane coordinates in units of the semimajor axis  */
+<span class="lineNum">      77 </span>            :         /* Multiplying by ra, rather than dividing by a because the CalCOFI projection       */
+<span class="lineNum">      78 </span>            :         /* stomps on a and hence (apparently) depends on this to roundtrip correctly         */
+<span class="lineNum">      79 </span>            :         /* (CalCOFI avoids further scaling by stomping - but a better solution is possible)  */
+<span class="lineNum">      80 </span><span class="lineCov">     304524 :         coo.xyz.x *= P-&gt;ra;</span>
+<span class="lineNum">      81 </span><span class="lineCov">     304524 :         coo.xyz.y *= P-&gt;ra;</span>
+<span class="lineNum">      82 </span><span class="lineCov">     304524 :         return coo;</span>
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineCov">     349644 :     case PJ_IO_UNITS_RADIANS:</span>
+<span class="lineNum">      85 </span><span class="lineCov">     349644 :         coo.lpz.z = P-&gt;vto_meter * coo.lpz.z - P-&gt;z0;</span>
+<span class="lineNum">      86 </span><span class="lineCov">     349644 :         break;</span>
+<span class="lineNum">      87 </span>            :     }
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :     /* Should not happen, so we could return pj_coord_err here */
+<span class="lineNum">      90 </span><span class="lineCov">     349644 :     return coo;</span>
+<span class="lineNum">      91 </span>            : }
+<span class="lineNum">      92 </span>            : 
+<a name="93"><span class="lineNum">      93 </span>            : </a>
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span><span class="lineCov">     701257 : static PJ_COORD inv_finalize (PJ *P, PJ_COORD coo) {</span>
+<span class="lineNum">      96 </span><span class="lineCov">     701257 :     if (coo.xyz.x == HUGE_VAL) {</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :         proj_errno_set (P, PJD_ERR_INVALID_X_OR_Y);</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :         return proj_coord_error ();</span>
+<span class="lineNum">      99 </span>            :     }
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span><span class="lineCov">     701257 :     if (OUTPUT_UNITS==PJ_IO_UNITS_RADIANS) {</span>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :         /* Distance from central meridian, taking system zero meridian into account */
+<span class="lineNum">     104 </span><span class="lineCov">     701230 :         coo.lp.lam = coo.lp.lam + P-&gt;from_greenwich + P-&gt;lam0;</span>
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            :         /* adjust longitude to central meridian */
+<span class="lineNum">     107 </span><span class="lineCov">     701230 :         if (0==P-&gt;over)</span>
+<span class="lineNum">     108 </span><span class="lineCov">     700917 :             coo.lpz.lam = adjlon(coo.lpz.lam);</span>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineCov">     701230 :         if (P-&gt;vgridshift)</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :             coo = proj_trans (P-&gt;vgridshift, PJ_INV, coo); /* Go geometric from orthometric */</span>
+<span class="lineNum">     112 </span><span class="lineCov">     701230 :         if (coo.lp.lam==HUGE_VAL)</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :             return coo;</span>
+<span class="lineNum">     114 </span><span class="lineCov">     701230 :         if (P-&gt;hgridshift)</span>
+<span class="lineNum">     115 </span><span class="lineCov">          2 :             coo = proj_trans (P-&gt;hgridshift, PJ_FWD, coo);</span>
+<span class="lineNum">     116 </span><span class="lineCov">     701228 :         else if (P-&gt;helmert || (P-&gt;cart_wgs84 != nullptr &amp;&amp; P-&gt;cart != nullptr)) {</span>
+<span class="lineNum">     117 </span><span class="lineCov">     156112 :             coo = proj_trans (P-&gt;cart,       PJ_FWD, coo); /* Go cartesian in local frame */</span>
+<span class="lineNum">     118 </span><span class="lineCov">     156112 :             if( P-&gt;helmert )</span>
+<span class="lineNum">     119 </span><span class="lineCov">          1 :                 coo = proj_trans (P-&gt;helmert,    PJ_FWD, coo); /* Step into WGS84 */</span>
+<span class="lineNum">     120 </span><span class="lineCov">     156112 :             coo = proj_trans (P-&gt;cart_wgs84, PJ_INV, coo); /* Go back to angular using WGS84 ellps */</span>
+<span class="lineNum">     121 </span>            :         }
+<span class="lineNum">     122 </span><span class="lineCov">     701230 :         if (coo.lp.lam==HUGE_VAL)</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :             return coo;</span>
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span>            :         /* If input latitude was geocentrical, convert back to geocentrical */
+<span class="lineNum">     126 </span><span class="lineCov">     701230 :         if (P-&gt;geoc)</span>
+<span class="lineNum">     127 </span><span class="lineCov">          7 :             coo = pj_geocentric_latitude (P, PJ_FWD, coo);</span>
+<span class="lineNum">     128 </span>            :     }
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineCov">     701257 :     return coo;</span>
+<span class="lineNum">     131 </span>            : }
+<a name="132"><span class="lineNum">     132 </span>            : </a>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span><span class="lineCov">    1380358 : static PJ_COORD error_or_coord(PJ *P, PJ_COORD coord, int last_errno) {</span>
+<span class="lineNum">     135 </span><span class="lineCov">    1380358 :     if (proj_errno(P))</span>
+<span class="lineNum">     136 </span><span class="lineCov">          4 :         return proj_coord_error();</span>
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span><span class="lineCov">    1380354 :     proj_errno_restore(P, last_errno);</span>
+<span class="lineNum">     139 </span><span class="lineCov">    1380354 :     return coord;</span>
+<span class="lineNum">     140 </span>            : }
+<a name="141"><span class="lineNum">     141 </span>            : </a>
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span><span class="lineCov">       1303 : PJ_LP pj_inv(PJ_XY xy, PJ *P) {</span>
+<span class="lineNum">     144 </span>            :     int last_errno;
+<span class="lineNum">     145 </span><span class="lineCov">       1303 :     PJ_COORD coo = {{0,0,0,0}};</span>
+<span class="lineNum">     146 </span><span class="lineCov">       1303 :     coo.xy = xy;</span>
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span><span class="lineCov">       1303 :     last_errno = proj_errno_reset(P);</span>
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span><span class="lineCov">       1303 :     if (!P-&gt;skip_inv_prepare)</span>
+<span class="lineNum">     151 </span><span class="lineCov">       1293 :         coo = inv_prepare (P, coo);</span>
+<span class="lineNum">     152 </span><span class="lineCov">       1303 :     if (HUGE_VAL==coo.v[0])</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :         return proj_coord_error ().lp;</span>
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            :     /* Do the transformation, using the lowest dimensional transformer available */
+<span class="lineNum">     156 </span><span class="lineCov">       1303 :     if (P-&gt;inv)</span>
+<span class="lineNum">     157 </span><span class="lineCov">       1302 :         coo.lp = P-&gt;inv(coo.xy, P);</span>
+<span class="lineNum">     158 </span><span class="lineCov">          1 :     else if (P-&gt;inv3d)</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :         coo.lpz = P-&gt;inv3d (coo.xyz, P);</span>
+<span class="lineNum">     160 </span><span class="lineCov">          1 :     else if (P-&gt;inv4d)</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :         coo = P-&gt;inv4d (coo, P);</span>
+<span class="lineNum">     162 </span>            :     else {
+<span class="lineNum">     163 </span><span class="lineCov">          1 :         proj_errno_set (P, EINVAL);</span>
+<span class="lineNum">     164 </span><span class="lineCov">          1 :         return proj_coord_error ().lp;</span>
+<span class="lineNum">     165 </span>            :     }
+<span class="lineNum">     166 </span><span class="lineCov">       1302 :     if (HUGE_VAL==coo.v[0])</span>
+<span class="lineNum">     167 </span><span class="lineCov">          8 :         return proj_coord_error ().lp;</span>
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span><span class="lineCov">       1294 :     if (!P-&gt;skip_inv_finalize)</span>
+<span class="lineNum">     170 </span><span class="lineCov">       1284 :         coo = inv_finalize (P, coo);</span>
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span><span class="lineCov">       1294 :     return error_or_coord(P, coo, last_errno).lp;</span>
+<span class="lineNum">     173 </span>            : }
+<span class="lineNum">     174 </span>            : 
+<a name="175"><span class="lineNum">     175 </span>            : </a>
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span><span class="lineCov">         76 : PJ_LPZ pj_inv3d (PJ_XYZ xyz, PJ *P) {</span>
+<span class="lineNum">     178 </span>            :     int last_errno;
+<span class="lineNum">     179 </span><span class="lineCov">         76 :     PJ_COORD coo = {{0,0,0,0}};</span>
+<span class="lineNum">     180 </span><span class="lineCov">         76 :     coo.xyz = xyz;</span>
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span><span class="lineCov">         76 :     last_errno = proj_errno_reset(P);</span>
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span><span class="lineCov">         76 :     if (!P-&gt;skip_inv_prepare)</span>
+<span class="lineNum">     185 </span><span class="lineCov">         76 :         coo = inv_prepare (P, coo);</span>
+<span class="lineNum">     186 </span><span class="lineCov">         76 :     if (HUGE_VAL==coo.v[0])</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :         return proj_coord_error ().lpz;</span>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :     /* Do the transformation, using the lowest dimensional transformer feasible */
+<span class="lineNum">     190 </span><span class="lineCov">         76 :     if (P-&gt;inv3d)</span>
+<span class="lineNum">     191 </span><span class="lineCov">         42 :         coo.lpz = P-&gt;inv3d (coo.xyz, P);</span>
+<span class="lineNum">     192 </span><span class="lineCov">         34 :     else if (P-&gt;inv4d)</span>
+<span class="lineNum">     193 </span><span class="lineCov">          2 :         coo = P-&gt;inv4d (coo, P);</span>
+<span class="lineNum">     194 </span><span class="lineCov">         32 :     else if (P-&gt;inv)</span>
+<span class="lineNum">     195 </span><span class="lineCov">         32 :         coo.lp = P-&gt;inv (coo.xy, P);</span>
+<span class="lineNum">     196 </span>            :     else {
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :         proj_errno_set (P, EINVAL);</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :         return proj_coord_error ().lpz;</span>
+<span class="lineNum">     199 </span>            :     }
+<span class="lineNum">     200 </span><span class="lineCov">         76 :     if (HUGE_VAL==coo.v[0])</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :         return proj_coord_error ().lpz;</span>
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span><span class="lineCov">         76 :     if (!P-&gt;skip_inv_finalize)</span>
+<span class="lineNum">     204 </span><span class="lineCov">         76 :         coo = inv_finalize (P, coo);</span>
+<span class="lineNum">     205 </span>            : 
+<span class="lineNum">     206 </span><span class="lineCov">         76 :     return error_or_coord(P, coo, last_errno).lpz;</span>
+<span class="lineNum">     207 </span>            : }
+<span class="lineNum">     208 </span>            : 
+<a name="209"><span class="lineNum">     209 </span>            : </a>
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span><span class="lineCov">    1378992 : PJ_COORD pj_inv4d (PJ_COORD coo, PJ *P) {</span>
+<span class="lineNum">     212 </span><span class="lineCov">    1378992 :     int last_errno = proj_errno_reset(P);</span>
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span><span class="lineCov">    1378992 :     if (!P-&gt;skip_inv_prepare)</span>
+<span class="lineNum">     215 </span><span class="lineCov">     699893 :         coo = inv_prepare (P, coo);</span>
+<span class="lineNum">     216 </span><span class="lineCov">    1378992 :     if (HUGE_VAL==coo.v[0])</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :         return proj_coord_error ();</span>
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span>            :     /* Call the highest dimensional converter available */
+<span class="lineNum">     220 </span><span class="lineCov">    1378992 :     if (P-&gt;inv4d)</span>
+<span class="lineNum">     221 </span><span class="lineCov">     683947 :         coo = P-&gt;inv4d (coo, P);</span>
+<span class="lineNum">     222 </span><span class="lineCov">     695045 :     else if (P-&gt;inv3d)</span>
+<span class="lineNum">     223 </span><span class="lineCov">     364388 :         coo.lpz = P-&gt;inv3d (coo.xyz, P);</span>
+<span class="lineNum">     224 </span><span class="lineCov">     330657 :     else if (P-&gt;inv)</span>
+<span class="lineNum">     225 </span><span class="lineCov">     330655 :         coo.lp = P-&gt;inv (coo.xy, P);</span>
+<span class="lineNum">     226 </span>            :     else {
+<span class="lineNum">     227 </span><span class="lineCov">          2 :         proj_errno_set (P, EINVAL);</span>
+<span class="lineNum">     228 </span><span class="lineCov">          2 :         return proj_coord_error ();</span>
+<span class="lineNum">     229 </span>            :     }
+<span class="lineNum">     230 </span><span class="lineCov">    1378990 :     if (HUGE_VAL==coo.v[0])</span>
+<span class="lineNum">     231 </span><span class="lineCov">          2 :         return proj_coord_error ();</span>
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span><span class="lineCov">    1378988 :     if (!P-&gt;skip_inv_finalize)</span>
+<span class="lineNum">     234 </span><span class="lineCov">     699897 :         coo = inv_finalize (P, coo);</span>
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span><span class="lineCov">    1378988 :     return error_or_coord(P, coo, last_errno);</span>
+<span class="lineNum">     237 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

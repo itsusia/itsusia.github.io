@@ -1,0 +1,733 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/iso19111/static.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/iso19111</a> - static.cpp<span style="font-size: 80%;"> (source / <a href="static.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">235</td>
+            <td class="headerCovTableEntry">235</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /******************************************************************************</a>
+<span class="lineNum">       2 </span>            :  *
+<span class="lineNum">       3 </span>            :  * Project:  PROJ
+<span class="lineNum">       4 </span>            :  * Purpose:  ISO19111:2019 implementation
+<span class="lineNum">       5 </span>            :  * Author:   Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  ******************************************************************************
+<span class="lineNum">       8 </span>            :  * Copyright (c) 2018, Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      11 </span>            :  * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      12 </span>            :  * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      13 </span>            :  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      14 </span>            :  * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      15 </span>            :  * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      16 </span>            :  *
+<span class="lineNum">      17 </span>            :  * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      18 </span>            :  * in all copies or substantial portions of the Software.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      21 </span>            :  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      22 </span>            :  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      23 </span>            :  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      24 </span>            :  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      25 </span>            :  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      26 </span>            :  * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      27 </span>            :  ****************************************************************************/
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #ifndef FROM_PROJ_CPP
+<span class="lineNum">      30 </span>            : #define FROM_PROJ_CPP
+<span class="lineNum">      31 </span>            : #endif
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #include &quot;proj/common.hpp&quot;
+<span class="lineNum">      34 </span>            : #include &quot;proj/coordinateoperation.hpp&quot;
+<span class="lineNum">      35 </span>            : #include &quot;proj/coordinatesystem.hpp&quot;
+<span class="lineNum">      36 </span>            : #include &quot;proj/crs.hpp&quot;
+<span class="lineNum">      37 </span>            : #include &quot;proj/datum.hpp&quot;
+<span class="lineNum">      38 </span>            : #include &quot;proj/io.hpp&quot;
+<span class="lineNum">      39 </span>            : #include &quot;proj/metadata.hpp&quot;
+<span class="lineNum">      40 </span>            : #include &quot;proj/util.hpp&quot;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : #include &quot;proj/internal/coordinatesystem_internal.hpp&quot;
+<span class="lineNum">      43 </span>            : #include &quot;proj/internal/io_internal.hpp&quot;
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : #include &lt;map&gt;
+<span class="lineNum">      46 </span>            : #include &lt;set&gt;
+<span class="lineNum">      47 </span>            : #include &lt;string&gt;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : #ifndef M_PI
+<span class="lineNum">      50 </span>            : #define M_PI 3.14159265358979323846
+<span class="lineNum">      51 </span>            : #endif
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : // We put all static definitions in the same compilation unit, and in
+<span class="lineNum">      54 </span>            : // increasing order of dependency, to avoid the &quot;static initialization fiasco&quot;
+<span class="lineNum">      55 </span>            : // See https://isocpp.org/wiki/faq/ctors#static-init-order
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            : using namespace NS_PROJ::crs;
+<span class="lineNum">      58 </span>            : using namespace NS_PROJ::datum;
+<span class="lineNum">      59 </span>            : using namespace NS_PROJ::io;
+<span class="lineNum">      60 </span>            : using namespace NS_PROJ::metadata;
+<span class="lineNum">      61 </span>            : using namespace NS_PROJ::operation;
+<span class="lineNum">      62 </span>            : using namespace NS_PROJ::util;
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : NS_PROJ_START
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            : /** \brief Key to set the authority citation of a metadata::Identifier.
+<span class="lineNum">      69 </span>            :  *
+<span class="lineNum">      70 </span>            :  * The value is to be provided as a string or a metadata::Citation.
+<span class="lineNum">      71 </span>            :  */
+<span class="lineNum">      72 </span><span class="lineCov">        642 : const std::string Identifier::AUTHORITY_KEY(&quot;authority&quot;);</span>
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            : /** \brief Key to set the code of a metadata::Identifier.
+<span class="lineNum">      75 </span>            :  *
+<span class="lineNum">      76 </span>            :  * The value is to be provided as a integer or a string.
+<span class="lineNum">      77 </span>            :  */
+<span class="lineNum">      78 </span><span class="lineCov">        642 : const std::string Identifier::CODE_KEY(&quot;code&quot;);</span>
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            : /** \brief Key to set the organization responsible for definition and
+<span class="lineNum">      81 </span>            :  * maintenance of the code of a metadata::Identifier.
+<span class="lineNum">      82 </span>            :  *
+<span class="lineNum">      83 </span>            :  * The value is to be provided as a string.
+<span class="lineNum">      84 </span>            :  */
+<span class="lineNum">      85 </span><span class="lineCov">        642 : const std::string Identifier::CODESPACE_KEY(&quot;codespace&quot;);</span>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            : /** \brief Key to set the version identifier for the namespace of a
+<span class="lineNum">      88 </span>            :  * metadata::Identifier.
+<span class="lineNum">      89 </span>            :  *
+<span class="lineNum">      90 </span>            :  * The value is to be provided as a string.
+<span class="lineNum">      91 </span>            :  */
+<span class="lineNum">      92 </span><span class="lineCov">        642 : const std::string Identifier::VERSION_KEY(&quot;version&quot;);</span>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            : /** \brief Key to set the natural language description of the meaning of the
+<span class="lineNum">      95 </span>            :  * code value of a metadata::Identifier.
+<span class="lineNum">      96 </span>            :  *
+<span class="lineNum">      97 </span>            :  * The value is to be provided as a string.
+<span class="lineNum">      98 </span>            :  */
+<span class="lineNum">      99 </span><span class="lineCov">        642 : const std::string Identifier::DESCRIPTION_KEY(&quot;description&quot;);</span>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : /** \brief Key to set the URI of a metadata::Identifier.
+<span class="lineNum">     102 </span>            :  *
+<span class="lineNum">     103 </span>            :  * The value is to be provided as a string.
+<span class="lineNum">     104 </span>            :  */
+<span class="lineNum">     105 </span><span class="lineCov">        642 : const std::string Identifier::URI_KEY(&quot;uri&quot;);</span>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            : /** \brief EPSG codespace.
+<span class="lineNum">     108 </span>            :  */
+<span class="lineNum">     109 </span><span class="lineCov">        642 : const std::string Identifier::EPSG(&quot;EPSG&quot;);</span>
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            : /** \brief OGC codespace.
+<span class="lineNum">     112 </span>            :  */
+<span class="lineNum">     113 </span><span class="lineCov">        642 : const std::string Identifier::OGC(&quot;OGC&quot;);</span>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            : /** \brief Key to set the name of a common::IdentifiedObject
+<span class="lineNum">     118 </span>            :  *
+<span class="lineNum">     119 </span>            :  * The value is to be provided as a string or metadata::IdentifierNNPtr.
+<span class="lineNum">     120 </span>            :  */
+<span class="lineNum">     121 </span><span class="lineCov">        642 : const std::string common::IdentifiedObject::NAME_KEY(&quot;name&quot;);</span>
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span>            : /** \brief Key to set the identifier(s) of a common::IdentifiedObject
+<span class="lineNum">     124 </span>            :  *
+<span class="lineNum">     125 </span>            :  * The value is to be provided as a common::IdentifierNNPtr or a
+<span class="lineNum">     126 </span>            :  * util::ArrayOfBaseObjectNNPtr
+<span class="lineNum">     127 </span>            :  * of common::IdentifierNNPtr.
+<span class="lineNum">     128 </span>            :  */
+<span class="lineNum">     129 </span><span class="lineCov">        642 : const std::string common::IdentifiedObject::IDENTIFIERS_KEY(&quot;identifiers&quot;);</span>
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span>            : /** \brief Key to set the alias(es) of a common::IdentifiedObject
+<span class="lineNum">     132 </span>            :  *
+<span class="lineNum">     133 </span>            :  * The value is to be provided as string, a util::GenericNameNNPtr or a
+<span class="lineNum">     134 </span>            :  * util::ArrayOfBaseObjectNNPtr
+<span class="lineNum">     135 </span>            :  * of util::GenericNameNNPtr.
+<span class="lineNum">     136 </span>            :  */
+<span class="lineNum">     137 </span><span class="lineCov">        642 : const std::string common::IdentifiedObject::ALIAS_KEY(&quot;alias&quot;);</span>
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            : /** \brief Key to set the remarks of a common::IdentifiedObject
+<span class="lineNum">     140 </span>            :  *
+<span class="lineNum">     141 </span>            :  * The value is to be provided as a string.
+<span class="lineNum">     142 </span>            :  */
+<span class="lineNum">     143 </span><span class="lineCov">        642 : const std::string common::IdentifiedObject::REMARKS_KEY(&quot;remarks&quot;);</span>
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            : /** \brief Key to set the deprecation flag of a common::IdentifiedObject
+<span class="lineNum">     146 </span>            :  *
+<span class="lineNum">     147 </span>            :  * The value is to be provided as a boolean.
+<span class="lineNum">     148 </span>            :  */
+<span class="lineNum">     149 </span><span class="lineCov">        642 : const std::string common::IdentifiedObject::DEPRECATED_KEY(&quot;deprecated&quot;);</span>
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            : /** \brief Key to set the scope of a common::ObjectUsage
+<span class="lineNum">     154 </span>            :  *
+<span class="lineNum">     155 </span>            :  * The value is to be provided as a string.
+<span class="lineNum">     156 </span>            :  */
+<span class="lineNum">     157 </span><span class="lineCov">        642 : const std::string common::ObjectUsage::SCOPE_KEY(&quot;scope&quot;);</span>
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            : /** \brief Key to set the domain of validity of a common::ObjectUsage
+<span class="lineNum">     160 </span>            :  *
+<span class="lineNum">     161 </span>            :  * The value is to be provided as a common::ExtentNNPtr.
+<span class="lineNum">     162 </span>            :  */
+<span class="lineNum">     163 </span>            : const std::string
+<span class="lineNum">     164 </span><span class="lineCov">        642 :     common::ObjectUsage::DOMAIN_OF_VALIDITY_KEY(&quot;domainOfValidity&quot;);</span>
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            : /** \brief Key to set the object domain(s) of a common::ObjectUsage
+<span class="lineNum">     167 </span>            :  *
+<span class="lineNum">     168 </span>            :  * The value is to be provided as a common::ObjectDomainNNPtr or a
+<span class="lineNum">     169 </span>            :  * util::ArrayOfBaseObjectNNPtr
+<span class="lineNum">     170 </span>            :  * of common::ObjectDomainNNPtr.
+<span class="lineNum">     171 </span>            :  */
+<span class="lineNum">     172 </span><span class="lineCov">        642 : const std::string common::ObjectUsage::OBJECT_DOMAIN_KEY(&quot;objectDomain&quot;);</span>
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span>            : /** \brief World extent. */
+<span class="lineNum">     177 </span>            : const ExtentNNPtr
+<span class="lineNum">     178 </span><span class="lineCov">       1284 :     Extent::WORLD(Extent::createFromBBOX(-180, -90, 180, 90,</span>
+<span class="lineNum">     179 </span><span class="lineCov">       1926 :                                          util::optional&lt;std::string&gt;(&quot;World&quot;)));</span>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            : //! @cond Doxygen_Suppress
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineCov">        642 : std::vector&lt;std::string&gt; WKTConstants::constants_;</span>
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span><span class="lineCov">      61632 : const char *WKTConstants::createAndAddToConstantList(const char *text) {</span>
+<span class="lineNum">     188 </span><span class="lineCov">     123264 :     WKTConstants::constants_.push_back(text);</span>
+<span class="lineNum">     189 </span><span class="lineCov">      61632 :     return text;</span>
+<span class="lineNum">     190 </span>            : }
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            : #define DEFINE_WKT_CONSTANT(x)                                                 \
+<span class="lineNum">     193 </span>            :     const std::string WKTConstants::x(createAndAddToConstantList(#x))
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(GEOCCS);</span>
+<span class="lineNum">     196 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(GEOGCS);</span>
+<span class="lineNum">     197 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(DATUM);</span>
+<span class="lineNum">     198 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(UNIT);</span>
+<span class="lineNum">     199 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(SPHEROID);</span>
+<span class="lineNum">     200 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(AXIS);</span>
+<span class="lineNum">     201 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(PRIMEM);</span>
+<span class="lineNum">     202 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(AUTHORITY);</span>
+<span class="lineNum">     203 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(PROJCS);</span>
+<span class="lineNum">     204 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(PROJECTION);</span>
+<span class="lineNum">     205 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(PARAMETER);</span>
+<span class="lineNum">     206 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(VERT_CS);</span>
+<span class="lineNum">     207 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(VERT_DATUM);</span>
+<span class="lineNum">     208 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(COMPD_CS);</span>
+<span class="lineNum">     209 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(TOWGS84);</span>
+<span class="lineNum">     210 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(EXTENSION);</span>
+<span class="lineNum">     211 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(LOCAL_CS);</span>
+<span class="lineNum">     212 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(LOCAL_DATUM);</span>
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(GEODCRS);</span>
+<span class="lineNum">     215 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(LENGTHUNIT);</span>
+<span class="lineNum">     216 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(ANGLEUNIT);</span>
+<span class="lineNum">     217 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(SCALEUNIT);</span>
+<span class="lineNum">     218 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(TIMEUNIT);</span>
+<span class="lineNum">     219 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(ELLIPSOID);</span>
+<span class="lineNum">     220 </span><span class="lineCov">        642 : const std::string WKTConstants::CS_(createAndAddToConstantList(&quot;CS&quot;));</span>
+<span class="lineNum">     221 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(ID);</span>
+<span class="lineNum">     222 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(PROJCRS);</span>
+<span class="lineNum">     223 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(BASEGEODCRS);</span>
+<span class="lineNum">     224 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(MERIDIAN);</span>
+<span class="lineNum">     225 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(ORDER);</span>
+<span class="lineNum">     226 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(ANCHOR);</span>
+<span class="lineNum">     227 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(CONVERSION);</span>
+<span class="lineNum">     228 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(METHOD);</span>
+<span class="lineNum">     229 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(REMARK);</span>
+<span class="lineNum">     230 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(GEOGCRS);</span>
+<span class="lineNum">     231 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(BASEGEOGCRS);</span>
+<span class="lineNum">     232 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(SCOPE);</span>
+<span class="lineNum">     233 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(AREA);</span>
+<span class="lineNum">     234 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(BBOX);</span>
+<span class="lineNum">     235 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(CITATION);</span>
+<span class="lineNum">     236 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(URI);</span>
+<span class="lineNum">     237 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(VERTCRS);</span>
+<span class="lineNum">     238 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(VDATUM);</span>
+<span class="lineNum">     239 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(COMPOUNDCRS);</span>
+<span class="lineNum">     240 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(PARAMETERFILE);</span>
+<span class="lineNum">     241 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(COORDINATEOPERATION);</span>
+<span class="lineNum">     242 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(SOURCECRS);</span>
+<span class="lineNum">     243 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(TARGETCRS);</span>
+<span class="lineNum">     244 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(INTERPOLATIONCRS);</span>
+<span class="lineNum">     245 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(OPERATIONACCURACY);</span>
+<span class="lineNum">     246 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(CONCATENATEDOPERATION);</span>
+<span class="lineNum">     247 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(STEP);</span>
+<span class="lineNum">     248 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(BOUNDCRS);</span>
+<span class="lineNum">     249 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(ABRIDGEDTRANSFORMATION);</span>
+<span class="lineNum">     250 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(DERIVINGCONVERSION);</span>
+<span class="lineNum">     251 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(TDATUM);</span>
+<span class="lineNum">     252 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(CALENDAR);</span>
+<span class="lineNum">     253 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(TIMEORIGIN);</span>
+<span class="lineNum">     254 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(TIMECRS);</span>
+<span class="lineNum">     255 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(VERTICALEXTENT);</span>
+<span class="lineNum">     256 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(TIMEEXTENT);</span>
+<span class="lineNum">     257 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(USAGE);</span>
+<span class="lineNum">     258 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(DYNAMIC);</span>
+<span class="lineNum">     259 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(FRAMEEPOCH);</span>
+<span class="lineNum">     260 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(MODEL);</span>
+<span class="lineNum">     261 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(VELOCITYGRID);</span>
+<span class="lineNum">     262 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(ENSEMBLE);</span>
+<span class="lineNum">     263 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(MEMBER);</span>
+<span class="lineNum">     264 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(ENSEMBLEACCURACY);</span>
+<span class="lineNum">     265 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(DERIVEDPROJCRS);</span>
+<span class="lineNum">     266 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(BASEPROJCRS);</span>
+<span class="lineNum">     267 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(EDATUM);</span>
+<span class="lineNum">     268 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(ENGCRS);</span>
+<span class="lineNum">     269 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(PDATUM);</span>
+<span class="lineNum">     270 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(PARAMETRICCRS);</span>
+<span class="lineNum">     271 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(PARAMETRICUNIT);</span>
+<span class="lineNum">     272 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(BASEVERTCRS);</span>
+<span class="lineNum">     273 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(BASEENGCRS);</span>
+<span class="lineNum">     274 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(BASEPARAMCRS);</span>
+<span class="lineNum">     275 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(BASETIMECRS);</span>
+<span class="lineNum">     276 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(VERSION);</span>
+<span class="lineNum">     277 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(GEOIDMODEL);</span>
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(GEODETICCRS);</span>
+<span class="lineNum">     280 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(GEODETICDATUM);</span>
+<span class="lineNum">     281 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(PROJECTEDCRS);</span>
+<span class="lineNum">     282 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(PRIMEMERIDIAN);</span>
+<span class="lineNum">     283 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(GEOGRAPHICCRS);</span>
+<span class="lineNum">     284 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(TRF);</span>
+<span class="lineNum">     285 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(VERTICALCRS);</span>
+<span class="lineNum">     286 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(VERTICALDATUM);</span>
+<span class="lineNum">     287 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(VRF);</span>
+<span class="lineNum">     288 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(TIMEDATUM);</span>
+<span class="lineNum">     289 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(TEMPORALQUANTITY);</span>
+<span class="lineNum">     290 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(ENGINEERINGDATUM);</span>
+<span class="lineNum">     291 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(ENGINEERINGCRS);</span>
+<span class="lineNum">     292 </span><span class="lineCov">        642 : DEFINE_WKT_CONSTANT(PARAMETRICDATUM);</span>
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            : //! @endcond
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            : namespace common {
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            : /** \brief &quot;Empty&quot;/&quot;None&quot;, unit of measure of type NONE. */
+<span class="lineNum">     301 </span><span class="lineCov">       2568 : const UnitOfMeasure UnitOfMeasure::NONE(&quot;&quot;, 1.0, UnitOfMeasure::Type::NONE);</span>
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span>            : /** \brief Scale unity, unit of measure of type SCALE. */
+<span class="lineNum">     304 </span><span class="lineCov">        642 : const UnitOfMeasure UnitOfMeasure::SCALE_UNITY(&quot;unity&quot;, 1.0,</span>
+<span class="lineNum">     305 </span>            :                                                UnitOfMeasure::Type::SCALE,
+<span class="lineNum">     306 </span><span class="lineCov">       1926 :                                                Identifier::EPSG, &quot;9201&quot;);</span>
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span>            : /** \brief Parts-per-million, unit of measure of type SCALE. */
+<span class="lineNum">     309 </span><span class="lineCov">        642 : const UnitOfMeasure UnitOfMeasure::PARTS_PER_MILLION(&quot;parts per million&quot;, 1e-6,</span>
+<span class="lineNum">     310 </span>            :                                                      UnitOfMeasure::Type::SCALE,
+<span class="lineNum">     311 </span><span class="lineCov">       1926 :                                                      Identifier::EPSG, &quot;9202&quot;);</span>
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span>            : /** \brief Metre, unit of measure of type LINEAR (SI unit). */
+<span class="lineNum">     314 </span><span class="lineCov">        642 : const UnitOfMeasure UnitOfMeasure::METRE(&quot;metre&quot;, 1.0,</span>
+<span class="lineNum">     315 </span>            :                                          UnitOfMeasure::Type::LINEAR,
+<span class="lineNum">     316 </span><span class="lineCov">       1926 :                                          Identifier::EPSG, &quot;9001&quot;);</span>
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span>            : /** \brief Degree, unit of measure of type ANGULAR. */
+<span class="lineNum">     319 </span><span class="lineCov">        642 : const UnitOfMeasure UnitOfMeasure::DEGREE(&quot;degree&quot;, M_PI / 180.,</span>
+<span class="lineNum">     320 </span>            :                                           UnitOfMeasure::Type::ANGULAR,
+<span class="lineNum">     321 </span><span class="lineCov">       1926 :                                           Identifier::EPSG, &quot;9122&quot;);</span>
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span>            : /** \brief Arc-second, unit of measure of type ANGULAR. */
+<span class="lineNum">     324 </span><span class="lineCov">        642 : const UnitOfMeasure UnitOfMeasure::ARC_SECOND(&quot;arc-second&quot;, M_PI / 180. / 3600.,</span>
+<span class="lineNum">     325 </span>            :                                               UnitOfMeasure::Type::ANGULAR,
+<span class="lineNum">     326 </span><span class="lineCov">       1926 :                                               Identifier::EPSG, &quot;9104&quot;);</span>
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span>            : /** \brief Grad, unit of measure of type ANGULAR. */
+<span class="lineNum">     329 </span><span class="lineCov">        642 : const UnitOfMeasure UnitOfMeasure::GRAD(&quot;grad&quot;, M_PI / 200.,</span>
+<span class="lineNum">     330 </span>            :                                         UnitOfMeasure::Type::ANGULAR,
+<span class="lineNum">     331 </span><span class="lineCov">       1926 :                                         Identifier::EPSG, &quot;9105&quot;);</span>
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            : /** \brief Radian, unit of measure of type ANGULAR (SI unit). */
+<span class="lineNum">     334 </span><span class="lineCov">        642 : const UnitOfMeasure UnitOfMeasure::RADIAN(&quot;radian&quot;, 1.0,</span>
+<span class="lineNum">     335 </span>            :                                           UnitOfMeasure::Type::ANGULAR,
+<span class="lineNum">     336 </span><span class="lineCov">       1926 :                                           Identifier::EPSG, &quot;9101&quot;);</span>
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            : /** \brief Microradian, unit of measure of type ANGULAR. */
+<span class="lineNum">     339 </span><span class="lineCov">        642 : const UnitOfMeasure UnitOfMeasure::MICRORADIAN(&quot;microradian&quot;, 1e-6,</span>
+<span class="lineNum">     340 </span>            :                                                UnitOfMeasure::Type::ANGULAR,
+<span class="lineNum">     341 </span><span class="lineCov">       1926 :                                                Identifier::EPSG, &quot;9109&quot;);</span>
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span>            : /** \brief Second, unit of measure of type TIME (SI unit). */
+<span class="lineNum">     344 </span><span class="lineCov">        642 : const UnitOfMeasure UnitOfMeasure::SECOND(&quot;second&quot;, 1.0,</span>
+<span class="lineNum">     345 </span>            :                                           UnitOfMeasure::Type::TIME,
+<span class="lineNum">     346 </span><span class="lineCov">       1926 :                                           Identifier::EPSG, &quot;1029&quot;);</span>
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            : /** \brief Year, unit of measure of type TIME */
+<span class="lineNum">     349 </span><span class="lineCov">        642 : const UnitOfMeasure UnitOfMeasure::YEAR(&quot;year&quot;, 31556925.445,</span>
+<span class="lineNum">     350 </span>            :                                         UnitOfMeasure::Type::TIME,
+<span class="lineNum">     351 </span><span class="lineCov">       1926 :                                         Identifier::EPSG, &quot;1040&quot;);</span>
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span>            : /** \brief Metre per year, unit of measure of type LINEAR. */
+<span class="lineNum">     354 </span><span class="lineCov">        642 : const UnitOfMeasure UnitOfMeasure::METRE_PER_YEAR(&quot;metres per year&quot;,</span>
+<span class="lineNum">     355 </span>            :                                                   1.0 / 31556925.445,
+<span class="lineNum">     356 </span>            :                                                   UnitOfMeasure::Type::LINEAR,
+<span class="lineNum">     357 </span><span class="lineCov">       1926 :                                                   Identifier::EPSG, &quot;1042&quot;);</span>
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span>            : /** \brief Arc-second per year, unit of measure of type ANGULAR. */
+<span class="lineNum">     360 </span><span class="lineCov">        642 : const UnitOfMeasure UnitOfMeasure::ARC_SECOND_PER_YEAR(</span>
+<span class="lineNum">     361 </span>            :     &quot;arc-seconds per year&quot;, M_PI / 180. / 3600. / 31556925.445,
+<span class="lineNum">     362 </span><span class="lineCov">       1926 :     UnitOfMeasure::Type::ANGULAR, Identifier::EPSG, &quot;1043&quot;);</span>
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span>            : /** \brief Part-sper-million per year, unit of measure of type SCALE. */
+<span class="lineNum">     365 </span><span class="lineCov">        642 : const UnitOfMeasure UnitOfMeasure::PPM_PER_YEAR(&quot;parts per million per year&quot;,</span>
+<span class="lineNum">     366 </span>            :                                                 1e-6 / 31556925.445,
+<span class="lineNum">     367 </span>            :                                                 UnitOfMeasure::Type::SCALE,
+<span class="lineNum">     368 </span><span class="lineCov">       1926 :                                                 Identifier::EPSG, &quot;1036&quot;);</span>
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span>            : } // namespace common
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span>            : namespace cs {
+<span class="lineNum">     375 </span><span class="lineCov">        642 : std::map&lt;std::string, const AxisDirection *&gt; AxisDirection::registry;</span>
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span>            : /** Axis positive direction is north. In a geodetic or projected CRS, north is
+<span class="lineNum">     378 </span>            :  * defined through the geodetic reference frame. In an engineering CRS, north
+<span class="lineNum">     379 </span>            :  * may be defined with respect to an engineering object rather than a
+<span class="lineNum">     380 </span>            :  * geographical direction. */
+<span class="lineNum">     381 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::NORTH(&quot;north&quot;);</span>
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            : /** Axis positive direction is approximately north-north-east. */
+<span class="lineNum">     384 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::NORTH_NORTH_EAST(&quot;northNorthEast&quot;);</span>
+<span class="lineNum">     385 </span>            : 
+<span class="lineNum">     386 </span>            : /** Axis positive direction is approximately north-east. */
+<span class="lineNum">     387 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::NORTH_EAST(&quot;northEast&quot;);</span>
+<span class="lineNum">     388 </span>            : 
+<span class="lineNum">     389 </span>            : /** Axis positive direction is approximately east-north-east. */
+<span class="lineNum">     390 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::EAST_NORTH_EAST(&quot;eastNorthEast&quot;);</span>
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span>            : /** Axis positive direction is 90deg clockwise from north. */
+<span class="lineNum">     393 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::EAST(&quot;east&quot;);</span>
+<span class="lineNum">     394 </span>            : 
+<span class="lineNum">     395 </span>            : /** Axis positive direction is approximately east-south-east. */
+<span class="lineNum">     396 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::EAST_SOUTH_EAST(&quot;eastSouthEast&quot;);</span>
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span>            : /** Axis positive direction is approximately south-east. */
+<span class="lineNum">     399 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::SOUTH_EAST(&quot;southEast&quot;);</span>
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            : /** Axis positive direction is approximately south-south-east. */
+<span class="lineNum">     402 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::SOUTH_SOUTH_EAST(&quot;southSouthEast&quot;);</span>
+<span class="lineNum">     403 </span>            : 
+<span class="lineNum">     404 </span>            : /** Axis positive direction is 180deg clockwise from north. */
+<span class="lineNum">     405 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::SOUTH(&quot;south&quot;);</span>
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span>            : /** Axis positive direction is approximately south-south-west. */
+<span class="lineNum">     408 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::SOUTH_SOUTH_WEST(&quot;southSouthWest&quot;);</span>
+<span class="lineNum">     409 </span>            : 
+<span class="lineNum">     410 </span>            : /** Axis positive direction is approximately south-west. */
+<span class="lineNum">     411 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::SOUTH_WEST(&quot;southWest&quot;);</span>
+<span class="lineNum">     412 </span>            : 
+<span class="lineNum">     413 </span>            : /** Axis positive direction is approximately west-south-west. */
+<span class="lineNum">     414 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::WEST_SOUTH_WEST(&quot;westSouthWest&quot;);</span>
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span>            : /** Axis positive direction is 270deg clockwise from north. */
+<span class="lineNum">     417 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::WEST(&quot;west&quot;);</span>
+<span class="lineNum">     418 </span>            : 
+<span class="lineNum">     419 </span>            : /** Axis positive direction is approximately west-north-west. */
+<span class="lineNum">     420 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::WEST_NORTH_WEST(&quot;westNorthWest&quot;);</span>
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span>            : /** Axis positive direction is approximately north-west. */
+<span class="lineNum">     423 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::NORTH_WEST(&quot;northWest&quot;);</span>
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span>            : /** Axis positive direction is approximately north-north-west. */
+<span class="lineNum">     426 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::NORTH_NORTH_WEST(&quot;northNorthWest&quot;);</span>
+<span class="lineNum">     427 </span>            : 
+<span class="lineNum">     428 </span>            : /** Axis positive direction is up relative to gravity. */
+<span class="lineNum">     429 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::UP(&quot;up&quot;);</span>
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span>            : /** Axis positive direction is down relative to gravity. */
+<span class="lineNum">     432 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::DOWN(&quot;down&quot;);</span>
+<span class="lineNum">     433 </span>            : 
+<span class="lineNum">     434 </span>            : /** Axis positive direction is in the equatorial plane from the centre of the
+<span class="lineNum">     435 </span>            :  * modelled Earth towards the intersection of the equator with the prime
+<span class="lineNum">     436 </span>            :  * meridian. */
+<span class="lineNum">     437 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::GEOCENTRIC_X(&quot;geocentricX&quot;);</span>
+<span class="lineNum">     438 </span>            : 
+<span class="lineNum">     439 </span>            : /** Axis positive direction is in the equatorial plane from the centre of the
+<span class="lineNum">     440 </span>            :  * modelled Earth towards the intersection of the equator and the meridian 90deg
+<span class="lineNum">     441 </span>            :  * eastwards from the prime meridian. */
+<span class="lineNum">     442 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::GEOCENTRIC_Y(&quot;geocentricY&quot;);</span>
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span>            : /** Axis positive direction is from the centre of the modelled Earth parallel to
+<span class="lineNum">     445 </span>            :  * its rotation axis and towards its north pole. */
+<span class="lineNum">     446 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::GEOCENTRIC_Z(&quot;geocentricZ&quot;);</span>
+<span class="lineNum">     447 </span>            : 
+<span class="lineNum">     448 </span>            : /** Axis positive direction is towards higher pixel column. */
+<span class="lineNum">     449 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::COLUMN_POSITIVE(&quot;columnPositive&quot;);</span>
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span>            : /** Axis positive direction is towards lower pixel column. */
+<span class="lineNum">     452 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::COLUMN_NEGATIVE(&quot;columnNegative&quot;);</span>
+<span class="lineNum">     453 </span>            : 
+<span class="lineNum">     454 </span>            : /** Axis positive direction is towards higher pixel row. */
+<span class="lineNum">     455 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::ROW_POSITIVE(&quot;rowPositive&quot;);</span>
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span>            : /** Axis positive direction is towards lower pixel row. */
+<span class="lineNum">     458 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::ROW_NEGATIVE(&quot;rowNegative&quot;);</span>
+<span class="lineNum">     459 </span>            : 
+<span class="lineNum">     460 </span>            : /** Axis positive direction is right in display. */
+<span class="lineNum">     461 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::DISPLAY_RIGHT(&quot;displayRight&quot;);</span>
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span>            : /** Axis positive direction is left in display. */
+<span class="lineNum">     464 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::DISPLAY_LEFT(&quot;displayLeft&quot;);</span>
+<span class="lineNum">     465 </span>            : 
+<span class="lineNum">     466 </span>            : /** Axis positive direction is towards top of approximately vertical display
+<span class="lineNum">     467 </span>            :  * surface. */
+<span class="lineNum">     468 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::DISPLAY_UP(&quot;displayUp&quot;);</span>
+<span class="lineNum">     469 </span>            : 
+<span class="lineNum">     470 </span>            : /** Axis positive direction is towards bottom of approximately vertical display
+<span class="lineNum">     471 </span>            :  * surface. */
+<span class="lineNum">     472 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::DISPLAY_DOWN(&quot;displayDown&quot;);</span>
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span>            : /** Axis positive direction is forward; for an observer at the centre of the
+<span class="lineNum">     475 </span>            :  * object this is will be towards its front, bow or nose. */
+<span class="lineNum">     476 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::FORWARD(&quot;forward&quot;);</span>
+<span class="lineNum">     477 </span>            : 
+<span class="lineNum">     478 </span>            : /** Axis positive direction is aft; for an observer at the centre of the object
+<span class="lineNum">     479 </span>            :  * this will be towards its back, stern or tail. */
+<span class="lineNum">     480 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::AFT(&quot;aft&quot;);</span>
+<span class="lineNum">     481 </span>            : 
+<span class="lineNum">     482 </span>            : /** Axis positive direction is port; for an observer at the centre of the object
+<span class="lineNum">     483 </span>            :  * this will be towards its left. */
+<span class="lineNum">     484 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::PORT(&quot;port&quot;);</span>
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span>            : /** Axis positive direction is starboard; for an observer at the centre of the
+<span class="lineNum">     487 </span>            :  * object this will be towards its right. */
+<span class="lineNum">     488 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::STARBOARD(&quot;starboard&quot;);</span>
+<span class="lineNum">     489 </span>            : 
+<span class="lineNum">     490 </span>            : /** Axis positive direction is clockwise from a specified direction. */
+<span class="lineNum">     491 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::CLOCKWISE(&quot;clockwise&quot;);</span>
+<span class="lineNum">     492 </span>            : 
+<span class="lineNum">     493 </span>            : /** Axis positive direction is counter clockwise from a specified direction. */
+<span class="lineNum">     494 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::COUNTER_CLOCKWISE(&quot;counterClockwise&quot;);</span>
+<span class="lineNum">     495 </span>            : 
+<span class="lineNum">     496 </span>            : /** Axis positive direction is towards the object. */
+<span class="lineNum">     497 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::TOWARDS(&quot;towards&quot;);</span>
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span>            : /** Axis positive direction is away from the object. */
+<span class="lineNum">     500 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::AWAY_FROM(&quot;awayFrom&quot;);</span>
+<span class="lineNum">     501 </span>            : 
+<span class="lineNum">     502 </span>            : /** Temporal axis positive direction is towards the future. */
+<span class="lineNum">     503 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::FUTURE(&quot;future&quot;);</span>
+<span class="lineNum">     504 </span>            : 
+<span class="lineNum">     505 </span>            : /** Temporal axis positive direction is towards the past. */
+<span class="lineNum">     506 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::PAST(&quot;past&quot;);</span>
+<span class="lineNum">     507 </span>            : 
+<span class="lineNum">     508 </span>            : /** Axis positive direction is unspecified. */
+<span class="lineNum">     509 </span><span class="lineCov">       1284 : const AxisDirection AxisDirection::UNSPECIFIED(&quot;unspecified&quot;);</span>
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span>            : //! @cond Doxygen_Suppress
+<span class="lineNum">     514 </span>            : 
+<span class="lineNum">     515 </span><span class="lineCov">        642 : std::map&lt;std::string, const AxisDirectionWKT1 *&gt; AxisDirectionWKT1::registry;</span>
+<span class="lineNum">     516 </span>            : 
+<span class="lineNum">     517 </span><span class="lineCov">       1284 : const AxisDirectionWKT1 AxisDirectionWKT1::NORTH(&quot;NORTH&quot;);</span>
+<span class="lineNum">     518 </span><span class="lineCov">       1284 : const AxisDirectionWKT1 AxisDirectionWKT1::EAST(&quot;EAST&quot;);</span>
+<span class="lineNum">     519 </span><span class="lineCov">       1284 : const AxisDirectionWKT1 AxisDirectionWKT1::SOUTH(&quot;SOUTH&quot;);</span>
+<span class="lineNum">     520 </span><span class="lineCov">       1284 : const AxisDirectionWKT1 AxisDirectionWKT1::WEST(&quot;WEST&quot;);</span>
+<span class="lineNum">     521 </span><span class="lineCov">       1284 : const AxisDirectionWKT1 AxisDirectionWKT1::UP(&quot;UP&quot;);</span>
+<span class="lineNum">     522 </span><span class="lineCov">       1284 : const AxisDirectionWKT1 AxisDirectionWKT1::DOWN(&quot;DOWN&quot;);</span>
+<span class="lineNum">     523 </span><span class="lineCov">       1284 : const AxisDirectionWKT1 AxisDirectionWKT1::OTHER(&quot;OTHER&quot;);</span>
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span>            : //! @endcond
+<span class="lineNum">     526 </span>            : 
+<span class="lineNum">     527 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     528 </span>            : 
+<span class="lineNum">     529 </span>            : //! @cond Doxygen_Suppress
+<span class="lineNum">     530 </span><span class="lineCov">        642 : const std::string AxisName::Longitude(&quot;Longitude&quot;);</span>
+<span class="lineNum">     531 </span><span class="lineCov">        642 : const std::string AxisName::Latitude(&quot;Latitude&quot;);</span>
+<span class="lineNum">     532 </span><span class="lineCov">        642 : const std::string AxisName::Easting(&quot;Easting&quot;);</span>
+<span class="lineNum">     533 </span><span class="lineCov">        642 : const std::string AxisName::Northing(&quot;Northing&quot;);</span>
+<span class="lineNum">     534 </span><span class="lineCov">        642 : const std::string AxisName::Westing(&quot;Westing&quot;);</span>
+<span class="lineNum">     535 </span><span class="lineCov">        642 : const std::string AxisName::Southing(&quot;Southing&quot;);</span>
+<span class="lineNum">     536 </span><span class="lineCov">        642 : const std::string AxisName::Ellipsoidal_height(&quot;Ellipsoidal height&quot;);</span>
+<span class="lineNum">     537 </span><span class="lineCov">        642 : const std::string AxisName::Geocentric_X(&quot;Geocentric X&quot;);</span>
+<span class="lineNum">     538 </span><span class="lineCov">        642 : const std::string AxisName::Geocentric_Y(&quot;Geocentric Y&quot;);</span>
+<span class="lineNum">     539 </span><span class="lineCov">        642 : const std::string AxisName::Geocentric_Z(&quot;Geocentric Z&quot;);</span>
+<span class="lineNum">     540 </span>            : //! @endcond
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     543 </span>            : 
+<span class="lineNum">     544 </span>            : //! @cond Doxygen_Suppress
+<span class="lineNum">     545 </span><span class="lineCov">        642 : const std::string AxisAbbreviation::lon(&quot;lon&quot;);</span>
+<span class="lineNum">     546 </span><span class="lineCov">        642 : const std::string AxisAbbreviation::lat(&quot;lat&quot;);</span>
+<span class="lineNum">     547 </span><span class="lineCov">        642 : const std::string AxisAbbreviation::E(&quot;E&quot;);</span>
+<span class="lineNum">     548 </span><span class="lineCov">        642 : const std::string AxisAbbreviation::N(&quot;N&quot;);</span>
+<span class="lineNum">     549 </span><span class="lineCov">        642 : const std::string AxisAbbreviation::h(&quot;h&quot;);</span>
+<span class="lineNum">     550 </span><span class="lineCov">        642 : const std::string AxisAbbreviation::X(&quot;X&quot;);</span>
+<span class="lineNum">     551 </span><span class="lineCov">        642 : const std::string AxisAbbreviation::Y(&quot;Y&quot;);</span>
+<span class="lineNum">     552 </span><span class="lineCov">        642 : const std::string AxisAbbreviation::Z(&quot;Z&quot;);</span>
+<span class="lineNum">     553 </span>            : //! @endcond
+<span class="lineNum">     554 </span>            : 
+<span class="lineNum">     555 </span>            : } // namespace cs
+<span class="lineNum">     556 </span>            : 
+<span class="lineNum">     557 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     558 </span>            : 
+<span class="lineNum">     559 </span>            : /** \brief The realization is by adjustment of a levelling network fixed to one
+<span class="lineNum">     560 </span>            :  * or more tide gauges. */
+<span class="lineNum">     561 </span><span class="lineCov">       1284 : const RealizationMethod RealizationMethod::LEVELLING(&quot;levelling&quot;);</span>
+<span class="lineNum">     562 </span>            : /** \brief The realization is through a geoid height model or a height
+<span class="lineNum">     563 </span>            :  * correction model. This is applied to a specified geodetic CRS. */
+<span class="lineNum">     564 </span><span class="lineCov">       1284 : const RealizationMethod RealizationMethod::GEOID(&quot;geoid&quot;);</span>
+<span class="lineNum">     565 </span>            : /** \brief The realization is through a tidal model or by tidal predictions. */
+<span class="lineNum">     566 </span><span class="lineCov">       1284 : const RealizationMethod RealizationMethod::TIDAL(&quot;tidal&quot;);</span>
+<span class="lineNum">     567 </span>            : 
+<span class="lineNum">     568 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     569 </span>            : 
+<span class="lineNum">     570 </span>            : /** \brief The Greenwich PrimeMeridian */
+<span class="lineNum">     571 </span>            : const PrimeMeridianNNPtr
+<span class="lineNum">     572 </span><span class="lineCov">        642 :     PrimeMeridian::GREENWICH(PrimeMeridian::createGREENWICH());</span>
+<span class="lineNum">     573 </span>            : /** \brief The &quot;Reference Meridian&quot; PrimeMeridian.
+<span class="lineNum">     574 </span>            :  *
+<span class="lineNum">     575 </span>            :  * This is a meridian of longitude 0 to be used with non-Earth bodies. */
+<span class="lineNum">     576 </span><span class="lineCov">        642 : const PrimeMeridianNNPtr PrimeMeridian::REFERENCE_MERIDIAN(</span>
+<span class="lineNum">     577 </span>            :     PrimeMeridian::createREFERENCE_MERIDIAN());
+<span class="lineNum">     578 </span>            : /** \brief The Paris PrimeMeridian */
+<span class="lineNum">     579 </span><span class="lineCov">        642 : const PrimeMeridianNNPtr PrimeMeridian::PARIS(PrimeMeridian::createPARIS());</span>
+<span class="lineNum">     580 </span>            : 
+<span class="lineNum">     581 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     582 </span>            : 
+<span class="lineNum">     583 </span>            : /** \brief Earth celestial body */
+<span class="lineNum">     584 </span><span class="lineCov">        642 : const std::string Ellipsoid::EARTH(&quot;Earth&quot;);</span>
+<span class="lineNum">     585 </span>            : 
+<span class="lineNum">     586 </span>            : /** \brief The EPSG:7008 / &quot;Clarke 1866&quot; Ellipsoid */
+<span class="lineNum">     587 </span><span class="lineCov">        642 : const EllipsoidNNPtr Ellipsoid::CLARKE_1866(Ellipsoid::createCLARKE_1866());</span>
+<span class="lineNum">     588 </span>            : 
+<span class="lineNum">     589 </span>            : /** \brief The EPSG:7030 / &quot;WGS 84&quot; Ellipsoid */
+<span class="lineNum">     590 </span><span class="lineCov">        642 : const EllipsoidNNPtr Ellipsoid::WGS84(Ellipsoid::createWGS84());</span>
+<span class="lineNum">     591 </span>            : 
+<span class="lineNum">     592 </span>            : /** \brief The EPSG:7019 / &quot;GRS 1980&quot; Ellipsoid */
+<span class="lineNum">     593 </span><span class="lineCov">        642 : const EllipsoidNNPtr Ellipsoid::GRS1980(Ellipsoid::createGRS1980());</span>
+<span class="lineNum">     594 </span>            : 
+<span class="lineNum">     595 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     596 </span>            : 
+<span class="lineNum">     597 </span>            : /** \brief The EPSG:6267 / &quot;North_American_Datum_1927&quot; GeodeticReferenceFrame */
+<span class="lineNum">     598 </span><span class="lineCov">        642 : const GeodeticReferenceFrameNNPtr GeodeticReferenceFrame::EPSG_6267(</span>
+<span class="lineNum">     599 </span>            :     GeodeticReferenceFrame::createEPSG_6267());
+<span class="lineNum">     600 </span>            : 
+<span class="lineNum">     601 </span>            : /** \brief The EPSG:6269 / &quot;North_American_Datum_1983&quot; GeodeticReferenceFrame */
+<span class="lineNum">     602 </span><span class="lineCov">        642 : const GeodeticReferenceFrameNNPtr GeodeticReferenceFrame::EPSG_6269(</span>
+<span class="lineNum">     603 </span>            :     GeodeticReferenceFrame::createEPSG_6269());
+<span class="lineNum">     604 </span>            : 
+<span class="lineNum">     605 </span>            : /** \brief The EPSG:6326 / &quot;WGS_1984&quot; GeodeticReferenceFrame */
+<span class="lineNum">     606 </span><span class="lineCov">        642 : const GeodeticReferenceFrameNNPtr GeodeticReferenceFrame::EPSG_6326(</span>
+<span class="lineNum">     607 </span>            :     GeodeticReferenceFrame::createEPSG_6326());
+<span class="lineNum">     608 </span>            : 
+<span class="lineNum">     609 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     610 </span>            : 
+<span class="lineNum">     611 </span>            : /** \brief The proleptic Gregorian calendar. */
+<span class="lineNum">     612 </span>            : const std::string
+<span class="lineNum">     613 </span><span class="lineCov">        642 :     TemporalDatum::CALENDAR_PROLEPTIC_GREGORIAN(&quot;proleptic Gregorian&quot;);</span>
+<span class="lineNum">     614 </span>            : 
+<span class="lineNum">     615 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     616 </span>            : 
+<span class="lineNum">     617 </span>            : /** \brief EPSG:4978 / &quot;WGS 84&quot; Geocentric */
+<span class="lineNum">     618 </span><span class="lineCov">        642 : const GeodeticCRSNNPtr GeodeticCRS::EPSG_4978(GeodeticCRS::createEPSG_4978());</span>
+<span class="lineNum">     619 </span>            : 
+<span class="lineNum">     620 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     621 </span>            : 
+<span class="lineNum">     622 </span>            : /** \brief EPSG:4267 / &quot;NAD27&quot; 2D GeographicCRS */
+<span class="lineNum">     623 </span>            : const GeographicCRSNNPtr
+<span class="lineNum">     624 </span><span class="lineCov">        642 :     GeographicCRS::EPSG_4267(GeographicCRS::createEPSG_4267());</span>
+<span class="lineNum">     625 </span>            : 
+<span class="lineNum">     626 </span>            : /** \brief EPSG:4269 / &quot;NAD83&quot; 2D GeographicCRS */
+<span class="lineNum">     627 </span>            : const GeographicCRSNNPtr
+<span class="lineNum">     628 </span><span class="lineCov">        642 :     GeographicCRS::EPSG_4269(GeographicCRS::createEPSG_4269());</span>
+<span class="lineNum">     629 </span>            : 
+<span class="lineNum">     630 </span>            : /** \brief EPSG:4326 / &quot;WGS 84&quot; 2D GeographicCRS */
+<span class="lineNum">     631 </span>            : const GeographicCRSNNPtr
+<span class="lineNum">     632 </span><span class="lineCov">        642 :     GeographicCRS::EPSG_4326(GeographicCRS::createEPSG_4326());</span>
+<span class="lineNum">     633 </span>            : 
+<span class="lineNum">     634 </span>            : /** \brief OGC:CRS84 / &quot;CRS 84&quot; 2D GeographicCRS (long, lat)*/
+<span class="lineNum">     635 </span>            : const GeographicCRSNNPtr
+<span class="lineNum">     636 </span><span class="lineCov">        642 :     GeographicCRS::OGC_CRS84(GeographicCRS::createOGC_CRS84());</span>
+<span class="lineNum">     637 </span>            : 
+<span class="lineNum">     638 </span>            : /** \brief EPSG:4807 / &quot;NTF (Paris)&quot; 2D GeographicCRS */
+<span class="lineNum">     639 </span>            : const GeographicCRSNNPtr
+<span class="lineNum">     640 </span><span class="lineCov">        642 :     GeographicCRS::EPSG_4807(GeographicCRS::createEPSG_4807());</span>
+<span class="lineNum">     641 </span>            : 
+<span class="lineNum">     642 </span>            : /** \brief EPSG:4979 / &quot;WGS 84&quot; 3D GeographicCRS */
+<span class="lineNum">     643 </span>            : const GeographicCRSNNPtr
+<span class="lineNum">     644 </span><span class="lineCov">        642 :     GeographicCRS::EPSG_4979(GeographicCRS::createEPSG_4979());</span>
+<span class="lineNum">     645 </span>            : 
+<span class="lineNum">     646 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     647 </span>            : 
+<span class="lineNum">     648 </span>            : /** \brief Key to set the operation version of a operation::CoordinateOperation
+<span class="lineNum">     649 </span>            :  *
+<span class="lineNum">     650 </span>            :  * The value is to be provided as a string.
+<span class="lineNum">     651 </span>            :  */
+<span class="lineNum">     652 </span>            : const std::string
+<span class="lineNum">     653 </span><span class="lineCov">        642 :     operation::CoordinateOperation::OPERATION_VERSION_KEY(&quot;operationVersion&quot;);</span>
+<span class="lineNum">     654 </span>            : 
+<a name="655"><span class="lineNum">     655 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     656 </span>            : 
+<span class="lineNum">     657 </span><span class="lineCov">       1926 : NS_PROJ_END</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

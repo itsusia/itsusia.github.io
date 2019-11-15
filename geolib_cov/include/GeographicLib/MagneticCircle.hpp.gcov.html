@@ -1,0 +1,256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/MagneticCircle.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - MagneticCircle.hpp<span style="font-size: 80%;"> (source / <a href="MagneticCircle.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file MagneticCircle.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::MagneticCircle class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2011-2015) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_MAGNETICCIRCLE_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_MAGNETICCIRCLE_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;GeographicLib/CircularEngine.hpp&gt;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : namespace GeographicLib {
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            :   /**
+<span class="lineNum">      20 </span>            :    * \brief Geomagnetic field on a circle of latitude
+<span class="lineNum">      21 </span>            :    *
+<span class="lineNum">      22 </span>            :    * Evaluate the earth's magnetic field on a circle of constant height and
+<span class="lineNum">      23 </span>            :    * latitude.  This uses a CircularEngine to pre-evaluate the inner sum of the
+<span class="lineNum">      24 </span>            :    * spherical harmonic sum, allowing the values of the field at several
+<span class="lineNum">      25 </span>            :    * different longitudes to be evaluated rapidly.
+<span class="lineNum">      26 </span>            :    *
+<span class="lineNum">      27 </span>            :    * Use MagneticModel::Circle to create a MagneticCircle object.  (The
+<span class="lineNum">      28 </span>            :    * constructor for this class is private.)
+<span class="lineNum">      29 </span>            :    *
+<span class="lineNum">      30 </span>            :    * Example of use:
+<span class="lineNum">      31 </span>            :    * \include example-MagneticCircle.cpp
+<span class="lineNum">      32 </span>            :    *
+<span class="lineNum">      33 </span>            :    * &lt;a href=&quot;MagneticField.1.html&quot;&gt;MagneticField&lt;/a&gt; is a command-line utility
+<span class="lineNum">      34 </span>            :    * providing access to the functionality of MagneticModel and MagneticCircle.
+<span class="lineNum">      35 </span>            :    **********************************************************************/
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            :   class GEOGRAPHICLIB_EXPORT MagneticCircle {
+<span class="lineNum">      38 </span>            :   private:
+<span class="lineNum">      39 </span>            :     typedef Math::real real;
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            :     real _a, _f, _lat, _h, _t, _cphi, _sphi, _t1, _dt0;
+<span class="lineNum">      42 </span>            :     bool _interpolate, _constterm;
+<a name="43"><span class="lineNum">      43 </span>            :     CircularEngine _circ0, _circ1, _circ2;</a>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :     MagneticCircle(real a, real f, real lat, real h, real t,</span>
+<span class="lineNum">      46 </span>            :                    real cphi, real sphi, real t1, real dt0,
+<span class="lineNum">      47 </span>            :                    bool interpolate,
+<span class="lineNum">      48 </span>            :                    const CircularEngine&amp; circ0, const CircularEngine&amp; circ1)
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :       : _a(a)</span>
+<span class="lineNum">      50 </span>            :       , _f(f)
+<span class="lineNum">      51 </span>            :       , _lat(Math::LatFix(lat))
+<span class="lineNum">      52 </span>            :       , _h(h)
+<span class="lineNum">      53 </span>            :       , _t(t)
+<span class="lineNum">      54 </span>            :       , _cphi(cphi)
+<span class="lineNum">      55 </span>            :       , _sphi(sphi)
+<span class="lineNum">      56 </span>            :       , _t1(t1)
+<span class="lineNum">      57 </span>            :       , _dt0(dt0)
+<span class="lineNum">      58 </span>            :       , _interpolate(interpolate)
+<span class="lineNum">      59 </span>            :       , _constterm(false)
+<span class="lineNum">      60 </span>            :       , _circ0(circ0)
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :       , _circ1(circ1)</span>
+<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :     {}</span></a>
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :     MagneticCircle(real a, real f, real lat, real h, real t,</span>
+<span class="lineNum">      65 </span>            :                    real cphi, real sphi, real t1, real dt0,
+<span class="lineNum">      66 </span>            :                    bool interpolate,
+<span class="lineNum">      67 </span>            :                    const CircularEngine&amp; circ0, const CircularEngine&amp; circ1,
+<span class="lineNum">      68 </span>            :                    const CircularEngine&amp; circ2)
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :       : _a(a)</span>
+<span class="lineNum">      70 </span>            :       , _f(f)
+<span class="lineNum">      71 </span>            :       , _lat(lat)
+<span class="lineNum">      72 </span>            :       , _h(h)
+<span class="lineNum">      73 </span>            :       , _t(t)
+<span class="lineNum">      74 </span>            :       , _cphi(cphi)
+<span class="lineNum">      75 </span>            :       , _sphi(sphi)
+<span class="lineNum">      76 </span>            :       , _t1(t1)
+<span class="lineNum">      77 </span>            :       , _dt0(dt0)
+<span class="lineNum">      78 </span>            :       , _interpolate(interpolate)
+<span class="lineNum">      79 </span>            :       , _constterm(true)
+<span class="lineNum">      80 </span>            :       , _circ0(circ0)
+<span class="lineNum">      81 </span>            :       , _circ1(circ1)
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :       , _circ2(circ2)</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :     {}</span>
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            :     void Field(real lon, bool diffp,
+<span class="lineNum">      86 </span>            :                real&amp; Bx, real&amp; By, real&amp; Bz,
+<span class="lineNum">      87 </span>            :                real&amp; Bxt, real&amp; Byt, real&amp; Bzt) const;
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :     friend class MagneticModel; // MagneticModel calls the private constructor
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :   public:
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :     /**
+<span class="lineNum">      94 </span>            :      * A default constructor for the normal gravity.  This sets up an
+<span class="lineNum">      95 </span>            :      * uninitialized object which can be later replaced by the
+<span class="lineNum">      96 </span>            :      * MagneticModel::Circle.
+<span class="lineNum">      97 </span>            :      **********************************************************************/
+<span class="lineNum">      98 </span>            :     MagneticCircle() : _a(-1) {}
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :     /** \name Compute the magnetic field
+<span class="lineNum">     101 </span>            :      **********************************************************************/
+<span class="lineNum">     102 </span>            :     ///@{
+<span class="lineNum">     103 </span>            :     /**
+<span class="lineNum">     104 </span>            :      * Evaluate the components of the geomagnetic field at a particular
+<span class="lineNum">     105 </span>            :      * longitude.
+<span class="lineNum">     106 </span>            :      *
+<span class="lineNum">     107 </span>            :      * @param[in] lon longitude of the point (degrees).
+<span class="lineNum">     108 </span>            :      * @param[out] Bx the easterly component of the magnetic field (nanotesla).
+<span class="lineNum">     109 </span>            :      * @param[out] By the northerly component of the magnetic field
+<span class="lineNum">     110 </span>            :      *   (nanotesla).
+<span class="lineNum">     111 </span>            :      * @param[out] Bz the vertical (up) component of the magnetic field
+<span class="lineNum">     112 </span>            :      *   (nanotesla).
+<span class="lineNum">     113 </span>            :      **********************************************************************/
+<span class="lineNum">     114 </span>            :     void operator()(real lon, real&amp; Bx, real&amp; By, real&amp; Bz) const {
+<span class="lineNum">     115 </span>            :       real dummy;
+<span class="lineNum">     116 </span>            :       Field(lon, false, Bx, By, Bz, dummy, dummy, dummy);
+<span class="lineNum">     117 </span>            :     }
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :     /**
+<span class="lineNum">     120 </span>            :      * Evaluate the components of the geomagnetic field and their time
+<span class="lineNum">     121 </span>            :      * derivatives at a particular longitude.
+<span class="lineNum">     122 </span>            :      *
+<span class="lineNum">     123 </span>            :      * @param[in] lon longitude of the point (degrees).
+<span class="lineNum">     124 </span>            :      * @param[out] Bx the easterly component of the magnetic field (nanotesla).
+<span class="lineNum">     125 </span>            :      * @param[out] By the northerly component of the magnetic field
+<span class="lineNum">     126 </span>            :      *   (nanotesla).
+<span class="lineNum">     127 </span>            :      * @param[out] Bz the vertical (up) component of the magnetic field
+<span class="lineNum">     128 </span>            :      *   (nanotesla).
+<span class="lineNum">     129 </span>            :      * @param[out] Bxt the rate of change of \e Bx (nT/yr).
+<span class="lineNum">     130 </span>            :      * @param[out] Byt the rate of change of \e By (nT/yr).
+<span class="lineNum">     131 </span>            :      * @param[out] Bzt the rate of change of \e Bz (nT/yr).
+<span class="lineNum">     132 </span>            :      **********************************************************************/
+<span class="lineNum">     133 </span>            :     void operator()(real lon, real&amp; Bx, real&amp; By, real&amp; Bz,
+<span class="lineNum">     134 </span>            :                     real&amp; Bxt, real&amp; Byt, real&amp; Bzt) const {
+<span class="lineNum">     135 </span>            :       Field(lon, true, Bx, By, Bz, Bxt, Byt, Bzt);
+<span class="lineNum">     136 </span>            :     }
+<span class="lineNum">     137 </span>            :     ///@}
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            :     /** \name Inspector functions
+<span class="lineNum">     140 </span>            :      **********************************************************************/
+<span class="lineNum">     141 </span>            :     ///@{
+<span class="lineNum">     142 </span>            :     /**
+<span class="lineNum">     143 </span>            :      * @return true if the object has been initialized.
+<span class="lineNum">     144 </span>            :      **********************************************************************/
+<span class="lineNum">     145 </span>            :     bool Init() const { return _a &gt; 0; }
+<span class="lineNum">     146 </span>            :     /**
+<span class="lineNum">     147 </span>            :      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
+<span class="lineNum">     148 </span>            :      *   the value inherited from the MagneticModel object used in the
+<span class="lineNum">     149 </span>            :      *   constructor.
+<span class="lineNum">     150 </span>            :      **********************************************************************/
+<span class="lineNum">     151 </span>            :     Math::real MajorRadius() const
+<span class="lineNum">     152 </span>            :     { return Init() ? _a : Math::NaN(); }
+<span class="lineNum">     153 </span>            :     /**
+<span class="lineNum">     154 </span>            :      * @return \e f the flattening of the ellipsoid.  This is the value
+<span class="lineNum">     155 </span>            :      *   inherited from the MagneticModel object used in the constructor.
+<span class="lineNum">     156 </span>            :      **********************************************************************/
+<span class="lineNum">     157 </span>            :     Math::real Flattening() const
+<span class="lineNum">     158 </span>            :     { return Init() ? _f : Math::NaN(); }
+<span class="lineNum">     159 </span>            :     /**
+<span class="lineNum">     160 </span>            :      * @return the latitude of the circle (degrees).
+<span class="lineNum">     161 </span>            :      **********************************************************************/
+<span class="lineNum">     162 </span>            :     Math::real Latitude() const
+<span class="lineNum">     163 </span>            :     { return Init() ? _lat : Math::NaN(); }
+<span class="lineNum">     164 </span>            :     /**
+<span class="lineNum">     165 </span>            :      * @return the height of the circle (meters).
+<span class="lineNum">     166 </span>            :      **********************************************************************/
+<span class="lineNum">     167 </span>            :     Math::real Height() const
+<span class="lineNum">     168 </span>            :     { return Init() ? _h : Math::NaN(); }
+<span class="lineNum">     169 </span>            :     /**
+<span class="lineNum">     170 </span>            :      * @return the time (fractional years).
+<span class="lineNum">     171 </span>            :      **********************************************************************/
+<span class="lineNum">     172 </span>            :     Math::real Time() const
+<span class="lineNum">     173 </span>            :     { return Init() ? _t : Math::NaN(); }
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            :     ///@}
+<span class="lineNum">     176 </span>            :   };
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span>            : } // namespace GeographicLib
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            : #endif  // GEOGRAPHICLIB_MAGNETICCIRCLE_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/MGRS.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - MGRS.hpp<span style="font-size: 80%;"> (source / <a href="MGRS.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file MGRS.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::MGRS class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2008-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_MGRS_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_MGRS_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/UTMUPS.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      17 </span>            : // Squelch warnings about dll vs string
+<span class="lineNum">      18 </span>            : #  pragma warning (push)
+<span class="lineNum">      19 </span>            : #  pragma warning (disable: 4251)
+<span class="lineNum">      20 </span>            : #endif
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : namespace GeographicLib {
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            :   /**
+<span class="lineNum">      25 </span>            :    * \brief Convert between UTM/UPS and %MGRS
+<span class="lineNum">      26 </span>            :    *
+<span class="lineNum">      27 </span>            :    * MGRS is defined in Chapter 3 of
+<span class="lineNum">      28 </span>            :    * - J. W. Hager, L. L. Fry, S. S. Jacks, D. R. Hill,
+<span class="lineNum">      29 </span>            :    *   &lt;a href=&quot;http://earth-info.nga.mil/GandG/publications/tm8358.1/pdf/TM8358_1.pdf&quot;&gt;
+<span class="lineNum">      30 </span>            :    *   Datums, Ellipsoids, Grids, and Grid Reference Systems&lt;/a&gt;,
+<span class="lineNum">      31 </span>            :    *   Defense Mapping Agency, Technical Manual TM8358.1 (1990).
+<span class="lineNum">      32 </span>            :    * .
+<span class="lineNum">      33 </span>            :    * This document has been updated by the two NGA documents
+<span class="lineNum">      34 </span>            :    * - &lt;a href=&quot;http://earth-info.nga.mil/GandG/publications/NGA_STND_0037_2_0_0_GRIDS/NGA.STND.0037_2.0.0_GRIDS.pdf&quot;&gt;
+<span class="lineNum">      35 </span>            :    *   Universal Grids and Grid Reference Systems&lt;/a&gt;,
+<span class="lineNum">      36 </span>            :    *   NGA.STND.0037_2.0.0_GRIDS (2014).
+<span class="lineNum">      37 </span>            :    * - &lt;a href=&quot;http://earth-info.nga.mil/GandG/publications/NGA_SIG_0012_2_0_0_UTMUPS/NGA.SIG.0012_2.0.0_UTMUPS.pdf&quot;&gt;
+<span class="lineNum">      38 </span>            :    *   The Universal Grids and the Transverse Mercator and Polar Stereographic
+<span class="lineNum">      39 </span>            :    *   Map Projections&lt;/a&gt;, NGA.SIG.0012_2.0.0_UTMUPS (2014).
+<span class="lineNum">      40 </span>            :    *
+<span class="lineNum">      41 </span>            :    * This implementation has the following properties:
+<span class="lineNum">      42 </span>            :    * - The conversions are closed, i.e., output from Forward is legal input for
+<span class="lineNum">      43 </span>            :    *   Reverse and vice versa.  Conversion in both directions preserve the
+<span class="lineNum">      44 </span>            :    *   UTM/UPS selection and the UTM zone.
+<span class="lineNum">      45 </span>            :    * - Forward followed by Reverse and vice versa is approximately the
+<span class="lineNum">      46 </span>            :    *   identity.  (This is affected in predictable ways by errors in
+<span class="lineNum">      47 </span>            :    *   determining the latitude band and by loss of precision in the MGRS
+<span class="lineNum">      48 </span>            :    *   coordinates.)
+<span class="lineNum">      49 </span>            :    * - The trailing digits produced by Forward are consistent as the precision
+<span class="lineNum">      50 </span>            :    *   is varied.  Specifically, the digits are obtained by operating on the
+<span class="lineNum">      51 </span>            :    *   easting with &amp;lfloor;10&lt;sup&gt;6&lt;/sup&gt; &lt;i&gt;x&lt;/i&gt;&amp;rfloor; and extracting the
+<span class="lineNum">      52 </span>            :    *   required digits from the resulting number (and similarly for the
+<span class="lineNum">      53 </span>            :    *   northing).
+<span class="lineNum">      54 </span>            :    * - All MGRS coordinates truncate to legal 100 km blocks.  All MGRS
+<span class="lineNum">      55 </span>            :    *   coordinates with a legal 100 km block prefix are legal (even though the
+<span class="lineNum">      56 </span>            :    *   latitude band letter may now belong to a neighboring band).
+<span class="lineNum">      57 </span>            :    * - The range of UTM/UPS coordinates allowed for conversion to MGRS
+<span class="lineNum">      58 </span>            :    *   coordinates is the maximum consistent with staying within the letter
+<span class="lineNum">      59 </span>            :    *   ranges of the MGRS scheme.
+<span class="lineNum">      60 </span>            :    * - All the transformations are implemented as static methods in the MGRS
+<span class="lineNum">      61 </span>            :    *   class.
+<span class="lineNum">      62 </span>            :    *
+<span class="lineNum">      63 </span>            :    * The &lt;a href=&quot;http://www.nga.mil&quot;&gt;NGA&lt;/a&gt; software package
+<span class="lineNum">      64 </span>            :    * &lt;a href=&quot;http://earth-info.nga.mil/GandG/geotrans/index.html&quot;&gt;geotrans&lt;/a&gt;
+<span class="lineNum">      65 </span>            :    * also provides conversions to and from MGRS.  Version 3.0 (and earlier)
+<span class="lineNum">      66 </span>            :    * suffers from some drawbacks:
+<span class="lineNum">      67 </span>            :    * - Inconsistent rules are used to determine the whether a particular MGRS
+<span class="lineNum">      68 </span>            :    *   coordinate is legal.  A more systematic approach is taken here.
+<span class="lineNum">      69 </span>            :    * - The underlying projections are not very accurately implemented.
+<span class="lineNum">      70 </span>            :    *
+<span class="lineNum">      71 </span>            :    * Example of use:
+<span class="lineNum">      72 </span>            :    * \include example-MGRS.cpp
+<span class="lineNum">      73 </span>            :    **********************************************************************/
+<span class="lineNum">      74 </span>            :   class GEOGRAPHICLIB_EXPORT MGRS {
+<span class="lineNum">      75 </span>            :   private:
+<span class="lineNum">      76 </span>            :     typedef Math::real real;
+<span class="lineNum">      77 </span>            :     static const char* const hemispheres_;
+<span class="lineNum">      78 </span>            :     static const char* const utmcols_[3];
+<span class="lineNum">      79 </span>            :     static const char* const utmrow_;
+<span class="lineNum">      80 </span>            :     static const char* const upscols_[4];
+<span class="lineNum">      81 </span>            :     static const char* const upsrows_[2];
+<span class="lineNum">      82 </span>            :     static const char* const latband_;
+<span class="lineNum">      83 </span>            :     static const char* const upsband_;
+<span class="lineNum">      84 </span>            :     static const char* const digits_;
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            :     static const int mineasting_[4];
+<span class="lineNum">      87 </span>            :     static const int maxeasting_[4];
+<span class="lineNum">      88 </span>            :     static const int minnorthing_[4];
+<span class="lineNum">      89 </span>            :     static const int maxnorthing_[4];
+<span class="lineNum">      90 </span>            :     enum {
+<span class="lineNum">      91 </span>            :       base_ = 10,
+<span class="lineNum">      92 </span>            :       // Top-level tiles are 10^5 m = 100 km on a side
+<span class="lineNum">      93 </span>            :       tilelevel_ = 5,
+<span class="lineNum">      94 </span>            :       // Period of UTM row letters
+<span class="lineNum">      95 </span>            :       utmrowperiod_ = 20,
+<span class="lineNum">      96 </span>            :       // Row letters are shifted by 5 for even zones
+<span class="lineNum">      97 </span>            :       utmevenrowshift_ = 5,
+<span class="lineNum">      98 </span>            :       // Maximum precision is um
+<span class="lineNum">      99 </span>            :       maxprec_ = 5 + 6,
+<span class="lineNum">     100 </span>            :       // For generating digits at maxprec
+<span class="lineNum">     101 </span>            :       mult_ = 1000000,
+<span class="lineNum">     102 </span>            :     };
+<span class="lineNum">     103 </span>            :     static void CheckCoords(bool utmp, bool&amp; northp, real&amp; x, real&amp; y);
+<span class="lineNum">     104 </span>            :     static int UTMRow(int iband, int icol, int irow);
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            :     friend class UTMUPS;        // UTMUPS::StandardZone calls LatitudeBand
+<a name="107"><span class="lineNum">     107 </span>            :     // Return latitude band number [-10, 10) for the given latitude (degrees).</a>
+<span class="lineNum">     108 </span>            :     // The bands are reckoned in include their southern edges.
+<span class="lineNum">     109 </span><span class="lineCov">         88 :     static int LatitudeBand(real lat) {</span>
+<span class="lineNum">     110 </span>            :       using std::floor;
+<span class="lineNum">     111 </span><span class="lineCov">         88 :       int ilat = int(floor(lat));</span>
+<span class="lineNum">     112 </span><span class="lineCov">        264 :       return (std::max)(-10, (std::min)(9, (ilat + 80)/8 - 10));</span>
+<span class="lineNum">     113 </span>            :     }
+<span class="lineNum">     114 </span>            :     // Return approximate latitude band number [-10, 10) for the given northing
+<span class="lineNum">     115 </span>            :     // (meters).  With this rule, each 100km tile would have a unique band
+<span class="lineNum">     116 </span>            :     // letter corresponding to the latitude at the center of the tile.  This
+<span class="lineNum">     117 </span>            :     // function isn't currently used.
+<span class="lineNum">     118 </span>            :     static int ApproxLatitudeBand(real y) {
+<span class="lineNum">     119 </span>            :       // northing at tile center in units of tile = 100km
+<span class="lineNum">     120 </span>            :       using std::floor; using std::abs;
+<span class="lineNum">     121 </span>            :       real ya = floor( (std::min)(real(88), abs(y/tile_)) ) +
+<span class="lineNum">     122 </span>            :         real(0.5);
+<span class="lineNum">     123 </span>            :       // convert to lat (mult by 90/100) and then to band (divide by 8)
+<span class="lineNum">     124 </span>            :       // the +1 fine tunes the boundary between bands 3 and 4
+<span class="lineNum">     125 </span>            :       int b = int(floor( ((ya * 9 + 1) / 10) / 8 ));
+<span class="lineNum">     126 </span>            :       // For the northern hemisphere we have
+<span class="lineNum">     127 </span>            :       // band rows  num
+<span class="lineNum">     128 </span>            :       // N 0   0:8    9
+<span class="lineNum">     129 </span>            :       // P 1   9:17   9
+<span class="lineNum">     130 </span>            :       // Q 2  18:26   9
+<span class="lineNum">     131 </span>            :       // R 3  27:34   8
+<span class="lineNum">     132 </span>            :       // S 4  35:43   9
+<span class="lineNum">     133 </span>            :       // T 5  44:52   9
+<span class="lineNum">     134 </span>            :       // U 6  53:61   9
+<span class="lineNum">     135 </span>            :       // V 7  62:70   9
+<span class="lineNum">     136 </span>            :       // W 8  71:79   9
+<span class="lineNum">     137 </span>            :       // X 9  80:94  15
+<span class="lineNum">     138 </span>            :       return y &gt;= 0 ? b : -(b + 1);
+<span class="lineNum">     139 </span>            :     }
+<span class="lineNum">     140 </span>            :     // UTMUPS access these enums
+<span class="lineNum">     141 </span>            :     enum {
+<span class="lineNum">     142 </span>            :       tile_ = 100000,            // Size MGRS blocks
+<span class="lineNum">     143 </span>            :       minutmcol_ = 1,
+<span class="lineNum">     144 </span>            :       maxutmcol_ = 9,
+<span class="lineNum">     145 </span>            :       minutmSrow_ = 10,
+<span class="lineNum">     146 </span>            :       maxutmSrow_ = 100,         // Also used for UTM S false northing
+<span class="lineNum">     147 </span>            :       minutmNrow_ = 0,           // Also used for UTM N false northing
+<span class="lineNum">     148 </span>            :       maxutmNrow_ = 95,
+<span class="lineNum">     149 </span>            :       minupsSind_ = 8,           // These 4 ind's apply to easting and northing
+<span class="lineNum">     150 </span>            :       maxupsSind_ = 32,
+<span class="lineNum">     151 </span>            :       minupsNind_ = 13,
+<span class="lineNum">     152 </span>            :       maxupsNind_ = 27,
+<span class="lineNum">     153 </span>            :       upseasting_ = 20,          // Also used for UPS false northing
+<span class="lineNum">     154 </span>            :       utmeasting_ = 5,           // UTM false easting
+<span class="lineNum">     155 </span>            :       // Difference between S hemisphere northing and N hemisphere northing
+<span class="lineNum">     156 </span>            :       utmNshift_ = (maxutmSrow_ - minutmNrow_) * tile_
+<span class="lineNum">     157 </span>            :     };
+<span class="lineNum">     158 </span>            :     MGRS();                     // Disable constructor
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            :   public:
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            :     /**
+<span class="lineNum">     163 </span>            :      * Convert UTM or UPS coordinate to an MGRS coordinate.
+<span class="lineNum">     164 </span>            :      *
+<span class="lineNum">     165 </span>            :      * @param[in] zone UTM zone (zero means UPS).
+<span class="lineNum">     166 </span>            :      * @param[in] northp hemisphere (true means north, false means south).
+<span class="lineNum">     167 </span>            :      * @param[in] x easting of point (meters).
+<span class="lineNum">     168 </span>            :      * @param[in] y northing of point (meters).
+<span class="lineNum">     169 </span>            :      * @param[in] prec precision relative to 100 km.
+<span class="lineNum">     170 </span>            :      * @param[out] mgrs MGRS string.
+<span class="lineNum">     171 </span>            :      * @exception GeographicErr if \e zone, \e x, or \e y is outside its
+<span class="lineNum">     172 </span>            :      *   allowed range.
+<span class="lineNum">     173 </span>            :      * @exception GeographicErr if the memory for the MGRS string can't be
+<span class="lineNum">     174 </span>            :      *   allocated.
+<span class="lineNum">     175 </span>            :      *
+<span class="lineNum">     176 </span>            :      * \e prec specifies the precision of the MGRS string as follows:
+<span class="lineNum">     177 </span>            :      * - \e prec = &amp;minus;1 (min), only the grid zone is returned
+<span class="lineNum">     178 </span>            :      * - \e prec = 0, 100 km
+<span class="lineNum">     179 </span>            :      * - \e prec = 1, 10 km
+<span class="lineNum">     180 </span>            :      * - \e prec = 2, 1 km
+<span class="lineNum">     181 </span>            :      * - \e prec = 3, 100 m
+<span class="lineNum">     182 </span>            :      * - \e prec = 4, 10 m
+<span class="lineNum">     183 </span>            :      * - \e prec = 5, 1 m
+<span class="lineNum">     184 </span>            :      * - \e prec = 6, 0.1 m
+<span class="lineNum">     185 </span>            :      * - &amp;hellip;
+<span class="lineNum">     186 </span>            :      * - \e prec = 11 (max), 1 &amp;mu;m
+<span class="lineNum">     187 </span>            :      *
+<span class="lineNum">     188 </span>            :      * UTM eastings are allowed to be in the range [100 km, 900 km], northings
+<span class="lineNum">     189 </span>            :      * are allowed to be in in [0 km, 9500 km] for the northern hemisphere and
+<span class="lineNum">     190 </span>            :      * in [1000 km, 10000 km] for the southern hemisphere.  (However UTM
+<span class="lineNum">     191 </span>            :      * northings can be continued across the equator.  So the actual limits on
+<span class="lineNum">     192 </span>            :      * the northings are [&amp;minus;9000 km, 9500 km] for the &quot;northern&quot;
+<span class="lineNum">     193 </span>            :      * hemisphere and [1000 km, 19500 km] for the &quot;southern&quot; hemisphere.)
+<span class="lineNum">     194 </span>            :      *
+<span class="lineNum">     195 </span>            :      * UPS eastings/northings are allowed to be in the range [1300 km, 2700 km]
+<span class="lineNum">     196 </span>            :      * in the northern hemisphere and in [800 km, 3200 km] in the southern
+<span class="lineNum">     197 </span>            :      * hemisphere.
+<span class="lineNum">     198 </span>            :      *
+<span class="lineNum">     199 </span>            :      * The ranges are 100 km more restrictive than for the conversion between
+<span class="lineNum">     200 </span>            :      * geographic coordinates and UTM and UPS given by UTMUPS.  These
+<span class="lineNum">     201 </span>            :      * restrictions are dictated by the allowed letters in MGRS coordinates.
+<span class="lineNum">     202 </span>            :      * The choice of 9500 km for the maximum northing for northern hemisphere
+<span class="lineNum">     203 </span>            :      * and of 1000 km as the minimum northing for southern hemisphere provide
+<span class="lineNum">     204 </span>            :      * at least 0.5 degree extension into standard UPS zones.  The upper ends
+<span class="lineNum">     205 </span>            :      * of the ranges for the UPS coordinates is dictated by requiring symmetry
+<span class="lineNum">     206 </span>            :      * about the meridians 0E and 90E.
+<span class="lineNum">     207 </span>            :      *
+<span class="lineNum">     208 </span>            :      * All allowed UTM and UPS coordinates may now be converted to legal MGRS
+<span class="lineNum">     209 </span>            :      * coordinates with the proviso that eastings and northings on the upper
+<span class="lineNum">     210 </span>            :      * boundaries are silently reduced by about 4 nm (4 nanometers) to place
+<span class="lineNum">     211 </span>            :      * them \e within the allowed range.  (This includes reducing a southern
+<span class="lineNum">     212 </span>            :      * hemisphere northing of 10000 km by 4 nm so that it is placed in latitude
+<span class="lineNum">     213 </span>            :      * band M.)  The UTM or UPS coordinates are truncated to requested
+<span class="lineNum">     214 </span>            :      * precision to determine the MGRS coordinate.  Thus in UTM zone 38n, the
+<span class="lineNum">     215 </span>            :      * square area with easting in [444 km, 445 km) and northing in [3688 km,
+<span class="lineNum">     216 </span>            :      * 3689 km) maps to MGRS coordinate 38SMB4488 (at \e prec = 2, 1 km),
+<span class="lineNum">     217 </span>            :      * Khulani Sq., Baghdad.
+<span class="lineNum">     218 </span>            :      *
+<span class="lineNum">     219 </span>            :      * The UTM/UPS selection and the UTM zone is preserved in the conversion to
+<span class="lineNum">     220 </span>            :      * MGRS coordinate.  Thus for \e zone &gt; 0, the MGRS coordinate begins with
+<span class="lineNum">     221 </span>            :      * the zone number followed by one of [C--M] for the southern
+<span class="lineNum">     222 </span>            :      * hemisphere and [N--X] for the northern hemisphere.  For \e zone =
+<span class="lineNum">     223 </span>            :      * 0, the MGRS coordinates begins with one of [AB] for the southern
+<span class="lineNum">     224 </span>            :      * hemisphere and [XY] for the northern hemisphere.
+<span class="lineNum">     225 </span>            :      *
+<span class="lineNum">     226 </span>            :      * The conversion to the MGRS is exact for prec in [0, 5] except that a
+<span class="lineNum">     227 </span>            :      * neighboring latitude band letter may be given if the point is within 5nm
+<span class="lineNum">     228 </span>            :      * of a band boundary.  For prec in [6, 11], the conversion is accurate to
+<span class="lineNum">     229 </span>            :      * roundoff.
+<span class="lineNum">     230 </span>            :      *
+<span class="lineNum">     231 </span>            :      * If \e prec = &amp;minus;1, then the &quot;grid zone designation&quot;, e.g., 18T, is
+<span class="lineNum">     232 </span>            :      * returned.  This consists of the UTM zone number (absent for UPS) and the
+<span class="lineNum">     233 </span>            :      * first letter of the MGRS string which labels the latitude band for UTM
+<span class="lineNum">     234 </span>            :      * and the hemisphere for UPS.
+<span class="lineNum">     235 </span>            :      *
+<span class="lineNum">     236 </span>            :      * If \e x or \e y is NaN or if \e zone is UTMUPS::INVALID, the returned
+<span class="lineNum">     237 </span>            :      * MGRS string is &quot;INVALID&quot;.
+<span class="lineNum">     238 </span>            :      *
+<span class="lineNum">     239 </span>            :      * Return the result via a reference argument to avoid the overhead of
+<span class="lineNum">     240 </span>            :      * allocating a potentially large number of small strings.  If an error is
+<span class="lineNum">     241 </span>            :      * thrown, then \e mgrs is unchanged.
+<span class="lineNum">     242 </span>            :      **********************************************************************/
+<span class="lineNum">     243 </span>            :     static void Forward(int zone, bool northp, real x, real y,
+<span class="lineNum">     244 </span>            :                         int prec, std::string&amp; mgrs);
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span>            :     /**
+<span class="lineNum">     247 </span>            :      * Convert UTM or UPS coordinate to an MGRS coordinate when the latitude is
+<span class="lineNum">     248 </span>            :      * known.
+<span class="lineNum">     249 </span>            :      *
+<span class="lineNum">     250 </span>            :      * @param[in] zone UTM zone (zero means UPS).
+<span class="lineNum">     251 </span>            :      * @param[in] northp hemisphere (true means north, false means south).
+<span class="lineNum">     252 </span>            :      * @param[in] x easting of point (meters).
+<span class="lineNum">     253 </span>            :      * @param[in] y northing of point (meters).
+<span class="lineNum">     254 </span>            :      * @param[in] lat latitude (degrees).
+<span class="lineNum">     255 </span>            :      * @param[in] prec precision relative to 100 km.
+<span class="lineNum">     256 </span>            :      * @param[out] mgrs MGRS string.
+<span class="lineNum">     257 </span>            :      * @exception GeographicErr if \e zone, \e x, or \e y is outside its
+<span class="lineNum">     258 </span>            :      *   allowed range.
+<span class="lineNum">     259 </span>            :      * @exception GeographicErr if \e lat is inconsistent with the given UTM
+<span class="lineNum">     260 </span>            :      *   coordinates.
+<span class="lineNum">     261 </span>            :      * @exception std::bad_alloc if the memory for \e mgrs can't be allocated.
+<span class="lineNum">     262 </span>            :      *
+<span class="lineNum">     263 </span>            :      * The latitude is ignored for \e zone = 0 (UPS); otherwise the latitude is
+<span class="lineNum">     264 </span>            :      * used to determine the latitude band and this is checked for consistency
+<span class="lineNum">     265 </span>            :      * using the same tests as Reverse.
+<span class="lineNum">     266 </span>            :      **********************************************************************/
+<span class="lineNum">     267 </span>            :     static void Forward(int zone, bool northp, real x, real y, real lat,
+<span class="lineNum">     268 </span>            :                         int prec, std::string&amp; mgrs);
+<span class="lineNum">     269 </span>            : 
+<span class="lineNum">     270 </span>            :     /**
+<span class="lineNum">     271 </span>            :      * Convert a MGRS coordinate to UTM or UPS coordinates.
+<span class="lineNum">     272 </span>            :      *
+<span class="lineNum">     273 </span>            :      * @param[in] mgrs MGRS string.
+<span class="lineNum">     274 </span>            :      * @param[out] zone UTM zone (zero means UPS).
+<span class="lineNum">     275 </span>            :      * @param[out] northp hemisphere (true means north, false means south).
+<span class="lineNum">     276 </span>            :      * @param[out] x easting of point (meters).
+<span class="lineNum">     277 </span>            :      * @param[out] y northing of point (meters).
+<span class="lineNum">     278 </span>            :      * @param[out] prec precision relative to 100 km.
+<span class="lineNum">     279 </span>            :      * @param[in] centerp if true (default), return center of the MGRS square,
+<span class="lineNum">     280 </span>            :      *   else return SW (lower left) corner.
+<span class="lineNum">     281 </span>            :      * @exception GeographicErr if \e mgrs is illegal.
+<span class="lineNum">     282 </span>            :      *
+<span class="lineNum">     283 </span>            :      * All conversions from MGRS to UTM/UPS are permitted provided the MGRS
+<span class="lineNum">     284 </span>            :      * coordinate is a possible result of a conversion in the other direction.
+<span class="lineNum">     285 </span>            :      * (The leading 0 may be dropped from an input MGRS coordinate for UTM
+<span class="lineNum">     286 </span>            :      * zones 1--9.)  In addition, MGRS coordinates with a neighboring
+<span class="lineNum">     287 </span>            :      * latitude band letter are permitted provided that some portion of the
+<span class="lineNum">     288 </span>            :      * 100 km block is within the given latitude band.  Thus
+<span class="lineNum">     289 </span>            :      * - 38VLS and 38WLS are allowed (latitude 64N intersects the square
+<span class="lineNum">     290 </span>            :      *   38[VW]LS); but 38VMS is not permitted (all of 38WMS is north of 64N)
+<span class="lineNum">     291 </span>            :      * - 38MPE and 38NPF are permitted (they straddle the equator); but 38NPE
+<span class="lineNum">     292 </span>            :      *   and 38MPF are not permitted (the equator does not intersect either
+<span class="lineNum">     293 </span>            :      *   block).
+<span class="lineNum">     294 </span>            :      * - Similarly ZAB and YZB are permitted (they straddle the prime
+<span class="lineNum">     295 </span>            :      *   meridian); but YAB and ZZB are not (the prime meridian does not
+<span class="lineNum">     296 </span>            :      *   intersect either block).
+<span class="lineNum">     297 </span>            :      *
+<span class="lineNum">     298 </span>            :      * The UTM/UPS selection and the UTM zone is preserved in the conversion
+<span class="lineNum">     299 </span>            :      * from MGRS coordinate.  The conversion is exact for prec in [0, 5].  With
+<span class="lineNum">     300 </span>            :      * \e centerp = true, the conversion from MGRS to geographic and back is
+<span class="lineNum">     301 </span>            :      * stable.  This is not assured if \e centerp = false.
+<span class="lineNum">     302 </span>            :      *
+<span class="lineNum">     303 </span>            :      * If a &quot;grid zone designation&quot; (for example, 18T or A) is given, then some
+<span class="lineNum">     304 </span>            :      * suitable (but essentially arbitrary) point within that grid zone is
+<span class="lineNum">     305 </span>            :      * returned.  The main utility of the conversion is to allow \e zone and \e
+<span class="lineNum">     306 </span>            :      * northp to be determined.  In this case, the \e centerp parameter is
+<span class="lineNum">     307 </span>            :      * ignored and \e prec is set to &amp;minus;1.
+<span class="lineNum">     308 </span>            :      *
+<span class="lineNum">     309 </span>            :      * If the first 3 characters of \e mgrs are &quot;INV&quot;, then \e x and \e y are
+<span class="lineNum">     310 </span>            :      * set to NaN, \e zone is set to UTMUPS::INVALID, and \e prec is set to
+<span class="lineNum">     311 </span>            :      * &amp;minus;2.
+<span class="lineNum">     312 </span>            :      *
+<span class="lineNum">     313 </span>            :      * If an exception is thrown, then the arguments are unchanged.
+<span class="lineNum">     314 </span>            :      **********************************************************************/
+<span class="lineNum">     315 </span>            :     static void Reverse(const std::string&amp; mgrs,
+<span class="lineNum">     316 </span>            :                         int&amp; zone, bool&amp; northp, real&amp; x, real&amp; y,
+<span class="lineNum">     317 </span>            :                         int&amp; prec, bool centerp = true);
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span>            :     /** \name Inspector functions
+<span class="lineNum">     320 </span>            :      **********************************************************************/
+<span class="lineNum">     321 </span>            :     ///@{
+<span class="lineNum">     322 </span>            :     /**
+<span class="lineNum">     323 </span>            :      * @return \e a the equatorial radius of the WGS84 ellipsoid (meters).
+<span class="lineNum">     324 </span>            :      *
+<span class="lineNum">     325 </span>            :      * (The WGS84 value is returned because the UTM and UPS projections are
+<span class="lineNum">     326 </span>            :      * based on this ellipsoid.)
+<span class="lineNum">     327 </span>            :      **********************************************************************/
+<span class="lineNum">     328 </span>            :     static Math::real MajorRadius() { return UTMUPS::MajorRadius(); }
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span>            :     /**
+<span class="lineNum">     331 </span>            :      * @return \e f the flattening of the WGS84 ellipsoid.
+<span class="lineNum">     332 </span>            :      *
+<span class="lineNum">     333 </span>            :      * (The WGS84 value is returned because the UTM and UPS projections are
+<span class="lineNum">     334 </span>            :      * based on this ellipsoid.)
+<span class="lineNum">     335 </span>            :      **********************************************************************/
+<span class="lineNum">     336 </span>            :     static Math::real Flattening() { return UTMUPS::Flattening(); }
+<span class="lineNum">     337 </span>            :     ///@}
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span>            :     /**
+<span class="lineNum">     340 </span>            :      * Perform some checks on the UTMUPS coordinates on this ellipsoid.  Throw
+<span class="lineNum">     341 </span>            :      * an error if any of the assumptions made in the MGRS class is not true.
+<span class="lineNum">     342 </span>            :      * This check needs to be carried out if the ellipsoid parameters (or the
+<span class="lineNum">     343 </span>            :      * UTM/UPS scales) are ever changed.
+<span class="lineNum">     344 </span>            :      **********************************************************************/
+<span class="lineNum">     345 </span>            :     static void Check();
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span>            :   };
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span>            : } // namespace GeographicLib
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">     352 </span>            : #  pragma warning (pop)
+<span class="lineNum">     353 </span>            : #endif
+<span class="lineNum">     354 </span>            : 
+<span class="lineNum">     355 </span>            : #endif  // GEOGRAPHICLIB_MGRS_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

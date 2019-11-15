@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/Georef.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - Georef.cpp<span style="font-size: 80%;"> (source / <a href="Georef.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">80</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file Georef.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::Georef class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2015-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;GeographicLib/Georef.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;GeographicLib/Utility.hpp&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : namespace GeographicLib {
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :   using namespace std;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            :   const char* const Georef::digits_ = &quot;0123456789&quot;;
+<span class="lineNum">      18 </span>            :   const char* const Georef::lontile_ = &quot;ABCDEFGHJKLMNPQRSTUVWXYZ&quot;;
+<span class="lineNum">      19 </span>            :   const char* const Georef::lattile_ = &quot;ABCDEFGHJKLM&quot;;
+<span class="lineNum">      20 </span>            :   const char* const Georef::degrees_ = &quot;ABCDEFGHJKLMNPQ&quot;;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineNoCov">          0 :   void Georef::Forward(real lat, real lon, int prec, std::string&amp; georef) {</span>
+<span class="lineNum">      23 </span><span class="lineNoCov">          0 :     if (abs(lat) &gt; 90)</span>
+<span class="lineNum">      24 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Latitude &quot; + Utility::str(lat)</span>
+<span class="lineNum">      25 </span><span class="lineNoCov">          0 :                           + &quot;d not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">      26 </span>            :     if (Math::isnan(lat) || Math::isnan(lon)) {
+<span class="lineNum">      27 </span>            :       georef = &quot;INVALID&quot;;
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 :       return;</span>
+<span class="lineNum">      29 </span>            :     }
+<span class="lineNum">      30 </span>            :     lon = Math::AngNormalize(lon); // lon in [-180,180)
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 :     if (lat == 90) lat *= (1 - numeric_limits&lt;real&gt;::epsilon() / 2);</span>
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :     prec = max(-1, min(int(maxprec_), prec));</span>
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :     if (prec == 1) ++prec;      // Disallow prec = 1</span>
+<span class="lineNum">      34 </span>            :     // The C++ standard mandates 64 bits for long long.  But
+<span class="lineNum">      35 </span>            :     // check, to make sure.
+<span class="lineNum">      36 </span>            :     GEOGRAPHICLIB_STATIC_ASSERT(numeric_limits&lt;long long&gt;::digits &gt;= 45,
+<span class="lineNum">      37 </span>            :                                 &quot;long long not wide enough to store 21600e9&quot;);
+<span class="lineNum">      38 </span>            :     const long long m = 60000000000LL;
+<span class="lineNum">      39 </span>            :     long long
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :       x = (long long)(floor(lon * real(m))) - lonorig_ * m,</span>
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :       y = (long long)(floor(lat * real(m))) - latorig_ * m;</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :     int ilon = int(x / m); int ilat = int(y / m);</span>
+<span class="lineNum">      43 </span>            :     char georef1[maxlen_];
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :     georef1[0] = lontile_[ilon / tile_];</span>
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :     georef1[1] = lattile_[ilat / tile_];</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :     if (prec &gt;= 0) {</span>
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :       georef1[2] = degrees_[ilon % tile_];</span>
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :       georef1[3] = degrees_[ilat % tile_];</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :       if (prec &gt; 0) {</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :         x -= m * ilon; y -= m * ilat;</span>
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :         long long d = (long long)pow(real(base_), maxprec_ - prec);</span>
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :         x /= d; y /= d;</span>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :         for (int c = prec; c--;) {</span>
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :           georef1[baselen_ + c       ] = digits_[x % base_]; x /= base_;</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :           georef1[baselen_ + c + prec] = digits_[y % base_]; y /= base_;</span>
+<span class="lineNum">      56 </span>            :         }
+<span class="lineNum">      57 </span>            :       }
+<span class="lineNum">      58 </span>            :     }
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :     georef.resize(baselen_ + 2 * prec);</span>
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :     copy(georef1, georef1 + baselen_ + 2 * prec, georef.begin());</span>
+<span class="lineNum">      61 </span>            :   }
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :   void Georef::Reverse(const std::string&amp; georef, real&amp; lat, real&amp; lon,</span>
+<span class="lineNum">      64 </span>            :                         int&amp; prec, bool centerp) {
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :     int len = int(georef.length());</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :     if (len &gt;= 3 &amp;&amp;</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :         toupper(georef[0]) == 'I' &amp;&amp;</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :         toupper(georef[1]) == 'N' &amp;&amp;</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :         toupper(georef[2]) == 'V') {</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :       lat = lon = Math::NaN();</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :       return;</span>
+<span class="lineNum">      72 </span>            :     }
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :     if (len &lt; baselen_ - 2)</span>
+<span class="lineNum">      74 </span>            :       throw GeographicErr(&quot;Georef must start with at least 2 letters &quot;
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :                           + georef);</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :     int prec1 = (2 + len - baselen_) / 2 - 1;</span>
+<span class="lineNum">      77 </span>            :     int k;
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :     k = Utility::lookup(lontile_, georef[0]);</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :     if (k &lt; 0)</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Bad longitude tile letter in georef &quot; + georef);</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :     real lon1 = k + lonorig_ / tile_;</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :     k = Utility::lookup(lattile_, georef[1]);</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :     if (k &lt; 0)</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Bad latitude tile letter in georef &quot; + georef);</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     real lat1 = k + latorig_ / tile_;</span>
+<span class="lineNum">      86 </span>            :     real unit = 1;
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :     if (len &gt; 2) {</span>
+<span class="lineNum">      88 </span>            :       unit *= tile_;
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :       k = Utility::lookup(degrees_, georef[2]);</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :       if (k &lt; 0)</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Bad longitude degree letter in georef &quot; + georef);</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :       lon1 = lon1 * tile_ + k;</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :       if (len &lt; 4)</span>
+<span class="lineNum">      94 </span>            :         throw GeographicErr(&quot;Missing latitude degree letter in georef &quot;
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :                             + georef);</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :       k = Utility::lookup(degrees_, georef[3]);</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :       if (k &lt; 0)</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Bad latitude degree letter in georef &quot; + georef);</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :       lat1 = lat1 * tile_ + k;</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :       if (prec1 &gt; 0) {</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :         if (georef.find_first_not_of(digits_, baselen_) != string::npos)</span>
+<span class="lineNum">     102 </span>            :           throw GeographicErr(&quot;Non digits in trailing portion of georef &quot;
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :                               + georef.substr(baselen_));</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :         if (len % 2)</span>
+<span class="lineNum">     105 </span>            :           throw GeographicErr(&quot;Georef must end with an even number of digits &quot;
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :                               + georef.substr(baselen_));</span>
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :         if (prec1 == 1)</span>
+<span class="lineNum">     108 </span>            :           throw GeographicErr(&quot;Georef needs at least 4 digits for minutes &quot;
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :                               + georef.substr(baselen_));</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :         if (prec1 &gt; maxprec_)</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;More than &quot; + Utility::str(2*maxprec_)</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :                               + &quot; digits in georef &quot;</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :                               + georef.substr(baselen_));</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :         for (int i = 0; i &lt; prec1; ++i) {</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :           int m = i ? base_ : 6;</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :           unit *= m;</span>
+<span class="lineNum">     117 </span>            :           int
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :             x = Utility::lookup(digits_, georef[baselen_ + i]),</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :             y = Utility::lookup(digits_, georef[baselen_ + i + prec1]);</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :           if (!(i || (x &lt; m &amp;&amp; y &lt; m)))</span>
+<span class="lineNum">     121 </span>            :             throw GeographicErr(&quot;Minutes terms in georef must be less than 60 &quot;
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :                                 + georef.substr(baselen_));</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :           lon1 = m * lon1 + x;</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :           lat1 = m * lat1 + y;</span>
+<span class="lineNum">     125 </span>            :         }
+<span class="lineNum">     126 </span>            :       }
+<span class="lineNum">     127 </span>            :     }
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :     if (centerp) {</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :       unit *= 2; lat1 = 2 * lat1 + 1; lon1 = 2 * lon1 + 1;</span>
+<span class="lineNum">     130 </span>            :     }
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :     lat = (tile_ * lat1) / unit;</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :     lon = (tile_ * lon1) / unit;</span>
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :     prec = prec1;</span>
+<span class="lineNum">     134 </span>            :   }
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

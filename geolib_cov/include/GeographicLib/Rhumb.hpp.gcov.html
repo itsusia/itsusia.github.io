@@ -1,0 +1,666 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/Rhumb.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - Rhumb.hpp<span style="font-size: 80%;"> (source / <a href="Rhumb.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">36</td>
+            <td class="headerCovTableEntry">43</td>
+            <td class="headerCovTableEntryMed">83.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryMed">88.9 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file Rhumb.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::Rhumb and GeographicLib::RhumbLine classes
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2014-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_RHUMB_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_RHUMB_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/Ellipsoid.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : #if !defined(GEOGRAPHICLIB_RHUMBAREA_ORDER)
+<span class="lineNum">      17 </span>            : /**
+<span class="lineNum">      18 </span>            :  * The order of the series approximation used in rhumb area calculations.
+<span class="lineNum">      19 </span>            :  * GEOGRAPHICLIB_RHUMBAREA_ORDER can be set to any integer in [4, 8].
+<span class="lineNum">      20 </span>            :  **********************************************************************/
+<span class="lineNum">      21 </span>            : #  define GEOGRAPHICLIB_RHUMBAREA_ORDER \
+<span class="lineNum">      22 </span>            :   (GEOGRAPHICLIB_PRECISION == 2 ? 6 : \
+<span class="lineNum">      23 </span>            :    (GEOGRAPHICLIB_PRECISION == 1 ? 4 : 8))
+<span class="lineNum">      24 </span>            : #endif
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : namespace GeographicLib {
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :   class RhumbLine;
+<span class="lineNum">      29 </span>            :   template &lt;class T&gt; class PolygonAreaT;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            :   /**
+<span class="lineNum">      32 </span>            :    * \brief Solve of the direct and inverse rhumb problems.
+<span class="lineNum">      33 </span>            :    *
+<span class="lineNum">      34 </span>            :    * The path of constant azimuth between two points on a ellipsoid at (\e
+<span class="lineNum">      35 </span>            :    * lat1, \e lon1) and (\e lat2, \e lon2) is called the rhumb line (also
+<span class="lineNum">      36 </span>            :    * called the loxodrome).  Its length is \e s12 and its azimuth is \e azi12.
+<span class="lineNum">      37 </span>            :    * (The azimuth is the heading measured clockwise from north.)
+<span class="lineNum">      38 </span>            :    *
+<span class="lineNum">      39 </span>            :    * Given \e lat1, \e lon1, \e azi12, and \e s12, we can determine \e lat2,
+<span class="lineNum">      40 </span>            :    * and \e lon2.  This is the \e direct rhumb problem and its solution is
+<span class="lineNum">      41 </span>            :    * given by the function Rhumb::Direct.
+<span class="lineNum">      42 </span>            :    *
+<span class="lineNum">      43 </span>            :    * Given \e lat1, \e lon1, \e lat2, and \e lon2, we can determine \e azi12
+<span class="lineNum">      44 </span>            :    * and \e s12.  This is the \e inverse rhumb problem, whose solution is given
+<span class="lineNum">      45 </span>            :    * by Rhumb::Inverse.  This finds the shortest such rhumb line, i.e., the one
+<span class="lineNum">      46 </span>            :    * that wraps no more than half way around the earth.  If the end points are
+<span class="lineNum">      47 </span>            :    * on opposite meridians, there are two shortest rhumb lines and the
+<span class="lineNum">      48 </span>            :    * east-going one is chosen.
+<span class="lineNum">      49 </span>            :    *
+<span class="lineNum">      50 </span>            :    * These routines also optionally calculate the area under the rhumb line, \e
+<span class="lineNum">      51 </span>            :    * S12.  This is the area, measured counter-clockwise, of the rhumb line
+<span class="lineNum">      52 </span>            :    * quadrilateral with corners (&lt;i&gt;lat1&lt;/i&gt;,&lt;i&gt;lon1&lt;/i&gt;), (0,&lt;i&gt;lon1&lt;/i&gt;),
+<span class="lineNum">      53 </span>            :    * (0,&lt;i&gt;lon2&lt;/i&gt;), and (&lt;i&gt;lat2&lt;/i&gt;,&lt;i&gt;lon2&lt;/i&gt;).
+<span class="lineNum">      54 </span>            :    *
+<span class="lineNum">      55 </span>            :    * Note that rhumb lines may be appreciably longer (up to 50%) than the
+<span class="lineNum">      56 </span>            :    * corresponding Geodesic.  For example the distance between London Heathrow
+<span class="lineNum">      57 </span>            :    * and Tokyo Narita via the rhumb line is 11400 km which is 18% longer than
+<span class="lineNum">      58 </span>            :    * the geodesic distance 9600 km.
+<span class="lineNum">      59 </span>            :    *
+<span class="lineNum">      60 </span>            :    * For more information on rhumb lines see \ref rhumb.
+<span class="lineNum">      61 </span>            :    *
+<span class="lineNum">      62 </span>            :    * Example of use:
+<span class="lineNum">      63 </span>            :    * \include example-Rhumb.cpp
+<span class="lineNum">      64 </span>            :    **********************************************************************/
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :   class  GEOGRAPHICLIB_EXPORT Rhumb {
+<span class="lineNum">      67 </span>            :   private:
+<span class="lineNum">      68 </span>            :     typedef Math::real real;
+<span class="lineNum">      69 </span>            :     friend class RhumbLine;
+<span class="lineNum">      70 </span>            :     template &lt;class T&gt; friend class PolygonAreaT;
+<span class="lineNum">      71 </span>            :     Ellipsoid _ell;
+<span class="lineNum">      72 </span>            :     bool _exact;
+<span class="lineNum">      73 </span>            :     real _c2;
+<span class="lineNum">      74 </span>            :     static const int tm_maxord = GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER;
+<span class="lineNum">      75 </span>            :     static const int maxpow_ = GEOGRAPHICLIB_RHUMBAREA_ORDER;
+<span class="lineNum">      76 </span>            :     // _R[0] unused
+<span class="lineNum">      77 </span>            :     real _R[maxpow_ + 1];
+<span class="lineNum">      78 </span>            :     static real gd(real x)
+<span class="lineNum">      79 </span><span class="lineCov">          9 :     { using std::atan; using std::sinh; return atan(sinh(x)); }</span>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            :     // Use divided differences to determine (mu2 - mu1) / (psi2 - psi1)
+<span class="lineNum">      82 </span>            :     // accurately
+<span class="lineNum">      83 </span>            :     //
+<span class="lineNum">      84 </span>            :     // Definition: Df(x,y,d) = (f(x) - f(y)) / (x - y)
+<span class="lineNum">      85 </span>            :     // See:
+<span class="lineNum">      86 </span>            :     //   W. M. Kahan and R. J. Fateman,
+<span class="lineNum">      87 </span>            :     //   Symbolic computation of divided differences,
+<span class="lineNum">      88 </span>            :     //   SIGSAM Bull. 33(3), 7-28 (1999)
+<span class="lineNum">      89 </span>            :     //   https://doi.org/10.1145/334714.334716
+<span class="lineNum">      90 </span>            :     //   http://www.cs.berkeley.edu/~fateman/papers/divdiff.pdf
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :     static real Dlog(real x, real y) {
+<span class="lineNum">      93 </span><span class="lineCov">          8 :       real t = x - y;</span>
+<span class="lineNum">      94 </span><span class="lineCov">         12 :       return t != 0 ? 2 * Math::atanh(t / (x + y)) / t : 1 / x;</span>
+<a name="95"><span class="lineNum">      95 </span>            :     }</a>
+<span class="lineNum">      96 </span>            :     // N.B., x and y are in degrees
+<span class="lineNum">      97 </span><span class="lineCov">         14 :     static real Dtan(real x, real y) {</span>
+<span class="lineNum">      98 </span><span class="lineCov">         14 :       real d = x - y, tx = Math::tand(x), ty = Math::tand(y), txy = tx * ty;</span>
+<span class="lineNum">      99 </span><span class="lineCov">         20 :       return d != 0 ?</span>
+<span class="lineNum">     100 </span><span class="lineCov">          6 :         (2 * txy &gt; -1 ? (1 + txy) * Math::tand(d) : tx - ty) /</span>
+<span class="lineNum">     101 </span><span class="lineCov">          6 :         (d * Math::degree()) :</span>
+<a name="102"><span class="lineNum">     102 </span><span class="lineCov">         14 :         1 + txy;</span></a>
+<span class="lineNum">     103 </span>            :     }
+<span class="lineNum">     104 </span><span class="lineCov">         16 :     static real Datan(real x, real y) {</span>
+<span class="lineNum">     105 </span>            :       using std::atan;
+<span class="lineNum">     106 </span><span class="lineCov">         16 :       real d = x - y, xy = x * y;</span>
+<span class="lineNum">     107 </span><span class="lineCov">         32 :       return d != 0 ?</span>
+<span class="lineNum">     108 </span><span class="lineCov">          8 :         (2 * xy &gt; -1 ? atan( d / (1 + xy) ) : atan(x) - atan(y)) / d :</span>
+<a name="109"><span class="lineNum">     109 </span><span class="lineCov">         24 :         1 / (1 + xy);</span></a>
+<span class="lineNum">     110 </span>            :     }
+<span class="lineNum">     111 </span><span class="lineCov">         13 :     static real Dsin(real x, real y) {</span>
+<span class="lineNum">     112 </span>            :       using std::sin; using std::cos;
+<span class="lineNum">     113 </span><span class="lineCov">         13 :       real d = (x - y) / 2;</span>
+<a name="114"><span class="lineNum">     114 </span><span class="lineCov">         13 :       return cos((x + y)/2) * (d != 0 ? sin(d) / d : 1);</span></a>
+<span class="lineNum">     115 </span>            :     }
+<span class="lineNum">     116 </span><span class="lineCov">          9 :     static real Dsinh(real x, real y) {</span>
+<span class="lineNum">     117 </span>            :       using std::sinh; using std::cosh;
+<span class="lineNum">     118 </span><span class="lineCov">          9 :       real d = (x - y) / 2;</span>
+<a name="119"><span class="lineNum">     119 </span><span class="lineCov">          9 :       return cosh((x + y) / 2) * (d != 0 ? sinh(d) / d : 1);</span></a>
+<span class="lineNum">     120 </span>            :     }
+<span class="lineNum">     121 </span><span class="lineCov">          8 :     static real Dcosh(real x, real y) {</span>
+<span class="lineNum">     122 </span>            :       using std::sinh;
+<span class="lineNum">     123 </span><span class="lineCov">          8 :       real d = (x - y) / 2;</span>
+<a name="124"><span class="lineNum">     124 </span><span class="lineCov">          8 :       return sinh((x + y) / 2) * (d != 0 ? sinh(d) / d : 1);</span></a>
+<span class="lineNum">     125 </span>            :     }
+<span class="lineNum">     126 </span><span class="lineCov">          7 :     static real Dasinh(real x, real y) {</span>
+<span class="lineNum">     127 </span><span class="lineCov">          7 :       real d = x - y,</span>
+<span class="lineNum">     128 </span>            :         hx = Math::hypot(real(1), x), hy = Math::hypot(real(1), y);
+<span class="lineNum">     129 </span><span class="lineCov">         11 :       return d != 0 ? Math::asinh(x*y &gt; 0 ? d * (x + y) / (x*hy + y*hx) :</span>
+<span class="lineNum">     130 </span><span class="lineCov">          1 :                                   x*hy - y*hx) / d :</span>
+<a name="131"><span class="lineNum">     131 </span><span class="lineCov">          7 :         1 / hx;</span></a>
+<span class="lineNum">     132 </span>            :     }
+<span class="lineNum">     133 </span><span class="lineCov">          9 :     static real Dgd(real x, real y) {</span>
+<span class="lineNum">     134 </span>            :       using std::sinh;
+<span class="lineNum">     135 </span><span class="lineCov">          9 :       return Datan(sinh(x), sinh(y)) * Dsinh(x, y);</span>
+<a name="136"><span class="lineNum">     136 </span>            :     }</a>
+<span class="lineNum">     137 </span>            :     // N.B., x and y are the tangents of the angles
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :     static real Dgdinv(real x, real y)</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :     { return Dasinh(x, y) / Datan(x, y); }</span>
+<a name="140"><span class="lineNum">     140 </span>            :     // Copied from LambertConformalConic...</a>
+<span class="lineNum">     141 </span>            :     // Deatanhe(x,y) = eatanhe((x-y)/(1-e^2*x*y))/(x-y)
+<span class="lineNum">     142 </span><span class="lineCov">          7 :     real Deatanhe(real x, real y) const {</span>
+<span class="lineNum">     143 </span><span class="lineCov">          7 :       real t = x - y, d = 1 - _ell._e2 * x * y;</span>
+<span class="lineNum">     144 </span><span class="lineCov">          7 :       return t != 0 ? Math::eatanhe(t / d, _ell._es) / t : _ell._e2 / d;</span>
+<span class="lineNum">     145 </span>            :     }
+<span class="lineNum">     146 </span>            :     // (E(x) - E(y)) / (x - y) -- E = incomplete elliptic integral of 2nd kind
+<span class="lineNum">     147 </span>            :     real DE(real x, real y) const;
+<span class="lineNum">     148 </span>            :     // (mux - muy) / (phix - phiy) using elliptic integrals
+<span class="lineNum">     149 </span>            :     real DRectifying(real latx, real laty) const;
+<span class="lineNum">     150 </span>            :     // (psix - psiy) / (phix - phiy)
+<span class="lineNum">     151 </span>            :     real DIsometric(real latx, real laty) const;
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            :     // (sum(c[j]*sin(2*j*x),j=1..n) - sum(c[j]*sin(2*j*x),j=1..n)) / (x - y)
+<span class="lineNum">     154 </span>            :     static real SinCosSeries(bool sinp,
+<span class="lineNum">     155 </span>            :                              real x, real y, const real c[], int n);
+<span class="lineNum">     156 </span>            :     // (mux - muy) / (chix - chiy) using Krueger's series
+<span class="lineNum">     157 </span>            :     real DConformalToRectifying(real chix, real chiy) const;
+<span class="lineNum">     158 </span>            :     // (chix - chiy) / (mux - muy) using Krueger's series
+<span class="lineNum">     159 </span>            :     real DRectifyingToConformal(real mux, real muy) const;
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            :     // (mux - muy) / (psix - psiy)
+<span class="lineNum">     162 </span>            :     // N.B., psix and psiy are in degrees
+<span class="lineNum">     163 </span>            :     real DIsometricToRectifying(real psix, real psiy) const;
+<span class="lineNum">     164 </span>            :     // (psix - psiy) / (mux - muy)
+<span class="lineNum">     165 </span>            :     real DRectifyingToIsometric(real mux, real muy) const;
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            :     real MeanSinXi(real psi1, real psi2) const;
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :     // The following two functions (with lots of ignored arguments) mimic the
+<span class="lineNum">     170 </span>            :     // interface to the corresponding Geodesic function.  These are needed by
+<span class="lineNum">     171 </span>            :     // PolygonAreaT.
+<span class="lineNum">     172 </span>            :     void GenDirect(real lat1, real lon1, real azi12,
+<span class="lineNum">     173 </span>            :                    bool, real s12, unsigned outmask,
+<span class="lineNum">     174 </span>            :                    real&amp; lat2, real&amp; lon2, real&amp;, real&amp;, real&amp;, real&amp;, real&amp;,
+<span class="lineNum">     175 </span>            :                    real&amp; S12) const {
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :       GenDirect(lat1, lon1, azi12, s12, outmask, lat2, lon2, S12);</span>
+<span class="lineNum">     177 </span>            :     }
+<span class="lineNum">     178 </span>            :     void GenInverse(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     179 </span>            :                     unsigned outmask, real&amp; s12, real&amp; azi12,
+<span class="lineNum">     180 </span>            :                     real&amp;, real&amp; , real&amp; , real&amp; , real&amp; S12) const {
+<span class="lineNum">     181 </span><span class="lineCov">          6 :       GenInverse(lat1, lon1, lat2, lon2, outmask, s12, azi12, S12);</span>
+<span class="lineNum">     182 </span>            :     }
+<span class="lineNum">     183 </span>            :   public:
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span>            :     /**
+<span class="lineNum">     186 </span>            :      * Bit masks for what calculations to do.  They specify which results to
+<span class="lineNum">     187 </span>            :      * return in the general routines Rhumb::GenDirect and Rhumb::GenInverse
+<span class="lineNum">     188 </span>            :      * routines.  RhumbLine::mask is a duplication of this enum.
+<span class="lineNum">     189 </span>            :      **********************************************************************/
+<span class="lineNum">     190 </span>            :     enum mask {
+<span class="lineNum">     191 </span>            :       /**
+<span class="lineNum">     192 </span>            :        * No output.
+<span class="lineNum">     193 </span>            :        * @hideinitializer
+<span class="lineNum">     194 </span>            :        **********************************************************************/
+<span class="lineNum">     195 </span>            :       NONE          = 0U,
+<span class="lineNum">     196 </span>            :       /**
+<span class="lineNum">     197 </span>            :        * Calculate latitude \e lat2.
+<span class="lineNum">     198 </span>            :        * @hideinitializer
+<span class="lineNum">     199 </span>            :        **********************************************************************/
+<span class="lineNum">     200 </span>            :       LATITUDE      = 1U&lt;&lt;7,
+<span class="lineNum">     201 </span>            :       /**
+<span class="lineNum">     202 </span>            :        * Calculate longitude \e lon2.
+<span class="lineNum">     203 </span>            :        * @hideinitializer
+<span class="lineNum">     204 </span>            :        **********************************************************************/
+<span class="lineNum">     205 </span>            :       LONGITUDE     = 1U&lt;&lt;8,
+<span class="lineNum">     206 </span>            :       /**
+<span class="lineNum">     207 </span>            :        * Calculate azimuth \e azi12.
+<span class="lineNum">     208 </span>            :        * @hideinitializer
+<span class="lineNum">     209 </span>            :        **********************************************************************/
+<span class="lineNum">     210 </span>            :       AZIMUTH       = 1U&lt;&lt;9,
+<span class="lineNum">     211 </span>            :       /**
+<span class="lineNum">     212 </span>            :        * Calculate distance \e s12.
+<span class="lineNum">     213 </span>            :        * @hideinitializer
+<span class="lineNum">     214 </span>            :        **********************************************************************/
+<span class="lineNum">     215 </span>            :       DISTANCE      = 1U&lt;&lt;10,
+<span class="lineNum">     216 </span>            :       /**
+<span class="lineNum">     217 </span>            :        * Calculate area \e S12.
+<span class="lineNum">     218 </span>            :        * @hideinitializer
+<span class="lineNum">     219 </span>            :        **********************************************************************/
+<span class="lineNum">     220 </span>            :       AREA          = 1U&lt;&lt;14,
+<span class="lineNum">     221 </span>            :       /**
+<span class="lineNum">     222 </span>            :        * Unroll \e lon2 in the direct calculation.
+<span class="lineNum">     223 </span>            :        * @hideinitializer
+<span class="lineNum">     224 </span>            :        **********************************************************************/
+<span class="lineNum">     225 </span>            :       LONG_UNROLL   = 1U&lt;&lt;15,
+<span class="lineNum">     226 </span>            :       /**
+<span class="lineNum">     227 </span>            :        * Calculate everything.  (LONG_UNROLL is not included in this mask.)
+<span class="lineNum">     228 </span>            :        * @hideinitializer
+<span class="lineNum">     229 </span>            :        **********************************************************************/
+<span class="lineNum">     230 </span>            :       ALL           = 0x7F80U,
+<span class="lineNum">     231 </span>            :     };
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span>            :     /**
+<span class="lineNum">     234 </span>            :      * Constructor for a ellipsoid with
+<span class="lineNum">     235 </span>            :      *
+<span class="lineNum">     236 </span>            :      * @param[in] a equatorial radius (meters).
+<span class="lineNum">     237 </span>            :      * @param[in] f flattening of ellipsoid.  Setting \e f = 0 gives a sphere.
+<span class="lineNum">     238 </span>            :      *   Negative \e f gives a prolate ellipsoid.
+<span class="lineNum">     239 </span>            :      * @param[in] exact if true (the default) use an addition theorem for
+<span class="lineNum">     240 </span>            :      *   elliptic integrals to compute divided differences; otherwise use
+<span class="lineNum">     241 </span>            :      *   series expansion (accurate for |&lt;i&gt;f&lt;/i&gt;| &lt; 0.01).
+<span class="lineNum">     242 </span>            :      * @exception GeographicErr if \e a or (1 &amp;minus; \e f) \e a is not
+<span class="lineNum">     243 </span>            :      *   positive.
+<span class="lineNum">     244 </span>            :      *
+<span class="lineNum">     245 </span>            :      * See \ref rhumb, for a detailed description of the \e exact parameter.
+<span class="lineNum">     246 </span>            :      **********************************************************************/
+<span class="lineNum">     247 </span>            :     Rhumb(real a, real f, bool exact = true);
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :     /**
+<span class="lineNum">     250 </span>            :      * Solve the direct rhumb problem returning also the area.
+<span class="lineNum">     251 </span>            :      *
+<span class="lineNum">     252 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     253 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     254 </span>            :      * @param[in] azi12 azimuth of the rhumb line (degrees).
+<span class="lineNum">     255 </span>            :      * @param[in] s12 distance between point 1 and point 2 (meters); it can be
+<span class="lineNum">     256 </span>            :      *   negative.
+<span class="lineNum">     257 </span>            :      * @param[out] lat2 latitude of point 2 (degrees).
+<span class="lineNum">     258 </span>            :      * @param[out] lon2 longitude of point 2 (degrees).
+<span class="lineNum">     259 </span>            :      * @param[out] S12 area under the rhumb line (meters&lt;sup&gt;2&lt;/sup&gt;).
+<span class="lineNum">     260 </span>            :      *
+<span class="lineNum">     261 </span>            :      * \e lat1 should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].  The value of
+<span class="lineNum">     262 </span>            :      * \e lon2 returned is in the range [&amp;minus;180&amp;deg;, 180&amp;deg;].
+<span class="lineNum">     263 </span>            :      *
+<span class="lineNum">     264 </span>            :      * If point 1 is a pole, the cosine of its latitude is taken to be
+<span class="lineNum">     265 </span>            :      * 1/&amp;epsilon;&lt;sup&gt;2&lt;/sup&gt; (where &amp;epsilon; is 2&lt;sup&gt;-52&lt;/sup&gt;).  This
+<span class="lineNum">     266 </span>            :      * position, which is extremely close to the actual pole, allows the
+<span class="lineNum">     267 </span>            :      * calculation to be carried out in finite terms.  If \e s12 is large
+<span class="lineNum">     268 </span>            :      * enough that the rhumb line crosses a pole, the longitude of point 2
+<span class="lineNum">     269 </span>            :      * is indeterminate (a NaN is returned for \e lon2 and \e S12).
+<span class="lineNum">     270 </span>            :      **********************************************************************/
+<span class="lineNum">     271 </span>            :     void Direct(real lat1, real lon1, real azi12, real s12,
+<span class="lineNum">     272 </span>            :                 real&amp; lat2, real&amp; lon2, real&amp; S12) const {
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :       GenDirect(lat1, lon1, azi12, s12,</span>
+<span class="lineNum">     274 </span>            :                 LATITUDE | LONGITUDE | AREA, lat2, lon2, S12);
+<span class="lineNum">     275 </span>            :     }
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span>            :     /**
+<span class="lineNum">     278 </span>            :      * Solve the direct rhumb problem without the area.
+<span class="lineNum">     279 </span>            :      **********************************************************************/
+<span class="lineNum">     280 </span>            :     void Direct(real lat1, real lon1, real azi12, real s12,
+<span class="lineNum">     281 </span>            :                 real&amp; lat2, real&amp; lon2) const {
+<span class="lineNum">     282 </span>            :       real t;
+<span class="lineNum">     283 </span>            :       GenDirect(lat1, lon1, azi12, s12, LATITUDE | LONGITUDE, lat2, lon2, t);
+<span class="lineNum">     284 </span>            :     }
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            :     /**
+<span class="lineNum">     287 </span>            :      * The general direct rhumb problem.  Rhumb::Direct is defined in terms
+<span class="lineNum">     288 </span>            :      * of this function.
+<span class="lineNum">     289 </span>            :      *
+<span class="lineNum">     290 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     291 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     292 </span>            :      * @param[in] azi12 azimuth of the rhumb line (degrees).
+<span class="lineNum">     293 </span>            :      * @param[in] s12 distance between point 1 and point 2 (meters); it can be
+<span class="lineNum">     294 </span>            :      *   negative.
+<span class="lineNum">     295 </span>            :      * @param[in] outmask a bitor'ed combination of Rhumb::mask values
+<span class="lineNum">     296 </span>            :      *   specifying which of the following parameters should be set.
+<span class="lineNum">     297 </span>            :      * @param[out] lat2 latitude of point 2 (degrees).
+<span class="lineNum">     298 </span>            :      * @param[out] lon2 longitude of point 2 (degrees).
+<span class="lineNum">     299 </span>            :      * @param[out] S12 area under the rhumb line (meters&lt;sup&gt;2&lt;/sup&gt;).
+<span class="lineNum">     300 </span>            :      *
+<span class="lineNum">     301 </span>            :      * The Rhumb::mask values possible for \e outmask are
+<span class="lineNum">     302 </span>            :      * - \e outmask |= Rhumb::LATITUDE for the latitude \e lat2;
+<span class="lineNum">     303 </span>            :      * - \e outmask |= Rhumb::LONGITUDE for the latitude \e lon2;
+<span class="lineNum">     304 </span>            :      * - \e outmask |= Rhumb::AREA for the area \e S12;
+<span class="lineNum">     305 </span>            :      * - \e outmask |= Rhumb::ALL for all of the above;
+<span class="lineNum">     306 </span>            :      * - \e outmask |= Rhumb::LONG_UNROLL to unroll \e lon2 instead of wrapping
+<span class="lineNum">     307 </span>            :      *   it into the range [&amp;minus;180&amp;deg;, 180&amp;deg;].
+<span class="lineNum">     308 </span>            :      * .
+<span class="lineNum">     309 </span>            :      * With the Rhumb::LONG_UNROLL bit set, the quantity \e lon2 &amp;minus;
+<span class="lineNum">     310 </span>            :      * \e lon1 indicates how many times and in what sense the rhumb line
+<span class="lineNum">     311 </span>            :      * encircles the ellipsoid.
+<span class="lineNum">     312 </span>            :      **********************************************************************/
+<span class="lineNum">     313 </span>            :     void GenDirect(real lat1, real lon1, real azi12, real s12,
+<span class="lineNum">     314 </span>            :                    unsigned outmask, real&amp; lat2, real&amp; lon2, real&amp; S12) const;
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :     /**
+<span class="lineNum">     317 </span>            :      * Solve the inverse rhumb problem returning also the area.
+<span class="lineNum">     318 </span>            :      *
+<span class="lineNum">     319 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     320 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     321 </span>            :      * @param[in] lat2 latitude of point 2 (degrees).
+<span class="lineNum">     322 </span>            :      * @param[in] lon2 longitude of point 2 (degrees).
+<span class="lineNum">     323 </span>            :      * @param[out] s12 rhumb distance between point 1 and point 2 (meters).
+<span class="lineNum">     324 </span>            :      * @param[out] azi12 azimuth of the rhumb line (degrees).
+<span class="lineNum">     325 </span>            :      * @param[out] S12 area under the rhumb line (meters&lt;sup&gt;2&lt;/sup&gt;).
+<span class="lineNum">     326 </span>            :      *
+<span class="lineNum">     327 </span>            :      * The shortest rhumb line is found.  If the end points are on opposite
+<span class="lineNum">     328 </span>            :      * meridians, there are two shortest rhumb lines and the east-going one is
+<span class="lineNum">     329 </span>            :      * chosen.  \e lat1 and \e lat2 should be in the range [&amp;minus;90&amp;deg;,
+<span class="lineNum">     330 </span>            :      * 90&amp;deg;].  The value of \e azi12 returned is in the range
+<span class="lineNum">     331 </span>            :      * [&amp;minus;180&amp;deg;, 180&amp;deg;].
+<span class="lineNum">     332 </span>            :      *
+<span class="lineNum">     333 </span>            :      * If either point is a pole, the cosine of its latitude is taken to be
+<span class="lineNum">     334 </span>            :      * 1/&amp;epsilon;&lt;sup&gt;2&lt;/sup&gt; (where &amp;epsilon; is 2&lt;sup&gt;-52&lt;/sup&gt;).  This
+<span class="lineNum">     335 </span>            :      * position, which is extremely close to the actual pole, allows the
+<span class="lineNum">     336 </span>            :      * calculation to be carried out in finite terms.
+<span class="lineNum">     337 </span>            :      **********************************************************************/
+<span class="lineNum">     338 </span>            :     void Inverse(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     339 </span>            :                  real&amp; s12, real&amp; azi12, real&amp; S12) const {
+<span class="lineNum">     340 </span><span class="lineCov">          2 :       GenInverse(lat1, lon1, lat2, lon2,</span>
+<span class="lineNum">     341 </span>            :                  DISTANCE | AZIMUTH | AREA, s12, azi12, S12);
+<span class="lineNum">     342 </span>            :     }
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            :     /**
+<span class="lineNum">     345 </span>            :      * Solve the inverse rhumb problem without the area.
+<span class="lineNum">     346 </span>            :      **********************************************************************/
+<span class="lineNum">     347 </span>            :     void Inverse(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     348 </span>            :                  real&amp; s12, real&amp; azi12) const {
+<span class="lineNum">     349 </span>            :       real t;
+<span class="lineNum">     350 </span>            :       GenInverse(lat1, lon1, lat2, lon2, DISTANCE | AZIMUTH, s12, azi12, t);
+<span class="lineNum">     351 </span>            :     }
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span>            :     /**
+<span class="lineNum">     354 </span>            :      * The general inverse rhumb problem.  Rhumb::Inverse is defined in terms
+<span class="lineNum">     355 </span>            :      * of this function.
+<span class="lineNum">     356 </span>            :      *
+<span class="lineNum">     357 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     358 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     359 </span>            :      * @param[in] lat2 latitude of point 2 (degrees).
+<span class="lineNum">     360 </span>            :      * @param[in] lon2 longitude of point 2 (degrees).
+<span class="lineNum">     361 </span>            :      * @param[in] outmask a bitor'ed combination of Rhumb::mask values
+<span class="lineNum">     362 </span>            :      *   specifying which of the following parameters should be set.
+<span class="lineNum">     363 </span>            :      * @param[out] s12 rhumb distance between point 1 and point 2 (meters).
+<span class="lineNum">     364 </span>            :      * @param[out] azi12 azimuth of the rhumb line (degrees).
+<span class="lineNum">     365 </span>            :      * @param[out] S12 area under the rhumb line (meters&lt;sup&gt;2&lt;/sup&gt;).
+<span class="lineNum">     366 </span>            :      *
+<span class="lineNum">     367 </span>            :      * The Rhumb::mask values possible for \e outmask are
+<span class="lineNum">     368 </span>            :      * - \e outmask |= Rhumb::DISTANCE for the latitude \e s12;
+<span class="lineNum">     369 </span>            :      * - \e outmask |= Rhumb::AZIMUTH for the latitude \e azi12;
+<span class="lineNum">     370 </span>            :      * - \e outmask |= Rhumb::AREA for the area \e S12;
+<span class="lineNum">     371 </span>            :      * - \e outmask |= Rhumb::ALL for all of the above;
+<span class="lineNum">     372 </span>            :      **********************************************************************/
+<span class="lineNum">     373 </span>            :     void GenInverse(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     374 </span>            :                     unsigned outmask,
+<span class="lineNum">     375 </span>            :                     real&amp; s12, real&amp; azi12, real&amp; S12) const;
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span>            :     /**
+<span class="lineNum">     378 </span>            :      * Set up to compute several points on a single rhumb line.
+<span class="lineNum">     379 </span>            :      *
+<span class="lineNum">     380 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     381 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     382 </span>            :      * @param[in] azi12 azimuth of the rhumb line (degrees).
+<span class="lineNum">     383 </span>            :      * @return a RhumbLine object.
+<span class="lineNum">     384 </span>            :      *
+<span class="lineNum">     385 </span>            :      * \e lat1 should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     386 </span>            :      *
+<span class="lineNum">     387 </span>            :      * If point 1 is a pole, the cosine of its latitude is taken to be
+<span class="lineNum">     388 </span>            :      * 1/&amp;epsilon;&lt;sup&gt;2&lt;/sup&gt; (where &amp;epsilon; is 2&lt;sup&gt;-52&lt;/sup&gt;).  This
+<span class="lineNum">     389 </span>            :      * position, which is extremely close to the actual pole, allows the
+<span class="lineNum">     390 </span>            :      * calculation to be carried out in finite terms.
+<span class="lineNum">     391 </span>            :      **********************************************************************/
+<span class="lineNum">     392 </span>            :     RhumbLine Line(real lat1, real lon1, real azi12) const;
+<span class="lineNum">     393 </span>            : 
+<span class="lineNum">     394 </span>            :     /** \name Inspector functions.
+<span class="lineNum">     395 </span>            :      **********************************************************************/
+<span class="lineNum">     396 </span>            :     ///@{
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span>            :     /**
+<span class="lineNum">     399 </span>            :      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
+<span class="lineNum">     400 </span>            :      *   the value used in the constructor.
+<span class="lineNum">     401 </span>            :      **********************************************************************/
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :     Math::real MajorRadius() const { return _ell.MajorRadius(); }</span>
+<span class="lineNum">     403 </span>            : 
+<span class="lineNum">     404 </span>            :     /**
+<span class="lineNum">     405 </span>            :      * @return \e f the  flattening of the ellipsoid.  This is the
+<span class="lineNum">     406 </span>            :      *   value used in the constructor.
+<span class="lineNum">     407 </span>            :      **********************************************************************/
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 :     Math::real Flattening() const { return _ell.Flattening(); }</span>
+<span class="lineNum">     409 </span>            : 
+<span class="lineNum">     410 </span><span class="lineCov">         15 :     Math::real EllipsoidArea() const { return _ell.Area(); }</span>
+<span class="lineNum">     411 </span>            : 
+<span class="lineNum">     412 </span>            :     /**
+<span class="lineNum">     413 </span>            :      * A global instantiation of Rhumb with the parameters for the WGS84
+<span class="lineNum">     414 </span>            :      * ellipsoid.
+<span class="lineNum">     415 </span>            :      **********************************************************************/
+<span class="lineNum">     416 </span>            :     static const Rhumb&amp; WGS84();
+<span class="lineNum">     417 </span>            :   };
+<span class="lineNum">     418 </span>            : 
+<span class="lineNum">     419 </span>            :   /**
+<span class="lineNum">     420 </span>            :    * \brief Find a sequence of points on a single rhumb line.
+<span class="lineNum">     421 </span>            :    *
+<span class="lineNum">     422 </span>            :    * RhumbLine facilitates the determination of a series of points on a single
+<span class="lineNum">     423 </span>            :    * rhumb line.  The starting point (\e lat1, \e lon1) and the azimuth \e
+<span class="lineNum">     424 </span>            :    * azi12 are specified in the call to Rhumb::Line which returns a RhumbLine
+<span class="lineNum">     425 </span>            :    * object.  RhumbLine.Position returns the location of point 2 (and,
+<span class="lineNum">     426 </span>            :    * optionally, the corresponding area, \e S12) a distance \e s12 along the
+<span class="lineNum">     427 </span>            :    * rhumb line.
+<span class="lineNum">     428 </span>            :    *
+<span class="lineNum">     429 </span>            :    * There is no public constructor for this class.  (Use Rhumb::Line to create
+<span class="lineNum">     430 </span>            :    * an instance.)  The Rhumb object used to create a RhumbLine must stay in
+<span class="lineNum">     431 </span>            :    * scope as long as the RhumbLine.
+<span class="lineNum">     432 </span>            :    *
+<span class="lineNum">     433 </span>            :    * Example of use:
+<span class="lineNum">     434 </span>            :    * \include example-RhumbLine.cpp
+<span class="lineNum">     435 </span>            :    **********************************************************************/
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            :   class  GEOGRAPHICLIB_EXPORT RhumbLine {
+<span class="lineNum">     438 </span>            :   private:
+<span class="lineNum">     439 </span>            :     typedef Math::real real;
+<span class="lineNum">     440 </span>            :     friend class Rhumb;
+<span class="lineNum">     441 </span>            :     const Rhumb&amp; _rh;
+<span class="lineNum">     442 </span>            :     bool _exact;
+<span class="lineNum">     443 </span>            :     real _lat1, _lon1, _azi12, _salp, _calp, _mu1, _psi1, _r1;
+<span class="lineNum">     444 </span>            :     RhumbLine&amp; operator=(const RhumbLine&amp;); // copy assignment not allowed
+<span class="lineNum">     445 </span>            :     RhumbLine(const Rhumb&amp; rh, real lat1, real lon1, real azi12,
+<span class="lineNum">     446 </span>            :               bool exact);
+<span class="lineNum">     447 </span>            :   public:
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span>            :     /**
+<span class="lineNum">     450 </span>            :      * This is a duplication of Rhumb::mask.
+<span class="lineNum">     451 </span>            :      **********************************************************************/
+<span class="lineNum">     452 </span>            :     enum mask {
+<span class="lineNum">     453 </span>            :       /**
+<span class="lineNum">     454 </span>            :        * No output.
+<span class="lineNum">     455 </span>            :        * @hideinitializer
+<span class="lineNum">     456 </span>            :        **********************************************************************/
+<span class="lineNum">     457 </span>            :       NONE          = Rhumb::NONE,
+<span class="lineNum">     458 </span>            :       /**
+<span class="lineNum">     459 </span>            :        * Calculate latitude \e lat2.
+<span class="lineNum">     460 </span>            :        * @hideinitializer
+<span class="lineNum">     461 </span>            :        **********************************************************************/
+<span class="lineNum">     462 </span>            :       LATITUDE      = Rhumb::LATITUDE,
+<span class="lineNum">     463 </span>            :       /**
+<span class="lineNum">     464 </span>            :        * Calculate longitude \e lon2.
+<span class="lineNum">     465 </span>            :        * @hideinitializer
+<span class="lineNum">     466 </span>            :        **********************************************************************/
+<span class="lineNum">     467 </span>            :       LONGITUDE     = Rhumb::LONGITUDE,
+<span class="lineNum">     468 </span>            :       /**
+<span class="lineNum">     469 </span>            :        * Calculate azimuth \e azi12.
+<span class="lineNum">     470 </span>            :        * @hideinitializer
+<span class="lineNum">     471 </span>            :        **********************************************************************/
+<span class="lineNum">     472 </span>            :       AZIMUTH       = Rhumb::AZIMUTH,
+<span class="lineNum">     473 </span>            :       /**
+<span class="lineNum">     474 </span>            :        * Calculate distance \e s12.
+<span class="lineNum">     475 </span>            :        * @hideinitializer
+<span class="lineNum">     476 </span>            :        **********************************************************************/
+<span class="lineNum">     477 </span>            :       DISTANCE      = Rhumb::DISTANCE,
+<span class="lineNum">     478 </span>            :       /**
+<span class="lineNum">     479 </span>            :        * Calculate area \e S12.
+<span class="lineNum">     480 </span>            :        * @hideinitializer
+<span class="lineNum">     481 </span>            :        **********************************************************************/
+<span class="lineNum">     482 </span>            :       AREA          = Rhumb::AREA,
+<span class="lineNum">     483 </span>            :       /**
+<span class="lineNum">     484 </span>            :        * Unroll \e lon2 in the direct calculation.
+<span class="lineNum">     485 </span>            :        * @hideinitializer
+<span class="lineNum">     486 </span>            :        **********************************************************************/
+<span class="lineNum">     487 </span>            :       LONG_UNROLL   = Rhumb::LONG_UNROLL,
+<span class="lineNum">     488 </span>            :       /**
+<span class="lineNum">     489 </span>            :        * Calculate everything.  (LONG_UNROLL is not included in this mask.)
+<span class="lineNum">     490 </span>            :        * @hideinitializer
+<span class="lineNum">     491 </span>            :        **********************************************************************/
+<span class="lineNum">     492 </span>            :       ALL           = Rhumb::ALL,
+<span class="lineNum">     493 </span>            :     };
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span>            :     /**
+<span class="lineNum">     496 </span>            :      * Compute the position of point 2 which is a distance \e s12 (meters) from
+<span class="lineNum">     497 </span>            :      * point 1.  The area is also computed.
+<span class="lineNum">     498 </span>            :      *
+<span class="lineNum">     499 </span>            :      * @param[in] s12 distance between point 1 and point 2 (meters); it can be
+<span class="lineNum">     500 </span>            :      *   negative.
+<span class="lineNum">     501 </span>            :      * @param[out] lat2 latitude of point 2 (degrees).
+<span class="lineNum">     502 </span>            :      * @param[out] lon2 longitude of point 2 (degrees).
+<span class="lineNum">     503 </span>            :      * @param[out] S12 area under the rhumb line (meters&lt;sup&gt;2&lt;/sup&gt;).
+<span class="lineNum">     504 </span>            :      *
+<span class="lineNum">     505 </span>            :      * The value of \e lon2 returned is in the range [&amp;minus;180&amp;deg;,
+<span class="lineNum">     506 </span>            :      * 180&amp;deg;].
+<span class="lineNum">     507 </span>            :      *
+<span class="lineNum">     508 </span>            :      * If \e s12 is large enough that the rhumb line crosses a pole, the
+<span class="lineNum">     509 </span>            :      * longitude of point 2 is indeterminate (a NaN is returned for \e lon2 and
+<span class="lineNum">     510 </span>            :      * \e S12).
+<span class="lineNum">     511 </span>            :      **********************************************************************/
+<span class="lineNum">     512 </span>            :     void Position(real s12, real&amp; lat2, real&amp; lon2, real&amp; S12) const {
+<span class="lineNum">     513 </span><span class="lineNoCov">          0 :       GenPosition(s12, LATITUDE | LONGITUDE | AREA, lat2, lon2, S12);</span>
+<span class="lineNum">     514 </span>            :     }
+<span class="lineNum">     515 </span>            : 
+<span class="lineNum">     516 </span>            :     /**
+<span class="lineNum">     517 </span>            :      * Compute the position of point 2 which is a distance \e s12 (meters) from
+<span class="lineNum">     518 </span>            :      * point 1.  The area is not computed.
+<span class="lineNum">     519 </span>            :      **********************************************************************/
+<span class="lineNum">     520 </span>            :     void Position(real s12, real&amp; lat2, real&amp; lon2) const {
+<span class="lineNum">     521 </span>            :       real t;
+<span class="lineNum">     522 </span>            :       GenPosition(s12, LATITUDE | LONGITUDE, lat2, lon2, t);
+<span class="lineNum">     523 </span>            :     }
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span>            :     /**
+<span class="lineNum">     526 </span>            :      * The general position routine.  RhumbLine::Position is defined in term so
+<span class="lineNum">     527 </span>            :      * this function.
+<span class="lineNum">     528 </span>            :      *
+<span class="lineNum">     529 </span>            :      * @param[in] s12 distance between point 1 and point 2 (meters); it can be
+<span class="lineNum">     530 </span>            :      *   negative.
+<span class="lineNum">     531 </span>            :      * @param[in] outmask a bitor'ed combination of RhumbLine::mask values
+<span class="lineNum">     532 </span>            :      *   specifying which of the following parameters should be set.
+<span class="lineNum">     533 </span>            :      * @param[out] lat2 latitude of point 2 (degrees).
+<span class="lineNum">     534 </span>            :      * @param[out] lon2 longitude of point 2 (degrees).
+<span class="lineNum">     535 </span>            :      * @param[out] S12 area under the rhumb line (meters&lt;sup&gt;2&lt;/sup&gt;).
+<span class="lineNum">     536 </span>            :      *
+<span class="lineNum">     537 </span>            :      * The RhumbLine::mask values possible for \e outmask are
+<span class="lineNum">     538 </span>            :      * - \e outmask |= RhumbLine::LATITUDE for the latitude \e lat2;
+<span class="lineNum">     539 </span>            :      * - \e outmask |= RhumbLine::LONGITUDE for the latitude \e lon2;
+<span class="lineNum">     540 </span>            :      * - \e outmask |= RhumbLine::AREA for the area \e S12;
+<span class="lineNum">     541 </span>            :      * - \e outmask |= RhumbLine::ALL for all of the above;
+<span class="lineNum">     542 </span>            :      * - \e outmask |= RhumbLine::LONG_UNROLL to unroll \e lon2 instead of
+<span class="lineNum">     543 </span>            :      *   wrapping it into the range [&amp;minus;180&amp;deg;, 180&amp;deg;].
+<span class="lineNum">     544 </span>            :      * .
+<span class="lineNum">     545 </span>            :      * With the RhumbLine::LONG_UNROLL bit set, the quantity \e lon2 &amp;minus; \e
+<span class="lineNum">     546 </span>            :      * lon1 indicates how many times and in what sense the rhumb line encircles
+<span class="lineNum">     547 </span>            :      * the ellipsoid.
+<span class="lineNum">     548 </span>            :      *
+<span class="lineNum">     549 </span>            :      * If \e s12 is large enough that the rhumb line crosses a pole, the
+<span class="lineNum">     550 </span>            :      * longitude of point 2 is indeterminate (a NaN is returned for \e lon2 and
+<span class="lineNum">     551 </span>            :      * \e S12).
+<span class="lineNum">     552 </span>            :      **********************************************************************/
+<span class="lineNum">     553 </span>            :     void GenPosition(real s12, unsigned outmask,
+<span class="lineNum">     554 </span>            :                      real&amp; lat2, real&amp; lon2, real&amp; S12) const;
+<span class="lineNum">     555 </span>            : 
+<span class="lineNum">     556 </span>            :     /** \name Inspector functions
+<span class="lineNum">     557 </span>            :      **********************************************************************/
+<span class="lineNum">     558 </span>            :     ///@{
+<span class="lineNum">     559 </span>            : 
+<span class="lineNum">     560 </span>            :     /**
+<span class="lineNum">     561 </span>            :      * @return \e lat1 the latitude of point 1 (degrees).
+<span class="lineNum">     562 </span>            :      **********************************************************************/
+<span class="lineNum">     563 </span>            :     Math::real Latitude() const { return _lat1; }
+<span class="lineNum">     564 </span>            : 
+<span class="lineNum">     565 </span>            :     /**
+<span class="lineNum">     566 </span>            :      * @return \e lon1 the longitude of point 1 (degrees).
+<span class="lineNum">     567 </span>            :      **********************************************************************/
+<span class="lineNum">     568 </span>            :     Math::real Longitude() const { return _lon1; }
+<span class="lineNum">     569 </span>            : 
+<span class="lineNum">     570 </span>            :     /**
+<span class="lineNum">     571 </span>            :      * @return \e azi12 the azimuth of the rhumb line (degrees).
+<span class="lineNum">     572 </span>            :      **********************************************************************/
+<span class="lineNum">     573 </span>            :     Math::real Azimuth() const { return  _azi12; }
+<span class="lineNum">     574 </span>            : 
+<span class="lineNum">     575 </span>            :     /**
+<span class="lineNum">     576 </span>            :      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
+<span class="lineNum">     577 </span>            :      *   the value inherited from the Rhumb object used in the constructor.
+<span class="lineNum">     578 </span>            :      **********************************************************************/
+<span class="lineNum">     579 </span>            :     Math::real MajorRadius() const { return _rh.MajorRadius(); }
+<span class="lineNum">     580 </span>            : 
+<span class="lineNum">     581 </span>            :     /**
+<span class="lineNum">     582 </span>            :      * @return \e f the flattening of the ellipsoid.  This is the value
+<span class="lineNum">     583 </span>            :      *   inherited from the Rhumb object used in the constructor.
+<span class="lineNum">     584 </span>            :      **********************************************************************/
+<span class="lineNum">     585 </span>            :     Math::real Flattening() const { return _rh.Flattening(); }
+<span class="lineNum">     586 </span>            :   };
+<span class="lineNum">     587 </span>            : 
+<span class="lineNum">     588 </span>            : } // namespace GeographicLib
+<span class="lineNum">     589 </span>            : 
+<span class="lineNum">     590 </span>            : #endif  // GEOGRAPHICLIB_RHUMB_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

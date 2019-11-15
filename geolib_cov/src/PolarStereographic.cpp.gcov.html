@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/PolarStereographic.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - PolarStereographic.cpp<span style="font-size: 80%;"> (source / <a href="PolarStereographic.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">35</td>
+            <td class="headerCovTableEntry">47</td>
+            <td class="headerCovTableEntryLo">74.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryMed">80.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file PolarStereographic.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::PolarStereographic class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2008-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;GeographicLib/PolarStereographic.hpp&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : namespace GeographicLib {
+<span class="lineNum">      13 </span>            : 
+<a name="14"><span class="lineNum">      14 </span>            :   using namespace std;</a>
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span><span class="lineCov">          9 :   PolarStereographic::PolarStereographic(real a, real f, real k0)</span>
+<span class="lineNum">      17 </span>            :     : _a(a)
+<span class="lineNum">      18 </span>            :     , _f(f)
+<span class="lineNum">      19 </span><span class="lineCov">          9 :     , _e2(_f * (2 - _f))</span>
+<span class="lineNum">      20 </span><span class="lineCov">         18 :     , _es((_f &lt; 0 ? -1 : 1) * sqrt(abs(_e2)))</span>
+<span class="lineNum">      21 </span><span class="lineCov">          9 :     , _e2m(1 - _e2)</span>
+<span class="lineNum">      22 </span><span class="lineCov">          9 :     , _c( (1 - _f) * exp(Math::eatanhe(real(1), _es)) )</span>
+<span class="lineNum">      23 </span><span class="lineCov">         45 :     , _k0(k0)</span>
+<span class="lineNum">      24 </span>            :   {
+<span class="lineNum">      25 </span><span class="lineCov">         18 :     if (!(Math::isfinite(_a) &amp;&amp; _a &gt; 0))</span>
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Equatorial radius is not positive&quot;);</span>
+<span class="lineNum">      27 </span><span class="lineCov">         27 :     if (!(Math::isfinite(_f) &amp;&amp; _f &lt; 1))</span>
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Polar semi-axis is not positive&quot;);</span>
+<span class="lineNum">      29 </span><span class="lineCov">         18 :     if (!(Math::isfinite(_k0) &amp;&amp; _k0 &gt; 0))</span>
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale is not positive&quot;);</span>
+<a name="31"><span class="lineNum">      31 </span><span class="lineCov">          9 :   }</span></a>
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span><span class="lineCov">         28 :   const PolarStereographic&amp; PolarStereographic::UPS() {</span>
+<span class="lineNum">      34 </span>            :     static const PolarStereographic ups(Constants::WGS84_a(),
+<span class="lineNum">      35 </span>            :                                         Constants::WGS84_f(),
+<span class="lineNum">      36 </span><span class="lineCov">         28 :                                         Constants::UPS_k0());</span>
+<span class="lineNum">      37 </span><span class="lineCov">         28 :     return ups;</span>
+<span class="lineNum">      38 </span>            :   }
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            :   // This formulation converts to conformal coordinates by tau = tan(phi) and
+<span class="lineNum">      41 </span>            :   // tau' = tan(phi') where phi' is the conformal latitude.  The formulas are:
+<span class="lineNum">      42 </span>            :   //    tau = tan(phi)
+<span class="lineNum">      43 </span>            :   //    secphi = hypot(1, tau)
+<span class="lineNum">      44 </span>            :   //    sig = sinh(e * atanh(e * tau / secphi))
+<span class="lineNum">      45 </span>            :   //    taup = tan(phip) = tau * hypot(1, sig) - sig * hypot(1, tau)
+<span class="lineNum">      46 </span>            :   //    c = (1 - f) * exp(e * atanh(e))
+<span class="lineNum">      47 </span>            :   //
+<span class="lineNum">      48 </span>            :   // Forward:
+<span class="lineNum">      49 </span>            :   //   rho = (2*k0*a/c) / (hypot(1, taup) + taup)  (taup &gt;= 0)
+<span class="lineNum">      50 </span>            :   //       = (2*k0*a/c) * (hypot(1, taup) - taup)  (taup &lt;  0)
+<span class="lineNum">      51 </span>            :   //
+<span class="lineNum">      52 </span>            :   // Reverse:
+<span class="lineNum">      53 </span>            :   //   taup = ((2*k0*a/c) / rho - rho / (2*k0*a/c))/2
+<span class="lineNum">      54 </span>            :   //
+<span class="lineNum">      55 </span>            :   // Scale:
+<span class="lineNum">      56 </span>            :   //   k = (rho/a) * secphi * sqrt((1-e2) + e2 / secphi^2)
+<span class="lineNum">      57 </span>            :   //
+<span class="lineNum">      58 </span>            :   // In limit rho -&gt; 0, tau -&gt; inf, taup -&gt; inf, secphi -&gt; inf, secphip -&gt; inf
+<span class="lineNum">      59 </span>            :   //   secphip = taup = exp(-e * atanh(e)) * tau = exp(-e * atanh(e)) * secphi
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span><span class="lineCov">         26 :   void PolarStereographic::Forward(bool northp, real lat, real lon,</span>
+<span class="lineNum">      62 </span>            :                                    real&amp; x, real&amp; y,
+<span class="lineNum">      63 </span>            :                                    real&amp; gamma, real&amp; k) const {
+<span class="lineNum">      64 </span>            :     lat = Math::LatFix(lat);
+<span class="lineNum">      65 </span><span class="lineCov">         26 :     lat *= northp ? 1 : -1;</span>
+<span class="lineNum">      66 </span>            :     real
+<span class="lineNum">      67 </span><span class="lineCov">         26 :       tau = Math::tand(lat),</span>
+<span class="lineNum">      68 </span>            :       secphi = Math::hypot(real(1), tau),
+<span class="lineNum">      69 </span><span class="lineCov">         26 :       taup = Math::taupf(tau, _es),</span>
+<span class="lineNum">      70 </span><span class="lineCov">         26 :       rho = Math::hypot(real(1), taup) + abs(taup);</span>
+<span class="lineNum">      71 </span><span class="lineCov">         26 :     rho = taup &gt;= 0 ? (lat != 90 ? 1/rho : 0) : rho;</span>
+<span class="lineNum">      72 </span><span class="lineCov">         26 :     rho *= 2 * _k0 * _a / _c;</span>
+<span class="lineNum">      73 </span><span class="lineCov">         50 :     k = lat != 90 ? (rho / _a) * secphi * sqrt(_e2m + _e2 / Math::sq(secphi)) :</span>
+<span class="lineNum">      74 </span>            :       _k0;
+<span class="lineNum">      75 </span><span class="lineCov">         26 :     Math::sincosd(lon, x, y);</span>
+<span class="lineNum">      76 </span><span class="lineCov">         26 :     x *= rho;</span>
+<span class="lineNum">      77 </span><span class="lineCov">         26 :     y *= (northp ? -rho : rho);</span>
+<span class="lineNum">      78 </span><span class="lineCov">         52 :     gamma = Math::AngNormalize(northp ? lon : -lon);</span>
+<span class="lineNum">      79 </span><span class="lineCov">         26 :   }</span>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineCov">          2 :   void PolarStereographic::Reverse(bool northp, real x, real y,</span>
+<span class="lineNum">      82 </span>            :                                    real&amp; lat, real&amp; lon,
+<span class="lineNum">      83 </span>            :                                    real&amp; gamma, real&amp; k) const {
+<span class="lineNum">      84 </span>            :     real
+<span class="lineNum">      85 </span>            :       rho = Math::hypot(x, y),
+<span class="lineNum">      86 </span><span class="lineCov">          2 :       t = rho != 0 ? rho / (2 * _k0 * _a / _c) :</span>
+<span class="lineNum">      87 </span>            :       Math::sq(numeric_limits&lt;real&gt;::epsilon()),
+<span class="lineNum">      88 </span><span class="lineCov">          2 :       taup = (1 / t - t) / 2,</span>
+<span class="lineNum">      89 </span><span class="lineCov">          2 :       tau = Math::tauf(taup, _es),</span>
+<span class="lineNum">      90 </span>            :       secphi = Math::hypot(real(1), tau);
+<span class="lineNum">      91 </span><span class="lineCov">          4 :     k = rho != 0 ? (rho / _a) * secphi * sqrt(_e2m + _e2 / Math::sq(secphi)) :</span>
+<span class="lineNum">      92 </span>            :       _k0;
+<span class="lineNum">      93 </span><span class="lineCov">          4 :     lat = (northp ? 1 : -1) * Math::atand(tau);</span>
+<span class="lineNum">      94 </span><span class="lineCov">          2 :     lon = Math::atan2d(x, northp ? -y : y );</span>
+<span class="lineNum">      95 </span><span class="lineCov">          4 :     gamma = Math::AngNormalize(northp ? lon : -lon);</span>
+<a name="96"><span class="lineNum">      96 </span><span class="lineCov">          2 :   }</span></a>
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :   void PolarStereographic::SetScale(real lat, real k) {</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(k) &amp;&amp; k &gt; 0))</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale is not positive&quot;);</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :     if (!(-90 &lt; lat &amp;&amp; lat &lt;= 90))</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Latitude must be in (-90d, 90d]&quot;);</span>
+<span class="lineNum">     103 </span>            :     real x, y, gamma, kold;
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :     _k0 = 1;</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :     Forward(true, lat, 0, x, y, gamma, kold);</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :     _k0 *= k/kold;</span>
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

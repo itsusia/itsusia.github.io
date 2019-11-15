@@ -1,0 +1,830 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/proj/coordinatesystem.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/proj</a> - coordinatesystem.hpp<span style="font-size: 80%;"> (source / <a href="coordinatesystem.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">33</td>
+            <td class="headerCovTableEntry">37</td>
+            <td class="headerCovTableEntryMed">89.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntry">45</td>
+            <td class="headerCovTableEntryMed">86.7 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /******************************************************************************</a>
+<span class="lineNum">       2 </span>            :  *
+<span class="lineNum">       3 </span>            :  * Project:  PROJ
+<span class="lineNum">       4 </span>            :  * Purpose:  ISO19111:2019 implementation
+<span class="lineNum">       5 </span>            :  * Author:   Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  ******************************************************************************
+<span class="lineNum">       8 </span>            :  * Copyright (c) 2018, Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      11 </span>            :  * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      12 </span>            :  * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      13 </span>            :  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      14 </span>            :  * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      15 </span>            :  * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      16 </span>            :  *
+<span class="lineNum">      17 </span>            :  * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      18 </span>            :  * in all copies or substantial portions of the Software.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      21 </span>            :  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      22 </span>            :  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      23 </span>            :  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      24 </span>            :  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      25 </span>            :  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      26 </span>            :  * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      27 </span>            :  ****************************************************************************/
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #ifndef CS_HH_INCLUDED
+<span class="lineNum">      30 </span>            : #define CS_HH_INCLUDED
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #include &lt;memory&gt;
+<span class="lineNum">      33 </span>            : #include &lt;set&gt;
+<span class="lineNum">      34 </span>            : #include &lt;string&gt;
+<span class="lineNum">      35 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : #include &quot;common.hpp&quot;
+<span class="lineNum">      38 </span>            : #include &quot;io.hpp&quot;
+<span class="lineNum">      39 </span>            : #include &quot;util.hpp&quot;
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : NS_PROJ_START
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : /** osgeo.proj.cs namespace
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :     \brief Coordinate systems and their axis.
+<span class="lineNum">      46 </span>            : */
+<span class="lineNum">      47 </span>            : namespace cs {
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : /** \brief The direction of positive increase in the coordinate value for a
+<span class="lineNum">      52 </span>            :  * coordinate system axis.
+<span class="lineNum">      53 </span>            :  *
+<a name="54"><span class="lineNum">      54 </span>            :  * \remark Implements AxisDirection from \ref ISO_19111_2019</a>
+<span class="lineNum">      55 </span>            :  */
+<span class="lineNum">      56 </span><span class="lineCov">      25680 : class AxisDirection : public util::CodeList {</span>
+<span class="lineNum">      57 </span>            :   public:
+<span class="lineNum">      58 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">      59 </span>            :     PROJ_DLL static const AxisDirection *
+<span class="lineNum">      60 </span>            :     valueOf(const std::string &amp;nameIn) noexcept;
+<span class="lineNum">      61 </span>            :     //! @endcond
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            :     PROJ_DLL static const AxisDirection NORTH;
+<span class="lineNum">      64 </span>            :     PROJ_DLL static const AxisDirection NORTH_NORTH_EAST;
+<span class="lineNum">      65 </span>            :     PROJ_DLL static const AxisDirection NORTH_EAST;
+<span class="lineNum">      66 </span>            :     PROJ_DLL static const AxisDirection EAST_NORTH_EAST;
+<span class="lineNum">      67 </span>            :     PROJ_DLL static const AxisDirection EAST;
+<span class="lineNum">      68 </span>            :     PROJ_DLL static const AxisDirection EAST_SOUTH_EAST;
+<span class="lineNum">      69 </span>            :     PROJ_DLL static const AxisDirection SOUTH_EAST;
+<span class="lineNum">      70 </span>            :     PROJ_DLL static const AxisDirection SOUTH_SOUTH_EAST;
+<span class="lineNum">      71 </span>            :     PROJ_DLL static const AxisDirection SOUTH;
+<span class="lineNum">      72 </span>            :     PROJ_DLL static const AxisDirection SOUTH_SOUTH_WEST;
+<span class="lineNum">      73 </span>            :     PROJ_DLL static const AxisDirection SOUTH_WEST;
+<span class="lineNum">      74 </span>            :     PROJ_DLL static const AxisDirection
+<span class="lineNum">      75 </span>            :         WEST_SOUTH_WEST; // note: was forgotten in WKT2-2015
+<span class="lineNum">      76 </span>            :     PROJ_DLL static const AxisDirection WEST;
+<span class="lineNum">      77 </span>            :     PROJ_DLL static const AxisDirection WEST_NORTH_WEST;
+<span class="lineNum">      78 </span>            :     PROJ_DLL static const AxisDirection NORTH_WEST;
+<span class="lineNum">      79 </span>            :     PROJ_DLL static const AxisDirection NORTH_NORTH_WEST;
+<span class="lineNum">      80 </span>            :     PROJ_DLL static const AxisDirection UP;
+<span class="lineNum">      81 </span>            :     PROJ_DLL static const AxisDirection DOWN;
+<span class="lineNum">      82 </span>            :     PROJ_DLL static const AxisDirection GEOCENTRIC_X;
+<span class="lineNum">      83 </span>            :     PROJ_DLL static const AxisDirection GEOCENTRIC_Y;
+<span class="lineNum">      84 </span>            :     PROJ_DLL static const AxisDirection GEOCENTRIC_Z;
+<span class="lineNum">      85 </span>            :     PROJ_DLL static const AxisDirection COLUMN_POSITIVE;
+<span class="lineNum">      86 </span>            :     PROJ_DLL static const AxisDirection COLUMN_NEGATIVE;
+<span class="lineNum">      87 </span>            :     PROJ_DLL static const AxisDirection ROW_POSITIVE;
+<span class="lineNum">      88 </span>            :     PROJ_DLL static const AxisDirection ROW_NEGATIVE;
+<span class="lineNum">      89 </span>            :     PROJ_DLL static const AxisDirection DISPLAY_RIGHT;
+<span class="lineNum">      90 </span>            :     PROJ_DLL static const AxisDirection DISPLAY_LEFT;
+<span class="lineNum">      91 </span>            :     PROJ_DLL static const AxisDirection DISPLAY_UP;
+<span class="lineNum">      92 </span>            :     PROJ_DLL static const AxisDirection DISPLAY_DOWN;
+<span class="lineNum">      93 </span>            :     PROJ_DLL static const AxisDirection FORWARD;
+<span class="lineNum">      94 </span>            :     PROJ_DLL static const AxisDirection AFT;
+<span class="lineNum">      95 </span>            :     PROJ_DLL static const AxisDirection PORT;
+<span class="lineNum">      96 </span>            :     PROJ_DLL static const AxisDirection STARBOARD;
+<span class="lineNum">      97 </span>            :     PROJ_DLL static const AxisDirection CLOCKWISE;
+<span class="lineNum">      98 </span>            :     PROJ_DLL static const AxisDirection COUNTER_CLOCKWISE;
+<span class="lineNum">      99 </span>            :     PROJ_DLL static const AxisDirection TOWARDS;
+<span class="lineNum">     100 </span>            :     PROJ_DLL static const AxisDirection AWAY_FROM;
+<span class="lineNum">     101 </span>            :     PROJ_DLL static const AxisDirection FUTURE;
+<span class="lineNum">     102 </span>            :     PROJ_DLL static const AxisDirection PAST;
+<span class="lineNum">     103 </span>            :     PROJ_DLL static const AxisDirection UNSPECIFIED;
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :   private:
+<span class="lineNum">     106 </span>            :     explicit AxisDirection(const std::string &amp;nameIn);
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            :     static std::map&lt;std::string, const AxisDirection *&gt; registry;
+<span class="lineNum">     109 </span>            : };
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            : class Meridian;
+<span class="lineNum">     114 </span>            : /** Shared pointer of Meridian. */
+<span class="lineNum">     115 </span>            : using MeridianPtr = std::shared_ptr&lt;Meridian&gt;;
+<span class="lineNum">     116 </span>            : /** Non-null shared pointer of Meridian. */
+<span class="lineNum">     117 </span>            : using MeridianNNPtr = util::nn&lt;MeridianPtr&gt;;
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            : /** \brief The meridian that the axis follows from the pole, for a coordinate
+<span class="lineNum">     120 </span>            :  * reference system centered on a pole.
+<span class="lineNum">     121 </span>            :  *
+<span class="lineNum">     122 </span>            :  * \note There is no modelling for this concept in \ref ISO_19111_2019
+<span class="lineNum">     123 </span>            :  *
+<a name="124"><span class="lineNum">     124 </span>            :  * \remark Implements MERIDIAN from \ref WKT2</a>
+<span class="lineNum">     125 </span>            :  */
+<span class="lineNum">     126 </span><span class="lineCov">        194 : class PROJ_GCC_DLL Meridian : public common::IdentifiedObject {</span>
+<span class="lineNum">     127 </span>            :   public:
+<span class="lineNum">     128 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     129 </span>            :     PROJ_DLL ~Meridian() override;
+<span class="lineNum">     130 </span>            :     //! @endcond
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            :     PROJ_DLL const common::Angle &amp;longitude() PROJ_PURE_DECL;
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :     // non-standard
+<span class="lineNum">     135 </span>            :     PROJ_DLL static MeridianNNPtr create(const common::Angle &amp;longitudeIn);
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     138 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">     139 </span>            :         const override; // throw(io::FormattingException)
+<span class="lineNum">     140 </span>            :                         //! @endcond
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            :   protected:
+<span class="lineNum">     143 </span>            : #ifdef DOXYGEN_ENABLED
+<span class="lineNum">     144 </span>            :     Angle angle_;
+<span class="lineNum">     145 </span>            : #endif
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            :     PROJ_INTERNAL explicit Meridian(const common::Angle &amp;longitudeIn);
+<span class="lineNum">     148 </span><span class="lineCov">        194 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            :   private:
+<span class="lineNum">     151 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     152 </span>            :     Meridian(const Meridian &amp;other) = delete;
+<span class="lineNum">     153 </span>            :     Meridian &amp;operator=(const Meridian &amp;other) = delete;
+<span class="lineNum">     154 </span>            : };
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            : class CoordinateSystemAxis;
+<span class="lineNum">     159 </span>            : /** Shared pointer of CoordinateSystemAxis. */
+<span class="lineNum">     160 </span>            : using CoordinateSystemAxisPtr = std::shared_ptr&lt;CoordinateSystemAxis&gt;;
+<span class="lineNum">     161 </span>            : /** Non-null shared pointer of CoordinateSystemAxis. */
+<span class="lineNum">     162 </span>            : using CoordinateSystemAxisNNPtr = util::nn&lt;CoordinateSystemAxisPtr&gt;;
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            : /** \brief The definition of a coordinate system axis.
+<span class="lineNum">     165 </span>            :  *
+<a name="166"><span class="lineNum">     166 </span>            :  * \remark Implements CoordinateSystemAxis from \ref ISO_19111_2019</a>
+<span class="lineNum">     167 </span>            :  */
+<span class="lineNum">     168 </span><span class="lineCov">      42790 : class PROJ_GCC_DLL CoordinateSystemAxis final : public common::IdentifiedObject,</span>
+<span class="lineNum">     169 </span>            :                                                 public io::IJSONExportable {
+<span class="lineNum">     170 </span>            :   public:
+<span class="lineNum">     171 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     172 </span>            :     PROJ_DLL ~CoordinateSystemAxis() override;
+<span class="lineNum">     173 </span>            :     //! @endcond
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            :     PROJ_DLL const std::string &amp;abbreviation() PROJ_PURE_DECL;
+<span class="lineNum">     176 </span>            :     PROJ_DLL const AxisDirection &amp;direction() PROJ_PURE_DECL;
+<span class="lineNum">     177 </span>            :     PROJ_DLL const common::UnitOfMeasure &amp;unit() PROJ_PURE_DECL;
+<span class="lineNum">     178 </span>            :     PROJ_DLL const util::optional&lt;double&gt; &amp;minimumValue() PROJ_PURE_DECL;
+<span class="lineNum">     179 </span>            :     PROJ_DLL const util::optional&lt;double&gt; &amp;maximumValue() PROJ_PURE_DECL;
+<span class="lineNum">     180 </span>            :     PROJ_DLL const MeridianPtr &amp;meridian() PROJ_PURE_DECL;
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span>            :     // Non-standard
+<span class="lineNum">     183 </span>            :     PROJ_DLL static CoordinateSystemAxisNNPtr
+<span class="lineNum">     184 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     185 </span>            :            const std::string &amp;abbreviationIn, const AxisDirection &amp;directionIn,
+<span class="lineNum">     186 </span>            :            const common::UnitOfMeasure &amp;unitIn,
+<span class="lineNum">     187 </span>            :            const MeridianPtr &amp;meridianIn = nullptr);
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     192 </span>            :         PROJ_INTERNAL bool
+<span class="lineNum">     193 </span>            :         _isEquivalentTo(
+<span class="lineNum">     194 </span>            :             const util::IComparable *other,
+<span class="lineNum">     195 </span>            :             util::IComparable::Criterion criterion =
+<span class="lineNum">     196 </span>            :                 util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter, int order,
+<span class="lineNum">     199 </span>            :                                     bool disableAbbrev) const;
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">     202 </span>            :         const override; // throw(io::FormattingException)
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :     PROJ_INTERNAL void _exportToJSON(io::JSONFormatter *formatter)
+<span class="lineNum">     205 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span>            :     PROJ_INTERNAL static std::string normalizeAxisName(const std::string &amp;str);
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span>            :     PROJ_INTERNAL static CoordinateSystemAxisNNPtr
+<span class="lineNum">     210 </span>            :     createLAT_NORTH(const common::UnitOfMeasure &amp;unit);
+<span class="lineNum">     211 </span>            :     PROJ_INTERNAL static CoordinateSystemAxisNNPtr
+<span class="lineNum">     212 </span>            :     createLONG_EAST(const common::UnitOfMeasure &amp;unit);
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            :     PROJ_INTERNAL CoordinateSystemAxisNNPtr
+<span class="lineNum">     215 </span>            :     alterUnit(const common::UnitOfMeasure &amp;newUnit) const;
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            :     //! @endcond
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span>            :   private:
+<span class="lineNum">     220 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     221 </span>            :     CoordinateSystemAxis(const CoordinateSystemAxis &amp;other) = delete;
+<span class="lineNum">     222 </span>            :     CoordinateSystemAxis &amp;operator=(const CoordinateSystemAxis &amp;other) = delete;
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span>            :     PROJ_INTERNAL CoordinateSystemAxis();
+<span class="lineNum">     225 </span>            :     /* cppcheck-suppress unusedPrivateFunction */
+<span class="lineNum">     226 </span><span class="lineCov">      42790 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     227 </span>            : };
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span>            : /** \brief Abstract class modelling a coordinate system (CS)
+<span class="lineNum">     232 </span>            :  *
+<span class="lineNum">     233 </span>            :  * A CS is the non-repeating sequence of coordinate system axes that spans a
+<span class="lineNum">     234 </span>            :  * given coordinate space. A CS is derived from a set of mathematical rules for
+<span class="lineNum">     235 </span>            :  * specifying how coordinates in a given space are to be assigned to points.
+<span class="lineNum">     236 </span>            :  * The coordinate values in a coordinate tuple shall be recorded in the order
+<span class="lineNum">     237 </span>            :  * in which the coordinate system axes associations are recorded.
+<span class="lineNum">     238 </span>            :  *
+<a name="239"><span class="lineNum">     239 </span>            :  * \remark Implements CoordinateSystem from \ref ISO_19111_2019</a>
+<span class="lineNum">     240 </span>            :  */
+<span class="lineNum">     241 </span><span class="lineCov">       8084 : class PROJ_GCC_DLL CoordinateSystem : public common::IdentifiedObject,</span>
+<span class="lineNum">     242 </span>            :                                       public io::IJSONExportable {
+<span class="lineNum">     243 </span>            :   public:
+<span class="lineNum">     244 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     245 </span>            :     PROJ_DLL ~CoordinateSystem() override;
+<span class="lineNum">     246 </span>            :     //! @endcond
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span>            :     PROJ_DLL const std::vector&lt;CoordinateSystemAxisNNPtr&gt; &amp;
+<span class="lineNum">     249 </span>            :     axisList() PROJ_PURE_DECL;
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     254 </span>            :         PROJ_INTERNAL void
+<span class="lineNum">     255 </span>            :         _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">     256 </span>            :             const override; // throw(io::FormattingException)
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span>            :     PROJ_INTERNAL void _exportToJSON(io::JSONFormatter *formatter)
+<span class="lineNum">     259 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span>            :     PROJ_INTERNAL virtual std::string getWKT2Type(bool) const = 0;
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     264 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     265 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     266 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     267 </span>            :     //! @endcond
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            :   protected:
+<span class="lineNum">     270 </span>            :     PROJ_INTERNAL explicit CoordinateSystem(
+<span class="lineNum">     271 </span>            :         const std::vector&lt;CoordinateSystemAxisNNPtr&gt; &amp;axisIn);
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span>            :   private:
+<span class="lineNum">     274 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     275 </span>            :     CoordinateSystem(const CoordinateSystem &amp;other) = delete;
+<span class="lineNum">     276 </span>            :     CoordinateSystem &amp;operator=(const CoordinateSystem &amp;other) = delete;
+<span class="lineNum">     277 </span>            : };
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span>            : /** Shared pointer of CoordinateSystem. */
+<span class="lineNum">     280 </span>            : using CoordinateSystemPtr = std::shared_ptr&lt;CoordinateSystem&gt;;
+<span class="lineNum">     281 </span>            : /** Non-null shared pointer of CoordinateSystem. */
+<span class="lineNum">     282 </span>            : using CoordinateSystemNNPtr = util::nn&lt;CoordinateSystemPtr&gt;;
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            : class SphericalCS;
+<span class="lineNum">     287 </span>            : /** Shared pointer of SphericalCS. */
+<span class="lineNum">     288 </span>            : using SphericalCSPtr = std::shared_ptr&lt;SphericalCS&gt;;
+<span class="lineNum">     289 </span>            : /** Non-null shared pointer of SphericalCS. */
+<span class="lineNum">     290 </span>            : using SphericalCSNNPtr = util::nn&lt;SphericalCSPtr&gt;;
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span>            : /** \brief A three-dimensional coordinate system in Euclidean space with one
+<span class="lineNum">     293 </span>            :  * distance measured from the origin and two angular coordinates.
+<span class="lineNum">     294 </span>            :  *
+<span class="lineNum">     295 </span>            :  * Not to be confused with an ellipsoidal coordinate system based on an
+<span class="lineNum">     296 </span>            :  * ellipsoid &quot;degenerated&quot; into a sphere. A SphericalCS shall have three
+<span class="lineNum">     297 </span>            :  * axis associations.
+<span class="lineNum">     298 </span>            :  *
+<a name="299"><span class="lineNum">     299 </span>            :  * \remark Implements SphericalCS from \ref ISO_19111_2019</a>
+<span class="lineNum">     300 </span>            :  */
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 : class PROJ_GCC_DLL SphericalCS final : public CoordinateSystem {</span>
+<span class="lineNum">     302 </span>            :   public:
+<span class="lineNum">     303 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     304 </span>            :     PROJ_DLL ~SphericalCS() override;
+<span class="lineNum">     305 </span>            :     //! @endcond
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            :     // non-standard
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            :     PROJ_DLL static SphericalCSNNPtr
+<span class="lineNum">     310 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     311 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis1,
+<span class="lineNum">     312 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis2,
+<span class="lineNum">     313 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis3);
+<span class="lineNum">     314 </span>            : 
+<span class="lineNum">     315 </span>            :   protected:
+<span class="lineNum">     316 </span>            :     PROJ_INTERNAL explicit SphericalCS(
+<span class="lineNum">     317 </span>            :         const std::vector&lt;CoordinateSystemAxisNNPtr&gt; &amp;axisIn);
+<a name="318"><span class="lineNum">     318 </span><span class="lineNoCov">          0 :     INLINED_MAKE_SHARED</span></a>
+<span class="lineNum">     319 </span>            : 
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :     PROJ_INTERNAL std::string getWKT2Type(bool) const override {</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :         return &quot;spherical&quot;;</span>
+<span class="lineNum">     322 </span>            :     }
+<span class="lineNum">     323 </span>            : 
+<span class="lineNum">     324 </span>            :   private:
+<span class="lineNum">     325 </span>            :     SphericalCS(const SphericalCS &amp;other) = delete;
+<span class="lineNum">     326 </span>            : };
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span>            : class EllipsoidalCS;
+<span class="lineNum">     331 </span>            : /** Shared pointer of EllipsoidalCS. */
+<span class="lineNum">     332 </span>            : using EllipsoidalCSPtr = std::shared_ptr&lt;EllipsoidalCS&gt;;
+<span class="lineNum">     333 </span>            : /** Non-null shared pointer of EllipsoidalCS. */
+<span class="lineNum">     334 </span>            : using EllipsoidalCSNNPtr = util::nn&lt;EllipsoidalCSPtr&gt;;
+<span class="lineNum">     335 </span>            : 
+<span class="lineNum">     336 </span>            : /** \brief A two- or three-dimensional coordinate system in which position is
+<span class="lineNum">     337 </span>            :  * specified by geodetic latitude, geodetic longitude, and (in the
+<span class="lineNum">     338 </span>            :  * three-dimensional case) ellipsoidal height.
+<span class="lineNum">     339 </span>            :  *
+<span class="lineNum">     340 </span>            :  * An EllipsoidalCS shall have two or three associations.
+<span class="lineNum">     341 </span>            :  *
+<a name="342"><span class="lineNum">     342 </span>            :  * \remark Implements EllipsoidalCS from \ref ISO_19111_2019</a>
+<span class="lineNum">     343 </span>            :  */
+<span class="lineNum">     344 </span><span class="lineCov">      12018 : class PROJ_GCC_DLL EllipsoidalCS final : public CoordinateSystem {</span>
+<span class="lineNum">     345 </span>            :   public:
+<span class="lineNum">     346 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     347 </span>            :     PROJ_DLL ~EllipsoidalCS() override;
+<span class="lineNum">     348 </span>            :     //! @endcond
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span>            :     // non-standard
+<span class="lineNum">     351 </span>            :     PROJ_DLL static EllipsoidalCSNNPtr
+<span class="lineNum">     352 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     353 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis1,
+<span class="lineNum">     354 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis2);
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span>            :     PROJ_DLL static EllipsoidalCSNNPtr
+<span class="lineNum">     357 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     358 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis1,
+<span class="lineNum">     359 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis2,
+<span class="lineNum">     360 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis3);
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span>            :     PROJ_DLL static EllipsoidalCSNNPtr
+<span class="lineNum">     363 </span>            :     createLatitudeLongitude(const common::UnitOfMeasure &amp;unit);
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span>            :     PROJ_DLL static EllipsoidalCSNNPtr createLatitudeLongitudeEllipsoidalHeight(
+<span class="lineNum">     366 </span>            :         const common::UnitOfMeasure &amp;angularUnit,
+<span class="lineNum">     367 </span>            :         const common::UnitOfMeasure &amp;linearUnit);
+<span class="lineNum">     368 </span>            : 
+<span class="lineNum">     369 </span>            :     PROJ_DLL static EllipsoidalCSNNPtr
+<span class="lineNum">     370 </span>            :     createLongitudeLatitude(const common::UnitOfMeasure &amp;unit);
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span>            :     PROJ_DLL static EllipsoidalCSNNPtr createLongitudeLatitudeEllipsoidalHeight(
+<span class="lineNum">     373 </span>            :         const common::UnitOfMeasure &amp;angularUnit,
+<span class="lineNum">     374 </span>            :         const common::UnitOfMeasure &amp;linearUnit);
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     377 </span>            : 
+<span class="lineNum">     378 </span>            :     /** \brief Typical axis order. */
+<span class="lineNum">     379 </span>            :     enum class AxisOrder {
+<span class="lineNum">     380 </span>            :         /** Latitude(North), Longitude(East) */
+<span class="lineNum">     381 </span>            :         LAT_NORTH_LONG_EAST,
+<span class="lineNum">     382 </span>            :         /** Latitude(North), Longitude(East), Height(up) */
+<span class="lineNum">     383 </span>            :         LAT_NORTH_LONG_EAST_HEIGHT_UP,
+<span class="lineNum">     384 </span>            :         /** Longitude(East), Latitude(North) */
+<span class="lineNum">     385 </span>            :         LONG_EAST_LAT_NORTH,
+<span class="lineNum">     386 </span>            :         /** Longitude(East), Latitude(North), Height(up) */
+<span class="lineNum">     387 </span>            :         LONG_EAST_LAT_NORTH_HEIGHT_UP,
+<span class="lineNum">     388 </span>            :         /** Other axis order. */
+<span class="lineNum">     389 </span>            :         OTHER
+<span class="lineNum">     390 </span>            :     };
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span>            :     PROJ_INTERNAL AxisOrder axisOrder() const;
+<span class="lineNum">     393 </span>            : 
+<span class="lineNum">     394 </span>            :     PROJ_INTERNAL EllipsoidalCSNNPtr
+<span class="lineNum">     395 </span>            :     alterAngularUnit(const common::UnitOfMeasure &amp;angularUnit) const;
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span>            :     PROJ_INTERNAL EllipsoidalCSNNPtr
+<span class="lineNum">     398 </span>            :     alterLinearUnit(const common::UnitOfMeasure &amp;linearUnit) const;
+<span class="lineNum">     399 </span>            : 
+<span class="lineNum">     400 </span>            :     //! @endcond
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span>            :   protected:
+<span class="lineNum">     403 </span>            :     PROJ_INTERNAL explicit EllipsoidalCS(
+<span class="lineNum">     404 </span>            :         const std::vector&lt;CoordinateSystemAxisNNPtr&gt; &amp;axisIn);
+<a name="405"><span class="lineNum">     405 </span><span class="lineCov">      12018 :     INLINED_MAKE_SHARED</span></a>
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span><span class="lineCov">      33759 :     PROJ_INTERNAL std::string getWKT2Type(bool) const override {</span>
+<span class="lineNum">     408 </span><span class="lineCov">      33759 :         return &quot;ellipsoidal&quot;;</span>
+<span class="lineNum">     409 </span>            :     }
+<span class="lineNum">     410 </span>            : 
+<span class="lineNum">     411 </span>            :   protected:
+<span class="lineNum">     412 </span>            :     EllipsoidalCS(const EllipsoidalCS &amp;other) = delete;
+<span class="lineNum">     413 </span>            : };
+<span class="lineNum">     414 </span>            : 
+<span class="lineNum">     415 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span>            : class VerticalCS;
+<span class="lineNum">     418 </span>            : /** Shared pointer of VerticalCS. */
+<span class="lineNum">     419 </span>            : using VerticalCSPtr = std::shared_ptr&lt;VerticalCS&gt;;
+<span class="lineNum">     420 </span>            : /** Non-null shared pointer of VerticalCS. */
+<span class="lineNum">     421 </span>            : using VerticalCSNNPtr = util::nn&lt;VerticalCSPtr&gt;;
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span>            : /** \brief A one-dimensional coordinate system used to record the heights or
+<span class="lineNum">     424 </span>            :  * depths of points.
+<span class="lineNum">     425 </span>            :  *
+<span class="lineNum">     426 </span>            :  * Such a coordinate system is usually dependent on the Earth's gravity field.
+<span class="lineNum">     427 </span>            :  * A VerticalCS shall have one axis association.
+<span class="lineNum">     428 </span>            :  *
+<a name="429"><span class="lineNum">     429 </span>            :  * \remark Implements VerticalCS from \ref ISO_19111_2019</a>
+<span class="lineNum">     430 </span>            :  */
+<span class="lineNum">     431 </span><span class="lineCov">        472 : class PROJ_GCC_DLL VerticalCS final : public CoordinateSystem {</span>
+<span class="lineNum">     432 </span>            :   public:
+<span class="lineNum">     433 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     434 </span>            :     PROJ_DLL ~VerticalCS() override;
+<span class="lineNum">     435 </span>            :     //! @endcond
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            :     PROJ_DLL static VerticalCSNNPtr
+<span class="lineNum">     438 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     439 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis);
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span>            :     PROJ_DLL static VerticalCSNNPtr
+<span class="lineNum">     442 </span>            :     createGravityRelatedHeight(const common::UnitOfMeasure &amp;unit);
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     445 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     446 </span>            :         PROJ_INTERNAL VerticalCSNNPtr
+<span class="lineNum">     447 </span>            :         alterUnit(const common::UnitOfMeasure &amp;unit) const;
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span>            :     //! @endcond
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span>            :   protected:
+<span class="lineNum">     452 </span>            :     PROJ_INTERNAL explicit VerticalCS(const CoordinateSystemAxisNNPtr &amp;axisIn);
+<a name="453"><span class="lineNum">     453 </span><span class="lineCov">        472 :     INLINED_MAKE_SHARED</span></a>
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span><span class="lineCov">        489 :     PROJ_INTERNAL std::string getWKT2Type(bool) const override {</span>
+<span class="lineNum">     456 </span><span class="lineCov">        489 :         return &quot;vertical&quot;;</span>
+<span class="lineNum">     457 </span>            :     }
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span>            :   private:
+<span class="lineNum">     460 </span>            :     VerticalCS(const VerticalCS &amp;other) = delete;
+<span class="lineNum">     461 </span>            : };
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     464 </span>            : 
+<span class="lineNum">     465 </span>            : class CartesianCS;
+<span class="lineNum">     466 </span>            : /** Shared pointer of CartesianCS. */
+<span class="lineNum">     467 </span>            : using CartesianCSPtr = std::shared_ptr&lt;CartesianCS&gt;;
+<span class="lineNum">     468 </span>            : /** Non-null shared pointer of CartesianCS. */
+<span class="lineNum">     469 </span>            : using CartesianCSNNPtr = util::nn&lt;CartesianCSPtr&gt;;
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span>            : /** \brief A two- or three-dimensional coordinate system in Euclidean space
+<span class="lineNum">     472 </span>            :  * with orthogonal straight axes.
+<span class="lineNum">     473 </span>            :  *
+<span class="lineNum">     474 </span>            :  * All axes shall have the same length unit. A CartesianCS shall have two or
+<span class="lineNum">     475 </span>            :  * three axis associations; the number of associations shall equal the
+<span class="lineNum">     476 </span>            :  * dimension of the CS.
+<span class="lineNum">     477 </span>            :  *
+<a name="478"><span class="lineNum">     478 </span>            :  * \remark Implements CartesianCS from \ref ISO_19111_2019</a>
+<span class="lineNum">     479 </span>            :  */
+<span class="lineNum">     480 </span><span class="lineCov">       3572 : class PROJ_GCC_DLL CartesianCS final : public CoordinateSystem {</span>
+<span class="lineNum">     481 </span>            :   public:
+<span class="lineNum">     482 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     483 </span>            :     PROJ_DLL ~CartesianCS() override;
+<span class="lineNum">     484 </span>            :     //! @endcond
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span>            :     PROJ_DLL static CartesianCSNNPtr
+<span class="lineNum">     487 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     488 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis1,
+<span class="lineNum">     489 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis2);
+<span class="lineNum">     490 </span>            :     PROJ_DLL static CartesianCSNNPtr
+<span class="lineNum">     491 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     492 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis1,
+<span class="lineNum">     493 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis2,
+<span class="lineNum">     494 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis3);
+<span class="lineNum">     495 </span>            : 
+<span class="lineNum">     496 </span>            :     PROJ_DLL static CartesianCSNNPtr
+<span class="lineNum">     497 </span>            :     createEastingNorthing(const common::UnitOfMeasure &amp;unit);
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span>            :     PROJ_DLL static CartesianCSNNPtr
+<span class="lineNum">     500 </span>            :     createNorthingEasting(const common::UnitOfMeasure &amp;unit);
+<span class="lineNum">     501 </span>            : 
+<span class="lineNum">     502 </span>            :     PROJ_DLL static CartesianCSNNPtr
+<span class="lineNum">     503 </span>            :     createNorthPoleEastingSouthNorthingSouth(const common::UnitOfMeasure &amp;unit);
+<span class="lineNum">     504 </span>            : 
+<span class="lineNum">     505 </span>            :     PROJ_DLL static CartesianCSNNPtr
+<span class="lineNum">     506 </span>            :     createSouthPoleEastingNorthNorthingNorth(const common::UnitOfMeasure &amp;unit);
+<span class="lineNum">     507 </span>            : 
+<span class="lineNum">     508 </span>            :     PROJ_DLL static CartesianCSNNPtr
+<span class="lineNum">     509 </span>            :     createWestingSouthing(const common::UnitOfMeasure &amp;unit);
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span>            :     PROJ_DLL static CartesianCSNNPtr
+<span class="lineNum">     512 </span>            :     createGeocentric(const common::UnitOfMeasure &amp;unit);
+<span class="lineNum">     513 </span>            : 
+<span class="lineNum">     514 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     515 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     516 </span>            :         PROJ_INTERNAL CartesianCSNNPtr
+<span class="lineNum">     517 </span>            :         alterUnit(const common::UnitOfMeasure &amp;unit) const;
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span>            :     //! @endcond
+<span class="lineNum">     520 </span>            : 
+<span class="lineNum">     521 </span>            :   protected:
+<span class="lineNum">     522 </span>            :     PROJ_INTERNAL explicit CartesianCS(
+<span class="lineNum">     523 </span>            :         const std::vector&lt;CoordinateSystemAxisNNPtr&gt; &amp;axisIn);
+<a name="524"><span class="lineNum">     524 </span><span class="lineCov">       3572 :     INLINED_MAKE_SHARED</span></a>
+<span class="lineNum">     525 </span>            : 
+<span class="lineNum">     526 </span><span class="lineCov">       1491 :     PROJ_INTERNAL std::string getWKT2Type(bool) const override {</span>
+<span class="lineNum">     527 </span><span class="lineCov">       1491 :         return &quot;Cartesian&quot;; // uppercase is intended</span>
+<span class="lineNum">     528 </span>            :     }
+<span class="lineNum">     529 </span>            : 
+<span class="lineNum">     530 </span>            :   private:
+<span class="lineNum">     531 </span>            :     CartesianCS(const CartesianCS &amp;other) = delete;
+<span class="lineNum">     532 </span>            : };
+<span class="lineNum">     533 </span>            : 
+<span class="lineNum">     534 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     535 </span>            : 
+<span class="lineNum">     536 </span>            : class OrdinalCS;
+<span class="lineNum">     537 </span>            : /** Shared pointer of OrdinalCS. */
+<span class="lineNum">     538 </span>            : using OrdinalCSPtr = std::shared_ptr&lt;OrdinalCS&gt;;
+<span class="lineNum">     539 </span>            : /** Non-null shared pointer of OrdinalCS. */
+<span class="lineNum">     540 </span>            : using OrdinalCSNNPtr = util::nn&lt;OrdinalCSPtr&gt;;
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span>            : /** \brief n-dimensional coordinate system in which every axis uses integers.
+<span class="lineNum">     543 </span>            :  *
+<span class="lineNum">     544 </span>            :  * The number of associations shall equal the
+<span class="lineNum">     545 </span>            :  * dimension of the CS.
+<span class="lineNum">     546 </span>            :  *
+<a name="547"><span class="lineNum">     547 </span>            :  * \remark Implements OrdinalCS from \ref ISO_19111_2019</a>
+<span class="lineNum">     548 </span>            :  */
+<span class="lineNum">     549 </span><span class="lineCov">          2 : class PROJ_GCC_DLL OrdinalCS final : public CoordinateSystem {</span>
+<span class="lineNum">     550 </span>            :   public:
+<span class="lineNum">     551 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     552 </span>            :     PROJ_DLL ~OrdinalCS() override;
+<span class="lineNum">     553 </span>            :     //! @endcond
+<span class="lineNum">     554 </span>            : 
+<span class="lineNum">     555 </span>            :     PROJ_DLL static OrdinalCSNNPtr
+<span class="lineNum">     556 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     557 </span>            :            const std::vector&lt;CoordinateSystemAxisNNPtr&gt; &amp;axisIn);
+<span class="lineNum">     558 </span>            : 
+<span class="lineNum">     559 </span>            :   protected:
+<span class="lineNum">     560 </span>            :     PROJ_INTERNAL explicit OrdinalCS(
+<span class="lineNum">     561 </span>            :         const std::vector&lt;CoordinateSystemAxisNNPtr&gt; &amp;axisIn);
+<a name="562"><span class="lineNum">     562 </span><span class="lineCov">          2 :     INLINED_MAKE_SHARED</span></a>
+<span class="lineNum">     563 </span>            : 
+<span class="lineNum">     564 </span><span class="lineCov">          1 :     PROJ_INTERNAL std::string getWKT2Type(bool) const override {</span>
+<span class="lineNum">     565 </span><span class="lineCov">          1 :         return &quot;ordinal&quot;;</span>
+<span class="lineNum">     566 </span>            :     }
+<span class="lineNum">     567 </span>            : 
+<span class="lineNum">     568 </span>            :   private:
+<span class="lineNum">     569 </span>            :     OrdinalCS(const OrdinalCS &amp;other) = delete;
+<span class="lineNum">     570 </span>            : };
+<span class="lineNum">     571 </span>            : 
+<span class="lineNum">     572 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     573 </span>            : 
+<span class="lineNum">     574 </span>            : class ParametricCS;
+<span class="lineNum">     575 </span>            : /** Shared pointer of ParametricCS. */
+<span class="lineNum">     576 </span>            : using ParametricCSPtr = std::shared_ptr&lt;ParametricCS&gt;;
+<span class="lineNum">     577 </span>            : /** Non-null shared pointer of ParametricCS. */
+<span class="lineNum">     578 </span>            : using ParametricCSNNPtr = util::nn&lt;ParametricCSPtr&gt;;
+<span class="lineNum">     579 </span>            : 
+<span class="lineNum">     580 </span>            : /** \brief one-dimensional coordinate reference system which uses parameter
+<span class="lineNum">     581 </span>            :  * values or functions that may vary monotonically with height.
+<span class="lineNum">     582 </span>            :  *
+<a name="583"><span class="lineNum">     583 </span>            :  * \remark Implements ParametricCS from \ref ISO_19111_2019</a>
+<span class="lineNum">     584 </span>            :  */
+<span class="lineNum">     585 </span><span class="lineCov">         46 : class PROJ_GCC_DLL ParametricCS final : public CoordinateSystem {</span>
+<span class="lineNum">     586 </span>            :   public:
+<span class="lineNum">     587 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     588 </span>            :     PROJ_DLL ~ParametricCS() override;
+<span class="lineNum">     589 </span>            :     //! @endcond
+<span class="lineNum">     590 </span>            : 
+<span class="lineNum">     591 </span>            :     PROJ_DLL static ParametricCSNNPtr
+<span class="lineNum">     592 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     593 </span>            :            const CoordinateSystemAxisNNPtr &amp;axisIn);
+<span class="lineNum">     594 </span>            : 
+<span class="lineNum">     595 </span>            :   protected:
+<span class="lineNum">     596 </span>            :     PROJ_INTERNAL explicit ParametricCS(
+<span class="lineNum">     597 </span>            :         const std::vector&lt;CoordinateSystemAxisNNPtr&gt; &amp;axisIn);
+<a name="598"><span class="lineNum">     598 </span><span class="lineCov">         46 :     INLINED_MAKE_SHARED</span></a>
+<span class="lineNum">     599 </span>            : 
+<span class="lineNum">     600 </span><span class="lineCov">         20 :     PROJ_INTERNAL std::string getWKT2Type(bool) const override {</span>
+<span class="lineNum">     601 </span><span class="lineCov">         20 :         return &quot;parametric&quot;;</span>
+<span class="lineNum">     602 </span>            :     }
+<span class="lineNum">     603 </span>            : 
+<span class="lineNum">     604 </span>            :   private:
+<span class="lineNum">     605 </span>            :     ParametricCS(const ParametricCS &amp;other) = delete;
+<span class="lineNum">     606 </span>            : };
+<span class="lineNum">     607 </span>            : 
+<span class="lineNum">     608 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     609 </span>            : 
+<span class="lineNum">     610 </span>            : class TemporalCS;
+<span class="lineNum">     611 </span>            : /** Shared pointer of TemporalCS. */
+<span class="lineNum">     612 </span>            : using TemporalCSPtr = std::shared_ptr&lt;TemporalCS&gt;;
+<span class="lineNum">     613 </span>            : /** Non-null shared pointer of TemporalCS. */
+<span class="lineNum">     614 </span>            : using TemporalCSNNPtr = util::nn&lt;TemporalCSPtr&gt;;
+<span class="lineNum">     615 </span>            : 
+<span class="lineNum">     616 </span>            : /** \brief (Abstract class) A one-dimensional coordinate system used to record
+<span class="lineNum">     617 </span>            :  * time.
+<span class="lineNum">     618 </span>            :  *
+<span class="lineNum">     619 </span>            :  * A TemporalCS shall have one axis association.
+<span class="lineNum">     620 </span>            :  *
+<a name="621"><span class="lineNum">     621 </span>            :  * \remark Implements TemporalCS from \ref ISO_19111_2019</a>
+<span class="lineNum">     622 </span>            :  */
+<span class="lineNum">     623 </span><span class="lineCov">         29 : class PROJ_GCC_DLL TemporalCS : public CoordinateSystem {</span>
+<span class="lineNum">     624 </span>            :   public:
+<span class="lineNum">     625 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     626 </span>            :     PROJ_DLL ~TemporalCS() override;
+<span class="lineNum">     627 </span>            :     //! @endcond
+<span class="lineNum">     628 </span>            : 
+<span class="lineNum">     629 </span>            :   protected:
+<span class="lineNum">     630 </span>            :     PROJ_INTERNAL explicit TemporalCS(const CoordinateSystemAxisNNPtr &amp;axis);
+<span class="lineNum">     631 </span>            :     INLINED_MAKE_SHARED
+<span class="lineNum">     632 </span>            : 
+<span class="lineNum">     633 </span>            :     PROJ_INTERNAL std::string
+<span class="lineNum">     634 </span>            :     getWKT2Type(bool use2019Keywords) const override = 0;
+<span class="lineNum">     635 </span>            : 
+<span class="lineNum">     636 </span>            :   private:
+<span class="lineNum">     637 </span>            :     TemporalCS(const TemporalCS &amp;other) = delete;
+<span class="lineNum">     638 </span>            : };
+<span class="lineNum">     639 </span>            : 
+<span class="lineNum">     640 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     641 </span>            : 
+<span class="lineNum">     642 </span>            : class DateTimeTemporalCS;
+<span class="lineNum">     643 </span>            : /** Shared pointer of DateTimeTemporalCS. */
+<span class="lineNum">     644 </span>            : using DateTimeTemporalCSPtr = std::shared_ptr&lt;DateTimeTemporalCS&gt;;
+<span class="lineNum">     645 </span>            : /** Non-null shared pointer of DateTimeTemporalCS. */
+<span class="lineNum">     646 </span>            : using DateTimeTemporalCSNNPtr = util::nn&lt;DateTimeTemporalCSPtr&gt;;
+<span class="lineNum">     647 </span>            : 
+<span class="lineNum">     648 </span>            : /** \brief A one-dimensional coordinate system used to record time in dateTime
+<span class="lineNum">     649 </span>            :  * representation as defined in ISO 8601.
+<span class="lineNum">     650 </span>            :  *
+<span class="lineNum">     651 </span>            :  * A DateTimeTemporalCS shall have one axis association. It does not use
+<span class="lineNum">     652 </span>            :  * axisUnitID; the temporal quantities are defined through the ISO 8601
+<span class="lineNum">     653 </span>            :  * representation.
+<span class="lineNum">     654 </span>            :  *
+<a name="655"><span class="lineNum">     655 </span>            :  * \remark Implements DateTimeTemporalCS from \ref ISO_19111_2019</a>
+<span class="lineNum">     656 </span>            :  */
+<span class="lineNum">     657 </span><span class="lineCov">         46 : class PROJ_GCC_DLL DateTimeTemporalCS final : public TemporalCS {</span>
+<span class="lineNum">     658 </span>            :   public:
+<span class="lineNum">     659 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     660 </span>            :     PROJ_DLL ~DateTimeTemporalCS() override;
+<span class="lineNum">     661 </span>            :     //! @endcond
+<span class="lineNum">     662 </span>            : 
+<span class="lineNum">     663 </span>            :     PROJ_DLL static DateTimeTemporalCSNNPtr
+<span class="lineNum">     664 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     665 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis);
+<span class="lineNum">     666 </span>            : 
+<span class="lineNum">     667 </span>            :   protected:
+<span class="lineNum">     668 </span>            :     PROJ_INTERNAL explicit DateTimeTemporalCS(
+<span class="lineNum">     669 </span>            :         const CoordinateSystemAxisNNPtr &amp;axis);
+<span class="lineNum">     670 </span><span class="lineCov">         46 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     671 </span>            : 
+<span class="lineNum">     672 </span>            :     PROJ_INTERNAL std::string getWKT2Type(bool use2019Keywords) const override;
+<span class="lineNum">     673 </span>            : 
+<span class="lineNum">     674 </span>            :   private:
+<span class="lineNum">     675 </span>            :     DateTimeTemporalCS(const DateTimeTemporalCS &amp;other) = delete;
+<span class="lineNum">     676 </span>            : };
+<span class="lineNum">     677 </span>            : 
+<span class="lineNum">     678 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     679 </span>            : 
+<span class="lineNum">     680 </span>            : class TemporalCountCS;
+<span class="lineNum">     681 </span>            : /** Shared pointer of TemporalCountCS. */
+<span class="lineNum">     682 </span>            : using TemporalCountCSPtr = std::shared_ptr&lt;TemporalCountCS&gt;;
+<span class="lineNum">     683 </span>            : /** Non-null shared pointer of TemporalCountCS. */
+<span class="lineNum">     684 </span>            : using TemporalCountCSNNPtr = util::nn&lt;TemporalCountCSPtr&gt;;
+<span class="lineNum">     685 </span>            : 
+<span class="lineNum">     686 </span>            : /** \brief A one-dimensional coordinate system used to record time as an
+<span class="lineNum">     687 </span>            :  * integer count.
+<span class="lineNum">     688 </span>            :  *
+<span class="lineNum">     689 </span>            :  * A TemporalCountCS shall have one axis association.
+<span class="lineNum">     690 </span>            :  *
+<a name="691"><span class="lineNum">     691 </span>            :  * \remark Implements TemporalCountCS from \ref ISO_19111_2019</a>
+<span class="lineNum">     692 </span>            :  */
+<span class="lineNum">     693 </span><span class="lineCov">          8 : class PROJ_GCC_DLL TemporalCountCS final : public TemporalCS {</span>
+<span class="lineNum">     694 </span>            :   public:
+<span class="lineNum">     695 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     696 </span>            :     PROJ_DLL ~TemporalCountCS() override;
+<span class="lineNum">     697 </span>            :     //! @endcond
+<span class="lineNum">     698 </span>            : 
+<span class="lineNum">     699 </span>            :     PROJ_DLL static TemporalCountCSNNPtr
+<span class="lineNum">     700 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     701 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis);
+<span class="lineNum">     702 </span>            : 
+<span class="lineNum">     703 </span>            :   protected:
+<span class="lineNum">     704 </span>            :     PROJ_INTERNAL explicit TemporalCountCS(
+<span class="lineNum">     705 </span>            :         const CoordinateSystemAxisNNPtr &amp;axis);
+<span class="lineNum">     706 </span><span class="lineCov">          8 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     707 </span>            : 
+<span class="lineNum">     708 </span>            :     PROJ_INTERNAL std::string getWKT2Type(bool use2019Keywords) const override;
+<span class="lineNum">     709 </span>            : 
+<span class="lineNum">     710 </span>            :   private:
+<span class="lineNum">     711 </span>            :     TemporalCountCS(const TemporalCountCS &amp;other) = delete;
+<span class="lineNum">     712 </span>            : };
+<span class="lineNum">     713 </span>            : 
+<span class="lineNum">     714 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     715 </span>            : 
+<span class="lineNum">     716 </span>            : class TemporalMeasureCS;
+<span class="lineNum">     717 </span>            : /** Shared pointer of TemporalMeasureCS. */
+<span class="lineNum">     718 </span>            : using TemporalMeasureCSPtr = std::shared_ptr&lt;TemporalMeasureCS&gt;;
+<span class="lineNum">     719 </span>            : /** Non-null shared pointer of TemporalMeasureCS. */
+<span class="lineNum">     720 </span>            : using TemporalMeasureCSNNPtr = util::nn&lt;TemporalMeasureCSPtr&gt;;
+<span class="lineNum">     721 </span>            : 
+<span class="lineNum">     722 </span>            : /** \brief A one-dimensional coordinate system used to record a time as a
+<span class="lineNum">     723 </span>            :  * real number.
+<span class="lineNum">     724 </span>            :  *
+<span class="lineNum">     725 </span>            :  * A TemporalMeasureCS shall have one axis association.
+<span class="lineNum">     726 </span>            :  *
+<a name="727"><span class="lineNum">     727 </span>            :  * \remark Implements TemporalMeasureCS from \ref ISO_19111_2019</a>
+<span class="lineNum">     728 </span>            :  */
+<span class="lineNum">     729 </span><span class="lineCov">          4 : class PROJ_GCC_DLL TemporalMeasureCS final : public TemporalCS {</span>
+<span class="lineNum">     730 </span>            :   public:
+<span class="lineNum">     731 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     732 </span>            :     PROJ_DLL ~TemporalMeasureCS() override;
+<span class="lineNum">     733 </span>            :     //! @endcond
+<span class="lineNum">     734 </span>            : 
+<span class="lineNum">     735 </span>            :     PROJ_DLL static TemporalMeasureCSNNPtr
+<span class="lineNum">     736 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     737 </span>            :            const CoordinateSystemAxisNNPtr &amp;axis);
+<span class="lineNum">     738 </span>            : 
+<span class="lineNum">     739 </span>            :   protected:
+<span class="lineNum">     740 </span>            :     PROJ_INTERNAL explicit TemporalMeasureCS(
+<span class="lineNum">     741 </span>            :         const CoordinateSystemAxisNNPtr &amp;axis);
+<span class="lineNum">     742 </span><span class="lineCov">          4 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     743 </span>            : 
+<span class="lineNum">     744 </span>            :     PROJ_INTERNAL std::string getWKT2Type(bool use2019Keywords) const override;
+<span class="lineNum">     745 </span>            : 
+<span class="lineNum">     746 </span>            :   private:
+<span class="lineNum">     747 </span>            :     TemporalMeasureCS(const TemporalMeasureCS &amp;other) = delete;
+<span class="lineNum">     748 </span>            : };
+<span class="lineNum">     749 </span>            : 
+<span class="lineNum">     750 </span>            : } // namespace cs
+<span class="lineNum">     751 </span>            : 
+<span class="lineNum">     752 </span>            : NS_PROJ_END
+<span class="lineNum">     753 </span>            : 
+<span class="lineNum">     754 </span>            : #endif //  CS_HH_INCLUDED
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

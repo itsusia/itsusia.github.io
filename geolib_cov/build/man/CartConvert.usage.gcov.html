@@ -1,0 +1,211 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - build/man/CartConvert.usage</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">build/man</a> - CartConvert.usage<span style="font-size: 80%;"> (source / <a href="CartConvert.usage.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span><span class="lineNoCov">          0 : int usage(int retval, bool brief) {</span></a>
+<span class="lineNum">       2 </span><span class="lineNoCov">          0 :   if (brief)</span>
+<span class="lineNum">       3 </span><span class="lineNoCov">          0 :     ( retval ? std::cerr : std::cout ) &lt;&lt; &quot;Usage:\n&quot;</span>
+<span class="lineNum">       4 </span>            : &quot;    CartConvert [ -r ] [ -l lat0 lon0 h0 ] [ -e a f ] [ -w ] [ -p prec ] [\n&quot;
+<span class="lineNum">       5 </span>            : &quot;    --comment-delimiter commentdelim ] [ --version | -h | --help ] [\n&quot;
+<span class="lineNum">       6 </span>            : &quot;    --input-file infile | --input-string instring ] [ --line-separator\n&quot;
+<span class="lineNum">       7 </span>            : &quot;    linesep ] [ --output-file outfile ]\n&quot;
+<span class="lineNum">       8 </span>            : &quot;\n&quot;
+<span class="lineNum">       9 </span>            : &quot;For full documentation type:\n&quot;
+<span class="lineNum">      10 </span>            : &quot;    CartConvert --help\n&quot;
+<span class="lineNum">      11 </span>            : &quot;or visit:\n&quot;
+<span class="lineNum">      12 </span><span class="lineNoCov">          0 : &quot;    https://geographiclib.sourceforge.io/1.49/CartConvert.1.html\n&quot;;</span>
+<span class="lineNum">      13 </span>            :   else
+<span class="lineNum">      14 </span><span class="lineNoCov">          0 :     ( retval ? std::cerr : std::cout ) &lt;&lt; &quot;Man page:\n&quot;</span>
+<span class="lineNum">      15 </span>            : &quot;NAME\n&quot;
+<span class="lineNum">      16 </span>            : &quot;       CartConvert -- convert geodetic coordinates to geocentric or local\n&quot;
+<span class="lineNum">      17 </span>            : &quot;       cartesian\n&quot;
+<span class="lineNum">      18 </span>            : &quot;\n&quot;
+<span class="lineNum">      19 </span>            : &quot;SYNOPSIS\n&quot;
+<span class="lineNum">      20 </span>            : &quot;       CartConvert [ -r ] [ -l lat0 lon0 h0 ] [ -e a f ] [ -w ] [ -p prec ] [\n&quot;
+<span class="lineNum">      21 </span>            : &quot;       --comment-delimiter commentdelim ] [ --version | -h | --help ] [\n&quot;
+<span class="lineNum">      22 </span>            : &quot;       --input-file infile | --input-string instring ] [ --line-separator\n&quot;
+<span class="lineNum">      23 </span>            : &quot;       linesep ] [ --output-file outfile ]\n&quot;
+<span class="lineNum">      24 </span>            : &quot;\n&quot;
+<span class="lineNum">      25 </span>            : &quot;DESCRIPTION\n&quot;
+<span class="lineNum">      26 </span>            : &quot;       Convert geodetic coordinates to either geocentric or local cartesian\n&quot;
+<span class="lineNum">      27 </span>            : &quot;       coordinates.  Geocentric coordinates have the origin at the center of\n&quot;
+<span class="lineNum">      28 </span>            : &quot;       the earth, with the z axis going thru the north pole, and the x axis\n&quot;
+<span class="lineNum">      29 </span>            : &quot;       thru latitude = 0, longitude = 0.  By default, the conversion is to\n&quot;
+<span class="lineNum">      30 </span>            : &quot;       geocentric coordinates.  Specifying -l lat0 lon0 h0 causes a local\n&quot;
+<span class="lineNum">      31 </span>            : &quot;       coordinate system to be used with the origin at latitude = lat0,\n&quot;
+<span class="lineNum">      32 </span>            : &quot;       longitude = lon0, height = h0, z normal to the ellipsoid and y due\n&quot;
+<span class="lineNum">      33 </span>            : &quot;       north.\n&quot;
+<span class="lineNum">      34 </span>            : &quot;\n&quot;
+<span class="lineNum">      35 </span>            : &quot;       Geodetic coordinates are provided on standard input as a set of lines\n&quot;
+<span class="lineNum">      36 </span>            : &quot;       containing (blank separated) latitude, longitude (decimal degrees or\n&quot;
+<span class="lineNum">      37 </span>            : &quot;       degrees, minutes and seconds), and height above the ellipsoid (meters);\n&quot;
+<span class="lineNum">      38 </span>            : &quot;       for details on the allowed formats for latitude and longitude, see the\n&quot;
+<span class="lineNum">      39 </span>            : &quot;       \&quot;GEOGRAPHIC COORDINATES\&quot; section of GeoConvert(1).  For each set of\n&quot;
+<span class="lineNum">      40 </span>            : &quot;       geodetic coordinates, the corresponding cartesian coordinates x, y, z\n&quot;
+<span class="lineNum">      41 </span>            : &quot;       (meters) are printed on standard output.\n&quot;
+<span class="lineNum">      42 </span>            : &quot;\n&quot;
+<span class="lineNum">      43 </span>            : &quot;OPTIONS\n&quot;
+<span class="lineNum">      44 </span>            : &quot;       -r  perform the reverse projection.  x, y, z are given on standard\n&quot;
+<span class="lineNum">      45 </span>            : &quot;           input and each line of standard output gives latitude, longitude,\n&quot;
+<span class="lineNum">      46 </span>            : &quot;           height.\n&quot;
+<span class="lineNum">      47 </span>            : &quot;\n&quot;
+<span class="lineNum">      48 </span>            : &quot;       -l lat0 lon0 h0\n&quot;
+<span class="lineNum">      49 </span>            : &quot;           specifies conversions to and from a local cartesion coordinate\n&quot;
+<span class="lineNum">      50 </span>            : &quot;           systems with origin lat0 lon0 h0, instead of a geocentric\n&quot;
+<span class="lineNum">      51 </span>            : &quot;           coordinate system.  The -w flag can be used to swap the default\n&quot;
+<span class="lineNum">      52 </span>            : &quot;           order of the 2 geographic coordinates, provided that it appears\n&quot;
+<span class="lineNum">      53 </span>            : &quot;           before -l.\n&quot;
+<span class="lineNum">      54 </span>            : &quot;\n&quot;
+<span class="lineNum">      55 </span>            : &quot;       -e a f\n&quot;
+<span class="lineNum">      56 </span>            : &quot;           specify the ellipsoid via the equatorial radius, a and the\n&quot;
+<span class="lineNum">      57 </span>            : &quot;           flattening, f.  Setting f = 0 results in a sphere.  Specify f &lt; 0\n&quot;
+<span class="lineNum">      58 </span>            : &quot;           for a prolate ellipsoid.  A simple fraction, e.g., 1/297, is\n&quot;
+<span class="lineNum">      59 </span>            : &quot;           allowed for f.  By default, the WGS84 ellipsoid is used, a =\n&quot;
+<span class="lineNum">      60 </span>            : &quot;           6378137 m, f = 1/298.257223563.\n&quot;
+<span class="lineNum">      61 </span>            : &quot;\n&quot;
+<span class="lineNum">      62 </span>            : &quot;       -w  toggle the longitude first flag (it starts off); if the flag is on,\n&quot;
+<span class="lineNum">      63 </span>            : &quot;           then on input and output, longitude precedes latitude (except that,\n&quot;
+<span class="lineNum">      64 </span>            : &quot;           on input, this can be overridden by a hemisphere designator, N, S,\n&quot;
+<span class="lineNum">      65 </span>            : &quot;           E, W).\n&quot;
+<span class="lineNum">      66 </span>            : &quot;\n&quot;
+<span class="lineNum">      67 </span>            : &quot;       -p prec\n&quot;
+<span class="lineNum">      68 </span>            : &quot;           set the output precision to prec (default 6).  prec is the number\n&quot;
+<span class="lineNum">      69 </span>            : &quot;           of digits after the decimal point for geocentric and local\n&quot;
+<span class="lineNum">      70 </span>            : &quot;           cartesion coordinates and for the height (in meters).  For\n&quot;
+<span class="lineNum">      71 </span>            : &quot;           latitudes and longitudes (in degrees), the number of digits after\n&quot;
+<span class="lineNum">      72 </span>            : &quot;           the decimal point is prec + 5.\n&quot;
+<span class="lineNum">      73 </span>            : &quot;\n&quot;
+<span class="lineNum">      74 </span>            : &quot;       --comment-delimiter commentdelim\n&quot;
+<span class="lineNum">      75 </span>            : &quot;           set the comment delimiter to commentdelim (e.g., \&quot;#\&quot; or \&quot;//\&quot;).  If\n&quot;
+<span class="lineNum">      76 </span>            : &quot;           set, the input lines will be scanned for this delimiter and, if\n&quot;
+<span class="lineNum">      77 </span>            : &quot;           found, the delimiter and the rest of the line will be removed prior\n&quot;
+<span class="lineNum">      78 </span>            : &quot;           to processing and subsequently appended to the output line\n&quot;
+<span class="lineNum">      79 </span>            : &quot;           (separated by a space).\n&quot;
+<span class="lineNum">      80 </span>            : &quot;\n&quot;
+<span class="lineNum">      81 </span>            : &quot;       --version\n&quot;
+<span class="lineNum">      82 </span>            : &quot;           print version and exit.\n&quot;
+<span class="lineNum">      83 </span>            : &quot;\n&quot;
+<span class="lineNum">      84 </span>            : &quot;       -h  print usage and exit.\n&quot;
+<span class="lineNum">      85 </span>            : &quot;\n&quot;
+<span class="lineNum">      86 </span>            : &quot;       --help\n&quot;
+<span class="lineNum">      87 </span>            : &quot;           print full documentation and exit.\n&quot;
+<span class="lineNum">      88 </span>            : &quot;\n&quot;
+<span class="lineNum">      89 </span>            : &quot;       --input-file infile\n&quot;
+<span class="lineNum">      90 </span>            : &quot;           read input from the file infile instead of from standard input; a\n&quot;
+<span class="lineNum">      91 </span>            : &quot;           file name of \&quot;-\&quot; stands for standard input.\n&quot;
+<span class="lineNum">      92 </span>            : &quot;\n&quot;
+<span class="lineNum">      93 </span>            : &quot;       --input-string instring\n&quot;
+<span class="lineNum">      94 </span>            : &quot;           read input from the string instring instead of from standard input.\n&quot;
+<span class="lineNum">      95 </span>            : &quot;           All occurrences of the line separator character (default is a\n&quot;
+<span class="lineNum">      96 </span>            : &quot;           semicolon) in instring are converted to newlines before the reading\n&quot;
+<span class="lineNum">      97 </span>            : &quot;           begins.\n&quot;
+<span class="lineNum">      98 </span>            : &quot;\n&quot;
+<span class="lineNum">      99 </span>            : &quot;       --line-separator linesep\n&quot;
+<span class="lineNum">     100 </span>            : &quot;           set the line separator character to linesep.  By default this is a\n&quot;
+<span class="lineNum">     101 </span>            : &quot;           semicolon.\n&quot;
+<span class="lineNum">     102 </span>            : &quot;\n&quot;
+<span class="lineNum">     103 </span>            : &quot;       --output-file outfile\n&quot;
+<span class="lineNum">     104 </span>            : &quot;           write output to the file outfile instead of to standard output; a\n&quot;
+<span class="lineNum">     105 </span>            : &quot;           file name of \&quot;-\&quot; stands for standard output.\n&quot;
+<span class="lineNum">     106 </span>            : &quot;\n&quot;
+<span class="lineNum">     107 </span>            : &quot;EXAMPLES\n&quot;
+<span class="lineNum">     108 </span>            : &quot;          echo 33.3 44.4 6000 | CartConvert\n&quot;
+<span class="lineNum">     109 </span>            : &quot;          =&gt; 3816209.60 3737108.55 3485109.57\n&quot;
+<span class="lineNum">     110 </span>            : &quot;          echo 33.3 44.4 6000 | CartConvert -l 33 44 20\n&quot;
+<span class="lineNum">     111 </span>            : &quot;          =&gt; 37288.97 33374.29 5783.64\n&quot;
+<span class="lineNum">     112 </span>            : &quot;          echo 30000 30000 0 | CartConvert -r\n&quot;
+<span class="lineNum">     113 </span>            : &quot;          =&gt; 6.483 45 -6335709.73\n&quot;
+<span class="lineNum">     114 </span>            : &quot;\n&quot;
+<span class="lineNum">     115 </span>            : &quot;ERRORS\n&quot;
+<span class="lineNum">     116 </span>            : &quot;       An illegal line of input will print an error message to standard output\n&quot;
+<span class="lineNum">     117 </span>            : &quot;       beginning with \&quot;ERROR:\&quot; and causes CartConvert to return an exit code\n&quot;
+<span class="lineNum">     118 </span>            : &quot;       of 1.  However, an error does not cause CartConvert to terminate;\n&quot;
+<span class="lineNum">     119 </span>            : &quot;       following lines will be converted.\n&quot;
+<span class="lineNum">     120 </span>            : &quot;\n&quot;
+<span class="lineNum">     121 </span>            : &quot;SEE ALSO\n&quot;
+<span class="lineNum">     122 </span>            : &quot;       The algorithm for converting geocentric to geodetic coordinates is\n&quot;
+<span class="lineNum">     123 </span>            : &quot;       given in Appendix B of C. F. F. Karney, Geodesics on an ellipsoid of\n&quot;
+<span class="lineNum">     124 </span>            : &quot;       revolution, Feb. 2011; preprint &lt;https://arxiv.org/abs/1102.1215&gt;.\n&quot;
+<span class="lineNum">     125 </span>            : &quot;\n&quot;
+<span class="lineNum">     126 </span>            : &quot;AUTHOR\n&quot;
+<span class="lineNum">     127 </span>            : &quot;       CartConvert was written by Charles Karney.\n&quot;
+<span class="lineNum">     128 </span>            : &quot;\n&quot;
+<span class="lineNum">     129 </span>            : &quot;HISTORY\n&quot;
+<span class="lineNum">     130 </span>            : &quot;       CartConvert was added to GeographicLib,\n&quot;
+<span class="lineNum">     131 </span>            : &quot;       &lt;https://geographiclib.sourceforge.io&gt;, in 2009-02.  Prior to 2009-03\n&quot;
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 : &quot;       it was called ECEFConvert.\n&quot;</span>
+<span class="lineNum">     133 </span>            : ;
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :   return retval;</span>
+<span class="lineNum">     135 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

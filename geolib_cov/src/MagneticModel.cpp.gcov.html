@@ -1,0 +1,345 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/MagneticModel.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - MagneticModel.cpp<span style="font-size: 80%;"> (source / <a href="MagneticModel.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">170</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file MagneticModel.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::MagneticModel class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2011-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;GeographicLib/MagneticModel.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;fstream&gt;
+<span class="lineNum">      12 </span>            : #include &lt;GeographicLib/SphericalEngine.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/MagneticCircle.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/Utility.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : #if !defined(GEOGRAPHICLIB_DATA)
+<span class="lineNum">      17 </span>            : #  if defined(_WIN32)
+<span class="lineNum">      18 </span>            : #    define GEOGRAPHICLIB_DATA &quot;C:/ProgramData/GeographicLib&quot;
+<span class="lineNum">      19 </span>            : #  else
+<span class="lineNum">      20 </span>            : #    define GEOGRAPHICLIB_DATA &quot;/usr/local/share/GeographicLib&quot;
+<span class="lineNum">      21 </span>            : #  endif
+<span class="lineNum">      22 </span>            : #endif
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #if !defined(GEOGRAPHICLIB_MAGNETIC_DEFAULT_NAME)
+<span class="lineNum">      25 </span>            : #  define GEOGRAPHICLIB_MAGNETIC_DEFAULT_NAME &quot;wmm2015&quot;
+<span class="lineNum">      26 </span>            : #endif
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      29 </span>            : // Squelch warnings about unsafe use of getenv
+<span class="lineNum">      30 </span>            : #  pragma warning (disable: 4996)
+<span class="lineNum">      31 </span>            : #endif
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : namespace GeographicLib {
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            :   using namespace std;
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :   MagneticModel::MagneticModel(const std::string&amp; name,const std::string&amp; path,</span>
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :                                const Geocentric&amp; earth)</span>
+<span class="lineNum">      39 </span>            :     : _name(name)
+<span class="lineNum">      40 </span>            :     , _dir(path)
+<span class="lineNum">      41 </span>            :     , _description(&quot;NONE&quot;)
+<span class="lineNum">      42 </span>            :     , _date(&quot;UNKNOWN&quot;)
+<span class="lineNum">      43 </span>            :     , _t0(Math::NaN())
+<span class="lineNum">      44 </span>            :     , _dt0(1)
+<span class="lineNum">      45 </span>            :     , _tmin(Math::NaN())
+<span class="lineNum">      46 </span>            :     , _tmax(Math::NaN())
+<span class="lineNum">      47 </span>            :     , _a(Math::NaN())
+<span class="lineNum">      48 </span>            :     , _hmin(Math::NaN())
+<span class="lineNum">      49 </span>            :     , _hmax(Math::NaN())
+<span class="lineNum">      50 </span>            :     , _Nmodels(1)
+<span class="lineNum">      51 </span>            :     , _Nconstants(0)
+<span class="lineNum">      52 </span>            :     , _norm(SphericalHarmonic::SCHMIDT)
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :     , _earth(earth)</span>
+<span class="lineNum">      54 </span>            :   {
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :     if (_dir.empty())</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :       _dir = DefaultMagneticPath();</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :     ReadMetadata(_name);</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :     _G.resize(_Nmodels + 1 + _Nconstants);</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :     _H.resize(_Nmodels + 1 + _Nconstants);</span>
+<span class="lineNum">      60 </span>            :     {
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :       string coeff = _filename + &quot;.cof&quot;;</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :       ifstream coeffstr(coeff.c_str(), ios::binary);</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :       if (!coeffstr.good())</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Error opening &quot; + coeff);</span>
+<span class="lineNum">      65 </span>            :       char id[idlength_ + 1];
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :       coeffstr.read(id, idlength_);</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :       if (!coeffstr.good())</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;No header in &quot; + coeff);</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :       id[idlength_] = '\0';</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :       if (_id != string(id))</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;ID mismatch: &quot; + _id + &quot; vs &quot; + id);</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :       for (int i = 0; i &lt; _Nmodels + 1 + _Nconstants; ++i) {</span>
+<span class="lineNum">      73 </span>            :         int N, M;
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :         SphericalEngine::coeff::readcoeffs(coeffstr, N, M, _G[i], _H[i]);</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :         if (!(M &lt; 0 || _G[i][0] == 0))</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;A degree 0 term is not permitted&quot;);</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :         _harm.push_back(SphericalHarmonic(_G[i], _H[i], N, N, M, _a, _norm));</span>
+<span class="lineNum">      78 </span>            :       }
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :       int pos = int(coeffstr.tellg());</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :       coeffstr.seekg(0, ios::end);</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :       if (pos != coeffstr.tellg())</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Extra data in &quot; + coeff);</span>
+<span class="lineNum">      83 </span>            :     }
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :   void MagneticModel::ReadMetadata(const std::string&amp; name) {</span>
+<span class="lineNum">      87 </span>            :     const char* spaces = &quot; \t\n\v\f\r&quot;;
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :     _filename = _dir + &quot;/&quot; + name + &quot;.wmm&quot;;</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :     ifstream metastr(_filename.c_str());</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :     if (!metastr.good())</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Cannot open &quot; + _filename);</span>
+<span class="lineNum">      92 </span>            :     string line;
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :     getline(metastr, line);</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :     if (!(line.size() &gt;= 6 &amp;&amp; line.substr(0,5) == &quot;WMMF-&quot;))</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :       throw GeographicErr(_filename + &quot; does not contain WMMF-n signature&quot;);</span>
+<span class="lineNum">      96 </span>            :     string::size_type n = line.find_first_of(spaces, 5);
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :     if (n != string::npos)</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :       n -= 5;</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :     string version(line, 5, n);</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :     if (!(version == &quot;1&quot; || version == &quot;2&quot;))</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Unknown version in &quot; + _filename + &quot;: &quot; + version);</span>
+<span class="lineNum">     102 </span>            :     string key, val;
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :     while (getline(metastr, line)) {</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :       if (!Utility::ParseLine(line, key, val))</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :         continue;</span>
+<span class="lineNum">     106 </span>            :       // Process key words
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :       if (key == &quot;Name&quot;)</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :         _name = val;</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :       else if (key == &quot;Description&quot;)</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :         _description = val;</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :       else if (key == &quot;ReleaseDate&quot;)</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :         _date = val;</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :       else if (key == &quot;Radius&quot;)</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :         _a = Utility::val&lt;real&gt;(val);</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :       else if (key == &quot;Type&quot;) {</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :         if (!(val == &quot;Linear&quot; || val == &quot;linear&quot;))</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;Only linear models are supported&quot;);</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :       } else if (key == &quot;Epoch&quot;)</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :         _t0 = Utility::val&lt;real&gt;(val);</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :       else if (key == &quot;DeltaEpoch&quot;)</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :         _dt0 = Utility::val&lt;real&gt;(val);</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :       else if (key == &quot;NumModels&quot;)</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :         _Nmodels = Utility::val&lt;int&gt;(val);</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :       else if (key == &quot;NumConstants&quot;)</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :         _Nconstants = Utility::val&lt;int&gt;(val);</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :       else if (key == &quot;MinTime&quot;)</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :         _tmin = Utility::val&lt;real&gt;(val);</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :       else if (key == &quot;MaxTime&quot;)</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :         _tmax = Utility::val&lt;real&gt;(val);</span>
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :       else if (key == &quot;MinHeight&quot;)</span>
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :         _hmin = Utility::val&lt;real&gt;(val);</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :       else if (key == &quot;MaxHeight&quot;)</span>
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :         _hmax = Utility::val&lt;real&gt;(val);</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :       else if (key == &quot;Normalization&quot;) {</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :         if (val == &quot;FULL&quot; || val == &quot;Full&quot; || val == &quot;full&quot;)</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :           _norm = SphericalHarmonic::FULL;</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :         else if (val == &quot;SCHMIDT&quot; || val == &quot;Schmidt&quot; || val == &quot;schmidt&quot;)</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :           _norm = SphericalHarmonic::SCHMIDT;</span>
+<span class="lineNum">     139 </span>            :         else
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;Unknown normalization &quot; + val);</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :       } else if (key == &quot;ByteOrder&quot;) {</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :         if (val == &quot;Big&quot; || val == &quot;big&quot;)</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;Only little-endian ordering is supported&quot;);</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :         else if (!(val == &quot;Little&quot; || val == &quot;little&quot;))</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;Unknown byte ordering &quot; + val);</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :       } else if (key == &quot;ID&quot;)</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :         _id = val;</span>
+<span class="lineNum">     148 </span>            :       // else unrecognized keywords are skipped
+<span class="lineNum">     149 </span>            :     }
+<span class="lineNum">     150 </span>            :     // Check values
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(_a) &amp;&amp; _a &gt; 0))</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Reference radius must be positive&quot;);</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :     if (!(_t0 &gt; 0))</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Epoch time not defined&quot;);</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :     if (_tmin &gt;= _tmax)</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Min time exceeds max time&quot;);</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :     if (_hmin &gt;= _hmax)</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Min height exceeds max height&quot;);</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :     if (int(_id.size()) != idlength_)</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Invalid ID&quot;);</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :     if (_Nmodels &lt; 1)</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;NumModels must be positive&quot;);</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :     if (!(_Nconstants == 0 || _Nconstants == 1))</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;NumConstants must be 0 or 1&quot;);</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :     if (!(_dt0 &gt; 0)) {</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :       if (_Nmodels &gt; 1)</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;DeltaEpoch must be positive&quot;);</span>
+<span class="lineNum">     168 </span>            :       else
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :         _dt0 = 1;</span>
+<span class="lineNum">     170 </span>            :     }
+<a name="171"><span class="lineNum">     171 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :   void MagneticModel::Field(real t, real lat, real lon, real h, bool diffp,</span>
+<span class="lineNum">     174 </span>            :                             real&amp; Bx, real&amp; By, real&amp; Bz,
+<span class="lineNum">     175 </span>            :                             real&amp; Bxt, real&amp; Byt, real&amp; Bzt) const {
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :     t -= _t0;</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :     int n = max(min(int(floor(t / _dt0)), _Nmodels - 1), 0);</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :     bool interpolate = n + 1 &lt; _Nmodels;</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :     t -= n * _dt0;</span>
+<span class="lineNum">     180 </span>            :     real X, Y, Z;
+<span class="lineNum">     181 </span>            :     real M[Geocentric::dim2_];
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :     _earth.IntForward(lat, lon, h, X, Y, Z, M);</span>
+<span class="lineNum">     183 </span>            :     // Components in geocentric basis
+<span class="lineNum">     184 </span>            :     // initial values to suppress warning
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :     real BX0 = 0, BY0 = 0, BZ0 = 0, BX1 = 0, BY1 = 0, BZ1 = 0;</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :     real BXc = 0, BYc = 0, BZc = 0;</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :     _harm[n](X, Y, Z, BX0, BY0, BZ0);</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :     _harm[n + 1](X, Y, Z, BX1, BY1, BZ1);</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :     if (_Nconstants)</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :       _harm[_Nmodels + 1](X, Y, Z, BXc, BYc, BZc);</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :     if (interpolate) {</span>
+<span class="lineNum">     192 </span>            :       // Convert to a time derivative
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :       BX1 = (BX1 - BX0) / _dt0;</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :       BY1 = (BY1 - BY0) / _dt0;</span>
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :       BZ1 = (BZ1 - BZ0) / _dt0;</span>
+<span class="lineNum">     196 </span>            :     }
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :     BX0 += t * BX1 + BXc;</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :     BY0 += t * BY1 + BYc;</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :     BZ0 += t * BZ1 + BZc;</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :     if (diffp) {</span>
+<span class="lineNum">     201 </span>            :       Geocentric::Unrotate(M, BX1, BY1, BZ1, Bxt, Byt, Bzt);
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :       Bxt *= - _a;</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :       Byt *= - _a;</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :       Bzt *= - _a;</span>
+<span class="lineNum">     205 </span>            :     }
+<span class="lineNum">     206 </span>            :     Geocentric::Unrotate(M, BX0, BY0, BZ0, Bx, By, Bz);
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :     Bx *= - _a;</span>
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :     By *= - _a;</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :     Bz *= - _a;</span>
+<a name="210"><span class="lineNum">     210 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :   MagneticCircle MagneticModel::Circle(real t, real lat, real h) const {</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :     real t1 = t - _t0;</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :     int n = max(min(int(floor(t1 / _dt0)), _Nmodels - 1), 0);</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :     bool interpolate = n + 1 &lt; _Nmodels;</span>
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :     t1 -= n * _dt0;</span>
+<span class="lineNum">     217 </span>            :     real X, Y, Z, M[Geocentric::dim2_];
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :     _earth.IntForward(lat, 0, h, X, Y, Z, M);</span>
+<span class="lineNum">     219 </span>            :     // Y = 0, cphi = M[7], sphi = M[8];
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :     return (_Nconstants == 0 ?</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :             MagneticCircle(_a, _earth._f, lat, h, t,</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :                            M[7], M[8], t1, _dt0, interpolate,</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :                            _harm[n].Circle(X, Z, true),</span>
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :                            _harm[n + 1].Circle(X, Z, true)) :</span>
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :             MagneticCircle(_a, _earth._f, lat, h, t,</span>
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :                            M[7], M[8], t1, _dt0, interpolate,</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :                            _harm[n].Circle(X, Z, true),</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :                            _harm[n + 1].Circle(X, Z, true),</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :                            _harm[_Nmodels + 1].Circle(X, Z, true)));</span>
+<a name="231"><span class="lineNum">     231 </span>            :   }</a>
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :   void MagneticModel::FieldComponents(real Bx, real By, real Bz,</span>
+<span class="lineNum">     234 </span>            :                                       real Bxt, real Byt, real Bzt,
+<span class="lineNum">     235 </span>            :                                       real&amp; H, real&amp; F, real&amp; D, real&amp; I,
+<span class="lineNum">     236 </span>            :                                       real&amp; Ht, real&amp; Ft,
+<span class="lineNum">     237 </span>            :                                       real&amp; Dt, real&amp; It) {
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :     H = Math::hypot(Bx, By);</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :     Ht = H != 0 ? (Bx * Bxt + By * Byt) / H : Math::hypot(Bxt, Byt);</span>
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :     D = H != 0 ? Math::atan2d(Bx, By) : Math::atan2d(Bxt, Byt);</span>
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :     Dt = (H != 0 ? (By * Bxt - Bx * Byt) / Math::sq(H) : 0) / Math::degree();</span>
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :     F = Math::hypot(H, Bz);</span>
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :     Ft = F != 0 ? (H * Ht + Bz * Bzt) / F : Math::hypot(Ht, Bzt);</span>
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :     I = F != 0 ? Math::atan2d(-Bz, H) : Math::atan2d(-Bzt, Ht);</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :     It = (F != 0 ? (Bz * Ht - H * Bzt) / Math::sq(F) : 0) / Math::degree();</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :   std::string MagneticModel::DefaultMagneticPath() {</span>
+<span class="lineNum">     249 </span>            :     string path;
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :     char* magneticpath = getenv(&quot;GEOGRAPHICLIB_MAGNETIC_PATH&quot;);</span>
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :     if (magneticpath)</span>
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :       path = string(magneticpath);</span>
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :     if (!path.empty())</span>
+<span class="lineNum">     254 </span>            :       return path;
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :     char* datapath = getenv(&quot;GEOGRAPHICLIB_DATA&quot;);</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :     if (datapath)</span>
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :       path = string(datapath);</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :     return (!path.empty() ? path : string(GEOGRAPHICLIB_DATA)) + &quot;/magnetic&quot;;</span>
+<span class="lineNum">     259 </span>            :   }
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :   std::string MagneticModel::DefaultMagneticName() {</span>
+<span class="lineNum">     262 </span>            :     string name;
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :     char* magneticname = getenv(&quot;GEOGRAPHICLIB_MAGNETIC_NAME&quot;);</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :     if (magneticname)</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :       name = string(magneticname);</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :     return !name.empty() ? name : string(GEOGRAPHICLIB_MAGNETIC_DEFAULT_NAME);</span>
+<span class="lineNum">     267 </span>            :   }
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

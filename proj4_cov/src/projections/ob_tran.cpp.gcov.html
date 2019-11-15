@@ -1,0 +1,329 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/projections/ob_tran.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/projections</a> - ob_tran.cpp<span style="font-size: 80%;"> (source / <a href="ob_tran.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">84</td>
+            <td class="headerCovTableEntry">109</td>
+            <td class="headerCovTableEntryMed">77.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #define PJ_LIB__</a>
+<span class="lineNum">       2 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">       3 </span>            : #include &lt;math.h&gt;
+<span class="lineNum">       4 </span>            : #include &lt;stddef.h&gt;
+<span class="lineNum">       5 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #include &quot;proj.h&quot;
+<span class="lineNum">       8 </span>            : #include &quot;proj_internal.h&quot;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : namespace { // anonymous namespace
+<span class="lineNum">      11 </span>            : struct pj_opaque {
+<span class="lineNum">      12 </span>            :     struct PJconsts *link;
+<span class="lineNum">      13 </span>            :     double  lamp;
+<span class="lineNum">      14 </span>            :     double  cphip, sphip;
+<span class="lineNum">      15 </span>            : };
+<span class="lineNum">      16 </span>            : } // anonymous namespace
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : PROJ_HEAD(ob_tran, &quot;General Oblique Transformation&quot;) &quot;\n\tMisc Sph&quot;
+<span class="lineNum">      19 </span>            : &quot;\n\to_proj= plus parameters for projection&quot;
+<span class="lineNum">      20 </span>            : &quot;\n\to_lat_p= o_lon_p= (new pole) or&quot;
+<span class="lineNum">      21 </span>            : &quot;\n\to_alpha= o_lon_c= o_lat_c= or&quot;
+<span class="lineNum">      22 </span>            : &quot;\n\to_lon_1= o_lat_1= o_lon_2= o_lat_2=&quot;;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #define TOL 1e-10
+<a name="25"><span class="lineNum">      25 </span>            : </a>
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span><span class="lineCov">          5 : static PJ_XY o_forward(PJ_LP lp, PJ *P) {             /* spheroid */</span>
+<span class="lineNum">      28 </span><span class="lineCov">          5 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">      29 </span>            :     double coslam, sinphi, cosphi;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineCov">          5 :     coslam = cos(lp.lam);</span>
+<span class="lineNum">      32 </span><span class="lineCov">          5 :     sinphi = sin(lp.phi);</span>
+<span class="lineNum">      33 </span><span class="lineCov">          5 :     cosphi = cos(lp.phi);</span>
+<span class="lineNum">      34 </span>            :     /* Formula (5-8b) of Snyder's &quot;Map projections: a working manual&quot; */
+<span class="lineNum">      35 </span><span class="lineCov">         15 :     lp.lam = adjlon(aatan2(cosphi * sin(lp.lam), Q-&gt;sphip * cosphi * coslam +</span>
+<span class="lineNum">      36 </span><span class="lineCov">         10 :         Q-&gt;cphip * sinphi) + Q-&gt;lamp);</span>
+<span class="lineNum">      37 </span>            :     /* Formula (5-7) */
+<span class="lineNum">      38 </span><span class="lineCov">          5 :     lp.phi = aasin(P-&gt;ctx,Q-&gt;sphip * sinphi - Q-&gt;cphip * cosphi * coslam);</span>
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span><span class="lineCov">          5 :     return Q-&gt;link-&gt;fwd(lp, Q-&gt;link);</span>
+<span class="lineNum">      41 </span>            : }
+<a name="42"><span class="lineNum">      42 </span>            : </a>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineCov">          2 : static PJ_XY t_forward(PJ_LP lp, PJ *P) {             /* spheroid */</span>
+<span class="lineNum">      45 </span><span class="lineCov">          2 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">      46 </span>            :     double cosphi, coslam;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineCov">          2 :     cosphi = cos(lp.phi);</span>
+<span class="lineNum">      49 </span><span class="lineCov">          2 :     coslam = cos(lp.lam);</span>
+<span class="lineNum">      50 </span><span class="lineCov">          2 :     lp.lam = adjlon(aatan2(cosphi * sin(lp.lam), sin(lp.phi)) + Q-&gt;lamp);</span>
+<span class="lineNum">      51 </span><span class="lineCov">          2 :     lp.phi = aasin(P-&gt;ctx, - cosphi * coslam);</span>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineCov">          2 :     return Q-&gt;link-&gt;fwd(lp, Q-&gt;link);</span>
+<span class="lineNum">      54 </span>            : }
+<a name="55"><span class="lineNum">      55 </span>            : </a>
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span><span class="lineCov">          5 : static PJ_LP o_inverse(PJ_XY xy, PJ *P) {             /* spheroid */</span>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineCov">          5 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">      60 </span>            :     double coslam, sinphi, cosphi;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span><span class="lineCov">          5 :     PJ_LP lp = Q-&gt;link-&gt;inv(xy, Q-&gt;link);</span>
+<span class="lineNum">      63 </span><span class="lineCov">          5 :     if (lp.lam != HUGE_VAL) {</span>
+<span class="lineNum">      64 </span><span class="lineCov">          5 :         coslam = cos(lp.lam -= Q-&gt;lamp);</span>
+<span class="lineNum">      65 </span><span class="lineCov">          5 :         sinphi = sin(lp.phi);</span>
+<span class="lineNum">      66 </span><span class="lineCov">          5 :         cosphi = cos(lp.phi);</span>
+<span class="lineNum">      67 </span>            :         /* Formula (5-9) */
+<span class="lineNum">      68 </span><span class="lineCov">          5 :         lp.phi = aasin(P-&gt;ctx,Q-&gt;sphip * sinphi + Q-&gt;cphip * cosphi * coslam);</span>
+<span class="lineNum">      69 </span>            :         /* Formula (5-10b) */
+<span class="lineNum">      70 </span><span class="lineCov">         10 :         lp.lam = aatan2(cosphi * sin(lp.lam), Q-&gt;sphip * cosphi * coslam -</span>
+<span class="lineNum">      71 </span><span class="lineCov">          5 :             Q-&gt;cphip * sinphi);</span>
+<span class="lineNum">      72 </span>            :     }
+<span class="lineNum">      73 </span><span class="lineCov">          5 :     return lp;</span>
+<span class="lineNum">      74 </span>            : }
+<a name="75"><span class="lineNum">      75 </span>            : </a>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineCov">          3 : static PJ_LP t_inverse(PJ_XY xy, PJ *P) {             /* spheroid */</span>
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span><span class="lineCov">          3 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">      80 </span>            :     double cosphi, t;
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span><span class="lineCov">          3 :     PJ_LP lp = Q-&gt;link-&gt;inv(xy, Q-&gt;link);</span>
+<span class="lineNum">      83 </span><span class="lineCov">          3 :     if (lp.lam != HUGE_VAL) {</span>
+<span class="lineNum">      84 </span><span class="lineCov">          2 :         cosphi = cos(lp.phi);</span>
+<span class="lineNum">      85 </span><span class="lineCov">          2 :         t = lp.lam - Q-&gt;lamp;</span>
+<span class="lineNum">      86 </span><span class="lineCov">          2 :         lp.lam = aatan2(cosphi * sin(t), - sin(lp.phi));</span>
+<span class="lineNum">      87 </span><span class="lineCov">          2 :         lp.phi = aasin(P-&gt;ctx,cosphi * cos(t));</span>
+<span class="lineNum">      88 </span>            :     }
+<span class="lineNum">      89 </span><span class="lineCov">          3 :     return lp;</span>
+<span class="lineNum">      90 </span>            : }
+<a name="91"><span class="lineNum">      91 </span>            : </a>
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span><span class="lineCov">         23 : static PJ *destructor(PJ *P, int errlev) {</span>
+<span class="lineNum">      94 </span><span class="lineCov">         23 :     if (nullptr==P)</span>
+<span class="lineNum">      95 </span>            :         return nullptr;
+<span class="lineNum">      96 </span><span class="lineCov">         23 :     if (nullptr==P-&gt;opaque)</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :         return pj_default_destructor (P, errlev);</span>
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span><span class="lineCov">         23 :     if (static_cast&lt;struct pj_opaque*&gt;(P-&gt;opaque)-&gt;link)</span>
+<span class="lineNum">     100 </span><span class="lineCov">         22 :         static_cast&lt;struct pj_opaque*&gt;(P-&gt;opaque)-&gt;link-&gt;destructor (static_cast&lt;struct pj_opaque*&gt;(P-&gt;opaque)-&gt;link, errlev);</span>
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span><span class="lineCov">         23 :     return pj_default_destructor(P, errlev);</span>
+<span class="lineNum">     103 </span>            : }
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            : /***********************************************************************
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            : These functions are modified versions of the functions &quot;argc_params&quot;
+<span class="lineNum">     111 </span>            : and &quot;argv_params&quot; from PJ_pipeline.c
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            : Basically, they do the somewhat backwards stunt of turning the paralist
+<span class="lineNum">     114 </span>            : representation of the +args back into the original +argv, +argc
+<span class="lineNum">     115 </span>            : representation accepted by pj_init_ctx().
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            : This, however, also begs the question of whether we really need the
+<span class="lineNum">     118 </span>            : paralist linked list representation, or if we could do with a simpler
+<span class="lineNum">     119 </span>            : null-terminated argv style array? This would simplfy some code, and
+<span class="lineNum">     120 </span>            : keep memory allocations more localized.
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            : ***********************************************************************/
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            : typedef struct {int argc; char **argv;} ARGS;
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            : /* count the number of args in the linked list &lt;params&gt; */
+<span class="lineNum">     127 </span>            : static size_t paralist_params_argc (paralist *params) {
+<span class="lineNum">     128 </span>            :     size_t argc = 0;
+<span class="lineNum">     129 </span><span class="lineCov">        333 :     for (; params != nullptr; params = params-&gt;next)</span>
+<span class="lineNum">     130 </span><span class="lineCov">        155 :         argc++;</span>
+<span class="lineNum">     131 </span>            :     return argc;
+<span class="lineNum">     132 </span>            : }
+<span class="lineNum">     133 </span>            : 
+<a name="134"><span class="lineNum">     134 </span>            : </a>
+<span class="lineNum">     135 </span>            : /* turn paralist into argc/argv style argument list */
+<span class="lineNum">     136 </span><span class="lineCov">         23 : static ARGS ob_tran_target_params (paralist *params) {</span>
+<span class="lineNum">     137 </span>            :     int i = 0;
+<span class="lineNum">     138 </span>            :     ARGS args = {0, nullptr};
+<span class="lineNum">     139 </span>            :     size_t argc = paralist_params_argc (params);
+<span class="lineNum">     140 </span><span class="lineCov">         23 :     if (argc &lt; 2)</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :         return args;</span>
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :     /* all args except the proj_ob_tran */
+<span class="lineNum">     144 </span><span class="lineCov">         23 :     args.argv = static_cast&lt;char**&gt;(pj_calloc (argc - 1, sizeof (char *)));</span>
+<span class="lineNum">     145 </span><span class="lineCov">         23 :     if (nullptr==args.argv)</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :         return args;</span>
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            :     /* Copy all args *except* the proj=ob_tran arg to the argv array */
+<span class="lineNum">     149 </span><span class="lineCov">        333 :     for (i = 0;  params != nullptr;  params = params-&gt;next) {</span>
+<span class="lineNum">     150 </span><span class="lineCov">        155 :         if (0==strcmp (params-&gt;param, &quot;proj=ob_tran&quot;))</span>
+<span class="lineNum">     151 </span><span class="lineCov">         23 :             continue;</span>
+<span class="lineNum">     152 </span><span class="lineCov">        132 :         args.argv[i++] = params-&gt;param;</span>
+<span class="lineNum">     153 </span>            :     }
+<span class="lineNum">     154 </span>            :     args.argc = i;
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            :     /* Then convert the o_proj=xxx element to proj=xxx */
+<span class="lineNum">     157 </span><span class="lineCov">         35 :     for (i = 0;   i &lt; args.argc;   i++) {</span>
+<span class="lineNum">     158 </span><span class="lineCov">         29 :         if (0!=strncmp (args.argv[i], &quot;o_proj=&quot;, 7))</span>
+<span class="lineNum">     159 </span>            :             continue;
+<span class="lineNum">     160 </span><span class="lineCov">         23 :         args.argv[i] += 2;</span>
+<span class="lineNum">     161 </span><span class="lineCov">         23 :         if (strcmp(args.argv[i], &quot;proj=ob_tran&quot;) == 0 ) {</span>
+<span class="lineNum">     162 </span><span class="lineCov">          1 :             pj_dealloc (args.argv);</span>
+<span class="lineNum">     163 </span>            :             args.argc = 0;
+<span class="lineNum">     164 </span>            :             args.argv = nullptr;
+<span class="lineNum">     165 </span>            :         }
+<span class="lineNum">     166 </span>            :         break;
+<span class="lineNum">     167 </span>            :     }
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span><span class="lineCov">         23 :     return args;</span>
+<span class="lineNum">     170 </span>            : }
+<span class="lineNum">     171 </span>            : 
+<a name="172"><span class="lineNum">     172 </span>            : </a>
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span><span class="lineCov">         69 : PJ *PROJECTION(ob_tran) {</span>
+<span class="lineNum">     175 </span>            :     double phip;
+<span class="lineNum">     176 </span>            :     ARGS args;
+<span class="lineNum">     177 </span>            :     PJ *R; /* projection to rotate */
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span><span class="lineCov">         23 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(pj_calloc (1, sizeof (struct pj_opaque)));</span>
+<span class="lineNum">     180 </span><span class="lineCov">         23 :     if (nullptr==Q)</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :         return destructor(P, ENOMEM);</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineCov">         23 :     P-&gt;opaque = Q;</span>
+<span class="lineNum">     184 </span><span class="lineCov">         23 :     P-&gt;destructor = destructor;</span>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span>            :     /* get name of projection to be translated */
+<span class="lineNum">     187 </span><span class="lineCov">         23 :     if (pj_param(P-&gt;ctx, P-&gt;params, &quot;so_proj&quot;).s == nullptr)</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :         return destructor(P, PJD_ERR_NO_ROTATION_PROJ);</span>
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span>            :     /* Create the target projection object to rotate */
+<span class="lineNum">     191 </span><span class="lineCov">         23 :     args = ob_tran_target_params (P-&gt;params);</span>
+<span class="lineNum">     192 </span>            :     /* avoid endless recursion */
+<span class="lineNum">     193 </span><span class="lineCov">         23 :     if (args.argv == nullptr ) {</span>
+<span class="lineNum">     194 </span><span class="lineCov">          1 :         return destructor(P, PJD_ERR_FAILED_TO_FIND_PROJ);</span>
+<span class="lineNum">     195 </span>            :     }
+<span class="lineNum">     196 </span><span class="lineCov">         22 :     R = pj_init_ctx (pj_get_ctx(P), args.argc, args.argv);</span>
+<span class="lineNum">     197 </span><span class="lineCov">         22 :     pj_dealloc (args.argv);</span>
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span><span class="lineCov">         22 :     if (nullptr==R)</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :         return destructor (P, PJD_ERR_UNKNOWN_PROJECTION_ID);</span>
+<span class="lineNum">     201 </span><span class="lineCov">         22 :     Q-&gt;link = R;</span>
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span><span class="lineCov">         22 :     if (pj_param(P-&gt;ctx, P-&gt;params, &quot;to_alpha&quot;).i) {</span>
+<span class="lineNum">     204 </span>            :         double lamc, phic, alpha;
+<span class="lineNum">     205 </span>            : 
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :         lamc    = pj_param(P-&gt;ctx, P-&gt;params, &quot;ro_lon_c&quot;).f;</span>
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :         phic    = pj_param(P-&gt;ctx, P-&gt;params, &quot;ro_lat_c&quot;).f;</span>
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :         alpha   = pj_param(P-&gt;ctx, P-&gt;params, &quot;ro_alpha&quot;).f;</span>
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :         if (fabs(fabs(phic) - M_HALFPI) &lt;= TOL)</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :             return destructor(P, PJD_ERR_LAT_0_OR_ALPHA_EQ_90);</span>
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :         Q-&gt;lamp = lamc + aatan2(-cos(alpha), -sin(alpha) * sin(phic));</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :         phip = aasin(P-&gt;ctx,cos(phic) * sin(alpha));</span>
+<span class="lineNum">     215 </span><span class="lineCov">         22 :     } else if (pj_param(P-&gt;ctx, P-&gt;params, &quot;to_lat_p&quot;).i) { /* specified new pole */</span>
+<span class="lineNum">     216 </span><span class="lineCov">         22 :         Q-&gt;lamp = pj_param(P-&gt;ctx, P-&gt;params, &quot;ro_lon_p&quot;).f;</span>
+<span class="lineNum">     217 </span><span class="lineCov">         22 :         phip = pj_param(P-&gt;ctx, P-&gt;params, &quot;ro_lat_p&quot;).f;</span>
+<span class="lineNum">     218 </span>            :     } else { /* specified new &quot;equator&quot; points */
+<span class="lineNum">     219 </span>            :         double lam1, lam2, phi1, phi2, con;
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :         lam1 = pj_param(P-&gt;ctx, P-&gt;params, &quot;ro_lon_1&quot;).f;</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :         phi1 = pj_param(P-&gt;ctx, P-&gt;params, &quot;ro_lat_1&quot;).f;</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :         lam2 = pj_param(P-&gt;ctx, P-&gt;params, &quot;ro_lon_2&quot;).f;</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :         phi2 = pj_param(P-&gt;ctx, P-&gt;params, &quot;ro_lat_2&quot;).f;</span>
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :         if (fabs(phi1 - phi2) &lt;= TOL || (con = fabs(phi1)) &lt;= TOL ||</span>
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :             fabs(con - M_HALFPI) &lt;= TOL || fabs(fabs(phi2) - M_HALFPI) &lt;= TOL)</span>
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :                 return destructor(P, PJD_ERR_LAT_1_OR_2_ZERO_OR_90);</span>
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :         Q-&gt;lamp = atan2(cos(phi1) * sin(phi2) * cos(lam1) -</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :             sin(phi1) * cos(phi2) * cos(lam2),</span>
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :             sin(phi1) * cos(phi2) * sin(lam2) -</span>
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :             cos(phi1) * sin(phi2) * sin(lam1));</span>
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :         phip = atan(-cos(Q-&gt;lamp - lam1) / tan(phi1));</span>
+<span class="lineNum">     234 </span>            :     }
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span><span class="lineCov">         22 :     if (fabs(phip) &gt; TOL) { /* oblique */</span>
+<span class="lineNum">     237 </span><span class="lineCov">         12 :         Q-&gt;cphip = cos(phip);</span>
+<span class="lineNum">     238 </span><span class="lineCov">         12 :         Q-&gt;sphip = sin(phip);</span>
+<span class="lineNum">     239 </span><span class="lineCov">         12 :         P-&gt;fwd = Q-&gt;link-&gt;fwd ? o_forward : nullptr;</span>
+<span class="lineNum">     240 </span><span class="lineCov">         12 :         P-&gt;inv = Q-&gt;link-&gt;inv ? o_inverse : nullptr;</span>
+<span class="lineNum">     241 </span>            :     } else { /* transverse */
+<span class="lineNum">     242 </span><span class="lineCov">         10 :         P-&gt;fwd = Q-&gt;link-&gt;fwd ? t_forward : nullptr;</span>
+<span class="lineNum">     243 </span><span class="lineCov">         10 :         P-&gt;inv = Q-&gt;link-&gt;inv ? t_inverse : nullptr;</span>
+<span class="lineNum">     244 </span>            :     }
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span>            :     /* Support some rather speculative test cases, where the rotated projection */
+<span class="lineNum">     247 </span>            :     /* is actually latlong. We do not want scaling in that case... */
+<span class="lineNum">     248 </span><span class="lineCov">         22 :     if (Q-&gt;link-&gt;right==PJ_IO_UNITS_RADIANS)</span>
+<span class="lineNum">     249 </span><span class="lineCov">         12 :         P-&gt;right = PJ_IO_UNITS_WHATEVER;</span>
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span>            :     return P;
+<span class="lineNum">     253 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

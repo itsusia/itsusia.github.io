@@ -1,0 +1,531 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/LambertConformalConic.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - LambertConformalConic.cpp<span style="font-size: 80%;"> (source / <a href="LambertConformalConic.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">119</td>
+            <td class="headerCovTableEntry">234</td>
+            <td class="headerCovTableEntryLo">50.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file LambertConformalConic.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::LambertConformalConic class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2010-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;GeographicLib/LambertConformalConic.hpp&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : namespace GeographicLib {
+<span class="lineNum">      13 </span>            : 
+<a name="14"><span class="lineNum">      14 </span>            :   using namespace std;</a>
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span><span class="lineNoCov">          0 :   LambertConformalConic::LambertConformalConic(real a, real f,</span>
+<span class="lineNum">      17 </span><span class="lineNoCov">          0 :                                                real stdlat, real k0)</span>
+<span class="lineNum">      18 </span>            :     : eps_(numeric_limits&lt;real&gt;::epsilon())
+<span class="lineNum">      19 </span>            :     , epsx_(Math::sq(eps_))
+<span class="lineNum">      20 </span>            :     , ahypover_(Math::digits() * log(real(numeric_limits&lt;real&gt;::radix)) + 2)
+<span class="lineNum">      21 </span>            :     , _a(a)
+<span class="lineNum">      22 </span>            :     , _f(f)
+<span class="lineNum">      23 </span><span class="lineNoCov">          0 :     , _fm(1 - _f)</span>
+<span class="lineNum">      24 </span><span class="lineNoCov">          0 :     , _e2(_f * (2 - _f))</span>
+<span class="lineNum">      25 </span><span class="lineNoCov">          0 :     , _es((_f &lt; 0 ? -1 : 1) * sqrt(abs(_e2)))</span>
+<span class="lineNum">      26 </span>            :   {
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(_a) &amp;&amp; _a &gt; 0))</span>
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Equatorial radius is not positive&quot;);</span>
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(_f) &amp;&amp; _f &lt; 1))</span>
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Polar semi-axis is not positive&quot;);</span>
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(k0) &amp;&amp; k0 &gt; 0))</span>
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale is not positive&quot;);</span>
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :     if (!(abs(stdlat) &lt;= 90))</span>
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Standard latitude not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">      35 </span>            :     real sphi, cphi;
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :     Math::sincosd(stdlat, sphi, cphi);</span>
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :     Init(sphi, cphi, sphi, cphi, k0);</span>
+<a name="38"><span class="lineNum">      38 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span><span class="lineCov">          9 :   LambertConformalConic::LambertConformalConic(real a, real f,</span>
+<span class="lineNum">      41 </span>            :                                                real stdlat1, real stdlat2,
+<span class="lineNum">      42 </span><span class="lineCov">          9 :                                                real k1)</span>
+<span class="lineNum">      43 </span>            :     : eps_(numeric_limits&lt;real&gt;::epsilon())
+<span class="lineNum">      44 </span>            :     , epsx_(Math::sq(eps_))
+<span class="lineNum">      45 </span>            :     , ahypover_(Math::digits() * log(real(numeric_limits&lt;real&gt;::radix)) + 2)
+<span class="lineNum">      46 </span>            :     , _a(a)
+<span class="lineNum">      47 </span>            :     , _f(f)
+<span class="lineNum">      48 </span><span class="lineCov">          9 :     , _fm(1 - _f)</span>
+<span class="lineNum">      49 </span><span class="lineCov">          9 :     , _e2(_f * (2 - _f))</span>
+<span class="lineNum">      50 </span><span class="lineCov">         36 :     , _es((_f &lt; 0 ? -1 : 1) * sqrt(abs(_e2)))</span>
+<span class="lineNum">      51 </span>            :   {
+<span class="lineNum">      52 </span><span class="lineCov">         18 :     if (!(Math::isfinite(_a) &amp;&amp; _a &gt; 0))</span>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Equatorial radius is not positive&quot;);</span>
+<span class="lineNum">      54 </span><span class="lineCov">         27 :     if (!(Math::isfinite(_f) &amp;&amp; _f &lt; 1))</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Polar semi-axis is not positive&quot;);</span>
+<span class="lineNum">      56 </span><span class="lineCov">         18 :     if (!(Math::isfinite(k1) &amp;&amp; k1 &gt; 0))</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale is not positive&quot;);</span>
+<span class="lineNum">      58 </span><span class="lineCov">          9 :     if (!(abs(stdlat1) &lt;= 90))</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Standard latitude 1 not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">      60 </span><span class="lineCov">          9 :     if (!(abs(stdlat2) &lt;= 90))</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Standard latitude 2 not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">      62 </span>            :     real sphi1, cphi1, sphi2, cphi2;
+<span class="lineNum">      63 </span><span class="lineCov">          9 :     Math::sincosd(stdlat1, sphi1, cphi1);</span>
+<span class="lineNum">      64 </span><span class="lineCov">          9 :     Math::sincosd(stdlat2, sphi2, cphi2);</span>
+<span class="lineNum">      65 </span><span class="lineCov">          9 :     Init(sphi1, cphi1, sphi2, cphi2, k1);</span>
+<a name="66"><span class="lineNum">      66 </span><span class="lineCov">          9 :   }</span></a>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :   LambertConformalConic::LambertConformalConic(real a, real f,</span>
+<span class="lineNum">      69 </span>            :                                                real sinlat1, real coslat1,
+<span class="lineNum">      70 </span>            :                                                real sinlat2, real coslat2,
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :                                                real k1)</span>
+<span class="lineNum">      72 </span>            :     : eps_(numeric_limits&lt;real&gt;::epsilon())
+<span class="lineNum">      73 </span>            :     , epsx_(Math::sq(eps_))
+<span class="lineNum">      74 </span>            :     , ahypover_(Math::digits() * log(real(numeric_limits&lt;real&gt;::radix)) + 2)
+<span class="lineNum">      75 </span>            :     , _a(a)
+<span class="lineNum">      76 </span>            :     , _f(f)
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :     , _fm(1 - _f)</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :     , _e2(_f * (2 - _f))</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :     , _es((_f &lt; 0 ? -1 : 1) * sqrt(abs(_e2)))</span>
+<span class="lineNum">      80 </span>            :   {
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(_a) &amp;&amp; _a &gt; 0))</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Equatorial radius is not positive&quot;);</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(_f) &amp;&amp; _f &lt; 1))</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Polar semi-axis is not positive&quot;);</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(k1) &amp;&amp; k1 &gt; 0))</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale is not positive&quot;);</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :     if (!(coslat1 &gt;= 0))</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Standard latitude 1 not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :     if (!(coslat2 &gt;= 0))</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Standard latitude 2 not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :     if (!(abs(sinlat1) &lt;= 1 &amp;&amp; coslat1 &lt;= 1) || (coslat1 == 0 &amp;&amp; sinlat1 == 0))</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Bad sine/cosine of standard latitude 1&quot;);</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :     if (!(abs(sinlat2) &lt;= 1 &amp;&amp; coslat2 &lt;= 1) || (coslat2 == 0 &amp;&amp; sinlat2 == 0))</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Bad sine/cosine of standard latitude 2&quot;);</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :     if (coslat1 == 0 || coslat2 == 0)</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :       if (!(coslat1 == coslat2 &amp;&amp; sinlat1 == sinlat2))</span>
+<span class="lineNum">      97 </span>            :         throw GeographicErr
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :           (&quot;Standard latitudes must be equal is either is a pole&quot;);</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :     Init(sinlat1, coslat1, sinlat2, coslat2, k1);</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span><span class="lineCov">          9 :   void LambertConformalConic::Init(real sphi1, real cphi1,</span>
+<span class="lineNum">     103 </span>            :                                    real sphi2, real cphi2, real k1) {
+<span class="lineNum">     104 </span>            :     {
+<span class="lineNum">     105 </span>            :       real r;
+<span class="lineNum">     106 </span><span class="lineCov">          9 :       r = Math::hypot(sphi1, cphi1);</span>
+<span class="lineNum">     107 </span><span class="lineCov">          9 :       sphi1 /= r; cphi1 /= r;</span>
+<span class="lineNum">     108 </span><span class="lineCov">          9 :       r = Math::hypot(sphi2, cphi2);</span>
+<span class="lineNum">     109 </span><span class="lineCov">          9 :       sphi2 /= r; cphi2 /= r;</span>
+<span class="lineNum">     110 </span>            :     }
+<span class="lineNum">     111 </span>            :     bool polar = (cphi1 == 0);
+<span class="lineNum">     112 </span><span class="lineCov">         18 :     cphi1 = max(epsx_, cphi1);   // Avoid singularities at poles</span>
+<span class="lineNum">     113 </span><span class="lineCov">          9 :     cphi2 = max(epsx_, cphi2);</span>
+<span class="lineNum">     114 </span>            :     // Determine hemisphere of tangent latitude
+<span class="lineNum">     115 </span><span class="lineCov">          9 :     _sign = sphi1 + sphi2 &gt;= 0 ? 1 : -1;</span>
+<span class="lineNum">     116 </span>            :     // Internally work with tangent latitude positive
+<span class="lineNum">     117 </span><span class="lineCov">          9 :     sphi1 *= _sign; sphi2 *= _sign;</span>
+<span class="lineNum">     118 </span><span class="lineCov">          9 :     if (sphi1 &gt; sphi2) {</span>
+<span class="lineNum">     119 </span>            :       swap(sphi1, sphi2); swap(cphi1, cphi2); // Make phi1 &lt; phi2
+<span class="lineNum">     120 </span>            :     }
+<span class="lineNum">     121 </span>            :     real
+<span class="lineNum">     122 </span><span class="lineCov">          9 :       tphi1 = sphi1/cphi1, tphi2 = sphi2/cphi2, tphi0;</span>
+<span class="lineNum">     123 </span>            :     //
+<span class="lineNum">     124 </span>            :     // Snyder: 15-8: n = (log(m1) - log(m2))/(log(t1)-log(t2))
+<span class="lineNum">     125 </span>            :     //
+<span class="lineNum">     126 </span>            :     // m = cos(bet) = 1/sec(bet) = 1/sqrt(1+tan(bet)^2)
+<span class="lineNum">     127 </span>            :     // bet = parametric lat, tan(bet) = (1-f)*tan(phi)
+<span class="lineNum">     128 </span>            :     //
+<span class="lineNum">     129 </span>            :     // t = tan(pi/4-chi/2) = 1/(sec(chi) + tan(chi)) = sec(chi) - tan(chi)
+<span class="lineNum">     130 </span>            :     // log(t) = -asinh(tan(chi)) = -psi
+<span class="lineNum">     131 </span>            :     // chi = conformal lat
+<span class="lineNum">     132 </span>            :     // tan(chi) = tan(phi)*cosh(xi) - sinh(xi)*sec(phi)
+<span class="lineNum">     133 </span>            :     // xi = eatanhe(sin(phi)), eatanhe(x) = e * atanh(e*x)
+<span class="lineNum">     134 </span>            :     //
+<span class="lineNum">     135 </span>            :     // n = (log(sec(bet2))-log(sec(bet1)))/(asinh(tan(chi2))-asinh(tan(chi1)))
+<span class="lineNum">     136 </span>            :     //
+<span class="lineNum">     137 </span>            :     // Let log(sec(bet)) = b(tphi), asinh(tan(chi)) = c(tphi)
+<span class="lineNum">     138 </span>            :     // Then n = Db(tphi2, tphi1)/Dc(tphi2, tphi1)
+<span class="lineNum">     139 </span>            :     // In limit tphi2 -&gt; tphi1, n -&gt; sphi1
+<span class="lineNum">     140 </span>            :     //
+<span class="lineNum">     141 </span>            :     real
+<span class="lineNum">     142 </span><span class="lineCov">          9 :       tbet1 = _fm * tphi1, scbet1 = hyp(tbet1),</span>
+<span class="lineNum">     143 </span><span class="lineCov">          9 :       tbet2 = _fm * tphi2, scbet2 = hyp(tbet2);</span>
+<span class="lineNum">     144 </span>            :     real
+<span class="lineNum">     145 </span><span class="lineCov">          9 :       scphi1 = 1/cphi1,</span>
+<span class="lineNum">     146 </span><span class="lineCov">          9 :       xi1 = Math::eatanhe(sphi1, _es), shxi1 = sinh(xi1), chxi1 = hyp(shxi1),</span>
+<span class="lineNum">     147 </span><span class="lineCov">          9 :       tchi1 = chxi1 * tphi1 - shxi1 * scphi1, scchi1 = hyp(tchi1),</span>
+<span class="lineNum">     148 </span><span class="lineCov">          9 :       scphi2 = 1/cphi2,</span>
+<span class="lineNum">     149 </span><span class="lineCov">          9 :       xi2 = Math::eatanhe(sphi2, _es), shxi2 = sinh(xi2), chxi2 = hyp(shxi2),</span>
+<span class="lineNum">     150 </span><span class="lineCov">          9 :       tchi2 = chxi2 * tphi2 - shxi2 * scphi2, scchi2 = hyp(tchi2),</span>
+<span class="lineNum">     151 </span>            :       psi1 = Math::asinh(tchi1);
+<span class="lineNum">     152 </span><span class="lineCov">          9 :     if (tphi2 - tphi1 != 0) {</span>
+<span class="lineNum">     153 </span>            :       // Db(tphi2, tphi1)
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :       real num = Dlog1p(Math::sq(tbet2)/(1 + scbet2),</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :                         Math::sq(tbet1)/(1 + scbet1))</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :         * Dhyp(tbet2, tbet1, scbet2, scbet1) * _fm;</span>
+<span class="lineNum">     157 </span>            :       // Dc(tphi2, tphi1)
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :       real den = Dasinh(tphi2, tphi1, scphi2, scphi1)</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :         - Deatanhe(sphi2, sphi1) * Dsn(tphi2, tphi1, sphi2, sphi1);</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       _n = num/den;</span>
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :       if (_n &lt; 0.25)</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :         _nc = sqrt((1 - _n) * (1 + _n));</span>
+<span class="lineNum">     164 </span>            :       else {
+<span class="lineNum">     165 </span>            :         // Compute nc = cos(phi0) = sqrt((1 - n) * (1 + n)), evaluating 1 - n
+<span class="lineNum">     166 </span>            :         // carefully.  First write
+<span class="lineNum">     167 </span>            :         //
+<span class="lineNum">     168 </span>            :         // Dc(tphi2, tphi1) * (tphi2 - tphi1)
+<span class="lineNum">     169 </span>            :         //   = log(tchi2 + scchi2) - log(tchi1 + scchi1)
+<span class="lineNum">     170 </span>            :         //
+<span class="lineNum">     171 </span>            :         // then den * (1 - n) =
+<span class="lineNum">     172 </span>            :         // (log((tchi2 + scchi2)/(2*scbet2)) -
+<span class="lineNum">     173 </span>            :         //  log((tchi1 + scchi1)/(2*scbet1))) / (tphi2 - tphi1)
+<span class="lineNum">     174 </span>            :         // = Dlog1p(a2, a1) * (tchi2+scchi2 + tchi1+scchi1)/(4*scbet1*scbet2)
+<span class="lineNum">     175 </span>            :         //   * fm * Q
+<span class="lineNum">     176 </span>            :         //
+<span class="lineNum">     177 </span>            :         // where
+<span class="lineNum">     178 </span>            :         // a1 = ( (tchi1 - scbet1) + (scchi1 - scbet1) ) / (2 * scbet1)
+<span class="lineNum">     179 </span>            :         // Q = ((scbet2 + scbet1)/fm)/((scchi2 + scchi1)/D(tchi2, tchi1))
+<span class="lineNum">     180 </span>            :         //     - (tbet2 + tbet1)/(scbet2 + scbet1)
+<span class="lineNum">     181 </span>            :         real t;
+<span class="lineNum">     182 </span>            :         {
+<span class="lineNum">     183 </span>            :           real
+<span class="lineNum">     184 </span>            :             // s1 = (scbet1 - scchi1) * (scbet1 + scchi1)
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :             s1 = (tphi1 * (2 * shxi1 * chxi1 * scphi1 - _e2 * tphi1) -</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :                   Math::sq(shxi1) * (1 + 2 * Math::sq(tphi1))),</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :             s2 = (tphi2 * (2 * shxi2 * chxi2 * scphi2 - _e2 * tphi2) -</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :                   Math::sq(shxi2) * (1 + 2 * Math::sq(tphi2))),</span>
+<span class="lineNum">     189 </span>            :             // t1 = scbet1 - tchi1
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :             t1 = tchi1 &lt; 0 ? scbet1 - tchi1 : (s1 + 1)/(scbet1 + tchi1),</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :             t2 = tchi2 &lt; 0 ? scbet2 - tchi2 : (s2 + 1)/(scbet2 + tchi2),</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :             a2 = -(s2 / (scbet2 + scchi2) + t2) / (2 * scbet2),</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :             a1 = -(s1 / (scbet1 + scchi1) + t1) / (2 * scbet1);</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :           t = Dlog1p(a2, a1) / den;</span>
+<span class="lineNum">     195 </span>            :         }
+<span class="lineNum">     196 </span>            :         // multiply by (tchi2 + scchi2 + tchi1 + scchi1)/(4*scbet1*scbet2) * fm
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :         t *= ( ( (tchi2 &gt;= 0 ? scchi2 + tchi2 : 1/(scchi2 - tchi2)) +</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :                  (tchi1 &gt;= 0 ? scchi1 + tchi1 : 1/(scchi1 - tchi1)) ) /</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :                (4 * scbet1 * scbet2) ) * _fm;</span>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            :         // Rewrite
+<span class="lineNum">     202 </span>            :         // Q = (1 - (tbet2 + tbet1)/(scbet2 + scbet1)) -
+<span class="lineNum">     203 </span>            :         //     (1 - ((scbet2 + scbet1)/fm)/((scchi2 + scchi1)/D(tchi2, tchi1)))
+<span class="lineNum">     204 </span>            :         //   = tbm - tam
+<span class="lineNum">     205 </span>            :         // where
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :         real tbm = ( ((tbet1 &gt; 0 ? 1/(scbet1+tbet1) : scbet1 - tbet1) +</span>
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :                       (tbet2 &gt; 0 ? 1/(scbet2+tbet2) : scbet2 - tbet2)) /</span>
+<span class="lineNum">     208 </span>            :                      (scbet1+scbet2) );
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            :         // tam = (1 - ((scbet2+scbet1)/fm)/((scchi2+scchi1)/D(tchi2, tchi1)))
+<span class="lineNum">     211 </span>            :         //
+<span class="lineNum">     212 </span>            :         // Let
+<span class="lineNum">     213 </span>            :         //   (scbet2 + scbet1)/fm = scphi2 + scphi1 + dbet
+<span class="lineNum">     214 </span>            :         //   (scchi2 + scchi1)/D(tchi2, tchi1) = scphi2 + scphi1 + dchi
+<span class="lineNum">     215 </span>            :         // then
+<span class="lineNum">     216 </span>            :         //   tam = D(tchi2, tchi1) * (dchi - dbet) / (scchi1 + scchi2)
+<span class="lineNum">     217 </span>            :         real
+<span class="lineNum">     218 </span>            :           // D(tchi2, tchi1)
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :           dtchi = den / Dasinh(tchi2, tchi1, scchi2, scchi1),</span>
+<span class="lineNum">     220 </span>            :           // (scbet2 + scbet1)/fm - (scphi2 + scphi1)
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :           dbet = (_e2/_fm) * ( 1 / (scbet2 + _fm * scphi2) +</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :                                1 / (scbet1 + _fm * scphi1) );</span>
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span>            :         // dchi = (scchi2 + scchi1)/D(tchi2, tchi1) - (scphi2 + scphi1)
+<span class="lineNum">     225 </span>            :         // Let
+<span class="lineNum">     226 </span>            :         //    tzet = chxiZ * tphi - shxiZ * scphi
+<span class="lineNum">     227 </span>            :         //    tchi = tzet + nu
+<span class="lineNum">     228 </span>            :         //    scchi = sczet + mu
+<span class="lineNum">     229 </span>            :         // where
+<span class="lineNum">     230 </span>            :         //    xiZ = eatanhe(1), shxiZ = sinh(xiZ), chxiZ = cosh(xiZ)
+<span class="lineNum">     231 </span>            :         //    nu =   scphi * (shxiZ - shxi) - tphi * (chxiZ - chxi)
+<span class="lineNum">     232 </span>            :         //    mu = - scphi * (chxiZ - chxi) + tphi * (shxiZ - shxi)
+<span class="lineNum">     233 </span>            :         // then
+<span class="lineNum">     234 </span>            :         // dchi = ((mu2 + mu1) - D(nu2, nu1) * (scphi2 + scphi1)) /
+<span class="lineNum">     235 </span>            :         //         D(tchi2, tchi1)
+<span class="lineNum">     236 </span>            :         real
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :           xiZ = Math::eatanhe(real(1), _es),</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :           shxiZ = sinh(xiZ), chxiZ = hyp(shxiZ),</span>
+<span class="lineNum">     239 </span>            :           // These are differences not divided differences
+<span class="lineNum">     240 </span>            :           // dxiZ1 = xiZ - xi1; dshxiZ1 = shxiZ - shxi; dchxiZ1 = chxiZ - chxi
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :           dxiZ1 = Deatanhe(real(1), sphi1)/(scphi1*(tphi1+scphi1)),</span>
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :           dxiZ2 = Deatanhe(real(1), sphi2)/(scphi2*(tphi2+scphi2)),</span>
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :           dshxiZ1 = Dsinh(xiZ, xi1, shxiZ, shxi1, chxiZ, chxi1) * dxiZ1,</span>
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :           dshxiZ2 = Dsinh(xiZ, xi2, shxiZ, shxi2, chxiZ, chxi2) * dxiZ2,</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :           dchxiZ1 = Dhyp(shxiZ, shxi1, chxiZ, chxi1) * dshxiZ1,</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :           dchxiZ2 = Dhyp(shxiZ, shxi2, chxiZ, chxi2) * dshxiZ2,</span>
+<span class="lineNum">     247 </span>            :           // mu1 + mu2
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :           amu12 = (- scphi1 * dchxiZ1 + tphi1 * dshxiZ1</span>
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :                    - scphi2 * dchxiZ2 + tphi2 * dshxiZ2),</span>
+<span class="lineNum">     250 </span>            :           // D(xi2, xi1)
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :           dxi = Deatanhe(sphi1, sphi2) * Dsn(tphi2, tphi1, sphi2, sphi1),</span>
+<span class="lineNum">     252 </span>            :           // D(nu2, nu1)
+<span class="lineNum">     253 </span>            :           dnu12 =
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :           ( (_f * 4 * scphi2 * dshxiZ2 &gt; _f * scphi1 * dshxiZ1 ?</span>
+<span class="lineNum">     255 </span>            :              // Use divided differences
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :              (dshxiZ1 + dshxiZ2)/2 * Dhyp(tphi1, tphi2, scphi1, scphi2)</span>
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :              - ( (scphi1 + scphi2)/2</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :                  * Dsinh(xi1, xi2, shxi1, shxi2, chxi1, chxi2) * dxi ) :</span>
+<span class="lineNum">     259 </span>            :              // Use ratio of differences
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :              (scphi2 * dshxiZ2 - scphi1 * dshxiZ1)/(tphi2 - tphi1))</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :             + ( (tphi1 + tphi2)/2 * Dhyp(shxi1, shxi2, chxi1, chxi2)</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :                 * Dsinh(xi1, xi2, shxi1, shxi2, chxi1, chxi2) * dxi )</span>
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :             - (dchxiZ1 + dchxiZ2)/2 ),</span>
+<span class="lineNum">     264 </span>            :           // dtchi * dchi
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :           dchia = (amu12 - dnu12 * (scphi2 + scphi1)),</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :           tam = (dchia - dtchi * dbet) / (scchi1 + scchi2);</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :         t *= tbm - tam;</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :         _nc = sqrt(max(real(0), t) * (1 + _n));</span>
+<span class="lineNum">     269 </span>            :       }
+<span class="lineNum">     270 </span>            :       {
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :         real r = Math::hypot(_n, _nc);</span>
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :         _n /= r;</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :         _nc /= r;</span>
+<span class="lineNum">     274 </span>            :       }
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :       tphi0 = _n / _nc;</span>
+<span class="lineNum">     276 </span>            :     } else {
+<span class="lineNum">     277 </span>            :       tphi0 = tphi1;
+<span class="lineNum">     278 </span><span class="lineCov">          9 :       _nc = 1/hyp(tphi0);</span>
+<span class="lineNum">     279 </span><span class="lineCov">          9 :       _n = tphi0 * _nc;</span>
+<span class="lineNum">     280 </span><span class="lineCov">          9 :       if (polar)</span>
+<span class="lineNum">     281 </span><span class="lineCov">          2 :         _nc = 0;</span>
+<span class="lineNum">     282 </span>            :     }
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span><span class="lineCov">         18 :     _scbet0 = hyp(_fm * tphi0);</span>
+<span class="lineNum">     285 </span><span class="lineCov">          9 :     real shxi0 = sinh(Math::eatanhe(_n, _es));</span>
+<span class="lineNum">     286 </span><span class="lineCov">         27 :     _tchi0 = tphi0 * hyp(shxi0) - shxi0 * hyp(tphi0); _scchi0 = hyp(_tchi0);</span>
+<span class="lineNum">     287 </span><span class="lineCov">         18 :     _psi0 = Math::asinh(_tchi0);</span>
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span><span class="lineCov">         18 :     _lat0 = atan(_sign * tphi0) / Math::degree();</span>
+<span class="lineNum">     290 </span><span class="lineCov">         18 :     _t0nm1 = Math::expm1(- _n * _psi0); // Snyder's t0^n - 1</span>
+<span class="lineNum">     291 </span>            :     // a * k1 * m1/t1^n = a * k1 * m2/t2^n = a * k1 * n * (Snyder's F)
+<span class="lineNum">     292 </span>            :     // = a * k1 / (scbet1 * exp(-n * psi1))
+<span class="lineNum">     293 </span><span class="lineCov">         27 :     _scale = _a * k1 / scbet1 *</span>
+<span class="lineNum">     294 </span>            :       // exp(n * psi1) = exp(- (1 - n) * psi1) * exp(psi1)
+<span class="lineNum">     295 </span>            :       // with (1-n) = nc^2/(1+n) and exp(-psi1) = scchi1 + tchi1
+<span class="lineNum">     296 </span><span class="lineCov">         18 :       exp( - (Math::sq(_nc)/(1 + _n)) * psi1 )</span>
+<span class="lineNum">     297 </span><span class="lineCov">          9 :       * (tchi1 &gt;= 0 ? scchi1 + tchi1 : 1 / (scchi1 - tchi1));</span>
+<span class="lineNum">     298 </span>            :     // Scale at phi0 = k0 = k1 * (scbet0*exp(-n*psi0))/(scbet1*exp(-n*psi1))
+<span class="lineNum">     299 </span>            :     //                    = k1 * scbet0/scbet1 * exp(n * (psi1 - psi0))
+<span class="lineNum">     300 </span>            :     // psi1 - psi0 = Dasinh(tchi1, tchi0) * (tchi1 - tchi0)
+<span class="lineNum">     301 </span><span class="lineCov">         27 :     _k0 = k1 * (_scbet0/scbet1) *</span>
+<span class="lineNum">     302 </span><span class="lineCov">         36 :       exp( - (Math::sq(_nc)/(1 + _n)) *</span>
+<span class="lineNum">     303 </span><span class="lineCov">         18 :            Dasinh(tchi1, _tchi0, scchi1, _scchi0) * (tchi1 - _tchi0))</span>
+<span class="lineNum">     304 </span><span class="lineCov">         18 :       * (tchi1 &gt;= 0 ? scchi1 + tchi1 : 1 / (scchi1 - tchi1)) /</span>
+<span class="lineNum">     305 </span><span class="lineCov">          9 :       (_scchi0 + _tchi0);</span>
+<span class="lineNum">     306 </span><span class="lineCov">          9 :     _nrho0 = polar ? 0 : _a * _k0 / _scbet0;</span>
+<span class="lineNum">     307 </span>            :     {
+<span class="lineNum">     308 </span>            :       // Figure _drhomax using code at beginning of Forward with lat = -90
+<span class="lineNum">     309 </span>            :       real
+<span class="lineNum">     310 </span><span class="lineCov">          9 :         sphi = -1, cphi =  epsx_,</span>
+<span class="lineNum">     311 </span><span class="lineCov">          9 :         tphi = sphi/cphi,</span>
+<span class="lineNum">     312 </span><span class="lineCov">          9 :         scphi = 1/cphi, shxi = sinh(Math::eatanhe(sphi, _es)),</span>
+<span class="lineNum">     313 </span><span class="lineCov">          9 :         tchi = hyp(shxi) * tphi - shxi * scphi, scchi = hyp(tchi),</span>
+<span class="lineNum">     314 </span>            :         psi = Math::asinh(tchi),
+<span class="lineNum">     315 </span><span class="lineCov">          9 :         dpsi = Dasinh(tchi, _tchi0, scchi, _scchi0) * (tchi - _tchi0);</span>
+<span class="lineNum">     316 </span><span class="lineCov">         18 :       _drhomax = - _scale * (2 * _nc &lt; 1 &amp;&amp; dpsi != 0 ?</span>
+<span class="lineNum">     317 </span><span class="lineCov">          4 :                              (exp(Math::sq(_nc)/(1 + _n) * psi ) *</span>
+<span class="lineNum">     318 </span><span class="lineCov">          2 :                               (tchi &gt; 0 ? 1/(scchi + tchi) : (scchi - tchi))</span>
+<span class="lineNum">     319 </span><span class="lineCov">          2 :                               - (_t0nm1 + 1))/(-_n) :</span>
+<span class="lineNum">     320 </span><span class="lineCov">          7 :                              Dexp(-_n * psi, -_n * _psi0) * dpsi);</span>
+<span class="lineNum">     321 </span>            :     }
+<a name="322"><span class="lineNum">     322 </span><span class="lineCov">          9 :   }</span></a>
+<span class="lineNum">     323 </span>            : 
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :   const LambertConformalConic&amp; LambertConformalConic::Mercator() {</span>
+<span class="lineNum">     325 </span>            :     static const LambertConformalConic mercator(Constants::WGS84_a(),
+<span class="lineNum">     326 </span>            :                                                 Constants::WGS84_f(),
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :                                                 real(0), real(1));</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :     return mercator;</span>
+<span class="lineNum">     329 </span>            :   }
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span><span class="lineCov">          1 :   void LambertConformalConic::Forward(real lon0, real lat, real lon,</span>
+<span class="lineNum">     332 </span>            :                                       real&amp; x, real&amp; y,
+<span class="lineNum">     333 </span>            :                                       real&amp; gamma, real&amp; k) const {
+<span class="lineNum">     334 </span>            :     lon = Math::AngDiff(lon0, lon);
+<span class="lineNum">     335 </span>            :     // From Snyder, we have
+<span class="lineNum">     336 </span>            :     //
+<span class="lineNum">     337 </span>            :     // theta = n * lambda
+<span class="lineNum">     338 </span>            :     // x = rho * sin(theta)
+<span class="lineNum">     339 </span>            :     //   = (nrho0 + n * drho) * sin(theta)/n
+<span class="lineNum">     340 </span>            :     // y = rho0 - rho * cos(theta)
+<span class="lineNum">     341 </span>            :     //   = nrho0 * (1-cos(theta))/n - drho * cos(theta)
+<span class="lineNum">     342 </span>            :     //
+<span class="lineNum">     343 </span>            :     // where nrho0 = n * rho0, drho = rho - rho0
+<span class="lineNum">     344 </span>            :     // and drho is evaluated with divided differences
+<span class="lineNum">     345 </span>            :     real sphi, cphi;
+<span class="lineNum">     346 </span><span class="lineCov">          1 :     Math::sincosd(Math::LatFix(lat) * _sign, sphi, cphi);</span>
+<span class="lineNum">     347 </span><span class="lineCov">          2 :     cphi = max(epsx_, cphi);</span>
+<span class="lineNum">     348 </span>            :     real
+<span class="lineNum">     349 </span><span class="lineCov">          1 :       lam = lon * Math::degree(),</span>
+<span class="lineNum">     350 </span><span class="lineCov">          1 :       tphi = sphi/cphi, scbet = hyp(_fm * tphi),</span>
+<span class="lineNum">     351 </span><span class="lineCov">          1 :       scphi = 1/cphi, shxi = sinh(Math::eatanhe(sphi, _es)),</span>
+<span class="lineNum">     352 </span><span class="lineCov">          1 :       tchi = hyp(shxi) * tphi - shxi * scphi, scchi = hyp(tchi),</span>
+<span class="lineNum">     353 </span>            :       psi = Math::asinh(tchi),
+<span class="lineNum">     354 </span><span class="lineCov">          1 :       theta = _n * lam, stheta = sin(theta), ctheta = cos(theta),</span>
+<span class="lineNum">     355 </span><span class="lineCov">          1 :       dpsi = Dasinh(tchi, _tchi0, scchi, _scchi0) * (tchi - _tchi0),</span>
+<span class="lineNum">     356 </span><span class="lineCov">          2 :       drho = - _scale * (2 * _nc &lt; 1 &amp;&amp; dpsi != 0 ?</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :                          (exp(Math::sq(_nc)/(1 + _n) * psi ) *</span>
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :                           (tchi &gt; 0 ? 1/(scchi + tchi) : (scchi - tchi))</span>
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :                           - (_t0nm1 + 1))/(-_n) :</span>
+<span class="lineNum">     360 </span><span class="lineCov">          2 :                          Dexp(-_n * psi, -_n * _psi0) * dpsi);</span>
+<span class="lineNum">     361 </span><span class="lineCov">          1 :     x = (_nrho0 + _n * drho) * (_n != 0 ? stheta / _n : lam);</span>
+<span class="lineNum">     362 </span><span class="lineCov">          3 :     y = _nrho0 *</span>
+<span class="lineNum">     363 </span><span class="lineCov">          2 :       (_n != 0 ?</span>
+<span class="lineNum">     364 </span><span class="lineCov">          2 :        (ctheta &lt; 0 ? 1 - ctheta : Math::sq(stheta)/(1 + ctheta)) / _n : 0)</span>
+<span class="lineNum">     365 </span><span class="lineCov">          1 :       - drho * ctheta;</span>
+<span class="lineNum">     366 </span><span class="lineCov">          2 :     k = _k0 * (scbet/_scbet0) /</span>
+<span class="lineNum">     367 </span><span class="lineCov">          2 :       (exp( - (Math::sq(_nc)/(1 + _n)) * dpsi )</span>
+<span class="lineNum">     368 </span><span class="lineCov">          1 :        * (tchi &gt;= 0 ? scchi + tchi : 1 / (scchi - tchi)) / (_scchi0 + _tchi0));</span>
+<span class="lineNum">     369 </span><span class="lineCov">          1 :     y *= _sign;</span>
+<span class="lineNum">     370 </span><span class="lineCov">          2 :     gamma = _sign * theta / Math::degree();</span>
+<span class="lineNum">     371 </span><span class="lineCov">          1 :   }</span>
+<span class="lineNum">     372 </span>            : 
+<span class="lineNum">     373 </span><span class="lineCov">          6 :   void LambertConformalConic::Reverse(real lon0, real x, real y,</span>
+<span class="lineNum">     374 </span>            :                                       real&amp; lat, real&amp; lon,
+<span class="lineNum">     375 </span>            :                                       real&amp; gamma, real&amp; k) const {
+<span class="lineNum">     376 </span>            :     // From Snyder, we have
+<span class="lineNum">     377 </span>            :     //
+<span class="lineNum">     378 </span>            :     //        x = rho * sin(theta)
+<span class="lineNum">     379 </span>            :     // rho0 - y = rho * cos(theta)
+<span class="lineNum">     380 </span>            :     //
+<span class="lineNum">     381 </span>            :     // rho = hypot(x, rho0 - y)
+<span class="lineNum">     382 </span>            :     // drho = (n*x^2 - 2*y*nrho0 + n*y^2)/(hypot(n*x, nrho0-n*y) + nrho0)
+<span class="lineNum">     383 </span>            :     // theta = atan2(n*x, nrho0-n*y)
+<span class="lineNum">     384 </span>            :     //
+<span class="lineNum">     385 </span>            :     // From drho, obtain t^n-1
+<span class="lineNum">     386 </span>            :     // psi = -log(t), so
+<span class="lineNum">     387 </span>            :     // dpsi = - Dlog1p(t^n-1, t0^n-1) * drho / scale
+<span class="lineNum">     388 </span><span class="lineCov">          6 :     y *= _sign;</span>
+<span class="lineNum">     389 </span>            :     real
+<span class="lineNum">     390 </span>            :       // Guard against 0 * inf in computation of ny
+<span class="lineNum">     391 </span><span class="lineCov">          6 :       nx = _n * x, ny = _n != 0 ? _n * y : 0, y1 = _nrho0 - ny,</span>
+<span class="lineNum">     392 </span><span class="lineCov">          6 :       den = Math::hypot(nx, y1) + _nrho0, // 0 implies origin with polar aspect</span>
+<span class="lineNum">     393 </span>            :       // isfinite test is to avoid inf/inf
+<span class="lineNum">     394 </span><span class="lineCov">          6 :       drho = ((den != 0 &amp;&amp; Math::isfinite(den))</span>
+<span class="lineNum">     395 </span><span class="lineCov">         10 :               ? (x*nx + y * (ny - 2*_nrho0)) / den</span>
+<span class="lineNum">     396 </span><span class="lineCov">          6 :               : den);</span>
+<span class="lineNum">     397 </span><span class="lineCov">         12 :     drho = min(drho, _drhomax);</span>
+<span class="lineNum">     398 </span><span class="lineCov">          6 :     if (_n == 0)</span>
+<span class="lineNum">     399 </span><span class="lineCov">          4 :       drho = max(drho, -_drhomax);</span>
+<span class="lineNum">     400 </span>            :     real
+<span class="lineNum">     401 </span><span class="lineCov">          6 :       tnm1 = _t0nm1 + _n * drho/_scale,</span>
+<span class="lineNum">     402 </span><span class="lineCov">          6 :       dpsi = (den == 0 ? 0 :</span>
+<span class="lineNum">     403 </span><span class="lineCov">          6 :               (tnm1 + 1 != 0 ? - Dlog1p(tnm1, _t0nm1) * drho / _scale :</span>
+<span class="lineNum">     404 </span>            :                ahypover_));
+<span class="lineNum">     405 </span>            :     real tchi;
+<span class="lineNum">     406 </span><span class="lineCov">          6 :     if (2 * _n &lt;= 1) {</span>
+<span class="lineNum">     407 </span>            :       // tchi = sinh(psi)
+<span class="lineNum">     408 </span>            :       real
+<span class="lineNum">     409 </span><span class="lineCov">          2 :         psi = _psi0 + dpsi, tchia = sinh(psi), scchi = hyp(tchia),</span>
+<span class="lineNum">     410 </span><span class="lineCov">          2 :         dtchi = Dsinh(psi, _psi0, tchia, _tchi0, scchi, _scchi0) * dpsi;</span>
+<span class="lineNum">     411 </span><span class="lineCov">          2 :       tchi = _tchi0 + dtchi;    // Update tchi using divided difference</span>
+<span class="lineNum">     412 </span>            :     } else {
+<span class="lineNum">     413 </span>            :       // tchi = sinh(-1/n * log(tn))
+<span class="lineNum">     414 </span>            :       //      = sinh((1-1/n) * log(tn) - log(tn))
+<span class="lineNum">     415 </span>            :       //      = + sinh((1-1/n) * log(tn)) * cosh(log(tn))
+<span class="lineNum">     416 </span>            :       //        - cosh((1-1/n) * log(tn)) * sinh(log(tn))
+<span class="lineNum">     417 </span>            :       // (1-1/n) = - nc^2/(n*(1+n))
+<span class="lineNum">     418 </span>            :       // cosh(log(tn)) = (tn + 1/tn)/2; sinh(log(tn)) = (tn - 1/tn)/2
+<span class="lineNum">     419 </span>            :       real
+<span class="lineNum">     420 </span><span class="lineCov">          4 :         tn = tnm1 + 1 == 0 ? epsx_ : tnm1 + 1,</span>
+<span class="lineNum">     421 </span><span class="lineCov">         12 :         sh = sinh( -Math::sq(_nc)/(_n * (1 + _n)) *</span>
+<span class="lineNum">     422 </span><span class="lineCov">          8 :                    (2 * tn &gt; 1 ? Math::log1p(tnm1) : log(tn)) );</span>
+<span class="lineNum">     423 </span><span class="lineCov">          8 :       tchi = sh * (tn + 1/tn)/2 - hyp(sh) * (tnm1 * (tn + 1)/tn)/2;</span>
+<span class="lineNum">     424 </span>            :     }
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span>            :     // log(t) = -asinh(tan(chi)) = -psi
+<span class="lineNum">     427 </span><span class="lineCov">          6 :     gamma = atan2(nx, y1);</span>
+<span class="lineNum">     428 </span>            :     real
+<span class="lineNum">     429 </span><span class="lineCov">          6 :       tphi = Math::tauf(tchi, _es),</span>
+<span class="lineNum">     430 </span><span class="lineCov">          6 :       scbet = hyp(_fm * tphi), scchi = hyp(tchi),</span>
+<span class="lineNum">     431 </span><span class="lineCov">          6 :       lam = _n != 0 ? gamma / _n : x / y1;</span>
+<span class="lineNum">     432 </span><span class="lineCov">         12 :     lat = Math::atand(_sign * tphi);</span>
+<span class="lineNum">     433 </span><span class="lineCov">          6 :     lon = lam / Math::degree();</span>
+<span class="lineNum">     434 </span><span class="lineCov">         12 :     lon = Math::AngNormalize(lon + Math::AngNormalize(lon0));</span>
+<span class="lineNum">     435 </span><span class="lineCov">         12 :     k = _k0 * (scbet/_scbet0) /</span>
+<span class="lineNum">     436 </span><span class="lineCov">         10 :       (exp(_nc != 0 ? - (Math::sq(_nc)/(1 + _n)) * dpsi : 0)</span>
+<span class="lineNum">     437 </span><span class="lineCov">          6 :        * (tchi &gt;= 0 ? scchi + tchi : 1 / (scchi - tchi)) / (_scchi0 + _tchi0));</span>
+<span class="lineNum">     438 </span><span class="lineCov">         12 :     gamma /= _sign * Math::degree();</span>
+<a name="439"><span class="lineNum">     439 </span><span class="lineCov">          6 :   }</span></a>
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 :   void LambertConformalConic::SetScale(real lat, real k) {</span>
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(k) &amp;&amp; k &gt; 0))</span>
+<span class="lineNum">     443 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale is not positive&quot;);</span>
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 :     if (!(abs(lat) &lt;= 90))</span>
+<span class="lineNum">     445 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Latitude for SetScale not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">     446 </span><span class="lineNoCov">          0 :     if (abs(lat) == 90 &amp;&amp; !(_nc == 0 &amp;&amp; lat * _n &gt; 0))</span>
+<span class="lineNum">     447 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Incompatible polar latitude in SetScale&quot;);</span>
+<span class="lineNum">     448 </span>            :     real x, y, gamma, kold;
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :     Forward(0, lat, 0, x, y, gamma, kold);</span>
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 :     k /= kold;</span>
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 :     _scale *= k;</span>
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :     _k0 *= k;</span>
+<span class="lineNum">     453 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

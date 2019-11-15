@@ -1,0 +1,306 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/param.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - param.cpp<span style="font-size: 80%;"> (source / <a href="param.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">85</td>
+            <td class="headerCovTableEntry">94</td>
+            <td class="headerCovTableEntryHi">90.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* put parameters in linked list and retrieve */</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            : #include &lt;ctype.h&gt;
+<span class="lineNum">       4 </span>            : #include &lt;stddef.h&gt;
+<span class="lineNum">       5 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">       6 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">       7 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &quot;proj.h&quot;
+<a name="10"><span class="lineNum">      10 </span>            : #include &quot;proj_internal.h&quot;</a>
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span><span class="lineCov">      29116 : static void unquote_string(char* param_str) {</span>
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span><span class="lineCov">      29116 :     size_t len = strlen(param_str);</span>
+<span class="lineNum">      15 </span>            :     // Remove leading and terminating spaces after equal sign
+<span class="lineNum">      16 </span>            :     const char* equal = strstr(param_str, &quot;=\&quot;&quot;);
+<span class="lineNum">      17 </span><span class="lineCov">      29116 :     if( equal &amp;&amp; equal - param_str + 1 &gt; 2 &amp;&amp; param_str[len-1] == '&quot;' ) {</span>
+<span class="lineNum">      18 </span><span class="lineCov">          2 :         size_t dst = equal + 1 - param_str;</span>
+<span class="lineNum">      19 </span><span class="lineCov">          2 :         size_t src = dst + 1;</span>
+<span class="lineNum">      20 </span><span class="lineCov">         82 :         for( ; param_str[src]; dst++, src++)</span>
+<span class="lineNum">      21 </span>            :         {
+<span class="lineNum">      22 </span><span class="lineCov">         42 :             if( param_str[src] == '&quot;' ) {</span>
+<span class="lineNum">      23 </span><span class="lineCov">          2 :                 if( param_str[src+1] == '&quot;' ) {</span>
+<span class="lineNum">      24 </span>            :                     src++;
+<span class="lineNum">      25 </span>            :                 } else {
+<span class="lineNum">      26 </span>            :                     break;
+<span class="lineNum">      27 </span>            :                 }
+<span class="lineNum">      28 </span>            :             }
+<span class="lineNum">      29 </span><span class="lineCov">         40 :             param_str[dst] = param_str[src];</span>
+<span class="lineNum">      30 </span>            :         }
+<span class="lineNum">      31 </span><span class="lineCov">          2 :         param_str[dst] = '\0';</span>
+<span class="lineNum">      32 </span>            :     }
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span><span class="lineCov">      29116 : }</span>
+<span class="lineNum">      35 </span>            : 
+<a name="36"><span class="lineNum">      36 </span>            : </a>
+<span class="lineNum">      37 </span>            : /* create parameter list entry */
+<span class="lineNum">      38 </span><span class="lineCov">      24636 : paralist *pj_mkparam(const char *str) {</span>
+<span class="lineNum">      39 </span>            :     paralist *newitem;
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineCov">      24636 :     if((newitem = (paralist *)pj_malloc(sizeof(paralist) + strlen(str))) != nullptr) {</span>
+<span class="lineNum">      42 </span><span class="lineCov">      24636 :         newitem-&gt;used = 0;</span>
+<span class="lineNum">      43 </span><span class="lineCov">      24636 :         newitem-&gt;next = nullptr;</span>
+<span class="lineNum">      44 </span><span class="lineCov">      24636 :         if (*str == '+')</span>
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :             ++str;</span>
+<span class="lineNum">      46 </span><span class="lineCov">      24636 :         (void)strcpy(newitem-&gt;param, str);</span>
+<span class="lineNum">      47 </span><span class="lineCov">      24636 :         unquote_string(newitem-&gt;param);</span>
+<span class="lineNum">      48 </span>            :     }
+<span class="lineNum">      49 </span><span class="lineCov">      24636 :     return newitem;</span>
+<span class="lineNum">      50 </span>            : }
+<span class="lineNum">      51 </span>            : 
+<a name="52"><span class="lineNum">      52 </span>            : </a>
+<span class="lineNum">      53 </span>            : /* As pj_mkparam, but payload ends at first whitespace, rather than at end of &lt;str&gt; */
+<span class="lineNum">      54 </span><span class="lineCov">       4480 : paralist *pj_mkparam_ws (const char *str, const char **next_str) {</span>
+<span class="lineNum">      55 </span>            :     paralist *newitem;
+<span class="lineNum">      56 </span>            :     size_t len = 0;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span><span class="lineCov">       4480 :     if (nullptr==str)</span>
+<span class="lineNum">      59 </span>            :         return nullptr;
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :     /* Find start and length of string */
+<span class="lineNum">      62 </span><span class="lineCov">      20807 :     while (isspace (*str))</span>
+<span class="lineNum">      63 </span><span class="lineCov">       3949 :         str++;</span>
+<span class="lineNum">      64 </span><span class="lineCov">       4480 :     if (*str == '+')</span>
+<span class="lineNum">      65 </span><span class="lineCov">        243 :         str++;</span>
+<span class="lineNum">      66 </span>            :     bool in_string = false;
+<span class="lineNum">      67 </span><span class="lineCov">      98228 :     for( ; str[len] != '\0'; len++ ) {</span>
+<span class="lineNum">      68 </span><span class="lineCov">      50823 :         if( in_string ) {</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :             if( str[len] == '&quot;' &amp;&amp; str[len+1] == '&quot;' ) {</span>
+<span class="lineNum">      70 </span>            :                 len++;
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :             } else if( str[len] == '&quot;' ) {</span>
+<span class="lineNum">      72 </span>            :                 in_string = false;
+<span class="lineNum">      73 </span>            :             }
+<span class="lineNum">      74 </span><span class="lineCov">      50823 :         } else if( str[len] == '=' &amp;&amp; str[len+1] == '&quot;' ) {</span>
+<span class="lineNum">      75 </span>            :             in_string = true;
+<span class="lineNum">      76 </span><span class="lineCov">      50823 :         } else if( isspace(str[len]) ) {</span>
+<span class="lineNum">      77 </span>            :             break;
+<span class="lineNum">      78 </span>            :         }
+<span class="lineNum">      79 </span>            :     }
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineCov">       4480 :     if( next_str )</span>
+<span class="lineNum">      82 </span><span class="lineCov">       4480 :         *next_str = str + len;</span>
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            :     /* Use calloc to automagically 0-terminate the copy */
+<span class="lineNum">      85 </span><span class="lineCov">       4480 :     newitem = (paralist *) pj_calloc (1, sizeof(paralist) + len + 1);</span>
+<span class="lineNum">      86 </span><span class="lineCov">       4480 :     if (nullptr==newitem)</span>
+<span class="lineNum">      87 </span>            :         return nullptr;
+<span class="lineNum">      88 </span><span class="lineCov">       4480 :     memmove(newitem-&gt;param, str, len);</span>
+<span class="lineNum">      89 </span><span class="lineCov">       4480 :     unquote_string(newitem-&gt;param);</span>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineCov">       4480 :     newitem-&gt;used = 0;</span>
+<span class="lineNum">      92 </span><span class="lineCov">       4480 :     newitem-&gt;next = nullptr;</span>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineCov">       4480 :     return newitem;</span>
+<span class="lineNum">      95 </span>            : }
+<a name="96"><span class="lineNum">      96 </span>            : </a>
+<span class="lineNum">      97 </span>            : /**************************************************************************************/
+<span class="lineNum">      98 </span><span class="lineCov">     134345 : paralist *pj_param_exists (paralist *list, const char *parameter) {</span>
+<span class="lineNum">      99 </span>            : /***************************************************************************************
+<span class="lineNum">     100 </span>            :     Determine whether a given parameter exists in a paralist. If it does, return
+<span class="lineNum">     101 </span>            :     a pointer to the corresponding list element - otherwise return 0.
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :     In support of the pipeline syntax, the search is terminated once a &quot;+step&quot; list
+<span class="lineNum">     104 </span>            :     element is reached, in which case a 0 is returned, unless the parameter
+<span class="lineNum">     105 </span>            :     searched for is actually &quot;step&quot;, in which case a pointer to the &quot;step&quot; list
+<span class="lineNum">     106 </span>            :     element is returned.
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            :     This function is equivalent to the pj_param (...) call with the &quot;opt&quot; argument
+<span class="lineNum">     109 </span>            :     set to the parameter name preceeeded by a 't'. But by using this one, one avoids
+<span class="lineNum">     110 </span>            :     writing the code allocating memory for a new copy of parameter name, and prepending
+<span class="lineNum">     111 </span>            :     the t (for compile time known names, this is obviously not an issue).
+<span class="lineNum">     112 </span>            : ***************************************************************************************/
+<span class="lineNum">     113 </span>            :     paralist *next = list;
+<span class="lineNum">     114 </span>            :     const char *c = strchr (parameter, '=');
+<span class="lineNum">     115 </span><span class="lineCov">     134345 :     size_t len = strlen (parameter);</span>
+<span class="lineNum">     116 </span><span class="lineCov">     134345 :     if (c)</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :         len = c - parameter;</span>
+<span class="lineNum">     118 </span><span class="lineCov">     134345 :     if (list==nullptr)</span>
+<span class="lineNum">     119 </span>            :         return nullptr;
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span><span class="lineCov">    1537580 :     for (next = list; next; next = next-&gt;next) {</span>
+<span class="lineNum">     122 </span><span class="lineCov">     724445 :         if (0==strncmp (parameter, next-&gt;param, len) &amp;&amp; (next-&gt;param[len]=='=' || next-&gt;param[len]==0)) {</span>
+<span class="lineNum">     123 </span><span class="lineCov">      22827 :             next-&gt;used = 1;</span>
+<span class="lineNum">     124 </span><span class="lineCov">      22827 :             return next;</span>
+<span class="lineNum">     125 </span>            :         }
+<span class="lineNum">     126 </span><span class="lineCov">     701618 :         if (0==strcmp (parameter, &quot;step&quot;))</span>
+<span class="lineNum">     127 </span>            :             return nullptr;
+<span class="lineNum">     128 </span>            :     }
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            :     return nullptr;
+<span class="lineNum">     131 </span>            : }
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            : /************************************************************************/
+<span class="lineNum">     135 </span>            : /*                              pj_param()                              */
+<span class="lineNum">     136 </span>            : /*                                                                      */
+<span class="lineNum">     137 </span>            : /*      Test for presence or get parameter value.  The first            */
+<span class="lineNum">     138 </span>            : /*      character in `opt' is a parameter type which can take the       */
+<span class="lineNum">     139 </span>            : /*      values:                                                         */
+<span class="lineNum">     140 </span>            : /*                                                                      */
+<span class="lineNum">     141 </span>            : /*       `t' - test for presence, return TRUE/FALSE in PROJVALUE.i      */
+<span class="lineNum">     142 </span>            : /*       `i' - integer value returned in PROJVALUE.i                    */
+<span class="lineNum">     143 </span>            : /*       `d' - simple valued real input returned in PROJVALUE.f         */
+<span class="lineNum">     144 </span>            : /*       `r' - degrees (DMS translation applied), returned as           */
+<span class="lineNum">     145 </span>            : /*             radians in PROJVALUE.f                                   */
+<span class="lineNum">     146 </span>            : /*       `s' - string returned in PROJVALUE.s                           */
+<span class="lineNum">     147 </span>            : /*       `b' - test for t/T/f/F, return in PROJVALUE.i                  */
+<span class="lineNum">     148 </span>            : /*                                                                      */
+<span class="lineNum">     149 </span>            : /*      Search is terminated when &quot;step&quot; is found, in which case        */
+<span class="lineNum">     150 </span>            : /*      0 is returned, unless &quot;step&quot; was the target searched for.       */
+<span class="lineNum">     151 </span>            : /*                                                                      */
+<a name="152"><span class="lineNum">     152 </span>            : /************************************************************************/</a>
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineCov">      86466 : PROJVALUE pj_param (projCtx ctx, paralist *pl, const char *opt) {</span>
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            :     int type;
+<span class="lineNum">     157 </span>            :     unsigned l;
+<span class="lineNum">     158 </span><span class="lineCov">      86466 :     PROJVALUE value = {0};</span>
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span><span class="lineCov">      86466 :     if ( ctx == nullptr )</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :         ctx = pj_get_default_ctx();</span>
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span><span class="lineCov">      86466 :     type = *opt++;</span>
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span><span class="lineCov">      86466 :     if (nullptr==strchr (&quot;tbirds&quot;, type)) {</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :         fprintf(stderr, &quot;invalid request to pj_param, fatal\n&quot;);</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :         exit(1);</span>
+<span class="lineNum">     168 </span>            :     }
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span><span class="lineCov">      86466 :     pl = pj_param_exists (pl, opt);</span>
+<span class="lineNum">     171 </span><span class="lineCov">      86466 :     if (type == 't') {</span>
+<span class="lineNum">     172 </span><span class="lineCov">      18126 :         value.i = pl != nullptr;</span>
+<span class="lineNum">     173 </span><span class="lineCov">      18126 :         return value;</span>
+<span class="lineNum">     174 </span>            :     }
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span>            :     /* Not found */
+<span class="lineNum">     177 </span><span class="lineCov">      68340 :     if (nullptr==pl) {</span>
+<span class="lineNum">     178 </span>            :         /* Return value after the switch, so that the return path is */
+<span class="lineNum">     179 </span>            :         /* taken in all cases */
+<span class="lineNum">     180 </span><span class="lineCov">      58849 :         switch (type) {</span>
+<span class="lineNum">     181 </span>            :         case 'b': case 'i':
+<span class="lineNum">     182 </span>            :             value.i = 0;
+<span class="lineNum">     183 </span>            :             break;
+<span class="lineNum">     184 </span>            :         case 'd': case 'r':
+<span class="lineNum">     185 </span>            :             value.f = 0.;
+<span class="lineNum">     186 </span>            :             break;
+<span class="lineNum">     187 </span><span class="lineCov">      32590 :         case 's':</span>
+<span class="lineNum">     188 </span><span class="lineCov">      32590 :             value.s = nullptr;</span>
+<span class="lineNum">     189 </span><span class="lineCov">      32590 :             break;</span>
+<span class="lineNum">     190 </span>            :         }
+<span class="lineNum">     191 </span><span class="lineCov">      58849 :         return value;</span>
+<span class="lineNum">     192 </span>            :     }
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span>            :     /* Found parameter - now find its value */
+<span class="lineNum">     195 </span><span class="lineCov">       9491 :     pl-&gt;used |= 1;</span>
+<span class="lineNum">     196 </span><span class="lineCov">       9491 :     l = (int) strlen(opt);</span>
+<span class="lineNum">     197 </span><span class="lineCov">       9491 :     opt = pl-&gt;param + l;</span>
+<span class="lineNum">     198 </span><span class="lineCov">       9491 :     if (*opt == '=')</span>
+<span class="lineNum">     199 </span><span class="lineCov">       9366 :         ++opt;</span>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span><span class="lineCov">       9491 :     switch (type) {</span>
+<span class="lineNum">     202 </span>            :     case 'i':    /* integer input */
+<span class="lineNum">     203 </span><span class="lineCov">        242 :         value.i = atoi(opt);</span>
+<span class="lineNum">     204 </span><span class="lineCov">        242 :         break;</span>
+<span class="lineNum">     205 </span><span class="lineCov">       2790 :     case 'd':    /* simple real input */</span>
+<span class="lineNum">     206 </span><span class="lineCov">       2790 :         value.f = pj_atof(opt);</span>
+<span class="lineNum">     207 </span><span class="lineCov">       2790 :         break;</span>
+<span class="lineNum">     208 </span><span class="lineCov">       2956 :     case 'r':    /* degrees input */</span>
+<span class="lineNum">     209 </span><span class="lineCov">       2956 :         value.f = dmstor_ctx(ctx, opt, nullptr);</span>
+<span class="lineNum">     210 </span><span class="lineCov">       2956 :         break;</span>
+<span class="lineNum">     211 </span><span class="lineCov">       3390 :     case 's':    /* char string */</span>
+<span class="lineNum">     212 </span><span class="lineCov">       3390 :         value.s = (char *) opt;</span>
+<span class="lineNum">     213 </span><span class="lineCov">       3390 :         break;</span>
+<span class="lineNum">     214 </span><span class="lineCov">        113 :     case 'b':    /* boolean */</span>
+<span class="lineNum">     215 </span><span class="lineCov">        113 :         switch (*opt) {</span>
+<span class="lineNum">     216 </span>            :         case 'F': case 'f':
+<span class="lineNum">     217 </span>            :             value.i = 0;
+<span class="lineNum">     218 </span>            :             break;
+<span class="lineNum">     219 </span><span class="lineCov">        113 :         case '\0': case 'T': case 't':</span>
+<span class="lineNum">     220 </span><span class="lineCov">        113 :             value.i = 1;</span>
+<span class="lineNum">     221 </span><span class="lineCov">        113 :             break;</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :         default:</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :             pj_ctx_set_errno (ctx, PJD_ERR_INVALID_BOOLEAN_PARAM);</span>
+<span class="lineNum">     224 </span>            :             value.i = 0;
+<span class="lineNum">     225 </span>            :             break;
+<span class="lineNum">     226 </span>            :         }
+<span class="lineNum">     227 </span>            :         break;
+<span class="lineNum">     228 </span>            :     }
+<span class="lineNum">     229 </span><span class="lineCov">       9491 :     return value;</span>
+<span class="lineNum">     230 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

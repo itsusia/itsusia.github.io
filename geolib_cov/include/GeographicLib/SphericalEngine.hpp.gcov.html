@@ -1,0 +1,453 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/SphericalEngine.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - SphericalEngine.hpp<span style="font-size: 80%;"> (source / <a href="SphericalEngine.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file SphericalEngine.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::SphericalEngine class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2011-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_SPHERICALENGINE_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_SPHERICALENGINE_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      14 </span>            : #include &lt;istream&gt;
+<span class="lineNum">      15 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      18 </span>            : // Squelch warnings about dll vs vector
+<span class="lineNum">      19 </span>            : #  pragma warning (push)
+<span class="lineNum">      20 </span>            : #  pragma warning (disable: 4251)
+<span class="lineNum">      21 </span>            : #endif
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : namespace GeographicLib {
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            :   class CircularEngine;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            :   /**
+<span class="lineNum">      28 </span>            :    * \brief The evaluation engine for SphericalHarmonic
+<span class="lineNum">      29 </span>            :    *
+<span class="lineNum">      30 </span>            :    * This serves as the backend to SphericalHarmonic, SphericalHarmonic1, and
+<span class="lineNum">      31 </span>            :    * SphericalHarmonic2.  Typically end-users will not have to access this
+<span class="lineNum">      32 </span>            :    * class directly.
+<span class="lineNum">      33 </span>            :    *
+<span class="lineNum">      34 </span>            :    * See SphericalEngine.cpp for more information on the implementation.
+<span class="lineNum">      35 </span>            :    *
+<span class="lineNum">      36 </span>            :    * Example of use:
+<span class="lineNum">      37 </span>            :    * \include example-SphericalEngine.cpp
+<span class="lineNum">      38 </span>            :    **********************************************************************/
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            :   class GEOGRAPHICLIB_EXPORT SphericalEngine {
+<span class="lineNum">      41 </span>            :   private:
+<span class="lineNum">      42 </span>            :     typedef Math::real real;
+<span class="lineNum">      43 </span>            :     // CircularEngine needs access to sqrttable, scale
+<span class="lineNum">      44 </span>            :     friend class CircularEngine;
+<span class="lineNum">      45 </span>            :     // Return the table of the square roots of integers
+<span class="lineNum">      46 </span>            :     static std::vector&lt;real&gt;&amp; sqrttable();
+<span class="lineNum">      47 </span>            :     // An internal scaling of the coefficients to avoid overflow in
+<span class="lineNum">      48 </span>            :     // intermediate calculations.
+<span class="lineNum">      49 </span>            :     static real scale() {
+<span class="lineNum">      50 </span>            :       using std::pow;
+<span class="lineNum">      51 </span>            :       static const real
+<span class="lineNum">      52 </span>            :         // Need extra real because, since C++11, pow(float, int) returns double
+<span class="lineNum">      53 </span>            :         s = real(pow(real(std::numeric_limits&lt;real&gt;::radix),
+<span class="lineNum">      54 </span>            :                      -3 * (std::numeric_limits&lt;real&gt;::max_exponent &lt; (1&lt;&lt;14) ?
+<span class="lineNum">      55 </span>            :                            std::numeric_limits&lt;real&gt;::max_exponent : (1&lt;&lt;14))
+<span class="lineNum">      56 </span>            :                      / 5));
+<span class="lineNum">      57 </span>            :       return s;
+<span class="lineNum">      58 </span>            :     }
+<span class="lineNum">      59 </span>            :     // Move latitudes near the pole off the axis by this amount.
+<span class="lineNum">      60 </span>            :     static real eps() {
+<span class="lineNum">      61 </span>            :       using std::sqrt;
+<span class="lineNum">      62 </span>            :       return std::numeric_limits&lt;real&gt;::epsilon() *
+<span class="lineNum">      63 </span>            :         sqrt(std::numeric_limits&lt;real&gt;::epsilon());
+<span class="lineNum">      64 </span>            :     }
+<span class="lineNum">      65 </span>            :     SphericalEngine();          // Disable constructor
+<span class="lineNum">      66 </span>            :   public:
+<span class="lineNum">      67 </span>            :     /**
+<span class="lineNum">      68 </span>            :      * Supported normalizations for associated Legendre polynomials.
+<span class="lineNum">      69 </span>            :      **********************************************************************/
+<span class="lineNum">      70 </span>            :     enum normalization {
+<span class="lineNum">      71 </span>            :       /**
+<span class="lineNum">      72 </span>            :        * Fully normalized associated Legendre polynomials.  See
+<span class="lineNum">      73 </span>            :        * SphericalHarmonic::FULL for documentation.
+<span class="lineNum">      74 </span>            :        *
+<span class="lineNum">      75 </span>            :        * @hideinitializer
+<span class="lineNum">      76 </span>            :        **********************************************************************/
+<span class="lineNum">      77 </span>            :       FULL = 0,
+<span class="lineNum">      78 </span>            :       /**
+<span class="lineNum">      79 </span>            :        * Schmidt semi-normalized associated Legendre polynomials.  See
+<span class="lineNum">      80 </span>            :        * SphericalHarmonic::SCHMIDT for documentation.
+<span class="lineNum">      81 </span>            :        *
+<span class="lineNum">      82 </span>            :        * @hideinitializer
+<span class="lineNum">      83 </span>            :        **********************************************************************/
+<span class="lineNum">      84 </span>            :       SCHMIDT = 1,
+<span class="lineNum">      85 </span>            :     };
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :     /**
+<span class="lineNum">      88 </span>            :      * \brief Package up coefficients for SphericalEngine
+<span class="lineNum">      89 </span>            :      *
+<span class="lineNum">      90 </span>            :      * This packages up the \e C, \e S coefficients and information about how
+<span class="lineNum">      91 </span>            :      * the coefficients are stored into a single structure.  This allows a
+<span class="lineNum">      92 </span>            :      * vector of type SphericalEngine::coeff to be passed to
+<span class="lineNum">      93 </span>            :      * SphericalEngine::Value.  This class also includes functions to aid
+<span class="lineNum">      94 </span>            :      * indexing into \e C and \e S.
+<span class="lineNum">      95 </span>            :      *
+<span class="lineNum">      96 </span>            :      * The storage layout of the coefficients is documented in
+<span class="lineNum">      97 </span>            :      * SphericalHarmonic and SphericalHarmonic::SphericalHarmonic.
+<span class="lineNum">      98 </span>            :      **********************************************************************/
+<span class="lineNum">      99 </span>            :     class GEOGRAPHICLIB_EXPORT coeff {
+<span class="lineNum">     100 </span>            :     private:
+<span class="lineNum">     101 </span>            :       int _Nx, _nmx, _mmx;
+<span class="lineNum">     102 </span>            :       std::vector&lt;real&gt;::const_iterator _Cnm;
+<span class="lineNum">     103 </span>            :       std::vector&lt;real&gt;::const_iterator _Snm;
+<span class="lineNum">     104 </span>            :     public:
+<span class="lineNum">     105 </span>            :       /**
+<span class="lineNum">     106 </span>            :        * A default constructor
+<span class="lineNum">     107 </span>            :        **********************************************************************/
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :       coeff() : _Nx(-1) , _nmx(-1) , _mmx(-1) {}</span>
+<span class="lineNum">     109 </span>            :       /**
+<span class="lineNum">     110 </span>            :        * The general constructor.
+<span class="lineNum">     111 </span>            :        *
+<span class="lineNum">     112 </span>            :        * @param[in] C a vector of coefficients for the cosine terms.
+<span class="lineNum">     113 </span>            :        * @param[in] S a vector of coefficients for the sine terms.
+<span class="lineNum">     114 </span>            :        * @param[in] N the degree giving storage layout for \e C and \e S.
+<span class="lineNum">     115 </span>            :        * @param[in] nmx the maximum degree to be used.
+<span class="lineNum">     116 </span>            :        * @param[in] mmx the maximum order to be used.
+<span class="lineNum">     117 </span>            :        * @exception GeographicErr if \e N, \e nmx, and \e mmx do not satisfy
+<span class="lineNum">     118 </span>            :        *   \e N &amp;ge; \e nmx &amp;ge; \e mmx &amp;ge; &amp;minus;1.
+<span class="lineNum">     119 </span>            :        * @exception GeographicErr if \e C or \e S is not big enough to hold the
+<span class="lineNum">     120 </span>            :        *   coefficients.
+<span class="lineNum">     121 </span>            :        * @exception std::bad_alloc if the memory for the square root table
+<a name="122"><span class="lineNum">     122 </span>            :        *   can't be allocated.</a>
+<span class="lineNum">     123 </span>            :        **********************************************************************/
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :       coeff(const std::vector&lt;real&gt;&amp; C,</span>
+<span class="lineNum">     125 </span>            :             const std::vector&lt;real&gt;&amp; S,
+<span class="lineNum">     126 </span>            :             int N, int nmx, int mmx)
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :         : _Nx(N)</span>
+<span class="lineNum">     128 </span>            :         , _nmx(nmx)
+<span class="lineNum">     129 </span>            :         , _mmx(mmx)
+<span class="lineNum">     130 </span>            :         , _Cnm(C.begin())
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :         , _Snm(S.begin())</span>
+<span class="lineNum">     132 </span>            :       {
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :         if (!(_Nx &gt;= _nmx &amp;&amp; _nmx &gt;= _mmx &amp;&amp; _mmx &gt;= -1))</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;Bad indices for coeff&quot;);</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :         if (!(index(_nmx, _mmx) &lt; int(C.size()) &amp;&amp;</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :               index(_nmx, _mmx) &lt; int(S.size()) + (_Nx + 1)))</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;Arrays too small in coeff&quot;);</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :         SphericalEngine::RootTable(_nmx);</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :       }</span>
+<span class="lineNum">     140 </span>            :       /**
+<span class="lineNum">     141 </span>            :        * The constructor for full coefficient vectors.
+<span class="lineNum">     142 </span>            :        *
+<span class="lineNum">     143 </span>            :        * @param[in] C a vector of coefficients for the cosine terms.
+<span class="lineNum">     144 </span>            :        * @param[in] S a vector of coefficients for the sine terms.
+<span class="lineNum">     145 </span>            :        * @param[in] N the maximum degree and order.
+<span class="lineNum">     146 </span>            :        * @exception GeographicErr if \e N does not satisfy \e N &amp;ge; &amp;minus;1.
+<span class="lineNum">     147 </span>            :        * @exception GeographicErr if \e C or \e S is not big enough to hold the
+<span class="lineNum">     148 </span>            :        *   coefficients.
+<span class="lineNum">     149 </span>            :        * @exception std::bad_alloc if the memory for the square root table
+<span class="lineNum">     150 </span>            :        *   can't be allocated.
+<span class="lineNum">     151 </span>            :        **********************************************************************/
+<span class="lineNum">     152 </span>            :       coeff(const std::vector&lt;real&gt;&amp; C,
+<span class="lineNum">     153 </span>            :             const std::vector&lt;real&gt;&amp; S,
+<span class="lineNum">     154 </span>            :             int N)
+<span class="lineNum">     155 </span>            :         : _Nx(N)
+<span class="lineNum">     156 </span>            :         , _nmx(N)
+<span class="lineNum">     157 </span>            :         , _mmx(N)
+<span class="lineNum">     158 </span>            :         , _Cnm(C.begin())
+<span class="lineNum">     159 </span>            :         , _Snm(S.begin())
+<span class="lineNum">     160 </span>            :       {
+<span class="lineNum">     161 </span>            :         if (!(_Nx &gt;= -1))
+<span class="lineNum">     162 </span>            :           throw GeographicErr(&quot;Bad indices for coeff&quot;);
+<span class="lineNum">     163 </span>            :         if (!(index(_nmx, _mmx) &lt; int(C.size()) &amp;&amp;
+<span class="lineNum">     164 </span>            :               index(_nmx, _mmx) &lt; int(S.size()) + (_Nx + 1)))
+<span class="lineNum">     165 </span>            :           throw GeographicErr(&quot;Arrays too small in coeff&quot;);
+<span class="lineNum">     166 </span>            :         SphericalEngine::RootTable(_nmx);
+<span class="lineNum">     167 </span>            :       }
+<span class="lineNum">     168 </span>            :       /**
+<span class="lineNum">     169 </span>            :        * @return \e N the degree giving storage layout for \e C and \e S.
+<span class="lineNum">     170 </span>            :        **********************************************************************/
+<span class="lineNum">     171 </span>            :       int N() const { return _Nx; }
+<span class="lineNum">     172 </span>            :       /**
+<span class="lineNum">     173 </span>            :        * @return \e nmx the maximum degree to be used.
+<span class="lineNum">     174 </span>            :        **********************************************************************/
+<span class="lineNum">     175 </span>            :       int nmx() const { return _nmx; }
+<span class="lineNum">     176 </span>            :       /**
+<span class="lineNum">     177 </span>            :        * @return \e mmx the maximum order to be used.
+<span class="lineNum">     178 </span>            :        **********************************************************************/
+<span class="lineNum">     179 </span>            :       int mmx() const { return _mmx; }
+<span class="lineNum">     180 </span>            :       /**
+<span class="lineNum">     181 </span>            :        * The one-dimensional index into \e C and \e S.
+<span class="lineNum">     182 </span>            :        *
+<span class="lineNum">     183 </span>            :        * @param[in] n the degree.
+<span class="lineNum">     184 </span>            :        * @param[in] m the order.
+<span class="lineNum">     185 </span>            :        * @return the one-dimensional index.
+<span class="lineNum">     186 </span>            :        **********************************************************************/
+<span class="lineNum">     187 </span>            :       int index(int n, int m) const
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :       { return m * _Nx - m * (m - 1) / 2 + n; }</span>
+<span class="lineNum">     189 </span>            :       /**
+<span class="lineNum">     190 </span>            :        * An element of \e C.
+<span class="lineNum">     191 </span>            :        *
+<span class="lineNum">     192 </span>            :        * @param[in] k the one-dimensional index.
+<span class="lineNum">     193 </span>            :        * @return the value of the \e C coefficient.
+<span class="lineNum">     194 </span>            :        **********************************************************************/
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :       Math::real Cv(int k) const { return *(_Cnm + k); }</span>
+<span class="lineNum">     196 </span>            :       /**
+<span class="lineNum">     197 </span>            :        * An element of \e S.
+<span class="lineNum">     198 </span>            :        *
+<span class="lineNum">     199 </span>            :        * @param[in] k the one-dimensional index.
+<span class="lineNum">     200 </span>            :        * @return the value of the \e S coefficient.
+<span class="lineNum">     201 </span>            :        **********************************************************************/
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :       Math::real Sv(int k) const { return *(_Snm + (k - (_Nx + 1))); }</span>
+<span class="lineNum">     203 </span>            :       /**
+<span class="lineNum">     204 </span>            :        * An element of \e C with checking.
+<span class="lineNum">     205 </span>            :        *
+<span class="lineNum">     206 </span>            :        * @param[in] k the one-dimensional index.
+<span class="lineNum">     207 </span>            :        * @param[in] n the requested degree.
+<span class="lineNum">     208 </span>            :        * @param[in] m the requested order.
+<span class="lineNum">     209 </span>            :        * @param[in] f a multiplier.
+<span class="lineNum">     210 </span>            :        * @return the value of the \e C coefficient multiplied by \e f in \e n
+<span class="lineNum">     211 </span>            :        *   and \e m are in range else 0.
+<span class="lineNum">     212 </span>            :        **********************************************************************/
+<span class="lineNum">     213 </span>            :       Math::real Cv(int k, int n, int m, real f) const
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :       { return m &gt; _mmx || n &gt; _nmx ? 0 : *(_Cnm + k) * f; }</span>
+<span class="lineNum">     215 </span>            :       /**
+<span class="lineNum">     216 </span>            :        * An element of \e S with checking.
+<span class="lineNum">     217 </span>            :        *
+<span class="lineNum">     218 </span>            :        * @param[in] k the one-dimensional index.
+<span class="lineNum">     219 </span>            :        * @param[in] n the requested degree.
+<span class="lineNum">     220 </span>            :        * @param[in] m the requested order.
+<span class="lineNum">     221 </span>            :        * @param[in] f a multiplier.
+<span class="lineNum">     222 </span>            :        * @return the value of the \e S coefficient multiplied by \e f in \e n
+<span class="lineNum">     223 </span>            :        *   and \e m are in range else 0.
+<span class="lineNum">     224 </span>            :        **********************************************************************/
+<span class="lineNum">     225 </span>            :       Math::real Sv(int k, int n, int m, real f) const
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :       { return m &gt; _mmx || n &gt; _nmx ? 0 : *(_Snm + (k - (_Nx + 1))) * f; }</span>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            :       /**
+<span class="lineNum">     229 </span>            :        * The size of the coefficient vector for the cosine terms.
+<span class="lineNum">     230 </span>            :        *
+<span class="lineNum">     231 </span>            :        * @param[in] N the maximum degree.
+<span class="lineNum">     232 </span>            :        * @param[in] M the maximum order.
+<span class="lineNum">     233 </span>            :        * @return the size of the vector of cosine terms as stored in column
+<span class="lineNum">     234 </span>            :        *   major order.
+<span class="lineNum">     235 </span>            :        **********************************************************************/
+<span class="lineNum">     236 </span>            :       static int Csize(int N, int M)
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :       { return (M + 1) * (2 * N - M + 2) / 2; }</span>
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            :       /**
+<span class="lineNum">     240 </span>            :        * The size of the coefficient vector for the sine terms.
+<span class="lineNum">     241 </span>            :        *
+<span class="lineNum">     242 </span>            :        * @param[in] N the maximum degree.
+<span class="lineNum">     243 </span>            :        * @param[in] M the maximum order.
+<span class="lineNum">     244 </span>            :        * @return the size of the vector of cosine terms as stored in column
+<span class="lineNum">     245 </span>            :        *   major order.
+<span class="lineNum">     246 </span>            :        **********************************************************************/
+<span class="lineNum">     247 </span>            :       static int Ssize(int N, int M)
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :       { return Csize(N, M) - (N + 1); }</span>
+<span class="lineNum">     249 </span>            : 
+<span class="lineNum">     250 </span>            :       /**
+<span class="lineNum">     251 </span>            :        * Load coefficients from a binary stream.
+<span class="lineNum">     252 </span>            :        *
+<span class="lineNum">     253 </span>            :        * @param[in] stream the input stream.
+<span class="lineNum">     254 </span>            :        * @param[out] N The maximum degree of the coefficients.
+<span class="lineNum">     255 </span>            :        * @param[out] M The maximum order of the coefficients.
+<span class="lineNum">     256 </span>            :        * @param[out] C The vector of cosine coefficients.
+<span class="lineNum">     257 </span>            :        * @param[out] S The vector of sine coefficients.
+<span class="lineNum">     258 </span>            :        * @exception GeographicErr if \e N and \e M do not satisfy \e N &amp;ge;
+<span class="lineNum">     259 </span>            :        *   \e M &amp;ge; &amp;minus;1.
+<span class="lineNum">     260 </span>            :        * @exception GeographicErr if there's an error reading the data.
+<span class="lineNum">     261 </span>            :        * @exception std::bad_alloc if the memory for \e C or \e S can't be
+<span class="lineNum">     262 </span>            :        *   allocated.
+<span class="lineNum">     263 </span>            :        *
+<span class="lineNum">     264 </span>            :        * \e N and \e M are read as 4-byte ints.  \e C and \e S are resized to
+<span class="lineNum">     265 </span>            :        * accommodate all the coefficients (with the \e m = 0 coefficients for
+<span class="lineNum">     266 </span>            :        * \e S excluded) and the data for these coefficients read as 8-byte
+<span class="lineNum">     267 </span>            :        * doubles.  The coefficients are stored in column major order.  The
+<span class="lineNum">     268 </span>            :        * bytes in the stream should use little-endian ordering.  IEEE floating
+<span class="lineNum">     269 </span>            :        * point is assumed for the coefficients.
+<span class="lineNum">     270 </span>            :        **********************************************************************/
+<span class="lineNum">     271 </span>            :       static void readcoeffs(std::istream&amp; stream, int&amp; N, int&amp; M,
+<span class="lineNum">     272 </span>            :                              std::vector&lt;real&gt;&amp; C, std::vector&lt;real&gt;&amp; S);
+<span class="lineNum">     273 </span>            :     };
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span>            :     /**
+<span class="lineNum">     276 </span>            :      * Evaluate a spherical harmonic sum and its gradient.
+<span class="lineNum">     277 </span>            :      *
+<span class="lineNum">     278 </span>            :      * @tparam gradp should the gradient be calculated.
+<span class="lineNum">     279 </span>            :      * @tparam norm the normalization for the associated Legendre polynomials.
+<span class="lineNum">     280 </span>            :      * @tparam L the number of terms in the coefficients.
+<span class="lineNum">     281 </span>            :      * @param[in] c an array of coeff objects.
+<span class="lineNum">     282 </span>            :      * @param[in] f array of coefficient multipliers.  f[0] should be 1.
+<span class="lineNum">     283 </span>            :      * @param[in] x the \e x component of the cartesian position.
+<span class="lineNum">     284 </span>            :      * @param[in] y the \e y component of the cartesian position.
+<span class="lineNum">     285 </span>            :      * @param[in] z the \e z component of the cartesian position.
+<span class="lineNum">     286 </span>            :      * @param[in] a the normalizing radius.
+<span class="lineNum">     287 </span>            :      * @param[out] gradx the \e x component of the gradient.
+<span class="lineNum">     288 </span>            :      * @param[out] grady the \e y component of the gradient.
+<span class="lineNum">     289 </span>            :      * @param[out] gradz the \e z component of the gradient.
+<span class="lineNum">     290 </span>            :      * @result the spherical harmonic sum.
+<span class="lineNum">     291 </span>            :      *
+<span class="lineNum">     292 </span>            :      * See the SphericalHarmonic class for the definition of the sum.  The
+<span class="lineNum">     293 </span>            :      * coefficients used by this function are, for example, c[0].Cv + f[1] *
+<span class="lineNum">     294 </span>            :      * c[1].Cv + ... + f[L&amp;minus;1] * c[L&amp;minus;1].Cv.  (Note that f[0] is \e
+<span class="lineNum">     295 </span>            :      * not used.)  The upper limits on the sum are determined by c[0].nmx() and
+<span class="lineNum">     296 </span>            :      * c[0].mmx(); these limits apply to \e all the components of the
+<span class="lineNum">     297 </span>            :      * coefficients.  The parameters \e gradp, \e norm, and \e L are template
+<span class="lineNum">     298 </span>            :      * parameters, to allow more optimization to be done at compile time.
+<span class="lineNum">     299 </span>            :      *
+<span class="lineNum">     300 </span>            :      * Clenshaw summation is used which permits the evaluation of the sum
+<span class="lineNum">     301 </span>            :      * without the need to allocate temporary arrays.  Thus this function never
+<span class="lineNum">     302 </span>            :      * throws an exception.
+<span class="lineNum">     303 </span>            :      **********************************************************************/
+<span class="lineNum">     304 </span>            :     template&lt;bool gradp, normalization norm, int L&gt;
+<span class="lineNum">     305 </span>            :       static Math::real Value(const coeff c[], const real f[],
+<span class="lineNum">     306 </span>            :                               real x, real y, real z, real a,
+<span class="lineNum">     307 </span>            :                               real&amp; gradx, real&amp; grady, real&amp; gradz);
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            :     /**
+<span class="lineNum">     310 </span>            :      * Create a CircularEngine object
+<span class="lineNum">     311 </span>            :      *
+<span class="lineNum">     312 </span>            :      * @tparam gradp should the gradient be calculated.
+<span class="lineNum">     313 </span>            :      * @tparam norm the normalization for the associated Legendre polynomials.
+<span class="lineNum">     314 </span>            :      * @tparam L the number of terms in the coefficients.
+<span class="lineNum">     315 </span>            :      * @param[in] c an array of coeff objects.
+<span class="lineNum">     316 </span>            :      * @param[in] f array of coefficient multipliers.  f[0] should be 1.
+<span class="lineNum">     317 </span>            :      * @param[in] p the radius of the circle = sqrt(&lt;i&gt;x&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; +
+<span class="lineNum">     318 </span>            :      *   &lt;i&gt;y&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;).
+<span class="lineNum">     319 </span>            :      * @param[in] z the height of the circle.
+<span class="lineNum">     320 </span>            :      * @param[in] a the normalizing radius.
+<span class="lineNum">     321 </span>            :      * @exception std::bad_alloc if the memory for the CircularEngine can't be
+<span class="lineNum">     322 </span>            :      *   allocated.
+<span class="lineNum">     323 </span>            :      * @result the CircularEngine object.
+<span class="lineNum">     324 </span>            :      *
+<span class="lineNum">     325 </span>            :      * If you need to evaluate the spherical harmonic sum for several points
+<span class="lineNum">     326 </span>            :      * with constant \e f, \e p = sqrt(&lt;i&gt;x&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; +
+<span class="lineNum">     327 </span>            :      * &lt;i&gt;y&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;), \e z, and \e a, it is more efficient to construct
+<span class="lineNum">     328 </span>            :      * call SphericalEngine::Circle to give a CircularEngine object and then
+<span class="lineNum">     329 </span>            :      * call CircularEngine::operator()() with arguments &lt;i&gt;x&lt;/i&gt;/\e p and
+<span class="lineNum">     330 </span>            :      * &lt;i&gt;y&lt;/i&gt;/\e p.
+<span class="lineNum">     331 </span>            :      **********************************************************************/
+<span class="lineNum">     332 </span>            :     template&lt;bool gradp, normalization norm, int L&gt;
+<span class="lineNum">     333 </span>            :       static CircularEngine Circle(const coeff c[], const real f[],
+<span class="lineNum">     334 </span>            :                                    real p, real z, real a);
+<span class="lineNum">     335 </span>            :     /**
+<span class="lineNum">     336 </span>            :      * Check that the static table of square roots is big enough and enlarge it
+<span class="lineNum">     337 </span>            :      * if necessary.
+<span class="lineNum">     338 </span>            :      *
+<span class="lineNum">     339 </span>            :      * @param[in] N the maximum degree to be used in SphericalEngine.
+<span class="lineNum">     340 </span>            :      * @exception std::bad_alloc if the memory for the square root table can't
+<span class="lineNum">     341 </span>            :      *   be allocated.
+<span class="lineNum">     342 </span>            :      *
+<span class="lineNum">     343 </span>            :      * Typically, there's no need for an end-user to call this routine, because
+<span class="lineNum">     344 </span>            :      * the constructors for SphericalEngine::coeff do so.  However, since this
+<span class="lineNum">     345 </span>            :      * updates a static table, there's a possible race condition in a
+<span class="lineNum">     346 </span>            :      * multi-threaded environment.  Because this routine does nothing if the
+<span class="lineNum">     347 </span>            :      * table is already large enough, one way to avoid race conditions is to
+<span class="lineNum">     348 </span>            :      * call this routine at program start up (when it's still single threaded),
+<span class="lineNum">     349 </span>            :      * supplying the largest degree that your program will use.  E.g., \code
+<span class="lineNum">     350 </span>            :      GeographicLib::SphericalEngine::RootTable(2190);
+<span class="lineNum">     351 </span>            :      \endcode
+<span class="lineNum">     352 </span>            :      * suffices to accommodate extant magnetic and gravity models.
+<span class="lineNum">     353 </span>            :      **********************************************************************/
+<span class="lineNum">     354 </span>            :     static void RootTable(int N);
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span>            :     /**
+<span class="lineNum">     357 </span>            :      * Clear the static table of square roots and release the memory.  Call
+<span class="lineNum">     358 </span>            :      * this only when you are sure you no longer will be using SphericalEngine.
+<span class="lineNum">     359 </span>            :      * Your program will crash if you call SphericalEngine after calling this
+<span class="lineNum">     360 </span>            :      * routine.
+<span class="lineNum">     361 </span>            :      *
+<span class="lineNum">     362 </span>            :      * \warning It's safest not to call this routine at all.  (The space used
+<span class="lineNum">     363 </span>            :      * by the table is modest.)
+<span class="lineNum">     364 </span>            :      **********************************************************************/
+<span class="lineNum">     365 </span>            :     static void ClearRootTable() {
+<span class="lineNum">     366 </span>            :       std::vector&lt;real&gt; temp(0);
+<span class="lineNum">     367 </span>            :       sqrttable().swap(temp);
+<span class="lineNum">     368 </span>            :     }
+<span class="lineNum">     369 </span>            :   };
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span>            : } // namespace GeographicLib
+<span class="lineNum">     372 </span>            : 
+<span class="lineNum">     373 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">     374 </span>            : #  pragma warning (pop)
+<span class="lineNum">     375 </span>            : #endif
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span>            : #endif  // GEOGRAPHICLIB_SPHERICALENGINE_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

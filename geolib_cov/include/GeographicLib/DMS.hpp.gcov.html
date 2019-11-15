@@ -1,0 +1,446 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/DMS.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - DMS.hpp<span style="font-size: 80%;"> (source / <a href="DMS.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryMed">77.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file DMS.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::DMS class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2008-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_DMS_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_DMS_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/Utility.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      17 </span>            : // Squelch warnings about dll vs vector and constant conditional expressions
+<span class="lineNum">      18 </span>            : #  pragma warning (push)
+<span class="lineNum">      19 </span>            : #  pragma warning (disable: 4251 4127)
+<span class="lineNum">      20 </span>            : #endif
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : namespace GeographicLib {
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            :   /**
+<span class="lineNum">      25 </span>            :    * \brief Convert between degrees and the %DMS representation
+<span class="lineNum">      26 </span>            :    *
+<span class="lineNum">      27 </span>            :    * Parse a string representing degree, minutes, and seconds and return the
+<span class="lineNum">      28 </span>            :    * angle in degrees and format an angle in degrees as degree, minutes, and
+<span class="lineNum">      29 </span>            :    * seconds.  In addition, handle NANs and infinities on input and output.
+<span class="lineNum">      30 </span>            :    *
+<span class="lineNum">      31 </span>            :    * Example of use:
+<span class="lineNum">      32 </span>            :    * \include example-DMS.cpp
+<span class="lineNum">      33 </span>            :    **********************************************************************/
+<span class="lineNum">      34 </span>            :   class GEOGRAPHICLIB_EXPORT DMS {
+<span class="lineNum">      35 </span>            :   public:
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            :     /**
+<span class="lineNum">      38 </span>            :      * Indicator for presence of hemisphere indicator (N/S/E/W) on latitudes
+<span class="lineNum">      39 </span>            :      * and longitudes.
+<span class="lineNum">      40 </span>            :      **********************************************************************/
+<span class="lineNum">      41 </span>            :     enum flag {
+<span class="lineNum">      42 </span>            :       /**
+<span class="lineNum">      43 </span>            :        * No indicator present.
+<span class="lineNum">      44 </span>            :        * @hideinitializer
+<span class="lineNum">      45 </span>            :        **********************************************************************/
+<span class="lineNum">      46 </span>            :       NONE = 0,
+<span class="lineNum">      47 </span>            :       /**
+<span class="lineNum">      48 </span>            :        * Latitude indicator (N/S) present.
+<span class="lineNum">      49 </span>            :        * @hideinitializer
+<span class="lineNum">      50 </span>            :        **********************************************************************/
+<span class="lineNum">      51 </span>            :       LATITUDE = 1,
+<span class="lineNum">      52 </span>            :       /**
+<span class="lineNum">      53 </span>            :        * Longitude indicator (E/W) present.
+<span class="lineNum">      54 </span>            :        * @hideinitializer
+<span class="lineNum">      55 </span>            :        **********************************************************************/
+<span class="lineNum">      56 </span>            :       LONGITUDE = 2,
+<span class="lineNum">      57 </span>            :       /**
+<span class="lineNum">      58 </span>            :        * Used in Encode to indicate output of an azimuth in [000, 360) with no
+<span class="lineNum">      59 </span>            :        * letter indicator.
+<span class="lineNum">      60 </span>            :        * @hideinitializer
+<span class="lineNum">      61 </span>            :        **********************************************************************/
+<span class="lineNum">      62 </span>            :       AZIMUTH = 3,
+<span class="lineNum">      63 </span>            :       /**
+<span class="lineNum">      64 </span>            :        * Used in Encode to indicate output of a plain number.
+<span class="lineNum">      65 </span>            :        * @hideinitializer
+<span class="lineNum">      66 </span>            :        **********************************************************************/
+<span class="lineNum">      67 </span>            :       NUMBER = 4,
+<span class="lineNum">      68 </span>            :     };
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :     /**
+<span class="lineNum">      71 </span>            :      * Indicator for trailing units on an angle.
+<span class="lineNum">      72 </span>            :      **********************************************************************/
+<span class="lineNum">      73 </span>            :     enum component {
+<span class="lineNum">      74 </span>            :       /**
+<span class="lineNum">      75 </span>            :        * Trailing unit is degrees.
+<span class="lineNum">      76 </span>            :        * @hideinitializer
+<span class="lineNum">      77 </span>            :        **********************************************************************/
+<span class="lineNum">      78 </span>            :       DEGREE = 0,
+<span class="lineNum">      79 </span>            :       /**
+<span class="lineNum">      80 </span>            :        * Trailing unit is arc minutes.
+<span class="lineNum">      81 </span>            :        * @hideinitializer
+<span class="lineNum">      82 </span>            :        **********************************************************************/
+<span class="lineNum">      83 </span>            :       MINUTE = 1,
+<span class="lineNum">      84 </span>            :       /**
+<span class="lineNum">      85 </span>            :        * Trailing unit is arc seconds.
+<span class="lineNum">      86 </span>            :        * @hideinitializer
+<span class="lineNum">      87 </span>            :        **********************************************************************/
+<span class="lineNum">      88 </span>            :       SECOND = 2,
+<span class="lineNum">      89 </span>            :     };
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :   private:
+<span class="lineNum">      92 </span>            :     typedef Math::real real;
+<span class="lineNum">      93 </span>            :     // Replace all occurrences of pat by c
+<span class="lineNum">      94 </span><span class="lineCov">       6566 :     static void replace(std::string&amp; s, const std::string&amp; pat, char c) {</span>
+<span class="lineNum">      95 </span>            :       std::string::size_type p = 0;
+<span class="lineNum">      96 </span>            :       while (true) {
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :         p = s.find(pat, p);</span>
+<span class="lineNum">      98 </span><span class="lineCov">       6566 :         if (p == std::string::npos)</span>
+<span class="lineNum">      99 </span>            :           break;
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :         s.replace(p, pat.length(), 1, c);</span>
+<span class="lineNum">     101 </span>            :       }
+<span class="lineNum">     102 </span><span class="lineCov">       6566 :     }</span>
+<span class="lineNum">     103 </span>            :     static const char* const hemispheres_;
+<span class="lineNum">     104 </span>            :     static const char* const signs_;
+<span class="lineNum">     105 </span>            :     static const char* const digits_;
+<span class="lineNum">     106 </span>            :     static const char* const dmsindicators_;
+<span class="lineNum">     107 </span>            :     static const char* const components_[3];
+<span class="lineNum">     108 </span>            :     static Math::real NumMatch(const std::string&amp; s);
+<span class="lineNum">     109 </span>            :     static Math::real InternalDecode(const std::string&amp; dmsa, flag&amp; ind);
+<span class="lineNum">     110 </span>            :     DMS();                      // Disable constructor
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            :   public:
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :     /**
+<span class="lineNum">     115 </span>            :      * Convert a string in DMS to an angle.
+<span class="lineNum">     116 </span>            :      *
+<span class="lineNum">     117 </span>            :      * @param[in] dms string input.
+<span class="lineNum">     118 </span>            :      * @param[out] ind a DMS::flag value signaling the presence of a
+<span class="lineNum">     119 </span>            :      *   hemisphere indicator.
+<span class="lineNum">     120 </span>            :      * @exception GeographicErr if \e dms is malformed (see below).
+<span class="lineNum">     121 </span>            :      * @return angle (degrees).
+<span class="lineNum">     122 </span>            :      *
+<span class="lineNum">     123 </span>            :      * Degrees, minutes, and seconds are indicated by the characters d, '
+<span class="lineNum">     124 </span>            :      * (single quote), &amp;quot; (double quote), and these components may only be
+<span class="lineNum">     125 </span>            :      * given in this order.  Any (but not all) components may be omitted and
+<span class="lineNum">     126 </span>            :      * other symbols (e.g., the &amp;deg; symbol for degrees and the unicode prime
+<span class="lineNum">     127 </span>            :      * and double prime symbols for minutes and seconds) may be substituted;
+<span class="lineNum">     128 </span>            :      * two single quotes can be used instead of &amp;quot;.  The last component
+<span class="lineNum">     129 </span>            :      * indicator may be omitted and is assumed to be the next smallest unit
+<span class="lineNum">     130 </span>            :      * (thus 33d10 is interpreted as 33d10').  The final component may be a
+<span class="lineNum">     131 </span>            :      * decimal fraction but the non-final components must be integers.  Instead
+<span class="lineNum">     132 </span>            :      * of using d, ', and &amp;quot; to indicate degrees, minutes, and seconds, :
+<span class="lineNum">     133 </span>            :      * (colon) may be used to &lt;i&gt;separate&lt;/i&gt; these components (numbers must
+<span class="lineNum">     134 </span>            :      * appear before and after each colon); thus 50d30'10.3&amp;quot; may be
+<span class="lineNum">     135 </span>            :      * written as 50:30:10.3, 5.5' may be written 0:5.5, and so on.  The
+<span class="lineNum">     136 </span>            :      * integer parts of the minutes and seconds components must be less
+<span class="lineNum">     137 </span>            :      * than 60.  A single leading sign is permitted.  A hemisphere designator
+<span class="lineNum">     138 </span>            :      * (N, E, W, S) may be added to the beginning or end of the string.  The
+<span class="lineNum">     139 </span>            :      * result is multiplied by the implied sign of the hemisphere designator
+<span class="lineNum">     140 </span>            :      * (negative for S and W).  In addition \e ind is set to DMS::LATITUDE if N
+<span class="lineNum">     141 </span>            :      * or S is present, to DMS::LONGITUDE if E or W is present, and to
+<span class="lineNum">     142 </span>            :      * DMS::NONE otherwise.  Throws an error on a malformed string.  No check
+<span class="lineNum">     143 </span>            :      * is performed on the range of the result.  Examples of legal and illegal
+<span class="lineNum">     144 </span>            :      * strings are
+<span class="lineNum">     145 </span>            :      * - &lt;i&gt;LEGAL&lt;/i&gt; (all the entries on each line are equivalent)
+<span class="lineNum">     146 </span>            :      *   - -20.51125, 20d30'40.5&amp;quot;S, -20&amp;deg;30'40.5, -20d30.675,
+<span class="lineNum">     147 </span>            :      *     N-20d30'40.5&amp;quot;, -20:30:40.5
+<span class="lineNum">     148 </span>            :      *   - 4d0'9, 4d9&amp;quot;, 4d9'', 4:0:9, 004:00:09, 4.0025, 4.0025d, 4d0.15,
+<span class="lineNum">     149 </span>            :      *     04:.15
+<span class="lineNum">     150 </span>            :      *   - 4:59.99999999999999, 4:60.0, 4:59:59.9999999999999, 4:59:60.0, 5
+<span class="lineNum">     151 </span>            :      * - &lt;i&gt;ILLEGAL&lt;/i&gt; (the exception thrown explains the problem)
+<span class="lineNum">     152 </span>            :      *   - 4d5&amp;quot;4', 4::5, 4:5:, :4:5, 4d4.5'4&amp;quot;, -N20.5, 1.8e2d, 4:60,
+<span class="lineNum">     153 </span>            :      *     4:59:60
+<span class="lineNum">     154 </span>            :      *
+<span class="lineNum">     155 </span>            :      * The decoding operation can also perform addition and subtraction
+<span class="lineNum">     156 </span>            :      * operations.  If the string includes &lt;i&gt;internal&lt;/i&gt; signs (i.e., not at
+<span class="lineNum">     157 </span>            :      * the beginning nor immediately after an initial hemisphere designator),
+<span class="lineNum">     158 </span>            :      * then the string is split immediately before such signs and each piece is
+<span class="lineNum">     159 </span>            :      * decoded according to the above rules and the results added; thus
+<span class="lineNum">     160 </span>            :      * &lt;code&gt;S3-2.5+4.1N&lt;/code&gt; is parsed as the sum of &lt;code&gt;S3&lt;/code&gt;,
+<span class="lineNum">     161 </span>            :      * &lt;code&gt;-2.5&lt;/code&gt;, &lt;code&gt;+4.1N&lt;/code&gt;.  Any piece can include a
+<span class="lineNum">     162 </span>            :      * hemisphere designator; however, if multiple designators are given, they
+<span class="lineNum">     163 </span>            :      * must compatible; e.g., you cannot mix N and E.  In addition, the
+<span class="lineNum">     164 </span>            :      * designator can appear at the beginning or end of the first piece, but
+<span class="lineNum">     165 </span>            :      * must be at the end of all subsequent pieces (a hemisphere designator is
+<span class="lineNum">     166 </span>            :      * not allowed after the initial sign).  Examples of legal and illegal
+<span class="lineNum">     167 </span>            :      * combinations are
+<span class="lineNum">     168 </span>            :      * - &lt;i&gt;LEGAL&lt;/i&gt; (these are all equivalent)
+<span class="lineNum">     169 </span>            :      *   - 070:00:45, 70:01:15W+0:0.5, 70:01:15W-0:0:30W, W70:01:15+0:0:30E
+<span class="lineNum">     170 </span>            :      * - &lt;i&gt;ILLEGAL&lt;/i&gt; (the exception thrown explains the problem)
+<span class="lineNum">     171 </span>            :      *   - 70:01:15W+0:0:15N, W70:01:15+W0:0:15
+<span class="lineNum">     172 </span>            :      *
+<span class="lineNum">     173 </span>            :      * \warning The &quot;exponential&quot; notation is not recognized.  Thus
+<span class="lineNum">     174 </span>            :      * &lt;code&gt;7.0E1&lt;/code&gt; is illegal, while &lt;code&gt;7.0E+1&lt;/code&gt; is parsed as
+<span class="lineNum">     175 </span>            :      * &lt;code&gt;(7.0E) + (+1)&lt;/code&gt;, yielding the same result as
+<span class="lineNum">     176 </span>            :      * &lt;code&gt;8.0E&lt;/code&gt;.
+<span class="lineNum">     177 </span>            :      *
+<span class="lineNum">     178 </span>            :      * \note At present, all the string handling in the C++
+<span class="lineNum">     179 </span>            :      * implementation %GeographicLib is with 8-bit characters.  The support for
+<span class="lineNum">     180 </span>            :      * unicode symbols for degrees, minutes, and seconds is therefore via the
+<span class="lineNum">     181 </span>            :      * &lt;a href=&quot;https://en.wikipedia.org/wiki/UTF-8&quot;&gt;UTF-8&lt;/a&gt; encoding.  (The
+<span class="lineNum">     182 </span>            :      * JavaScript implementation of this class uses unicode natively, of
+<span class="lineNum">     183 </span>            :      * course.)
+<span class="lineNum">     184 </span>            :      *
+<span class="lineNum">     185 </span>            :      * Here is the list of Unicode symbols supported for degrees, minutes,
+<span class="lineNum">     186 </span>            :      * seconds, and the sign:
+<span class="lineNum">     187 </span>            :      * - degrees:
+<span class="lineNum">     188 </span>            :      *   - d, D lower and upper case letters
+<span class="lineNum">     189 </span>            :      *   - U+00b0 degree symbol (&amp;deg;)
+<span class="lineNum">     190 </span>            :      *   - U+00ba masculine ordinal indicator
+<span class="lineNum">     191 </span>            :      *   - U+2070 superscript zero
+<span class="lineNum">     192 </span>            :      *   - U+02da ring above
+<span class="lineNum">     193 </span>            :      * - minutes:
+<span class="lineNum">     194 </span>            :      *   - ' apostrophe
+<span class="lineNum">     195 </span>            :      *   - U+2032 prime (&amp;prime;)
+<span class="lineNum">     196 </span>            :      *   - U+00b4 acute accent
+<span class="lineNum">     197 </span>            :      *   - U+2019 right single quote (&amp;rsquo;)
+<span class="lineNum">     198 </span>            :      * - seconds:
+<span class="lineNum">     199 </span>            :      *   - &amp;quot; quotation mark
+<span class="lineNum">     200 </span>            :      *   - U+2033 double prime (&amp;Prime;)
+<span class="lineNum">     201 </span>            :      *   - U+201d right double quote (&amp;rdquo;)
+<span class="lineNum">     202 </span>            :      *   - '&amp;nbsp;' any two consecutive symbols for minutes
+<span class="lineNum">     203 </span>            :      * - leading sign:
+<span class="lineNum">     204 </span>            :      *   - U+2212 minus sign (&amp;minus;)
+<span class="lineNum">     205 </span>            :      * .
+<span class="lineNum">     206 </span>            :      * The codes with a leading zero byte, e.g., U+00b0, are accepted in their
+<span class="lineNum">     207 </span>            :      * UTF-8 coded form 0xc2 0xb0 and as a single byte 0xb0.
+<span class="lineNum">     208 </span>            :      **********************************************************************/
+<span class="lineNum">     209 </span>            :     static Math::real Decode(const std::string&amp; dms, flag&amp; ind);
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :     /**
+<span class="lineNum">     212 </span>            :      * Convert DMS to an angle.
+<span class="lineNum">     213 </span>            :      *
+<span class="lineNum">     214 </span>            :      * @param[in] d degrees.
+<span class="lineNum">     215 </span>            :      * @param[in] m arc minutes.
+<span class="lineNum">     216 </span>            :      * @param[in] s arc seconds.
+<span class="lineNum">     217 </span>            :      * @return angle (degrees)
+<span class="lineNum">     218 </span>            :      *
+<span class="lineNum">     219 </span>            :      * This does not propagate the sign on \e d to the other components,
+<span class="lineNum">     220 </span>            :      * so -3d20' would need to be represented as - DMS::Decode(3.0, 20.0) or
+<span class="lineNum">     221 </span>            :      * DMS::Decode(-3.0, -20.0).
+<span class="lineNum">     222 </span>            :      **********************************************************************/
+<span class="lineNum">     223 </span>            :     static Math::real Decode(real d, real m = 0, real s = 0)
+<span class="lineNum">     224 </span>            :     { return d + (m + s / 60) / 60; }
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            :     /**
+<span class="lineNum">     227 </span>            :      * Convert a pair of strings to latitude and longitude.
+<span class="lineNum">     228 </span>            :      *
+<span class="lineNum">     229 </span>            :      * @param[in] dmsa first string.
+<span class="lineNum">     230 </span>            :      * @param[in] dmsb second string.
+<span class="lineNum">     231 </span>            :      * @param[out] lat latitude (degrees).
+<span class="lineNum">     232 </span>            :      * @param[out] lon longitude (degrees).
+<span class="lineNum">     233 </span>            :      * @param[in] longfirst if true assume longitude is given before latitude
+<span class="lineNum">     234 </span>            :      *   in the absence of hemisphere designators (default false).
+<span class="lineNum">     235 </span>            :      * @exception GeographicErr if \e dmsa or \e dmsb is malformed.
+<span class="lineNum">     236 </span>            :      * @exception GeographicErr if \e dmsa and \e dmsb are both interpreted as
+<span class="lineNum">     237 </span>            :      *   latitudes.
+<span class="lineNum">     238 </span>            :      * @exception GeographicErr if \e dmsa and \e dmsb are both interpreted as
+<span class="lineNum">     239 </span>            :      *   longitudes.
+<span class="lineNum">     240 </span>            :      * @exception GeographicErr if decoded latitude is not in [&amp;minus;90&amp;deg;,
+<span class="lineNum">     241 </span>            :      *   90&amp;deg;].
+<span class="lineNum">     242 </span>            :      *
+<span class="lineNum">     243 </span>            :      * By default, the \e lat (resp., \e lon) is assigned to the results of
+<span class="lineNum">     244 </span>            :      * decoding \e dmsa (resp., \e dmsb).  However this is overridden if either
+<span class="lineNum">     245 </span>            :      * \e dmsa or \e dmsb contain a latitude or longitude hemisphere designator
+<span class="lineNum">     246 </span>            :      * (N, S, E, W).  If an exception is thrown, \e lat and \e lon are
+<span class="lineNum">     247 </span>            :      * unchanged.
+<span class="lineNum">     248 </span>            :      **********************************************************************/
+<span class="lineNum">     249 </span>            :     static void DecodeLatLon(const std::string&amp; dmsa, const std::string&amp; dmsb,
+<span class="lineNum">     250 </span>            :                              real&amp; lat, real&amp; lon,
+<span class="lineNum">     251 </span>            :                              bool longfirst = false);
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            :     /**
+<span class="lineNum">     254 </span>            :      * Convert a string to an angle in degrees.
+<span class="lineNum">     255 </span>            :      *
+<span class="lineNum">     256 </span>            :      * @param[in] angstr input string.
+<span class="lineNum">     257 </span>            :      * @exception GeographicErr if \e angstr is malformed.
+<span class="lineNum">     258 </span>            :      * @exception GeographicErr if \e angstr includes a hemisphere designator.
+<span class="lineNum">     259 </span>            :      * @return angle (degrees)
+<span class="lineNum">     260 </span>            :      *
+<span class="lineNum">     261 </span>            :      * No hemisphere designator is allowed and no check is done on the range of
+<span class="lineNum">     262 </span>            :      * the result.
+<span class="lineNum">     263 </span>            :      **********************************************************************/
+<span class="lineNum">     264 </span>            :     static Math::real DecodeAngle(const std::string&amp; angstr);
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            :     /**
+<span class="lineNum">     267 </span>            :      * Convert a string to an azimuth in degrees.
+<span class="lineNum">     268 </span>            :      *
+<span class="lineNum">     269 </span>            :      * @param[in] azistr input string.
+<span class="lineNum">     270 </span>            :      * @exception GeographicErr if \e azistr is malformed.
+<span class="lineNum">     271 </span>            :      * @exception GeographicErr if \e azistr includes a N/S designator.
+<span class="lineNum">     272 </span>            :      * @return azimuth (degrees) reduced to the range [&amp;minus;180&amp;deg;,
+<span class="lineNum">     273 </span>            :      *   180&amp;deg;].
+<span class="lineNum">     274 </span>            :      *
+<span class="lineNum">     275 </span>            :      * A hemisphere designator E/W can be used; the result is multiplied by
+<span class="lineNum">     276 </span>            :      * &amp;minus;1 if W is present.
+<span class="lineNum">     277 </span>            :      **********************************************************************/
+<span class="lineNum">     278 </span>            :     static Math::real DecodeAzimuth(const std::string&amp; azistr);
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span>            :     /**
+<span class="lineNum">     281 </span>            :      * Convert angle (in degrees) into a DMS string (using d, ', and &amp;quot;).
+<span class="lineNum">     282 </span>            :      *
+<span class="lineNum">     283 </span>            :      * @param[in] angle input angle (degrees)
+<span class="lineNum">     284 </span>            :      * @param[in] trailing DMS::component value indicating the trailing units
+<span class="lineNum">     285 </span>            :      *   of the string (this component is given as a decimal number if
+<span class="lineNum">     286 </span>            :      *   necessary).
+<span class="lineNum">     287 </span>            :      * @param[in] prec the number of digits after the decimal point for the
+<span class="lineNum">     288 </span>            :      *   trailing component.
+<span class="lineNum">     289 </span>            :      * @param[in] ind DMS::flag value indicating additional formatting.
+<span class="lineNum">     290 </span>            :      * @param[in] dmssep if non-null, use as the DMS separator character
+<span class="lineNum">     291 </span>            :      *   (instead of d, ', &amp;quot; delimiters).
+<span class="lineNum">     292 </span>            :      * @exception std::bad_alloc if memory for the string can't be allocated.
+<span class="lineNum">     293 </span>            :      * @return formatted string
+<span class="lineNum">     294 </span>            :      *
+<span class="lineNum">     295 </span>            :      * The interpretation of \e ind is as follows:
+<span class="lineNum">     296 </span>            :      * - ind == DMS::NONE, signed result no leading zeros on degrees except in
+<span class="lineNum">     297 </span>            :      *   the units place, e.g., -8d03'.
+<span class="lineNum">     298 </span>            :      * - ind == DMS::LATITUDE, trailing N or S hemisphere designator, no sign,
+<span class="lineNum">     299 </span>            :      *   pad degrees to 2 digits, e.g., 08d03'S.
+<span class="lineNum">     300 </span>            :      * - ind == DMS::LONGITUDE, trailing E or W hemisphere designator, no
+<span class="lineNum">     301 </span>            :      *   sign, pad degrees to 3 digits, e.g., 008d03'W.
+<span class="lineNum">     302 </span>            :      * - ind == DMS::AZIMUTH, convert to the range [0, 360&amp;deg;), no
+<span class="lineNum">     303 </span>            :      *   sign, pad degrees to 3 digits, e.g., 351d57'.
+<span class="lineNum">     304 </span>            :      * .
+<span class="lineNum">     305 </span>            :      * The integer parts of the minutes and seconds components are always given
+<span class="lineNum">     306 </span>            :      * with 2 digits.
+<span class="lineNum">     307 </span>            :      **********************************************************************/
+<span class="lineNum">     308 </span>            :     static std::string Encode(real angle, component trailing, unsigned prec,
+<span class="lineNum">     309 </span>            :                               flag ind = NONE, char dmssep = char(0));
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            :     /**
+<span class="lineNum">     312 </span>            :      * Convert angle into a DMS string (using d, ', and &amp;quot;) selecting the
+<span class="lineNum">     313 </span>            :      * trailing component based on the precision.
+<span class="lineNum">     314 </span>            :      *
+<span class="lineNum">     315 </span>            :      * @param[in] angle input angle (degrees)
+<span class="lineNum">     316 </span>            :      * @param[in] prec the precision relative to 1 degree.
+<span class="lineNum">     317 </span>            :      * @param[in] ind DMS::flag value indicated additional formatting.
+<span class="lineNum">     318 </span>            :      * @param[in] dmssep if non-null, use as the DMS separator character
+<span class="lineNum">     319 </span>            :      *   (instead of d, ', &amp;quot; delimiters).
+<span class="lineNum">     320 </span>            :      * @exception std::bad_alloc if memory for the string can't be allocated.
+<span class="lineNum">     321 </span>            :      * @return formatted string
+<span class="lineNum">     322 </span>            :      *
+<span class="lineNum">     323 </span>            :      * \e prec indicates the precision relative to 1 degree, e.g., \e prec = 3
+<span class="lineNum">     324 </span>            :      * gives a result accurate to 0.1' and \e prec = 4 gives a result accurate
+<span class="lineNum">     325 </span>            :      * to 1&amp;quot;.  \e ind is interpreted as in DMS::Encode with the additional
+<span class="lineNum">     326 </span>            :      * facility that DMS::NUMBER represents \e angle as a number in fixed
+<a name="327"><span class="lineNum">     327 </span>            :      * format with precision \e prec.</a>
+<span class="lineNum">     328 </span>            :      **********************************************************************/
+<span class="lineNum">     329 </span><span class="lineCov">         21 :     static std::string Encode(real angle, unsigned prec, flag ind = NONE,</span>
+<span class="lineNum">     330 </span>            :                               char dmssep = char(0)) {
+<span class="lineNum">     331 </span>            :       return ind == NUMBER ? Utility::str(angle, int(prec)) :
+<span class="lineNum">     332 </span>            :         Encode(angle,
+<span class="lineNum">     333 </span><span class="lineCov">          4 :                prec &lt; 2 ? DEGREE : (prec &lt; 4 ? MINUTE : SECOND),</span>
+<span class="lineNum">     334 </span><span class="lineCov">          4 :                prec &lt; 2 ? prec : (prec &lt; 4 ? prec - 2 : prec - 4),</span>
+<span class="lineNum">     335 </span><span class="lineCov">        281 :                ind, dmssep);</span>
+<span class="lineNum">     336 </span>            :     }
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            :     /**
+<span class="lineNum">     339 </span>            :      * Split angle into degrees and minutes
+<span class="lineNum">     340 </span>            :      *
+<span class="lineNum">     341 </span>            :      * @param[in] ang angle (degrees)
+<span class="lineNum">     342 </span>            :      * @param[out] d degrees (an integer returned as a real)
+<span class="lineNum">     343 </span>            :      * @param[out] m arc minutes.
+<span class="lineNum">     344 </span>            :      **********************************************************************/
+<span class="lineNum">     345 </span>            :     static void Encode(real ang, real&amp; d, real&amp; m) {
+<span class="lineNum">     346 </span>            :       d = int(ang); m = 60 * (ang - d);
+<span class="lineNum">     347 </span>            :     }
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span>            :     /**
+<span class="lineNum">     350 </span>            :      * Split angle into degrees and minutes and seconds.
+<span class="lineNum">     351 </span>            :      *
+<span class="lineNum">     352 </span>            :      * @param[in] ang angle (degrees)
+<span class="lineNum">     353 </span>            :      * @param[out] d degrees (an integer returned as a real)
+<span class="lineNum">     354 </span>            :      * @param[out] m arc minutes (an integer returned as a real)
+<span class="lineNum">     355 </span>            :      * @param[out] s arc seconds.
+<span class="lineNum">     356 </span>            :      **********************************************************************/
+<span class="lineNum">     357 </span>            :     static void Encode(real ang, real&amp; d, real&amp; m, real&amp; s) {
+<span class="lineNum">     358 </span>            :       d = int(ang); ang = 60 * (ang - d);
+<span class="lineNum">     359 </span>            :       m = int(ang); s = 60 * (ang - m);
+<span class="lineNum">     360 </span>            :     }
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span>            :   };
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span>            : } // namespace GeographicLib
+<span class="lineNum">     365 </span>            : 
+<span class="lineNum">     366 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">     367 </span>            : #  pragma warning (pop)
+<span class="lineNum">     368 </span>            : #endif
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span>            : #endif  // GEOGRAPHICLIB_DMS_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

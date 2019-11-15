@@ -1,0 +1,461 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/proj/nn.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/proj</a> - nn.hpp<span style="font-size: 80%;"> (source / <a href="nn.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">143</td>
+            <td class="headerCovTableEntry">146</td>
+            <td class="headerCovTableEntryHi">97.9 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #pragma once</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            : /*
+<span class="lineNum">       4 </span>            :  * Copyright (c) 2015 Dropbox, Inc.
+<span class="lineNum">       5 </span>            :  *
+<span class="lineNum">       6 </span>            :  * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<span class="lineNum">       7 </span>            :  * you may not use this file except in compliance with the License.
+<span class="lineNum">       8 </span>            :  * You may obtain a copy of the License at
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *     http://www.apache.org/licenses/LICENSE-2.0
+<span class="lineNum">      11 </span>            :  *
+<span class="lineNum">      12 </span>            :  * Unless required by applicable law or agreed to in writing, software
+<span class="lineNum">      13 </span>            :  * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<span class="lineNum">      14 </span>            :  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<span class="lineNum">      15 </span>            :  * See the License for the specific language governing permissions and
+<span class="lineNum">      16 </span>            :  * limitations under the License.
+<span class="lineNum">      17 </span>            :  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &lt;cassert&gt;
+<span class="lineNum">      20 </span>            : #include &lt;cstdlib&gt;
+<span class="lineNum">      21 </span>            : #include &lt;functional&gt;
+<span class="lineNum">      22 </span>            : #include &lt;memory&gt;
+<span class="lineNum">      23 </span>            : #include &lt;type_traits&gt;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : namespace dropbox {
+<span class="lineNum">      26 </span>            : namespace oxygen {
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : // Marker type and value for use by nn below.
+<span class="lineNum">      29 </span>            : struct i_promise_i_checked_for_null_t {};
+<span class="lineNum">      30 </span>            : static constexpr i_promise_i_checked_for_null_t i_promise_i_checked_for_null{};
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : // Helper to get the type pointed to by a raw or smart pointer. This can be
+<span class="lineNum">      33 </span>            : // explicitly
+<span class="lineNum">      34 </span>            : // specialized if need be to provide compatibility with user-defined smart
+<span class="lineNum">      35 </span>            : // pointers.
+<span class="lineNum">      36 </span>            : namespace nn_detail {
+<span class="lineNum">      37 </span>            : template &lt;typename T&gt; struct element_type {
+<span class="lineNum">      38 </span>            :   using type = typename T::element_type;
+<span class="lineNum">      39 </span>            : };
+<span class="lineNum">      40 </span>            : template &lt;typename Pointee&gt; struct element_type&lt;Pointee *&gt; {
+<span class="lineNum">      41 </span>            :   using type = Pointee;
+<span class="lineNum">      42 </span>            : };
+<span class="lineNum">      43 </span>            : }
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : template &lt;typename PtrType&gt; class nn;
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            : // Trait to check whether a given type is a non-nullable pointer
+<span class="lineNum">      48 </span>            : template &lt;typename T&gt; struct is_nn : public std::false_type {};
+<span class="lineNum">      49 </span>            : template &lt;typename PtrType&gt;
+<span class="lineNum">      50 </span>            : struct is_nn&lt;nn&lt;PtrType&gt;&gt; : public std::true_type {};
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            : /* nn&lt;PtrType&gt;
+<span class="lineNum">      53 </span>            :  *
+<span class="lineNum">      54 </span>            :  * Wrapper around a pointer that is guaranteed to not be null. This works with
+<span class="lineNum">      55 </span>            :  * raw pointers
+<span class="lineNum">      56 </span>            :  * as well as any smart pointer: nn&lt;int *&gt;, nn&lt;shared_ptr&lt;DbxTable&gt;&gt;,
+<span class="lineNum">      57 </span>            :  * nn&lt;unique_ptr&lt;Foo&gt;&gt;,
+<span class="lineNum">      58 </span>            :  * etc. An nn&lt;PtrType&gt; can be used just like a PtrType.
+<span class="lineNum">      59 </span>            :  *
+<span class="lineNum">      60 </span>            :  * An nn&lt;PtrType&gt; can be constructed from another nn&lt;PtrType&gt;, if the underlying
+<span class="lineNum">      61 </span>            :  * type would
+<span class="lineNum">      62 </span>            :  * allow such construction. For example, nn&lt;shared_ptr&lt;PtrType&gt;&gt; can be copied
+<span class="lineNum">      63 </span>            :  * and moved, but
+<span class="lineNum">      64 </span>            :  * nn&lt;unique_ptr&lt;PtrType&gt;&gt; can only be moved; an nn&lt;unique_ptr&lt;PtrType&gt;&gt; can be
+<span class="lineNum">      65 </span>            :  * explicitly
+<span class="lineNum">      66 </span>            :  * (but not implicitly) created from an nn&lt;PtrType*&gt;; implicit upcasts are
+<span class="lineNum">      67 </span>            :  * allowed; and so on.
+<span class="lineNum">      68 </span>            :  *
+<span class="lineNum">      69 </span>            :  * Similarly, non-nullable pointers can be compared with regular or other
+<span class="lineNum">      70 </span>            :  * non-nullable
+<span class="lineNum">      71 </span>            :  * pointers, using the same rules as the underlying pointer types.
+<span class="lineNum">      72 </span>            :  *
+<span class="lineNum">      73 </span>            :  * This module also provides helpers for creating an nn&lt;PtrType&gt; from operations
+<span class="lineNum">      74 </span>            :  * that would
+<span class="lineNum">      75 </span>            :  * always return a non-null pointer: nn_make_unique, nn_make_shared,
+<span class="lineNum">      76 </span>            :  * nn_shared_from_this, and
+<span class="lineNum">      77 </span>            :  * nn_addr (a replacement for operator&amp;).
+<span class="lineNum">      78 </span>            :  *
+<span class="lineNum">      79 </span>            :  * We abbreviate nn&lt;unique_ptr&gt; as nn_unique_ptr - it's a little more readable.
+<span class="lineNum">      80 </span>            :  * Likewise,
+<span class="lineNum">      81 </span>            :  * nn&lt;shared_ptr&gt; can be written as nn_shared_ptr.
+<span class="lineNum">      82 </span>            :  *
+<span class="lineNum">      83 </span>            :  * Finally, we define macros NN_CHECK_ASSERT and NN_CHECK_THROW, to convert a
+<span class="lineNum">      84 </span>            :  * nullable pointer
+<span class="lineNum">      85 </span>            :  * to a non-nullable pointer. At Dropbox, these use customized error-handling
+<span class="lineNum">      86 </span>            :  * infrastructure
+<a name="87"><span class="lineNum">      87 </span>            :  * and are in a separate file. We've included sample implementations here.</a>
+<span class="lineNum">      88 </span>            :  */
+<span class="lineNum">      89 </span><span class="lineCov">    2133727 : template &lt;typename PtrType&gt; class nn {</span>
+<span class="lineNum">      90 </span>            : public:
+<span class="lineNum">      91 </span>            :   static_assert(!is_nn&lt;PtrType&gt;::value, &quot;nn&lt;nn&lt;T&gt;&gt; is disallowed&quot;);
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :   using element_type = typename nn_detail::element_type&lt;PtrType&gt;::type;
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :   // Pass through calls to operator* and operator-&gt; transparently
+<span class="lineNum">      96 </span>            :   element_type &amp;operator*() const { return *ptr; }
+<span class="lineNum">      97 </span>            :   element_type *operator-&gt;() const { return &amp;*ptr; }
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            :   // Expose the underlying PtrType
+<span class="lineNum">     100 </span><span class="lineCov">     270307 :   operator const PtrType &amp;() const &amp; { return ptr; }</span>
+<span class="lineNum">     101 </span><span class="lineCov">          1 :   operator PtrType &amp;&amp;() &amp;&amp; { return std::move(ptr); }</span>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :   // Trying to use the assignment operator to assign a nn&lt;PtrType&gt; to a PtrType
+<span class="lineNum">     104 </span>            :   // using the
+<span class="lineNum">     105 </span>            :   // above conversion functions hits an ambiguous resolution bug in clang:
+<span class="lineNum">     106 </span>            :   // http://llvm.org/bugs/show_bug.cgi?id=18359
+<span class="lineNum">     107 </span>            :   // While that exists, we can use these as simple ways of accessing the
+<span class="lineNum">     108 </span>            :   // underlying type
+<span class="lineNum">     109 </span>            :   // (instead of workarounds calling the operators explicitly or adding a
+<span class="lineNum">     110 </span>            :   // constructor call).
+<span class="lineNum">     111 </span><span class="lineCov">       8759 :   const PtrType &amp;as_nullable() const &amp; { return ptr; }</span>
+<span class="lineNum">     112 </span>            :   PtrType &amp;&amp;as_nullable() &amp;&amp; { return std::move(ptr); }
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :   // Can't convert to bool (that would be silly). The explicit delete results in
+<span class="lineNum">     115 </span>            :   // &quot;value of type 'nn&lt;...&gt;' is not contextually convertible to 'bool'&quot;, rather
+<span class="lineNum">     116 </span>            :   // than
+<span class="lineNum">     117 </span>            :   // &quot;no viable conversion&quot;, which is a bit more clear.
+<span class="lineNum">     118 </span>            :   operator bool() const = delete;
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            :   // Explicitly deleted constructors. These help produce clearer error messages,
+<span class="lineNum">     121 </span>            :   // as trying
+<span class="lineNum">     122 </span>            :   // to use them will result in clang printing the whole line, including the
+<span class="lineNum">     123 </span>            :   // comment.
+<span class="lineNum">     124 </span>            :   nn(std::nullptr_t) = delete;            // nullptr is not allowed here
+<span class="lineNum">     125 </span>            :   nn &amp;operator=(std::nullptr_t) = delete; // nullptr is not allowed here
+<span class="lineNum">     126 </span>            :   nn(PtrType) = delete;            // must use NN_CHECK_ASSERT or NN_CHECK_THROW
+<span class="lineNum">     127 </span>            :   nn &amp;operator=(PtrType) = delete; // must use NN_CHECK_ASSERT or NN_CHECK_THROW
+<span class="lineNum">     128 </span>            :   //PROJ_DLL ~nn();
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            :   // Semi-private constructor for use by NN_CHECK_ macros.
+<span class="lineNum">     131 </span><span class="lineCov">         57 :   explicit nn(i_promise_i_checked_for_null_t, const PtrType &amp;arg) noexcept : ptr(arg) {</span>
+<span class="lineNum">     132 </span>            :   }
+<span class="lineNum">     133 </span><span class="lineCov">        203 :   explicit nn(i_promise_i_checked_for_null_t, PtrType &amp;&amp;arg) noexcept</span>
+<span class="lineNum">     134 </span><span class="lineCov">        203 :       : ptr(std::move(arg)) {</span>
+<span class="lineNum">     135 </span>            :   }
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            :   // Type-converting move and copy constructor. We have four separate cases
+<span class="lineNum">     138 </span>            :   // here, for
+<span class="lineNum">     139 </span>            :   // implicit and explicit move and copy.
+<span class="lineNum">     140 </span>            :   template &lt;typename OtherType,
+<span class="lineNum">     141 </span>            :             typename std::enable_if&lt;
+<span class="lineNum">     142 </span>            :                 std::is_constructible&lt;PtrType, OtherType&gt;::value &amp;&amp;
+<span class="lineNum">     143 </span>            :                     !std::is_convertible&lt;OtherType, PtrType&gt;::value,
+<span class="lineNum">     144 </span>            :                 int&gt;::type = 0&gt;
+<span class="lineNum">     145 </span>            :   explicit nn(const nn&lt;OtherType&gt; &amp;other)
+<span class="lineNum">     146 </span>            :       : ptr(other.operator const OtherType &amp;()) {}
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            :   template &lt;typename OtherType,
+<span class="lineNum">     149 </span>            :             typename std::enable_if&lt;
+<span class="lineNum">     150 </span>            :                 std::is_constructible&lt;PtrType, OtherType&gt;::value &amp;&amp;
+<span class="lineNum">     151 </span>            :                     !std::is_convertible&lt;OtherType, PtrType&gt;::value &amp;&amp;
+<span class="lineNum">     152 </span>            :                     !std::is_pointer&lt;OtherType&gt;::value,
+<span class="lineNum">     153 </span>            :                 int&gt;::type = 0&gt;
+<span class="lineNum">     154 </span>            :   explicit nn(nn&lt;OtherType&gt; &amp;&amp;other)
+<span class="lineNum">     155 </span>            :       : ptr(std::move(other).operator OtherType &amp;&amp;()) {}
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            :   template &lt;typename OtherType,
+<span class="lineNum">     158 </span>            :             typename std::enable_if&lt;
+<span class="lineNum">     159 </span>            :                 std::is_convertible&lt;OtherType, PtrType&gt;::value, int&gt;::type = 0&gt;
+<span class="lineNum">     160 </span><span class="lineCov">         18 :   nn(const nn&lt;OtherType&gt; &amp;other) : ptr(other.operator const OtherType &amp;()) {}</span>
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            :   template &lt;
+<span class="lineNum">     163 </span>            :       typename OtherType,
+<span class="lineNum">     164 </span>            :       typename std::enable_if&lt;std::is_convertible&lt;OtherType, PtrType&gt;::value &amp;&amp;
+<span class="lineNum">     165 </span>            :                                   !std::is_pointer&lt;OtherType&gt;::value,
+<span class="lineNum">     166 </span>            :                               int&gt;::type = 0&gt;
+<span class="lineNum">     167 </span>            :   nn(nn&lt;OtherType&gt; &amp;&amp;other) : ptr(std::move(other).operator OtherType &amp;&amp;()) {}
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :   // A type-converting move and copy assignment operator aren't necessary;
+<span class="lineNum">     170 </span>            :   // writing
+<span class="lineNum">     171 </span>            :   // &quot;base_ptr = derived_ptr;&quot; will run the type-converting constructor followed
+<span class="lineNum">     172 </span>            :   // by the
+<span class="lineNum">     173 </span>            :   // implicit move assignment operator.
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            :   // Two-argument constructor, designed for use with the shared_ptr aliasing
+<span class="lineNum">     176 </span>            :   // constructor.
+<span class="lineNum">     177 </span>            :   // This will not be instantiated if PtrType doesn't have a suitable
+<span class="lineNum">     178 </span>            :   // constructor.
+<span class="lineNum">     179 </span>            :   template &lt;
+<span class="lineNum">     180 </span>            :       typename OtherType,
+<span class="lineNum">     181 </span>            :       typename std::enable_if&lt;
+<span class="lineNum">     182 </span>            :           std::is_constructible&lt;PtrType, OtherType, element_type *&gt;::value,
+<span class="lineNum">     183 </span>            :           int&gt;::type = 0&gt;
+<span class="lineNum">     184 </span>            :   nn(const nn&lt;OtherType&gt; &amp;ownership_ptr, nn&lt;element_type *&gt; target_ptr)
+<span class="lineNum">     185 </span>            :       : ptr(ownership_ptr.operator const OtherType &amp;(), target_ptr) {}
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span>            :   // Comparisons. Other comparisons are implemented in terms of these.
+<span class="lineNum">     188 </span>            :   template &lt;typename L, typename R&gt;
+<span class="lineNum">     189 </span>            :   friend bool operator==(const nn&lt;L&gt; &amp;, const R &amp;);
+<span class="lineNum">     190 </span>            :   template &lt;typename L, typename R&gt;
+<span class="lineNum">     191 </span>            :   friend bool operator==(const L &amp;, const nn&lt;R&gt; &amp;);
+<span class="lineNum">     192 </span>            :   template &lt;typename L, typename R&gt;
+<span class="lineNum">     193 </span>            :   friend bool operator==(const nn&lt;L&gt; &amp;, const nn&lt;R&gt; &amp;);
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span>            :   template &lt;typename L, typename R&gt;
+<span class="lineNum">     196 </span>            :   friend bool operator&lt;(const nn&lt;L&gt; &amp;, const R &amp;);
+<span class="lineNum">     197 </span>            :   template &lt;typename L, typename R&gt;
+<span class="lineNum">     198 </span>            :   friend bool operator&lt;(const L &amp;, const nn&lt;R&gt; &amp;);
+<span class="lineNum">     199 </span>            :   template &lt;typename L, typename R&gt;
+<span class="lineNum">     200 </span>            :   friend bool operator&lt;(const nn&lt;L&gt; &amp;, const nn&lt;R&gt; &amp;);
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span>            :   // ostream operator
+<span class="lineNum">     203 </span>            :   template &lt;typename T&gt;
+<span class="lineNum">     204 </span>            :   friend std::ostream &amp;operator&lt;&lt;(std::ostream &amp;, const nn&lt;T&gt; &amp;);
+<span class="lineNum">     205 </span>            : 
+<span class="lineNum">     206 </span>            :   template &lt;typename T = PtrType&gt; element_type *get() const {
+<span class="lineNum">     207 </span><span class="lineCov">    2846275 :     return ptr.get();</span>
+<span class="lineNum">     208 </span>            :   }
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            : private:
+<span class="lineNum">     211 </span>            :   // Backing pointer
+<span class="lineNum">     212 </span>            :   PtrType ptr;
+<span class="lineNum">     213 </span>            : };
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            : // Base comparisons - these are friends of nn&lt;PtrType&gt;, so they can access .ptr
+<span class="lineNum">     216 </span>            : // directly.
+<span class="lineNum">     217 </span>            : template &lt;typename L, typename R&gt; bool operator==(const nn&lt;L&gt; &amp;l, const R &amp;r) {
+<span class="lineNum">     218 </span>            :   return l.ptr == r;
+<span class="lineNum">     219 </span>            : }
+<span class="lineNum">     220 </span>            : template &lt;typename L, typename R&gt; bool operator==(const L &amp;l, const nn&lt;R&gt; &amp;r) {
+<span class="lineNum">     221 </span>            :   return l == r.ptr;
+<span class="lineNum">     222 </span>            : }
+<span class="lineNum">     223 </span>            : template &lt;typename L, typename R&gt;
+<span class="lineNum">     224 </span>            : bool operator==(const nn&lt;L&gt; &amp;l, const nn&lt;R&gt; &amp;r) {
+<span class="lineNum">     225 </span>            :   return l.ptr == r.ptr;
+<span class="lineNum">     226 </span>            : }
+<span class="lineNum">     227 </span>            : template &lt;typename L, typename R&gt; bool operator&lt;(const nn&lt;L&gt; &amp;l, const R &amp;r) {
+<span class="lineNum">     228 </span>            :   return l.ptr &lt; r;
+<span class="lineNum">     229 </span>            : }
+<span class="lineNum">     230 </span>            : template &lt;typename L, typename R&gt; bool operator&lt;(const L &amp;l, const nn&lt;R&gt; &amp;r) {
+<span class="lineNum">     231 </span>            :   return l &lt; r.ptr;
+<span class="lineNum">     232 </span>            : }
+<span class="lineNum">     233 </span>            : template &lt;typename L, typename R&gt;
+<span class="lineNum">     234 </span>            : bool operator&lt;(const nn&lt;L&gt; &amp;l, const nn&lt;R&gt; &amp;r) {
+<span class="lineNum">     235 </span>            :   return l.ptr &lt; r.ptr;
+<span class="lineNum">     236 </span>            : }
+<span class="lineNum">     237 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     238 </span>            : std::ostream &amp;operator&lt;&lt;(std::ostream &amp;os, const nn&lt;T&gt; &amp;p) {
+<span class="lineNum">     239 </span>            :   return os &lt;&lt; p.ptr;
+<span class="lineNum">     240 </span>            : }
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span>            : #define NN_DERIVED_OPERATORS(op, base)                                         \
+<span class="lineNum">     243 </span>            :   template &lt;typename L, typename R&gt;                                            \
+<span class="lineNum">     244 </span>            :   bool operator op(const nn&lt;L&gt; &amp;l, const R &amp;r) {                               \
+<span class="lineNum">     245 </span>            :     return base;                                                               \
+<span class="lineNum">     246 </span>            :   }                                                                            \
+<span class="lineNum">     247 </span>            :   template &lt;typename L, typename R&gt;                                            \
+<span class="lineNum">     248 </span>            :   bool operator op(const L &amp;l, const nn&lt;R&gt; &amp;r) {                               \
+<span class="lineNum">     249 </span>            :     return base;                                                               \
+<span class="lineNum">     250 </span>            :   }                                                                            \
+<span class="lineNum">     251 </span>            :   template &lt;typename L, typename R&gt;                                            \
+<span class="lineNum">     252 </span>            :   bool operator op(const nn&lt;L&gt; &amp;l, const nn&lt;R&gt; &amp;r) {                           \
+<span class="lineNum">     253 </span>            :     return base;                                                               \
+<span class="lineNum">     254 </span>            :   }
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            : NN_DERIVED_OPERATORS(&gt;, r &lt; l)
+<span class="lineNum">     257 </span>            : NN_DERIVED_OPERATORS(&lt;=, !(l &gt; r))
+<span class="lineNum">     258 </span>            : NN_DERIVED_OPERATORS(&gt;=, !(l &lt; r))
+<span class="lineNum">     259 </span><span class="lineCov">         10 : NN_DERIVED_OPERATORS(!=, !(l == r))</span>
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span>            : #undef NN_DERIVED_OPERATORS
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span>            : // Convenience typedefs
+<span class="lineNum">     264 </span>            : template &lt;typename T&gt; using nn_unique_ptr = nn&lt;std::unique_ptr&lt;T&gt;&gt;;
+<span class="lineNum">     265 </span>            : template &lt;typename T&gt; using nn_shared_ptr = nn&lt;std::shared_ptr&lt;T&gt;&gt;;
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span>            : template &lt;typename T, typename... Args&gt;
+<span class="lineNum">     268 </span>            : nn_unique_ptr&lt;T&gt; nn_make_unique(Args &amp;&amp;... args) {
+<span class="lineNum">     269 </span>            :   return nn_unique_ptr&lt;T&gt;(
+<span class="lineNum">     270 </span>            :       i_promise_i_checked_for_null,
+<span class="lineNum">     271 </span>            :       std::unique_ptr&lt;T&gt;(new T(std::forward&lt;Args&gt;(args)...)));
+<span class="lineNum">     272 </span>            : }
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            : template &lt;typename T, typename... Args&gt;
+<span class="lineNum">     275 </span>            : nn_shared_ptr&lt;T&gt; nn_make_shared(Args &amp;&amp;... args) {
+<span class="lineNum">     276 </span>            :   return nn_shared_ptr&lt;T&gt;(i_promise_i_checked_for_null,
+<span class="lineNum">     277 </span><span class="lineCov">     548524 :                           std::make_shared&lt;T&gt;(std::forward&lt;Args&gt;(args)...));</span>
+<span class="lineNum">     278 </span>            : }
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     281 </span>            : class nn_enable_shared_from_this : public std::enable_shared_from_this&lt;T&gt; {
+<span class="lineNum">     282 </span>            : public:
+<span class="lineNum">     283 </span>            :   using std::enable_shared_from_this&lt;T&gt;::enable_shared_from_this;
+<span class="lineNum">     284 </span>            :   nn_shared_ptr&lt;T&gt; nn_shared_from_this() {
+<span class="lineNum">     285 </span>            :     return nn_shared_ptr&lt;T&gt;(i_promise_i_checked_for_null,
+<span class="lineNum">     286 </span>            :                             this-&gt;shared_from_this());
+<span class="lineNum">     287 </span>            :   }
+<span class="lineNum">     288 </span>            :   nn_shared_ptr&lt;const T&gt; nn_shared_from_this() const {
+<span class="lineNum">     289 </span>            :     return nn_shared_ptr&lt;const T&gt;(i_promise_i_checked_for_null,
+<span class="lineNum">     290 </span>            :                                   this-&gt;shared_from_this());
+<span class="lineNum">     291 </span>            :   }
+<span class="lineNum">     292 </span>            : };
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            : template &lt;typename T&gt; nn&lt;T *&gt; nn_addr(T &amp;object) {
+<span class="lineNum">     295 </span>            :   return nn&lt;T *&gt;(i_promise_i_checked_for_null, &amp;object);
+<span class="lineNum">     296 </span>            : }
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            : template &lt;typename T&gt; nn&lt;const T *&gt; nn_addr(const T &amp;object) {
+<span class="lineNum">     299 </span>            :   return nn&lt;const T *&gt;(i_promise_i_checked_for_null, &amp;object);
+<span class="lineNum">     300 </span>            : }
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            : /* Non-nullable equivalents of shared_ptr's specialized casting functions.
+<span class="lineNum">     303 </span>            :  * These convert through a shared_ptr since nn&lt;shared_ptr&lt;T&gt;&gt; lacks the
+<span class="lineNum">     304 </span>            :  * ref-count-sharing cast
+<span class="lineNum">     305 </span>            :  * constructor, but thanks to moves there shouldn't be any significant extra
+<a name="306"><span class="lineNum">     306 </span>            :  * cost. */</a>
+<span class="lineNum">     307 </span>            : template &lt;typename T, typename U&gt;
+<span class="lineNum">     308 </span><span class="lineCov">      68888 : nn_shared_ptr&lt;T&gt; nn_static_pointer_cast(const nn_shared_ptr&lt;U&gt; &amp;org_ptr) {</span>
+<span class="lineNum">     309 </span>            :   auto raw_ptr =
+<span class="lineNum">     310 </span><span class="lineCov">       5603 :       static_cast&lt;typename nn_shared_ptr&lt;T&gt;::element_type *&gt;(org_ptr.get());</span>
+<span class="lineNum">     311 </span>            :   std::shared_ptr&lt;T&gt; nullable_ptr(org_ptr.as_nullable(), raw_ptr);
+<span class="lineNum">     312 </span>            :   return nn_shared_ptr&lt;T&gt;(i_promise_i_checked_for_null,
+<span class="lineNum">     313 </span><span class="lineCov">      68888 :                           std::move(nullable_ptr));</span>
+<span class="lineNum">     314 </span>            : }
+<a name="315"><span class="lineNum">     315 </span>            : </a>
+<span class="lineNum">     316 </span>            : template &lt;typename T, typename U&gt;
+<span class="lineNum">     317 </span><span class="lineCov">     109919 : std::shared_ptr&lt;T&gt; nn_dynamic_pointer_cast(const nn_shared_ptr&lt;U&gt; &amp;org_ptr) {</span>
+<span class="lineNum">     318 </span><span class="lineCov">     109909 :   auto raw_ptr =</span>
+<span class="lineNum">     319 </span><span class="lineCov">          2 :       dynamic_cast&lt;typename std::shared_ptr&lt;T&gt;::element_type *&gt;(org_ptr.get());</span>
+<span class="lineNum">     320 </span><span class="lineCov">     109917 :   if (!raw_ptr) {</span>
+<span class="lineNum">     321 </span>            :     return nullptr;
+<span class="lineNum">     322 </span>            :   } else {
+<span class="lineNum">     323 </span>            :     return std::shared_ptr&lt;T&gt;(org_ptr.as_nullable(), raw_ptr);
+<span class="lineNum">     324 </span>            :   }
+<span class="lineNum">     325 </span>            : }
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span>            : template &lt;typename T, typename U&gt;
+<span class="lineNum">     328 </span>            : nn_shared_ptr&lt;T&gt; nn_const_pointer_cast(const nn_shared_ptr&lt;U&gt; &amp;org_ptr) {
+<span class="lineNum">     329 </span>            :   auto raw_ptr =
+<span class="lineNum">     330 </span>            :       const_cast&lt;typename nn_shared_ptr&lt;T&gt;::element_type *&gt;(org_ptr.get());
+<span class="lineNum">     331 </span>            :   std::shared_ptr&lt;T&gt; nullable_ptr(org_ptr.as_nullable(), raw_ptr);
+<span class="lineNum">     332 </span>            :   return nn_shared_ptr&lt;T&gt;(i_promise_i_checked_for_null,
+<span class="lineNum">     333 </span>            :                           std::move(nullable_ptr));
+<span class="lineNum">     334 </span>            : }
+<span class="lineNum">     335 </span>            : }
+<span class="lineNum">     336 </span>            : } /* end namespace dropbox::oxygen */
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            : namespace std {
+<span class="lineNum">     339 </span>            : template &lt;typename T&gt; struct hash&lt;::dropbox::oxygen::nn&lt;T&gt;&gt; {
+<span class="lineNum">     340 </span>            :   using argument_type = ::dropbox::oxygen::nn&lt;T&gt;;
+<span class="lineNum">     341 </span>            :   using result_type = size_t;
+<span class="lineNum">     342 </span>            :   result_type operator()(const argument_type &amp;obj) const {
+<span class="lineNum">     343 </span>            :     return std::hash&lt;T&gt;{}(obj.as_nullable());
+<span class="lineNum">     344 </span>            :   }
+<span class="lineNum">     345 </span>            : };
+<span class="lineNum">     346 </span>            : }
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            : /* These have to be macros because our internal versions invoke other macros
+<span class="lineNum">     349 </span>            :  * that use
+<span class="lineNum">     350 </span>            :  * __FILE__ and __LINE__, which we want to correctly point to the call site.
+<span class="lineNum">     351 </span>            :  * We're looking
+<span class="lineNum">     352 </span>            :  * forward to std::source_location :)
+<span class="lineNum">     353 </span>            :  *
+<span class="lineNum">     354 </span>            :  * The lambdas ensure that we only evaluate _e once.
+<span class="lineNum">     355 </span>            :  */
+<span class="lineNum">     356 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">     357 </span>            : 
+<span class="lineNum">     358 </span>            : // NN_CHECK_ASSERT takes a pointer of type PT (e.g. raw pointer, std::shared_ptr
+<span class="lineNum">     359 </span>            : // or std::unique_ptr)
+<span class="lineNum">     360 </span>            : // and returns a non-nullable pointer of type nn&lt;PT&gt;.
+<span class="lineNum">     361 </span>            : // Triggers an assertion if expression evaluates to null.
+<span class="lineNum">     362 </span>            : #define NN_CHECK_ASSERT(_e)                                                    \
+<span class="lineNum">     363 </span>            :   (([&amp;](typename std::remove_reference&lt;decltype(_e)&gt;::type p) {                \
+<span class="lineNum">     364 </span>            :     /* note: assert() alone is not sufficient here, because it might be        \
+<span class="lineNum">     365 </span>            :      * compiled out. */                                                        \
+<span class="lineNum">     366 </span>            :     assert(p &amp;&amp;#_e &quot; must not be null&quot;);                                       \
+<span class="lineNum">     367 </span>            :     if (!p)                                                                    \
+<span class="lineNum">     368 </span>            :       std::abort();                                                            \
+<span class="lineNum">     369 </span>            :     return dropbox::oxygen::nn&lt;                                                \
+<span class="lineNum">     370 </span>            :         typename std::remove_reference&lt;decltype(p)&gt;::type&gt;(                    \
+<span class="lineNum">     371 </span>            :         dropbox::oxygen::i_promise_i_checked_for_null, std::move(p));          \
+<span class="lineNum">     372 </span>            :   })(_e))
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span>            : // NN_CHECK_THROW takes a pointer of type PT (e.g. raw pointer, std::shared_ptr
+<span class="lineNum">     375 </span>            : // or std::unique_ptr)
+<span class="lineNum">     376 </span>            : // and returns a non-nullable pointer of type nn&lt;PT&gt;.
+<span class="lineNum">     377 </span>            : // Throws if expression evaluates to null.
+<span class="lineNum">     378 </span>            : #define NN_CHECK_THROW(_e)                                                     \
+<span class="lineNum">     379 </span>            :   (([&amp;](typename std::remove_reference&lt;decltype(_e)&gt;::type p) {                \
+<span class="lineNum">     380 </span>            :     if (!p)                                                                    \
+<span class="lineNum">     381 </span>            :       throw std::runtime_error(#_e &quot; must not be null&quot;);                       \
+<span class="lineNum">     382 </span>            :     return dropbox::oxygen::nn&lt;                                                \
+<span class="lineNum">     383 </span>            :         typename std::remove_reference&lt;decltype(p)&gt;::type&gt;(                    \
+<span class="lineNum">     384 </span>            :         dropbox::oxygen::i_promise_i_checked_for_null, std::move(p));          \
+<span class="lineNum">     385 </span>            :   })(_e))
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

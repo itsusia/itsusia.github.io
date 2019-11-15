@@ -1,0 +1,312 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/LocalCartesian.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - LocalCartesian.hpp<span style="font-size: 80%;"> (source / <a href="LocalCartesian.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file LocalCartesian.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::LocalCartesian class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2008-2016) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_LOCALCARTESIAN_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_LOCALCARTESIAN_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/Geocentric.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : namespace GeographicLib {
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            :   /**
+<span class="lineNum">      19 </span>            :    * \brief Local cartesian coordinates
+<span class="lineNum">      20 </span>            :    *
+<span class="lineNum">      21 </span>            :    * Convert between geodetic coordinates latitude = \e lat, longitude = \e
+<span class="lineNum">      22 </span>            :    * lon, height = \e h (measured vertically from the surface of the ellipsoid)
+<span class="lineNum">      23 </span>            :    * to local cartesian coordinates (\e x, \e y, \e z).  The origin of local
+<span class="lineNum">      24 </span>            :    * cartesian coordinate system is at \e lat = \e lat0, \e lon = \e lon0, \e h
+<span class="lineNum">      25 </span>            :    * = \e h0. The \e z axis is normal to the ellipsoid; the \e y axis points
+<span class="lineNum">      26 </span>            :    * due north.  The plane \e z = - \e h0 is tangent to the ellipsoid.
+<span class="lineNum">      27 </span>            :    *
+<span class="lineNum">      28 </span>            :    * The conversions all take place via geocentric coordinates using a
+<span class="lineNum">      29 </span>            :    * Geocentric object (by default Geocentric::WGS84()).
+<span class="lineNum">      30 </span>            :    *
+<span class="lineNum">      31 </span>            :    * Example of use:
+<span class="lineNum">      32 </span>            :    * \include example-LocalCartesian.cpp
+<span class="lineNum">      33 </span>            :    *
+<span class="lineNum">      34 </span>            :    * &lt;a href=&quot;CartConvert.1.html&quot;&gt;CartConvert&lt;/a&gt; is a command-line utility
+<span class="lineNum">      35 </span>            :    * providing access to the functionality of Geocentric and LocalCartesian.
+<span class="lineNum">      36 </span>            :    **********************************************************************/
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :   class GEOGRAPHICLIB_EXPORT LocalCartesian {
+<span class="lineNum">      39 </span>            :   private:
+<span class="lineNum">      40 </span>            :     typedef Math::real real;
+<span class="lineNum">      41 </span>            :     static const size_t dim_ = 3;
+<span class="lineNum">      42 </span>            :     static const size_t dim2_ = dim_ * dim_;
+<span class="lineNum">      43 </span>            :     Geocentric _earth;
+<span class="lineNum">      44 </span>            :     real _lat0, _lon0, _h0;
+<span class="lineNum">      45 </span>            :     real _x0, _y0, _z0, _r[dim2_];
+<span class="lineNum">      46 </span>            :     void IntForward(real lat, real lon, real h, real&amp; x, real&amp; y, real&amp; z,
+<span class="lineNum">      47 </span>            :                     real M[dim2_]) const;
+<span class="lineNum">      48 </span>            :     void IntReverse(real x, real y, real z, real&amp; lat, real&amp; lon, real&amp; h,
+<span class="lineNum">      49 </span>            :                     real M[dim2_]) const;
+<span class="lineNum">      50 </span>            :     void MatrixMultiply(real M[dim2_]) const;
+<span class="lineNum">      51 </span>            :   public:
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            :     /**
+<span class="lineNum">      54 </span>            :      * Constructor setting the origin.
+<span class="lineNum">      55 </span>            :      *
+<span class="lineNum">      56 </span>            :      * @param[in] lat0 latitude at origin (degrees).
+<span class="lineNum">      57 </span>            :      * @param[in] lon0 longitude at origin (degrees).
+<span class="lineNum">      58 </span>            :      * @param[in] h0 height above ellipsoid at origin (meters); default 0.
+<span class="lineNum">      59 </span>            :      * @param[in] earth Geocentric object for the transformation; default
+<span class="lineNum">      60 </span>            :      *   Geocentric::WGS84().
+<span class="lineNum">      61 </span>            :      *
+<span class="lineNum">      62 </span>            :      * \e lat0 should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">      63 </span>            :      **********************************************************************/
+<span class="lineNum">      64 </span>            :     LocalCartesian(real lat0, real lon0, real h0 = 0,
+<span class="lineNum">      65 </span>            :                    const Geocentric&amp; earth = Geocentric::WGS84())
+<span class="lineNum">      66 </span><span class="lineCov">          2 :       : _earth(earth)</span>
+<span class="lineNum">      67 </span><span class="lineCov">          2 :     { Reset(lat0, lon0, h0); }</span>
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :     /**
+<span class="lineNum">      70 </span>            :      * Default constructor.
+<span class="lineNum">      71 </span>            :      *
+<span class="lineNum">      72 </span>            :      * @param[in] earth Geocentric object for the transformation; default
+<span class="lineNum">      73 </span>            :      *   Geocentric::WGS84().
+<span class="lineNum">      74 </span>            :      *
+<span class="lineNum">      75 </span>            :      * Sets \e lat0 = 0, \e lon0 = 0, \e h0 = 0.
+<span class="lineNum">      76 </span>            :      **********************************************************************/
+<span class="lineNum">      77 </span>            :     explicit LocalCartesian(const Geocentric&amp; earth = Geocentric::WGS84())
+<span class="lineNum">      78 </span>            :       : _earth(earth)
+<span class="lineNum">      79 </span>            :     { Reset(real(0), real(0), real(0)); }
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            :     /**
+<span class="lineNum">      82 </span>            :      * Reset the origin.
+<span class="lineNum">      83 </span>            :      *
+<span class="lineNum">      84 </span>            :      * @param[in] lat0 latitude at origin (degrees).
+<span class="lineNum">      85 </span>            :      * @param[in] lon0 longitude at origin (degrees).
+<span class="lineNum">      86 </span>            :      * @param[in] h0 height above ellipsoid at origin (meters); default 0.
+<span class="lineNum">      87 </span>            :      *
+<span class="lineNum">      88 </span>            :      * \e lat0 should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">      89 </span>            :      **********************************************************************/
+<span class="lineNum">      90 </span>            :     void Reset(real lat0, real lon0, real h0 = 0);
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :     /**
+<span class="lineNum">      93 </span>            :      * Convert from geodetic to local cartesian coordinates.
+<span class="lineNum">      94 </span>            :      *
+<span class="lineNum">      95 </span>            :      * @param[in] lat latitude of point (degrees).
+<span class="lineNum">      96 </span>            :      * @param[in] lon longitude of point (degrees).
+<span class="lineNum">      97 </span>            :      * @param[in] h height of point above the ellipsoid (meters).
+<span class="lineNum">      98 </span>            :      * @param[out] x local cartesian coordinate (meters).
+<span class="lineNum">      99 </span>            :      * @param[out] y local cartesian coordinate (meters).
+<span class="lineNum">     100 </span>            :      * @param[out] z local cartesian coordinate (meters).
+<span class="lineNum">     101 </span>            :      *
+<span class="lineNum">     102 </span>            :      * \e lat should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     103 </span>            :      **********************************************************************/
+<span class="lineNum">     104 </span>            :     void Forward(real lat, real lon, real h, real&amp; x, real&amp; y, real&amp; z)
+<span class="lineNum">     105 </span>            :       const {
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :       IntForward(lat, lon, h, x, y, z, NULL);</span>
+<span class="lineNum">     107 </span>            :     }
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :     /**
+<span class="lineNum">     110 </span>            :      * Convert from geodetic to local cartesian coordinates and return rotation
+<span class="lineNum">     111 </span>            :      * matrix.
+<span class="lineNum">     112 </span>            :      *
+<span class="lineNum">     113 </span>            :      * @param[in] lat latitude of point (degrees).
+<span class="lineNum">     114 </span>            :      * @param[in] lon longitude of point (degrees).
+<span class="lineNum">     115 </span>            :      * @param[in] h height of point above the ellipsoid (meters).
+<span class="lineNum">     116 </span>            :      * @param[out] x local cartesian coordinate (meters).
+<span class="lineNum">     117 </span>            :      * @param[out] y local cartesian coordinate (meters).
+<span class="lineNum">     118 </span>            :      * @param[out] z local cartesian coordinate (meters).
+<span class="lineNum">     119 </span>            :      * @param[out] M if the length of the vector is 9, fill with the rotation
+<span class="lineNum">     120 </span>            :      *   matrix in row-major order.
+<span class="lineNum">     121 </span>            :      *
+<span class="lineNum">     122 </span>            :      * \e lat should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     123 </span>            :      *
+<span class="lineNum">     124 </span>            :      * Let \e v be a unit vector located at (\e lat, \e lon, \e h).  We can
+<span class="lineNum">     125 </span>            :      * express \e v as \e column vectors in one of two ways
+<span class="lineNum">     126 </span>            :      * - in east, north, up coordinates (where the components are relative to a
+<span class="lineNum">     127 </span>            :      *   local coordinate system at (\e lat, \e lon, \e h)); call this
+<span class="lineNum">     128 </span>            :      *   representation \e v1.
+<span class="lineNum">     129 </span>            :      * - in \e x, \e y, \e z coordinates (where the components are relative to
+<span class="lineNum">     130 </span>            :      *   the local coordinate system at (\e lat0, \e lon0, \e h0)); call this
+<span class="lineNum">     131 </span>            :      *   representation \e v0.
+<span class="lineNum">     132 </span>            :      * .
+<span class="lineNum">     133 </span>            :      * Then we have \e v0 = \e M &amp;sdot; \e v1.
+<span class="lineNum">     134 </span>            :      **********************************************************************/
+<span class="lineNum">     135 </span>            :     void Forward(real lat, real lon, real h, real&amp; x, real&amp; y, real&amp; z,
+<span class="lineNum">     136 </span>            :                  std::vector&lt;real&gt;&amp; M)
+<span class="lineNum">     137 </span>            :       const  {
+<span class="lineNum">     138 </span>            :       if (M.end() == M.begin() + dim2_) {
+<span class="lineNum">     139 </span>            :         real t[dim2_];
+<span class="lineNum">     140 </span>            :         IntForward(lat, lon, h, x, y, z, t);
+<span class="lineNum">     141 </span>            :         std::copy(t, t + dim2_, M.begin());
+<span class="lineNum">     142 </span>            :       } else
+<span class="lineNum">     143 </span>            :         IntForward(lat, lon, h, x, y, z, NULL);
+<span class="lineNum">     144 </span>            :     }
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            :     /**
+<span class="lineNum">     147 </span>            :      * Convert from local cartesian to geodetic coordinates.
+<span class="lineNum">     148 </span>            :      *
+<span class="lineNum">     149 </span>            :      * @param[in] x local cartesian coordinate (meters).
+<span class="lineNum">     150 </span>            :      * @param[in] y local cartesian coordinate (meters).
+<span class="lineNum">     151 </span>            :      * @param[in] z local cartesian coordinate (meters).
+<span class="lineNum">     152 </span>            :      * @param[out] lat latitude of point (degrees).
+<span class="lineNum">     153 </span>            :      * @param[out] lon longitude of point (degrees).
+<span class="lineNum">     154 </span>            :      * @param[out] h height of point above the ellipsoid (meters).
+<span class="lineNum">     155 </span>            :      *
+<span class="lineNum">     156 </span>            :      * The value of \e lon returned is in the range [&amp;minus;180&amp;deg;,
+<span class="lineNum">     157 </span>            :      * 180&amp;deg;].
+<span class="lineNum">     158 </span>            :      **********************************************************************/
+<span class="lineNum">     159 </span>            :     void Reverse(real x, real y, real z, real&amp; lat, real&amp; lon, real&amp; h)
+<span class="lineNum">     160 </span>            :       const {
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :       IntReverse(x, y, z, lat, lon, h, NULL);</span>
+<span class="lineNum">     162 </span>            :     }
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            :     /**
+<span class="lineNum">     165 </span>            :      * Convert from local cartesian to geodetic coordinates and return rotation
+<span class="lineNum">     166 </span>            :      * matrix.
+<span class="lineNum">     167 </span>            :      *
+<span class="lineNum">     168 </span>            :      * @param[in] x local cartesian coordinate (meters).
+<span class="lineNum">     169 </span>            :      * @param[in] y local cartesian coordinate (meters).
+<span class="lineNum">     170 </span>            :      * @param[in] z local cartesian coordinate (meters).
+<span class="lineNum">     171 </span>            :      * @param[out] lat latitude of point (degrees).
+<span class="lineNum">     172 </span>            :      * @param[out] lon longitude of point (degrees).
+<span class="lineNum">     173 </span>            :      * @param[out] h height of point above the ellipsoid (meters).
+<span class="lineNum">     174 </span>            :      * @param[out] M if the length of the vector is 9, fill with the rotation
+<span class="lineNum">     175 </span>            :      *   matrix in row-major order.
+<span class="lineNum">     176 </span>            :      *
+<span class="lineNum">     177 </span>            :      * Let \e v be a unit vector located at (\e lat, \e lon, \e h).  We can
+<span class="lineNum">     178 </span>            :      * express \e v as \e column vectors in one of two ways
+<span class="lineNum">     179 </span>            :      * - in east, north, up coordinates (where the components are relative to a
+<span class="lineNum">     180 </span>            :      *   local coordinate system at (\e lat, \e lon, \e h)); call this
+<span class="lineNum">     181 </span>            :      *   representation \e v1.
+<span class="lineNum">     182 </span>            :      * - in \e x, \e y, \e z coordinates (where the components are relative to
+<span class="lineNum">     183 </span>            :      *   the local coordinate system at (\e lat0, \e lon0, \e h0)); call this
+<span class="lineNum">     184 </span>            :      *   representation \e v0.
+<span class="lineNum">     185 </span>            :      * .
+<span class="lineNum">     186 </span>            :      * Then we have \e v1 = &lt;i&gt;M&lt;/i&gt;&lt;sup&gt;T&lt;/sup&gt; &amp;sdot; \e v0, where
+<span class="lineNum">     187 </span>            :      * &lt;i&gt;M&lt;/i&gt;&lt;sup&gt;T&lt;/sup&gt; is the transpose of \e M.
+<span class="lineNum">     188 </span>            :      **********************************************************************/
+<span class="lineNum">     189 </span>            :     void Reverse(real x, real y, real z, real&amp; lat, real&amp; lon, real&amp; h,
+<span class="lineNum">     190 </span>            :                  std::vector&lt;real&gt;&amp; M)
+<span class="lineNum">     191 </span>            :       const {
+<span class="lineNum">     192 </span>            :       if (M.end() == M.begin() + dim2_) {
+<span class="lineNum">     193 </span>            :         real t[dim2_];
+<span class="lineNum">     194 </span>            :         IntReverse(x, y, z, lat, lon, h, t);
+<span class="lineNum">     195 </span>            :         std::copy(t, t + dim2_, M.begin());
+<span class="lineNum">     196 </span>            :       } else
+<span class="lineNum">     197 </span>            :         IntReverse(x, y, z, lat, lon, h, NULL);
+<span class="lineNum">     198 </span>            :     }
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            :     /** \name Inspector functions
+<span class="lineNum">     201 </span>            :      **********************************************************************/
+<span class="lineNum">     202 </span>            :     ///@{
+<span class="lineNum">     203 </span>            :     /**
+<span class="lineNum">     204 </span>            :      * @return latitude of the origin (degrees).
+<span class="lineNum">     205 </span>            :      **********************************************************************/
+<span class="lineNum">     206 </span>            :     Math::real LatitudeOrigin() const { return _lat0; }
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            :     /**
+<span class="lineNum">     209 </span>            :      * @return longitude of the origin (degrees).
+<span class="lineNum">     210 </span>            :      **********************************************************************/
+<span class="lineNum">     211 </span>            :     Math::real LongitudeOrigin() const { return _lon0; }
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span>            :     /**
+<span class="lineNum">     214 </span>            :      * @return height of the origin (meters).
+<span class="lineNum">     215 </span>            :      **********************************************************************/
+<span class="lineNum">     216 </span>            :     Math::real HeightOrigin() const { return _h0; }
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            :     /**
+<span class="lineNum">     219 </span>            :      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
+<span class="lineNum">     220 </span>            :      *   the value of \e a inherited from the Geocentric object used in the
+<span class="lineNum">     221 </span>            :      *   constructor.
+<span class="lineNum">     222 </span>            :      **********************************************************************/
+<span class="lineNum">     223 </span>            :     Math::real MajorRadius() const { return _earth.MajorRadius(); }
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :     /**
+<span class="lineNum">     226 </span>            :      * @return \e f the flattening of the ellipsoid.  This is the value
+<span class="lineNum">     227 </span>            :      *   inherited from the Geocentric object used in the constructor.
+<span class="lineNum">     228 </span>            :      **********************************************************************/
+<span class="lineNum">     229 </span>            :     Math::real Flattening() const { return _earth.Flattening(); }
+<span class="lineNum">     230 </span>            :     ///@}
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            :   };
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            : } // namespace GeographicLib
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span>            : #endif  // GEOGRAPHICLIB_LOCALCARTESIAN_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

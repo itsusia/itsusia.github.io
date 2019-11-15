@@ -1,0 +1,777 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/EllipticFunction.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - EllipticFunction.hpp<span style="font-size: 80%;"> (source / <a href="EllipticFunction.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file EllipticFunction.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::EllipticFunction class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2008-2016) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_ELLIPTICFUNCTION_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_ELLIPTICFUNCTION_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : namespace GeographicLib {
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            :   /**
+<span class="lineNum">      18 </span>            :    * \brief Elliptic integrals and functions
+<span class="lineNum">      19 </span>            :    *
+<span class="lineNum">      20 </span>            :    * This provides the elliptic functions and integrals needed for Ellipsoid,
+<span class="lineNum">      21 </span>            :    * GeodesicExact, and TransverseMercatorExact.  Two categories of function
+<span class="lineNum">      22 </span>            :    * are provided:
+<span class="lineNum">      23 </span>            :    * - \e static functions to compute symmetric elliptic integrals
+<span class="lineNum">      24 </span>            :    *   (http://dlmf.nist.gov/19.16.i)
+<span class="lineNum">      25 </span>            :    * - \e member functions to compute Legrendre's elliptic
+<span class="lineNum">      26 </span>            :    *   integrals (http://dlmf.nist.gov/19.2.ii) and the
+<span class="lineNum">      27 </span>            :    *   Jacobi elliptic functions (http://dlmf.nist.gov/22.2).
+<span class="lineNum">      28 </span>            :    * .
+<span class="lineNum">      29 </span>            :    * In the latter case, an object is constructed giving the modulus \e k (and
+<span class="lineNum">      30 </span>            :    * optionally the parameter &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;).  The modulus is always
+<span class="lineNum">      31 </span>            :    * passed as its square &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; which allows \e k to be pure
+<span class="lineNum">      32 </span>            :    * imaginary (&lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; &amp;lt; 0).  (Confusingly, Abramowitz and
+<span class="lineNum">      33 </span>            :    * Stegun call \e m = &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; the &quot;parameter&quot; and \e n =
+<span class="lineNum">      34 </span>            :    * &amp;alpha;&lt;sup&gt;2&lt;/sup&gt; the &quot;characteristic&quot;.)
+<span class="lineNum">      35 </span>            :    *
+<span class="lineNum">      36 </span>            :    * In geodesic applications, it is convenient to separate the incomplete
+<span class="lineNum">      37 </span>            :    * integrals into secular and periodic components, e.g.,
+<span class="lineNum">      38 </span>            :    * \f[
+<span class="lineNum">      39 </span>            :    *   E(\phi, k) = (2 E(k) / \pi) [ \phi + \delta E(\phi, k) ]
+<span class="lineNum">      40 </span>            :    * \f]
+<span class="lineNum">      41 </span>            :    * where &amp;delta;\e E(&amp;phi;, \e k) is an odd periodic function with period
+<span class="lineNum">      42 </span>            :    * &amp;pi;.
+<span class="lineNum">      43 </span>            :    *
+<span class="lineNum">      44 </span>            :    * The computation of the elliptic integrals uses the algorithms given in
+<span class="lineNum">      45 </span>            :    * - B. C. Carlson,
+<span class="lineNum">      46 </span>            :    *   &lt;a href=&quot;https://doi.org/10.1007/BF02198293&quot;&gt; Computation of real or
+<span class="lineNum">      47 </span>            :    *   complex elliptic integrals&lt;/a&gt;, Numerical Algorithms 10, 13--26 (1995)
+<span class="lineNum">      48 </span>            :    * .
+<span class="lineNum">      49 </span>            :    * with the additional optimizations given in http://dlmf.nist.gov/19.36.i.
+<span class="lineNum">      50 </span>            :    * The computation of the Jacobi elliptic functions uses the algorithm given
+<span class="lineNum">      51 </span>            :    * in
+<span class="lineNum">      52 </span>            :    * - R. Bulirsch,
+<span class="lineNum">      53 </span>            :    *   &lt;a href=&quot;https://doi.org/10.1007/BF01397975&quot;&gt; Numerical Calculation of
+<span class="lineNum">      54 </span>            :    *   Elliptic Integrals and Elliptic Functions&lt;/a&gt;, Numericshe Mathematik 7,
+<span class="lineNum">      55 </span>            :    *   78--90 (1965).
+<span class="lineNum">      56 </span>            :    * .
+<span class="lineNum">      57 </span>            :    * The notation follows http://dlmf.nist.gov/19 and http://dlmf.nist.gov/22
+<span class="lineNum">      58 </span>            :    *
+<span class="lineNum">      59 </span>            :    * Example of use:
+<span class="lineNum">      60 </span>            :    * \include example-EllipticFunction.cpp
+<span class="lineNum">      61 </span>            :    **********************************************************************/
+<span class="lineNum">      62 </span>            :   class GEOGRAPHICLIB_EXPORT EllipticFunction {
+<span class="lineNum">      63 </span>            :   private:
+<span class="lineNum">      64 </span>            :     typedef Math::real real;
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :     enum { num_ = 13 }; // Max depth required for sncndn; probably 5 is enough.
+<span class="lineNum">      67 </span>            :     real _k2, _kp2, _alpha2, _alphap2, _eps;
+<span class="lineNum">      68 </span>            :     real _Kc, _Ec, _Dc, _Pic, _Gc, _Hc;
+<span class="lineNum">      69 </span>            :   public:
+<span class="lineNum">      70 </span>            :     /** \name Constructor
+<span class="lineNum">      71 </span>            :      **********************************************************************/
+<span class="lineNum">      72 </span>            :     ///@{
+<span class="lineNum">      73 </span>            :     /**
+<span class="lineNum">      74 </span>            :      * Constructor specifying the modulus and parameter.
+<span class="lineNum">      75 </span>            :      *
+<span class="lineNum">      76 </span>            :      * @param[in] k2 the square of the modulus &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;.
+<span class="lineNum">      77 </span>            :      *   &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; must lie in (&amp;minus;&amp;infin;, 1].
+<span class="lineNum">      78 </span>            :      * @param[in] alpha2 the parameter &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;.
+<span class="lineNum">      79 </span>            :      *   &amp;alpha;&lt;sup&gt;2&lt;/sup&gt; must lie in (&amp;minus;&amp;infin;, 1].
+<span class="lineNum">      80 </span>            :      * @exception GeographicErr if \e k2 or \e alpha2 is out of its legal
+<span class="lineNum">      81 </span>            :      *   range.
+<span class="lineNum">      82 </span>            :      *
+<span class="lineNum">      83 </span>            :      * If only elliptic integrals of the first and second kinds are needed,
+<span class="lineNum">      84 </span>            :      * then set &amp;alpha;&lt;sup&gt;2&lt;/sup&gt; = 0 (the default value); in this case, we
+<span class="lineNum">      85 </span>            :      * have &amp;Pi;(&amp;phi;, 0, \e k) = \e F(&amp;phi;, \e k), \e G(&amp;phi;, 0, \e k) = \e
+<span class="lineNum">      86 </span>            :      * E(&amp;phi;, \e k), and \e H(&amp;phi;, 0, \e k) = \e F(&amp;phi;, \e k) - \e
+<span class="lineNum">      87 </span>            :      * D(&amp;phi;, \e k).
+<span class="lineNum">      88 </span>            :      **********************************************************************/
+<span class="lineNum">      89 </span>            :     EllipticFunction(real k2 = 0, real alpha2 = 0)
+<span class="lineNum">      90 </span><span class="lineCov">        163 :       { Reset(k2, alpha2); }</span>
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :     /**
+<span class="lineNum">      93 </span>            :      * Constructor specifying the modulus and parameter and their complements.
+<span class="lineNum">      94 </span>            :      *
+<span class="lineNum">      95 </span>            :      * @param[in] k2 the square of the modulus &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;.
+<span class="lineNum">      96 </span>            :      *   &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; must lie in (&amp;minus;&amp;infin;, 1].
+<span class="lineNum">      97 </span>            :      * @param[in] alpha2 the parameter &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;.
+<span class="lineNum">      98 </span>            :      *   &amp;alpha;&lt;sup&gt;2&lt;/sup&gt; must lie in (&amp;minus;&amp;infin;, 1].
+<span class="lineNum">      99 </span>            :      * @param[in] kp2 the complementary modulus squared &lt;i&gt;k'&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; =
+<span class="lineNum">     100 </span>            :      *   1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;.  This must lie in [0, &amp;infin;).
+<span class="lineNum">     101 </span>            :      * @param[in] alphap2 the complementary parameter &amp;alpha;'&lt;sup&gt;2&lt;/sup&gt; = 1
+<span class="lineNum">     102 </span>            :      *   &amp;minus; &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;.  This must lie in [0, &amp;infin;).
+<span class="lineNum">     103 </span>            :      * @exception GeographicErr if \e k2, \e alpha2, \e kp2, or \e alphap2 is
+<span class="lineNum">     104 </span>            :      *   out of its legal range.
+<span class="lineNum">     105 </span>            :      *
+<span class="lineNum">     106 </span>            :      * The arguments must satisfy \e k2 + \e kp2 = 1 and \e alpha2 + \e alphap2
+<span class="lineNum">     107 </span>            :      * = 1.  (No checking is done that these conditions are met.)  This
+<span class="lineNum">     108 </span>            :      * constructor is provided to enable accuracy to be maintained, e.g., when
+<span class="lineNum">     109 </span>            :      * \e k is very close to unity.
+<span class="lineNum">     110 </span>            :      **********************************************************************/
+<span class="lineNum">     111 </span>            :     EllipticFunction(real k2, real alpha2, real kp2, real alphap2)
+<span class="lineNum">     112 </span>            :       { Reset(k2, alpha2, kp2, alphap2); }
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :     /**
+<span class="lineNum">     115 </span>            :      * Reset the modulus and parameter.
+<span class="lineNum">     116 </span>            :      *
+<span class="lineNum">     117 </span>            :      * @param[in] k2 the new value of square of the modulus
+<span class="lineNum">     118 </span>            :      *   &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; which must lie in (&amp;minus;&amp;infin;, ].
+<span class="lineNum">     119 </span>            :      *   done.)
+<span class="lineNum">     120 </span>            :      * @param[in] alpha2 the new value of parameter &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;.
+<span class="lineNum">     121 </span>            :      *   &amp;alpha;&lt;sup&gt;2&lt;/sup&gt; must lie in (&amp;minus;&amp;infin;, 1].
+<span class="lineNum">     122 </span>            :      * @exception GeographicErr if \e k2 or \e alpha2 is out of its legal
+<span class="lineNum">     123 </span>            :      *   range.
+<span class="lineNum">     124 </span>            :      **********************************************************************/
+<span class="lineNum">     125 </span>            :     void Reset(real k2 = 0, real alpha2 = 0)
+<span class="lineNum">     126 </span><span class="lineCov">        163 :     { Reset(k2, alpha2, 1 - k2, 1 - alpha2); }</span>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span>            :     /**
+<span class="lineNum">     129 </span>            :      * Reset the modulus and parameter supplying also their complements.
+<span class="lineNum">     130 </span>            :      *
+<span class="lineNum">     131 </span>            :      * @param[in] k2 the square of the modulus &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;.
+<span class="lineNum">     132 </span>            :      *   &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; must lie in (&amp;minus;&amp;infin;, 1].
+<span class="lineNum">     133 </span>            :      * @param[in] alpha2 the parameter &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;.
+<span class="lineNum">     134 </span>            :      *   &amp;alpha;&lt;sup&gt;2&lt;/sup&gt; must lie in (&amp;minus;&amp;infin;, 1].
+<span class="lineNum">     135 </span>            :      * @param[in] kp2 the complementary modulus squared &lt;i&gt;k'&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; =
+<span class="lineNum">     136 </span>            :      *   1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;.  This must lie in [0, &amp;infin;).
+<span class="lineNum">     137 </span>            :      * @param[in] alphap2 the complementary parameter &amp;alpha;'&lt;sup&gt;2&lt;/sup&gt; = 1
+<span class="lineNum">     138 </span>            :      *   &amp;minus; &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;.  This must lie in [0, &amp;infin;).
+<span class="lineNum">     139 </span>            :      * @exception GeographicErr if \e k2, \e alpha2, \e kp2, or \e alphap2 is
+<span class="lineNum">     140 </span>            :      *   out of its legal range.
+<span class="lineNum">     141 </span>            :      *
+<span class="lineNum">     142 </span>            :      * The arguments must satisfy \e k2 + \e kp2 = 1 and \e alpha2 + \e alphap2
+<span class="lineNum">     143 </span>            :      * = 1.  (No checking is done that these conditions are met.)  This
+<span class="lineNum">     144 </span>            :      * constructor is provided to enable accuracy to be maintained, e.g., when
+<span class="lineNum">     145 </span>            :      * is very small.
+<span class="lineNum">     146 </span>            :      **********************************************************************/
+<span class="lineNum">     147 </span>            :     void Reset(real k2, real alpha2, real kp2, real alphap2);
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            :     ///@}
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span>            :     /** \name Inspector functions.
+<span class="lineNum">     152 </span>            :      **********************************************************************/
+<span class="lineNum">     153 </span>            :     ///@{
+<span class="lineNum">     154 </span>            :     /**
+<span class="lineNum">     155 </span>            :      * @return the square of the modulus &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;.
+<span class="lineNum">     156 </span>            :      **********************************************************************/
+<span class="lineNum">     157 </span>            :     Math::real k2() const { return _k2; }
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            :     /**
+<span class="lineNum">     160 </span>            :      * @return the square of the complementary modulus &lt;i&gt;k'&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; =
+<span class="lineNum">     161 </span>            :      *   1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;.
+<span class="lineNum">     162 </span>            :      **********************************************************************/
+<span class="lineNum">     163 </span>            :     Math::real kp2() const { return _kp2; }
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            :     /**
+<span class="lineNum">     166 </span>            :      * @return the parameter &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;.
+<span class="lineNum">     167 </span>            :      **********************************************************************/
+<span class="lineNum">     168 </span>            :     Math::real alpha2() const { return _alpha2; }
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            :     /**
+<span class="lineNum">     171 </span>            :      * @return the complementary parameter &amp;alpha;'&lt;sup&gt;2&lt;/sup&gt; = 1 &amp;minus;
+<span class="lineNum">     172 </span>            :      *   &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;.
+<span class="lineNum">     173 </span>            :      **********************************************************************/
+<span class="lineNum">     174 </span>            :     Math::real alphap2() const { return _alphap2; }
+<span class="lineNum">     175 </span>            :     ///@}
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            :     /** \name Complete elliptic integrals.
+<span class="lineNum">     178 </span>            :      **********************************************************************/
+<span class="lineNum">     179 </span>            :     ///@{
+<span class="lineNum">     180 </span>            :     /**
+<span class="lineNum">     181 </span>            :      * The complete integral of the first kind.
+<span class="lineNum">     182 </span>            :      *
+<span class="lineNum">     183 </span>            :      * @return \e K(\e k).
+<span class="lineNum">     184 </span>            :      *
+<span class="lineNum">     185 </span>            :      * \e K(\e k) is defined in http://dlmf.nist.gov/19.2.E4
+<span class="lineNum">     186 </span>            :      * \f[
+<span class="lineNum">     187 </span>            :      *   K(k) = \int_0^{\pi/2} \frac1{\sqrt{1-k^2\sin^2\phi}}\,d\phi.
+<span class="lineNum">     188 </span>            :      * \f]
+<span class="lineNum">     189 </span>            :      **********************************************************************/
+<span class="lineNum">     190 </span>            :     Math::real K() const { return _Kc; }
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            :     /**
+<span class="lineNum">     193 </span>            :      * The complete integral of the second kind.
+<span class="lineNum">     194 </span>            :      *
+<span class="lineNum">     195 </span>            :      * @return \e E(\e k).
+<span class="lineNum">     196 </span>            :      *
+<span class="lineNum">     197 </span>            :      * \e E(\e k) is defined in http://dlmf.nist.gov/19.2.E5
+<span class="lineNum">     198 </span>            :      * \f[
+<span class="lineNum">     199 </span>            :      *   E(k) = \int_0^{\pi/2} \sqrt{1-k^2\sin^2\phi}\,d\phi.
+<span class="lineNum">     200 </span>            :      * \f]
+<span class="lineNum">     201 </span>            :      **********************************************************************/
+<span class="lineNum">     202 </span>            :     Math::real E() const { return _Ec; }
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :     /**
+<span class="lineNum">     205 </span>            :      * Jahnke's complete integral.
+<span class="lineNum">     206 </span>            :      *
+<span class="lineNum">     207 </span>            :      * @return \e D(\e k).
+<span class="lineNum">     208 </span>            :      *
+<span class="lineNum">     209 </span>            :      * \e D(\e k) is defined in http://dlmf.nist.gov/19.2.E6
+<span class="lineNum">     210 </span>            :      * \f[
+<span class="lineNum">     211 </span>            :      *   D(k) =
+<span class="lineNum">     212 </span>            :      *   \int_0^{\pi/2} \frac{\sin^2\phi}{\sqrt{1-k^2\sin^2\phi}}\,d\phi.
+<span class="lineNum">     213 </span>            :      * \f]
+<span class="lineNum">     214 </span>            :      **********************************************************************/
+<span class="lineNum">     215 </span>            :     Math::real D() const { return _Dc; }
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            :     /**
+<span class="lineNum">     218 </span>            :      * The difference between the complete integrals of the first and second
+<span class="lineNum">     219 </span>            :      * kinds.
+<span class="lineNum">     220 </span>            :      *
+<span class="lineNum">     221 </span>            :      * @return \e K(\e k) &amp;minus; \e E(\e k).
+<span class="lineNum">     222 </span>            :      **********************************************************************/
+<span class="lineNum">     223 </span><span class="lineCov">          2 :     Math::real KE() const { return _k2 * _Dc; }</span>
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :     /**
+<span class="lineNum">     226 </span>            :      * The complete integral of the third kind.
+<span class="lineNum">     227 </span>            :      *
+<span class="lineNum">     228 </span>            :      * @return &amp;Pi;(&amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k).
+<span class="lineNum">     229 </span>            :      *
+<span class="lineNum">     230 </span>            :      * &amp;Pi;(&amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k) is defined in
+<span class="lineNum">     231 </span>            :      * http://dlmf.nist.gov/19.2.E7
+<span class="lineNum">     232 </span>            :      * \f[
+<span class="lineNum">     233 </span>            :      *   \Pi(\alpha^2, k) = \int_0^{\pi/2}
+<span class="lineNum">     234 </span>            :      *     \frac1{\sqrt{1-k^2\sin^2\phi}(1 - \alpha^2\sin^2\phi)}\,d\phi.
+<span class="lineNum">     235 </span>            :      * \f]
+<span class="lineNum">     236 </span>            :      **********************************************************************/
+<span class="lineNum">     237 </span>            :     Math::real Pi() const { return _Pic; }
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            :     /**
+<span class="lineNum">     240 </span>            :      * Legendre's complete geodesic longitude integral.
+<span class="lineNum">     241 </span>            :      *
+<span class="lineNum">     242 </span>            :      * @return \e G(&amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k).
+<span class="lineNum">     243 </span>            :      *
+<span class="lineNum">     244 </span>            :      * \e G(&amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k) is given by
+<span class="lineNum">     245 </span>            :      * \f[
+<span class="lineNum">     246 </span>            :      *   G(\alpha^2, k) = \int_0^{\pi/2}
+<span class="lineNum">     247 </span>            :      *     \frac{\sqrt{1-k^2\sin^2\phi}}{1 - \alpha^2\sin^2\phi}\,d\phi.
+<span class="lineNum">     248 </span>            :      * \f]
+<span class="lineNum">     249 </span>            :      **********************************************************************/
+<span class="lineNum">     250 </span>            :     Math::real G() const { return _Gc; }
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span>            :     /**
+<span class="lineNum">     253 </span>            :      * Cayley's complete geodesic longitude difference integral.
+<span class="lineNum">     254 </span>            :      *
+<span class="lineNum">     255 </span>            :      * @return \e H(&amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k).
+<span class="lineNum">     256 </span>            :      *
+<span class="lineNum">     257 </span>            :      * \e H(&amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k) is given by
+<span class="lineNum">     258 </span>            :      * \f[
+<span class="lineNum">     259 </span>            :      *   H(\alpha^2, k) = \int_0^{\pi/2}
+<span class="lineNum">     260 </span>            :      *     \frac{\cos^2\phi}{(1-\alpha^2\sin^2\phi)\sqrt{1-k^2\sin^2\phi}}
+<span class="lineNum">     261 </span>            :      *     \,d\phi.
+<span class="lineNum">     262 </span>            :      * \f]
+<span class="lineNum">     263 </span>            :      **********************************************************************/
+<span class="lineNum">     264 </span>            :     Math::real H() const { return _Hc; }
+<span class="lineNum">     265 </span>            :     ///@}
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span>            :     /** \name Incomplete elliptic integrals.
+<span class="lineNum">     268 </span>            :      **********************************************************************/
+<span class="lineNum">     269 </span>            :     ///@{
+<span class="lineNum">     270 </span>            :     /**
+<span class="lineNum">     271 </span>            :      * The incomplete integral of the first kind.
+<span class="lineNum">     272 </span>            :      *
+<span class="lineNum">     273 </span>            :      * @param[in] phi
+<span class="lineNum">     274 </span>            :      * @return \e F(&amp;phi;, \e k).
+<span class="lineNum">     275 </span>            :      *
+<span class="lineNum">     276 </span>            :      * \e F(&amp;phi;, \e k) is defined in http://dlmf.nist.gov/19.2.E4
+<span class="lineNum">     277 </span>            :      * \f[
+<span class="lineNum">     278 </span>            :      *   F(\phi, k) = \int_0^\phi \frac1{\sqrt{1-k^2\sin^2\theta}}\,d\theta.
+<span class="lineNum">     279 </span>            :      * \f]
+<span class="lineNum">     280 </span>            :      **********************************************************************/
+<span class="lineNum">     281 </span>            :     Math::real F(real phi) const;
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span>            :     /**
+<span class="lineNum">     284 </span>            :      * The incomplete integral of the second kind.
+<span class="lineNum">     285 </span>            :      *
+<span class="lineNum">     286 </span>            :      * @param[in] phi
+<span class="lineNum">     287 </span>            :      * @return \e E(&amp;phi;, \e k).
+<span class="lineNum">     288 </span>            :      *
+<span class="lineNum">     289 </span>            :      * \e E(&amp;phi;, \e k) is defined in http://dlmf.nist.gov/19.2.E5
+<span class="lineNum">     290 </span>            :      * \f[
+<span class="lineNum">     291 </span>            :      *   E(\phi, k) = \int_0^\phi \sqrt{1-k^2\sin^2\theta}\,d\theta.
+<span class="lineNum">     292 </span>            :      * \f]
+<span class="lineNum">     293 </span>            :      **********************************************************************/
+<span class="lineNum">     294 </span>            :     Math::real E(real phi) const;
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            :     /**
+<span class="lineNum">     297 </span>            :      * The incomplete integral of the second kind with the argument given in
+<span class="lineNum">     298 </span>            :      * degrees.
+<span class="lineNum">     299 </span>            :      *
+<span class="lineNum">     300 </span>            :      * @param[in] ang in &lt;i&gt;degrees&lt;/i&gt;.
+<span class="lineNum">     301 </span>            :      * @return \e E(&amp;pi; &lt;i&gt;ang&lt;/i&gt;/180, \e k).
+<span class="lineNum">     302 </span>            :      **********************************************************************/
+<span class="lineNum">     303 </span>            :     Math::real Ed(real ang) const;
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            :     /**
+<span class="lineNum">     306 </span>            :      * The inverse of the incomplete integral of the second kind.
+<span class="lineNum">     307 </span>            :      *
+<span class="lineNum">     308 </span>            :      * @param[in] x
+<span class="lineNum">     309 </span>            :      * @return &amp;phi; = &lt;i&gt;E&lt;/i&gt;&lt;sup&gt;&amp;minus;1&lt;/sup&gt;(\e x, \e k); i.e., the
+<span class="lineNum">     310 </span>            :      *   solution of such that \e E(&amp;phi;, \e k) = \e x.
+<span class="lineNum">     311 </span>            :      **********************************************************************/
+<span class="lineNum">     312 </span>            :     Math::real Einv(real x) const;
+<span class="lineNum">     313 </span>            : 
+<span class="lineNum">     314 </span>            :     /**
+<span class="lineNum">     315 </span>            :      * The incomplete integral of the third kind.
+<span class="lineNum">     316 </span>            :      *
+<span class="lineNum">     317 </span>            :      * @param[in] phi
+<span class="lineNum">     318 </span>            :      * @return &amp;Pi;(&amp;phi;, &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k).
+<span class="lineNum">     319 </span>            :      *
+<span class="lineNum">     320 </span>            :      * &amp;Pi;(&amp;phi;, &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k) is defined in
+<span class="lineNum">     321 </span>            :      * http://dlmf.nist.gov/19.2.E7
+<span class="lineNum">     322 </span>            :      * \f[
+<span class="lineNum">     323 </span>            :      *   \Pi(\phi, \alpha^2, k) = \int_0^\phi
+<span class="lineNum">     324 </span>            :      *     \frac1{\sqrt{1-k^2\sin^2\theta}(1 - \alpha^2\sin^2\theta)}\,d\theta.
+<span class="lineNum">     325 </span>            :      * \f]
+<span class="lineNum">     326 </span>            :      **********************************************************************/
+<span class="lineNum">     327 </span>            :     Math::real Pi(real phi) const;
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span>            :     /**
+<span class="lineNum">     330 </span>            :      * Jahnke's incomplete elliptic integral.
+<span class="lineNum">     331 </span>            :      *
+<span class="lineNum">     332 </span>            :      * @param[in] phi
+<span class="lineNum">     333 </span>            :      * @return \e D(&amp;phi;, \e k).
+<span class="lineNum">     334 </span>            :      *
+<span class="lineNum">     335 </span>            :      * \e D(&amp;phi;, \e k) is defined in http://dlmf.nist.gov/19.2.E4
+<span class="lineNum">     336 </span>            :      * \f[
+<span class="lineNum">     337 </span>            :      *   D(\phi, k) = \int_0^\phi
+<span class="lineNum">     338 </span>            :      *    \frac{\sin^2\theta}{\sqrt{1-k^2\sin^2\theta}}\,d\theta.
+<span class="lineNum">     339 </span>            :      * \f]
+<span class="lineNum">     340 </span>            :      **********************************************************************/
+<span class="lineNum">     341 </span>            :     Math::real D(real phi) const;
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span>            :     /**
+<span class="lineNum">     344 </span>            :      * Legendre's geodesic longitude integral.
+<span class="lineNum">     345 </span>            :      *
+<span class="lineNum">     346 </span>            :      * @param[in] phi
+<span class="lineNum">     347 </span>            :      * @return \e G(&amp;phi;, &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k).
+<span class="lineNum">     348 </span>            :      *
+<span class="lineNum">     349 </span>            :      * \e G(&amp;phi;, &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k) is defined by
+<span class="lineNum">     350 </span>            :      * \f[
+<span class="lineNum">     351 </span>            :      *   \begin{align}
+<span class="lineNum">     352 </span>            :      *   G(\phi, \alpha^2, k) &amp;=
+<span class="lineNum">     353 </span>            :      *   \frac{k^2}{\alpha^2} F(\phi, k) +
+<span class="lineNum">     354 </span>            :      *      \biggl(1 - \frac{k^2}{\alpha^2}\biggr) \Pi(\phi, \alpha^2, k) \\
+<span class="lineNum">     355 </span>            :      *    &amp;= \int_0^\phi
+<span class="lineNum">     356 </span>            :      *     \frac{\sqrt{1-k^2\sin^2\theta}}{1 - \alpha^2\sin^2\theta}\,d\theta.
+<span class="lineNum">     357 </span>            :      *   \end{align}
+<span class="lineNum">     358 </span>            :      * \f]
+<span class="lineNum">     359 </span>            :      *
+<span class="lineNum">     360 </span>            :      * Legendre expresses the longitude of a point on the geodesic in terms of
+<span class="lineNum">     361 </span>            :      * this combination of elliptic integrals in Exercices de Calcul
+<span class="lineNum">     362 </span>            :      * Int&amp;eacute;gral, Vol. 1 (1811), p. 181,
+<span class="lineNum">     363 </span>            :      * https://books.google.com/books?id=riIOAAAAQAAJ&amp;pg=PA181.
+<span class="lineNum">     364 </span>            :      *
+<span class="lineNum">     365 </span>            :      * See \ref geodellip for the expression for the longitude in terms of this
+<span class="lineNum">     366 </span>            :      * function.
+<span class="lineNum">     367 </span>            :      **********************************************************************/
+<span class="lineNum">     368 </span>            :     Math::real G(real phi) const;
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span>            :     /**
+<span class="lineNum">     371 </span>            :      * Cayley's geodesic longitude difference integral.
+<span class="lineNum">     372 </span>            :      *
+<span class="lineNum">     373 </span>            :      * @param[in] phi
+<span class="lineNum">     374 </span>            :      * @return \e H(&amp;phi;, &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k).
+<span class="lineNum">     375 </span>            :      *
+<span class="lineNum">     376 </span>            :      * \e H(&amp;phi;, &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k) is defined by
+<span class="lineNum">     377 </span>            :      * \f[
+<span class="lineNum">     378 </span>            :      *   \begin{align}
+<span class="lineNum">     379 </span>            :      *   H(\phi, \alpha^2, k) &amp;=
+<span class="lineNum">     380 </span>            :      *   \frac1{\alpha^2} F(\phi, k) +
+<span class="lineNum">     381 </span>            :      *        \biggl(1 - \frac1{\alpha^2}\biggr) \Pi(\phi, \alpha^2, k) \\
+<span class="lineNum">     382 </span>            :      *   &amp;= \int_0^\phi
+<span class="lineNum">     383 </span>            :      *     \frac{\cos^2\theta}
+<span class="lineNum">     384 </span>            :      *          {(1-\alpha^2\sin^2\theta)\sqrt{1-k^2\sin^2\theta}}
+<span class="lineNum">     385 </span>            :      *     \,d\theta.
+<span class="lineNum">     386 </span>            :      *   \end{align}
+<span class="lineNum">     387 </span>            :      * \f]
+<span class="lineNum">     388 </span>            :      *
+<span class="lineNum">     389 </span>            :      * Cayley expresses the longitude difference of a point on the geodesic in
+<span class="lineNum">     390 </span>            :      * terms of this combination of elliptic integrals in Phil. Mag. &lt;b&gt;40&lt;/b&gt;
+<span class="lineNum">     391 </span>            :      * (1870), p. 333, https://books.google.com/books?id=Zk0wAAAAIAAJ&amp;pg=PA333.
+<span class="lineNum">     392 </span>            :      *
+<span class="lineNum">     393 </span>            :      * See \ref geodellip for the expression for the longitude in terms of this
+<span class="lineNum">     394 </span>            :      * function.
+<span class="lineNum">     395 </span>            :      **********************************************************************/
+<span class="lineNum">     396 </span>            :     Math::real H(real phi) const;
+<span class="lineNum">     397 </span>            :     ///@}
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span>            :     /** \name Incomplete integrals in terms of Jacobi elliptic functions.
+<span class="lineNum">     400 </span>            :      **********************************************************************/
+<span class="lineNum">     401 </span>            :     /**
+<span class="lineNum">     402 </span>            :      * The incomplete integral of the first kind in terms of Jacobi elliptic
+<span class="lineNum">     403 </span>            :      * functions.
+<span class="lineNum">     404 </span>            :      *
+<span class="lineNum">     405 </span>            :      * @param[in] sn = sin&amp;phi;.
+<span class="lineNum">     406 </span>            :      * @param[in] cn = cos&amp;phi;.
+<span class="lineNum">     407 </span>            :      * @param[in] dn = sqrt(1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     408 </span>            :      *   sin&lt;sup&gt;2&lt;/sup&gt;&amp;phi;).
+<span class="lineNum">     409 </span>            :      * @return \e F(&amp;phi;, \e k) as though &amp;phi; &amp;isin; (&amp;minus;&amp;pi;, &amp;pi;].
+<span class="lineNum">     410 </span>            :      **********************************************************************/
+<span class="lineNum">     411 </span>            :     Math::real F(real sn, real cn, real dn) const;
+<span class="lineNum">     412 </span>            : 
+<span class="lineNum">     413 </span>            :     /**
+<span class="lineNum">     414 </span>            :      * The incomplete integral of the second kind in terms of Jacobi elliptic
+<span class="lineNum">     415 </span>            :      * functions.
+<span class="lineNum">     416 </span>            :      *
+<span class="lineNum">     417 </span>            :      * @param[in] sn = sin&amp;phi;.
+<span class="lineNum">     418 </span>            :      * @param[in] cn = cos&amp;phi;.
+<span class="lineNum">     419 </span>            :      * @param[in] dn = sqrt(1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     420 </span>            :      *   sin&lt;sup&gt;2&lt;/sup&gt;&amp;phi;).
+<span class="lineNum">     421 </span>            :      * @return \e E(&amp;phi;, \e k) as though &amp;phi; &amp;isin; (&amp;minus;&amp;pi;, &amp;pi;].
+<span class="lineNum">     422 </span>            :      **********************************************************************/
+<span class="lineNum">     423 </span>            :     Math::real E(real sn, real cn, real dn) const;
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span>            :     /**
+<span class="lineNum">     426 </span>            :      * The incomplete integral of the third kind in terms of Jacobi elliptic
+<span class="lineNum">     427 </span>            :      * functions.
+<span class="lineNum">     428 </span>            :      *
+<span class="lineNum">     429 </span>            :      * @param[in] sn = sin&amp;phi;.
+<span class="lineNum">     430 </span>            :      * @param[in] cn = cos&amp;phi;.
+<span class="lineNum">     431 </span>            :      * @param[in] dn = sqrt(1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     432 </span>            :      *   sin&lt;sup&gt;2&lt;/sup&gt;&amp;phi;).
+<span class="lineNum">     433 </span>            :      * @return &amp;Pi;(&amp;phi;, &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k) as though &amp;phi; &amp;isin;
+<span class="lineNum">     434 </span>            :      *   (&amp;minus;&amp;pi;, &amp;pi;].
+<span class="lineNum">     435 </span>            :      **********************************************************************/
+<span class="lineNum">     436 </span>            :     Math::real Pi(real sn, real cn, real dn) const;
+<span class="lineNum">     437 </span>            : 
+<span class="lineNum">     438 </span>            :     /**
+<span class="lineNum">     439 </span>            :      * Jahnke's incomplete elliptic integral in terms of Jacobi elliptic
+<span class="lineNum">     440 </span>            :      * functions.
+<span class="lineNum">     441 </span>            :      *
+<span class="lineNum">     442 </span>            :      * @param[in] sn = sin&amp;phi;.
+<span class="lineNum">     443 </span>            :      * @param[in] cn = cos&amp;phi;.
+<span class="lineNum">     444 </span>            :      * @param[in] dn = sqrt(1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     445 </span>            :      *   sin&lt;sup&gt;2&lt;/sup&gt;&amp;phi;).
+<span class="lineNum">     446 </span>            :      * @return \e D(&amp;phi;, \e k) as though &amp;phi; &amp;isin; (&amp;minus;&amp;pi;, &amp;pi;].
+<span class="lineNum">     447 </span>            :      **********************************************************************/
+<span class="lineNum">     448 </span>            :     Math::real D(real sn, real cn, real dn) const;
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span>            :     /**
+<span class="lineNum">     451 </span>            :      * Legendre's geodesic longitude integral in terms of Jacobi elliptic
+<span class="lineNum">     452 </span>            :      * functions.
+<span class="lineNum">     453 </span>            :      *
+<span class="lineNum">     454 </span>            :      * @param[in] sn = sin&amp;phi;.
+<span class="lineNum">     455 </span>            :      * @param[in] cn = cos&amp;phi;.
+<span class="lineNum">     456 </span>            :      * @param[in] dn = sqrt(1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     457 </span>            :      *   sin&lt;sup&gt;2&lt;/sup&gt;&amp;phi;).
+<span class="lineNum">     458 </span>            :      * @return \e G(&amp;phi;, &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k) as though &amp;phi; &amp;isin;
+<span class="lineNum">     459 </span>            :      *   (&amp;minus;&amp;pi;, &amp;pi;].
+<span class="lineNum">     460 </span>            :      **********************************************************************/
+<span class="lineNum">     461 </span>            :     Math::real G(real sn, real cn, real dn) const;
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span>            :     /**
+<span class="lineNum">     464 </span>            :      * Cayley's geodesic longitude difference integral in terms of Jacobi
+<span class="lineNum">     465 </span>            :      * elliptic functions.
+<span class="lineNum">     466 </span>            :      *
+<span class="lineNum">     467 </span>            :      * @param[in] sn = sin&amp;phi;.
+<span class="lineNum">     468 </span>            :      * @param[in] cn = cos&amp;phi;.
+<span class="lineNum">     469 </span>            :      * @param[in] dn = sqrt(1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     470 </span>            :      *   sin&lt;sup&gt;2&lt;/sup&gt;&amp;phi;).
+<span class="lineNum">     471 </span>            :      * @return \e H(&amp;phi;, &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k) as though &amp;phi; &amp;isin;
+<span class="lineNum">     472 </span>            :      *   (&amp;minus;&amp;pi;, &amp;pi;].
+<span class="lineNum">     473 </span>            :      **********************************************************************/
+<span class="lineNum">     474 </span>            :     Math::real H(real sn, real cn, real dn) const;
+<span class="lineNum">     475 </span>            :     ///@}
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span>            :     /** \name Periodic versions of incomplete elliptic integrals.
+<span class="lineNum">     478 </span>            :      **********************************************************************/
+<span class="lineNum">     479 </span>            :     ///@{
+<span class="lineNum">     480 </span>            :     /**
+<span class="lineNum">     481 </span>            :      * The periodic incomplete integral of the first kind.
+<span class="lineNum">     482 </span>            :      *
+<span class="lineNum">     483 </span>            :      * @param[in] sn = sin&amp;phi;.
+<span class="lineNum">     484 </span>            :      * @param[in] cn = cos&amp;phi;.
+<span class="lineNum">     485 </span>            :      * @param[in] dn = sqrt(1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     486 </span>            :      *   sin&lt;sup&gt;2&lt;/sup&gt;&amp;phi;).
+<span class="lineNum">     487 </span>            :      * @return the periodic function &amp;pi; \e F(&amp;phi;, \e k) / (2 \e K(\e k)) -
+<span class="lineNum">     488 </span>            :      *   &amp;phi;.
+<span class="lineNum">     489 </span>            :      **********************************************************************/
+<span class="lineNum">     490 </span>            :     Math::real deltaF(real sn, real cn, real dn) const;
+<span class="lineNum">     491 </span>            : 
+<span class="lineNum">     492 </span>            :     /**
+<span class="lineNum">     493 </span>            :      * The periodic incomplete integral of the second kind.
+<span class="lineNum">     494 </span>            :      *
+<span class="lineNum">     495 </span>            :      * @param[in] sn = sin&amp;phi;.
+<span class="lineNum">     496 </span>            :      * @param[in] cn = cos&amp;phi;.
+<span class="lineNum">     497 </span>            :      * @param[in] dn = sqrt(1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     498 </span>            :      *   sin&lt;sup&gt;2&lt;/sup&gt;&amp;phi;).
+<span class="lineNum">     499 </span>            :      * @return the periodic function &amp;pi; \e E(&amp;phi;, \e k) / (2 \e E(\e k)) -
+<span class="lineNum">     500 </span>            :      *   &amp;phi;.
+<span class="lineNum">     501 </span>            :      **********************************************************************/
+<span class="lineNum">     502 </span>            :     Math::real deltaE(real sn, real cn, real dn) const;
+<span class="lineNum">     503 </span>            : 
+<span class="lineNum">     504 </span>            :     /**
+<span class="lineNum">     505 </span>            :      * The periodic inverse of the incomplete integral of the second kind.
+<span class="lineNum">     506 </span>            :      *
+<span class="lineNum">     507 </span>            :      * @param[in] stau = sin&amp;tau;.
+<span class="lineNum">     508 </span>            :      * @param[in] ctau = sin&amp;tau;.
+<span class="lineNum">     509 </span>            :      * @return the periodic function &lt;i&gt;E&lt;/i&gt;&lt;sup&gt;&amp;minus;1&lt;/sup&gt;(&amp;tau; (2 \e
+<span class="lineNum">     510 </span>            :      *   E(\e k)/&amp;pi;), \e k) - &amp;tau;.
+<span class="lineNum">     511 </span>            :      **********************************************************************/
+<span class="lineNum">     512 </span>            :     Math::real deltaEinv(real stau, real ctau) const;
+<span class="lineNum">     513 </span>            : 
+<span class="lineNum">     514 </span>            :     /**
+<span class="lineNum">     515 </span>            :      * The periodic incomplete integral of the third kind.
+<span class="lineNum">     516 </span>            :      *
+<span class="lineNum">     517 </span>            :      * @param[in] sn = sin&amp;phi;.
+<span class="lineNum">     518 </span>            :      * @param[in] cn = cos&amp;phi;.
+<span class="lineNum">     519 </span>            :      * @param[in] dn = sqrt(1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     520 </span>            :      *   sin&lt;sup&gt;2&lt;/sup&gt;&amp;phi;).
+<span class="lineNum">     521 </span>            :      * @return the periodic function &amp;pi; &amp;Pi;(&amp;phi;, &amp;alpha;&lt;sup&gt;2&lt;/sup&gt;,
+<span class="lineNum">     522 </span>            :      *   \e k) / (2 &amp;Pi;(&amp;alpha;&lt;sup&gt;2&lt;/sup&gt;, \e k)) - &amp;phi;.
+<span class="lineNum">     523 </span>            :      **********************************************************************/
+<span class="lineNum">     524 </span>            :     Math::real deltaPi(real sn, real cn, real dn) const;
+<span class="lineNum">     525 </span>            : 
+<span class="lineNum">     526 </span>            :     /**
+<span class="lineNum">     527 </span>            :      * The periodic Jahnke's incomplete elliptic integral.
+<span class="lineNum">     528 </span>            :      *
+<span class="lineNum">     529 </span>            :      * @param[in] sn = sin&amp;phi;.
+<span class="lineNum">     530 </span>            :      * @param[in] cn = cos&amp;phi;.
+<span class="lineNum">     531 </span>            :      * @param[in] dn = sqrt(1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     532 </span>            :      *   sin&lt;sup&gt;2&lt;/sup&gt;&amp;phi;).
+<span class="lineNum">     533 </span>            :      * @return the periodic function &amp;pi; \e D(&amp;phi;, \e k) / (2 \e D(\e k)) -
+<span class="lineNum">     534 </span>            :      *   &amp;phi;.
+<span class="lineNum">     535 </span>            :      **********************************************************************/
+<span class="lineNum">     536 </span>            :     Math::real deltaD(real sn, real cn, real dn) const;
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span>            :     /**
+<span class="lineNum">     539 </span>            :      * Legendre's periodic geodesic longitude integral.
+<span class="lineNum">     540 </span>            :      *
+<span class="lineNum">     541 </span>            :      * @param[in] sn = sin&amp;phi;.
+<span class="lineNum">     542 </span>            :      * @param[in] cn = cos&amp;phi;.
+<span class="lineNum">     543 </span>            :      * @param[in] dn = sqrt(1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     544 </span>            :      *   sin&lt;sup&gt;2&lt;/sup&gt;&amp;phi;).
+<span class="lineNum">     545 </span>            :      * @return the periodic function &amp;pi; \e G(&amp;phi;, \e k) / (2 \e G(\e k)) -
+<span class="lineNum">     546 </span>            :      *   &amp;phi;.
+<span class="lineNum">     547 </span>            :      **********************************************************************/
+<span class="lineNum">     548 </span>            :     Math::real deltaG(real sn, real cn, real dn) const;
+<span class="lineNum">     549 </span>            : 
+<span class="lineNum">     550 </span>            :     /**
+<span class="lineNum">     551 </span>            :      * Cayley's periodic geodesic longitude difference integral.
+<span class="lineNum">     552 </span>            :      *
+<span class="lineNum">     553 </span>            :      * @param[in] sn = sin&amp;phi;.
+<span class="lineNum">     554 </span>            :      * @param[in] cn = cos&amp;phi;.
+<span class="lineNum">     555 </span>            :      * @param[in] dn = sqrt(1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     556 </span>            :      *   sin&lt;sup&gt;2&lt;/sup&gt;&amp;phi;).
+<span class="lineNum">     557 </span>            :      * @return the periodic function &amp;pi; \e H(&amp;phi;, \e k) / (2 \e H(\e k)) -
+<span class="lineNum">     558 </span>            :      *   &amp;phi;.
+<span class="lineNum">     559 </span>            :      **********************************************************************/
+<span class="lineNum">     560 </span>            :     Math::real deltaH(real sn, real cn, real dn) const;
+<span class="lineNum">     561 </span>            :     ///@}
+<span class="lineNum">     562 </span>            : 
+<span class="lineNum">     563 </span>            :     /** \name Elliptic functions.
+<span class="lineNum">     564 </span>            :      **********************************************************************/
+<span class="lineNum">     565 </span>            :     ///@{
+<span class="lineNum">     566 </span>            :     /**
+<span class="lineNum">     567 </span>            :      * The Jacobi elliptic functions.
+<span class="lineNum">     568 </span>            :      *
+<span class="lineNum">     569 </span>            :      * @param[in] x the argument.
+<span class="lineNum">     570 </span>            :      * @param[out] sn sn(\e x, \e k).
+<span class="lineNum">     571 </span>            :      * @param[out] cn cn(\e x, \e k).
+<span class="lineNum">     572 </span>            :      * @param[out] dn dn(\e x, \e k).
+<span class="lineNum">     573 </span>            :      **********************************************************************/
+<span class="lineNum">     574 </span>            :     void sncndn(real x, real&amp; sn, real&amp; cn, real&amp; dn) const;
+<span class="lineNum">     575 </span>            : 
+<span class="lineNum">     576 </span>            :     /**
+<span class="lineNum">     577 </span>            :      * The &amp;Delta; amplitude function.
+<span class="lineNum">     578 </span>            :      *
+<span class="lineNum">     579 </span>            :      * @param[in] sn sin&amp;phi;.
+<span class="lineNum">     580 </span>            :      * @param[in] cn cos&amp;phi;.
+<span class="lineNum">     581 </span>            :      * @return &amp;Delta; = sqrt(1 &amp;minus; &lt;i&gt;k&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     582 </span>            :      *   sin&lt;sup&gt;2&lt;/sup&gt;&amp;phi;).
+<span class="lineNum">     583 </span>            :      **********************************************************************/
+<span class="lineNum">     584 </span>            :     Math::real Delta(real sn, real cn) const {
+<span class="lineNum">     585 </span>            :       using std::sqrt;
+<span class="lineNum">     586 </span><span class="lineCov">         55 :       return sqrt(_k2 &lt; 0 ? 1 - _k2 * sn*sn : _kp2 + _k2 * cn*cn);</span>
+<span class="lineNum">     587 </span>            :     }
+<span class="lineNum">     588 </span>            :     ///@}
+<span class="lineNum">     589 </span>            : 
+<span class="lineNum">     590 </span>            :     /** \name Symmetric elliptic integrals.
+<span class="lineNum">     591 </span>            :      **********************************************************************/
+<span class="lineNum">     592 </span>            :     ///@{
+<span class="lineNum">     593 </span>            :     /**
+<span class="lineNum">     594 </span>            :      * Symmetric integral of the first kind &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;F&lt;/i&gt;&lt;/sub&gt;.
+<span class="lineNum">     595 </span>            :      *
+<span class="lineNum">     596 </span>            :      * @param[in] x
+<span class="lineNum">     597 </span>            :      * @param[in] y
+<span class="lineNum">     598 </span>            :      * @param[in] z
+<span class="lineNum">     599 </span>            :      * @return &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;F&lt;/i&gt;&lt;/sub&gt;(\e x, \e y, \e z).
+<span class="lineNum">     600 </span>            :      *
+<span class="lineNum">     601 </span>            :      * &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;F&lt;/i&gt;&lt;/sub&gt; is defined in http://dlmf.nist.gov/19.16.E1
+<span class="lineNum">     602 </span>            :      * \f[ R_F(x, y, z) = \frac12
+<span class="lineNum">     603 </span>            :      *       \int_0^\infty\frac1{\sqrt{(t + x) (t + y) (t + z)}}\, dt \f]
+<span class="lineNum">     604 </span>            :      * If one of the arguments is zero, it is more efficient to call the
+<span class="lineNum">     605 </span>            :      * two-argument version of this function with the non-zero arguments.
+<span class="lineNum">     606 </span>            :      **********************************************************************/
+<span class="lineNum">     607 </span>            :     static real RF(real x, real y, real z);
+<span class="lineNum">     608 </span>            : 
+<span class="lineNum">     609 </span>            :     /**
+<span class="lineNum">     610 </span>            :      * Complete symmetric integral of the first kind,
+<span class="lineNum">     611 </span>            :      * &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;F&lt;/i&gt;&lt;/sub&gt; with one argument zero.
+<span class="lineNum">     612 </span>            :      *
+<span class="lineNum">     613 </span>            :      * @param[in] x
+<span class="lineNum">     614 </span>            :      * @param[in] y
+<span class="lineNum">     615 </span>            :      * @return &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;F&lt;/i&gt;&lt;/sub&gt;(\e x, \e y, 0).
+<span class="lineNum">     616 </span>            :      **********************************************************************/
+<span class="lineNum">     617 </span>            :     static real RF(real x, real y);
+<span class="lineNum">     618 </span>            : 
+<span class="lineNum">     619 </span>            :     /**
+<span class="lineNum">     620 </span>            :      * Degenerate symmetric integral of the first kind
+<span class="lineNum">     621 </span>            :      * &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;C&lt;/i&gt;&lt;/sub&gt;.
+<span class="lineNum">     622 </span>            :      *
+<span class="lineNum">     623 </span>            :      * @param[in] x
+<span class="lineNum">     624 </span>            :      * @param[in] y
+<span class="lineNum">     625 </span>            :      * @return &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;C&lt;/i&gt;&lt;/sub&gt;(\e x, \e y) =
+<span class="lineNum">     626 </span>            :      *   &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;F&lt;/i&gt;&lt;/sub&gt;(\e x, \e y, \e y).
+<span class="lineNum">     627 </span>            :      *
+<span class="lineNum">     628 </span>            :      * &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;C&lt;/i&gt;&lt;/sub&gt; is defined in http://dlmf.nist.gov/19.2.E17
+<span class="lineNum">     629 </span>            :      * \f[ R_C(x, y) = \frac12
+<span class="lineNum">     630 </span>            :      *       \int_0^\infty\frac1{\sqrt{t + x}(t + y)}\,dt \f]
+<span class="lineNum">     631 </span>            :      **********************************************************************/
+<span class="lineNum">     632 </span>            :     static real RC(real x, real y);
+<span class="lineNum">     633 </span>            : 
+<span class="lineNum">     634 </span>            :     /**
+<span class="lineNum">     635 </span>            :      * Symmetric integral of the second kind &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;G&lt;/i&gt;&lt;/sub&gt;.
+<span class="lineNum">     636 </span>            :      *
+<span class="lineNum">     637 </span>            :      * @param[in] x
+<span class="lineNum">     638 </span>            :      * @param[in] y
+<span class="lineNum">     639 </span>            :      * @param[in] z
+<span class="lineNum">     640 </span>            :      * @return &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;G&lt;/i&gt;&lt;/sub&gt;(\e x, \e y, \e z).
+<span class="lineNum">     641 </span>            :      *
+<span class="lineNum">     642 </span>            :      * &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;G&lt;/i&gt;&lt;/sub&gt; is defined in Carlson, eq 1.5
+<span class="lineNum">     643 </span>            :      * \f[ R_G(x, y, z) = \frac14
+<span class="lineNum">     644 </span>            :      *       \int_0^\infty[(t + x) (t + y) (t + z)]^{-1/2}
+<span class="lineNum">     645 </span>            :      *        \biggl(
+<span class="lineNum">     646 </span>            :      *             \frac x{t + x} + \frac y{t + y} + \frac z{t + z}
+<span class="lineNum">     647 </span>            :      *        \biggr)t\,dt \f]
+<span class="lineNum">     648 </span>            :      * See also http://dlmf.nist.gov/19.16.E3.
+<span class="lineNum">     649 </span>            :      * If one of the arguments is zero, it is more efficient to call the
+<span class="lineNum">     650 </span>            :      * two-argument version of this function with the non-zero arguments.
+<span class="lineNum">     651 </span>            :      **********************************************************************/
+<span class="lineNum">     652 </span>            :     static real RG(real x, real y, real z);
+<span class="lineNum">     653 </span>            : 
+<span class="lineNum">     654 </span>            :     /**
+<span class="lineNum">     655 </span>            :      * Complete symmetric integral of the second kind,
+<span class="lineNum">     656 </span>            :      * &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;G&lt;/i&gt;&lt;/sub&gt; with one argument zero.
+<span class="lineNum">     657 </span>            :      *
+<span class="lineNum">     658 </span>            :      * @param[in] x
+<span class="lineNum">     659 </span>            :      * @param[in] y
+<span class="lineNum">     660 </span>            :      * @return &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;G&lt;/i&gt;&lt;/sub&gt;(\e x, \e y, 0).
+<span class="lineNum">     661 </span>            :      **********************************************************************/
+<span class="lineNum">     662 </span>            :     static real RG(real x, real y);
+<span class="lineNum">     663 </span>            : 
+<span class="lineNum">     664 </span>            :     /**
+<span class="lineNum">     665 </span>            :      * Symmetric integral of the third kind &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;J&lt;/i&gt;&lt;/sub&gt;.
+<span class="lineNum">     666 </span>            :      *
+<span class="lineNum">     667 </span>            :      * @param[in] x
+<span class="lineNum">     668 </span>            :      * @param[in] y
+<span class="lineNum">     669 </span>            :      * @param[in] z
+<span class="lineNum">     670 </span>            :      * @param[in] p
+<span class="lineNum">     671 </span>            :      * @return &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;J&lt;/i&gt;&lt;/sub&gt;(\e x, \e y, \e z, \e p).
+<span class="lineNum">     672 </span>            :      *
+<span class="lineNum">     673 </span>            :      * &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;J&lt;/i&gt;&lt;/sub&gt; is defined in http://dlmf.nist.gov/19.16.E2
+<span class="lineNum">     674 </span>            :      * \f[ R_J(x, y, z, p) = \frac32
+<span class="lineNum">     675 </span>            :      *       \int_0^\infty
+<span class="lineNum">     676 </span>            :      *       [(t + x) (t + y) (t + z)]^{-1/2} (t + p)^{-1}\, dt \f]
+<span class="lineNum">     677 </span>            :      **********************************************************************/
+<span class="lineNum">     678 </span>            :     static real RJ(real x, real y, real z, real p);
+<span class="lineNum">     679 </span>            : 
+<span class="lineNum">     680 </span>            :     /**
+<span class="lineNum">     681 </span>            :      * Degenerate symmetric integral of the third kind
+<span class="lineNum">     682 </span>            :      * &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;D&lt;/i&gt;&lt;/sub&gt;.
+<span class="lineNum">     683 </span>            :      *
+<span class="lineNum">     684 </span>            :      * @param[in] x
+<span class="lineNum">     685 </span>            :      * @param[in] y
+<span class="lineNum">     686 </span>            :      * @param[in] z
+<span class="lineNum">     687 </span>            :      * @return &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;D&lt;/i&gt;&lt;/sub&gt;(\e x, \e y, \e z) =
+<span class="lineNum">     688 </span>            :      *   &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;J&lt;/i&gt;&lt;/sub&gt;(\e x, \e y, \e z, \e z).
+<span class="lineNum">     689 </span>            :      *
+<span class="lineNum">     690 </span>            :      * &lt;i&gt;R&lt;/i&gt;&lt;sub&gt;&lt;i&gt;D&lt;/i&gt;&lt;/sub&gt; is defined in http://dlmf.nist.gov/19.16.E5
+<span class="lineNum">     691 </span>            :      * \f[ R_D(x, y, z) = \frac32
+<span class="lineNum">     692 </span>            :      *       \int_0^\infty[(t + x) (t + y)]^{-1/2} (t + z)^{-3/2}\, dt \f]
+<span class="lineNum">     693 </span>            :      **********************************************************************/
+<span class="lineNum">     694 </span>            :     static real RD(real x, real y, real z);
+<span class="lineNum">     695 </span>            :     ///@}
+<span class="lineNum">     696 </span>            : 
+<span class="lineNum">     697 </span>            :   };
+<span class="lineNum">     698 </span>            : 
+<span class="lineNum">     699 </span>            : } // namespace GeographicLib
+<span class="lineNum">     700 </span>            : 
+<span class="lineNum">     701 </span>            : #endif  // GEOGRAPHICLIB_ELLIPTICFUNCTION_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

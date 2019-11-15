@@ -1,0 +1,290 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/proj/internal/io_internal.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/proj/internal</a> - io_internal.hpp<span style="font-size: 80%;"> (source / <a href="io_internal.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /******************************************************************************</a>
+<span class="lineNum">       2 </span>            :  *
+<span class="lineNum">       3 </span>            :  * Project:  PROJ
+<span class="lineNum">       4 </span>            :  * Purpose:  ISO19111:2019 implementation
+<span class="lineNum">       5 </span>            :  * Author:   Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  ******************************************************************************
+<span class="lineNum">       8 </span>            :  * Copyright (c) 2018, Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      11 </span>            :  * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      12 </span>            :  * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      13 </span>            :  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      14 </span>            :  * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      15 </span>            :  * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      16 </span>            :  *
+<span class="lineNum">      17 </span>            :  * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      18 </span>            :  * in all copies or substantial portions of the Software.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      21 </span>            :  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      22 </span>            :  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      23 </span>            :  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      24 </span>            :  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      25 </span>            :  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      26 </span>            :  * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      27 </span>            :  ****************************************************************************/
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #ifndef FROM_PROJ_CPP
+<span class="lineNum">      30 </span>            : #error This file should only be included from a PROJ cpp file
+<span class="lineNum">      31 </span>            : #endif
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #ifndef IO_INTERNAL_HH_INCLUDED
+<span class="lineNum">      34 </span>            : #define IO_INTERNAL_HH_INCLUDED
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : #include &lt;string&gt;
+<span class="lineNum">      37 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : #include &quot;proj/io.hpp&quot;
+<span class="lineNum">      40 </span>            : #include &quot;proj/util.hpp&quot;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : //! @cond Doxygen_Suppress
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            : NS_PROJ_START
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : namespace io {
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : class WKTConstants {
+<span class="lineNum">      51 </span>            :   public:
+<span class="lineNum">      52 </span>            :     // WKT1
+<span class="lineNum">      53 </span>            :     static const std::string GEOCCS;
+<span class="lineNum">      54 </span>            :     static const std::string GEOGCS;
+<span class="lineNum">      55 </span>            :     static const std::string DATUM; // WKT2 preferred too
+<span class="lineNum">      56 </span>            :     static const std::string UNIT;
+<span class="lineNum">      57 </span>            :     static const std::string SPHEROID;
+<span class="lineNum">      58 </span>            :     static const std::string AXIS;   // WKT2 too
+<span class="lineNum">      59 </span>            :     static const std::string PRIMEM; // WKT2 too
+<span class="lineNum">      60 </span>            :     static const std::string AUTHORITY;
+<span class="lineNum">      61 </span>            :     static const std::string PROJCS;
+<span class="lineNum">      62 </span>            :     static const std::string PROJECTION;
+<span class="lineNum">      63 </span>            :     static const std::string PARAMETER; // WKT2 too
+<span class="lineNum">      64 </span>            :     static const std::string VERT_CS;
+<span class="lineNum">      65 </span>            :     static const std::string VERT_DATUM;
+<span class="lineNum">      66 </span>            :     static const std::string COMPD_CS;
+<span class="lineNum">      67 </span>            :     static const std::string TOWGS84;     // WKT1 only
+<span class="lineNum">      68 </span>            :     static const std::string EXTENSION;   // WKT1 only - GDAL specific
+<span class="lineNum">      69 </span>            :     static const std::string LOCAL_CS;    // WKT1 only
+<span class="lineNum">      70 </span>            :     static const std::string LOCAL_DATUM; // WKT1 only
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :     // WKT2 preferred
+<span class="lineNum">      73 </span>            :     static const std::string GEODCRS;
+<span class="lineNum">      74 </span>            :     static const std::string LENGTHUNIT;
+<span class="lineNum">      75 </span>            :     static const std::string ANGLEUNIT;
+<span class="lineNum">      76 </span>            :     static const std::string SCALEUNIT;
+<span class="lineNum">      77 </span>            :     static const std::string TIMEUNIT;
+<span class="lineNum">      78 </span>            :     static const std::string ELLIPSOID;
+<span class="lineNum">      79 </span>            :     // underscore, since there is a CS macro in Solaris system headers
+<span class="lineNum">      80 </span>            :     static const std::string CS_;
+<span class="lineNum">      81 </span>            :     static const std::string ID;
+<span class="lineNum">      82 </span>            :     static const std::string PROJCRS;
+<span class="lineNum">      83 </span>            :     static const std::string BASEGEODCRS;
+<span class="lineNum">      84 </span>            :     static const std::string MERIDIAN;
+<span class="lineNum">      85 </span>            :     static const std::string ORDER;
+<span class="lineNum">      86 </span>            :     static const std::string ANCHOR;
+<span class="lineNum">      87 </span>            :     static const std::string CONVERSION;
+<span class="lineNum">      88 </span>            :     static const std::string METHOD;
+<span class="lineNum">      89 </span>            :     static const std::string REMARK;
+<span class="lineNum">      90 </span>            :     static const std::string GEOGCRS;     // WKT2-2019
+<span class="lineNum">      91 </span>            :     static const std::string BASEGEOGCRS; // WKT2-2019
+<span class="lineNum">      92 </span>            :     static const std::string SCOPE;
+<span class="lineNum">      93 </span>            :     static const std::string AREA;
+<span class="lineNum">      94 </span>            :     static const std::string BBOX;
+<span class="lineNum">      95 </span>            :     static const std::string CITATION;
+<span class="lineNum">      96 </span>            :     static const std::string URI;
+<span class="lineNum">      97 </span>            :     static const std::string VERTCRS;
+<span class="lineNum">      98 </span>            :     static const std::string VDATUM;
+<span class="lineNum">      99 </span>            :     static const std::string COMPOUNDCRS;
+<span class="lineNum">     100 </span>            :     static const std::string PARAMETERFILE;
+<span class="lineNum">     101 </span>            :     static const std::string COORDINATEOPERATION;
+<span class="lineNum">     102 </span>            :     static const std::string SOURCECRS;
+<span class="lineNum">     103 </span>            :     static const std::string TARGETCRS;
+<span class="lineNum">     104 </span>            :     static const std::string INTERPOLATIONCRS;
+<span class="lineNum">     105 </span>            :     static const std::string OPERATIONACCURACY;
+<span class="lineNum">     106 </span>            :     static const std::string CONCATENATEDOPERATION; // WKT2-2019
+<span class="lineNum">     107 </span>            :     static const std::string STEP;                  // WKT2-2019
+<span class="lineNum">     108 </span>            :     static const std::string BOUNDCRS;
+<span class="lineNum">     109 </span>            :     static const std::string ABRIDGEDTRANSFORMATION;
+<span class="lineNum">     110 </span>            :     static const std::string DERIVINGCONVERSION;
+<span class="lineNum">     111 </span>            :     static const std::string TDATUM;
+<span class="lineNum">     112 </span>            :     static const std::string CALENDAR; // WKT2-2019
+<span class="lineNum">     113 </span>            :     static const std::string TIMEORIGIN;
+<span class="lineNum">     114 </span>            :     static const std::string TIMECRS;
+<span class="lineNum">     115 </span>            :     static const std::string VERTICALEXTENT;
+<span class="lineNum">     116 </span>            :     static const std::string TIMEEXTENT;
+<span class="lineNum">     117 </span>            :     static const std::string USAGE;            // WKT2-2019
+<span class="lineNum">     118 </span>            :     static const std::string DYNAMIC;          // WKT2-2019
+<span class="lineNum">     119 </span>            :     static const std::string FRAMEEPOCH;       // WKT2-2019
+<span class="lineNum">     120 </span>            :     static const std::string MODEL;            // WKT2-2019
+<span class="lineNum">     121 </span>            :     static const std::string VELOCITYGRID;     // WKT2-2019
+<span class="lineNum">     122 </span>            :     static const std::string ENSEMBLE;         // WKT2-2019
+<span class="lineNum">     123 </span>            :     static const std::string MEMBER;           // WKT2-2019
+<span class="lineNum">     124 </span>            :     static const std::string ENSEMBLEACCURACY; // WKT2-2019
+<span class="lineNum">     125 </span>            :     static const std::string DERIVEDPROJCRS;   // WKT2-2019
+<span class="lineNum">     126 </span>            :     static const std::string BASEPROJCRS;      // WKT2-2019
+<span class="lineNum">     127 </span>            :     static const std::string EDATUM;
+<span class="lineNum">     128 </span>            :     static const std::string ENGCRS;
+<span class="lineNum">     129 </span>            :     static const std::string PDATUM;
+<span class="lineNum">     130 </span>            :     static const std::string PARAMETRICCRS;
+<span class="lineNum">     131 </span>            :     static const std::string PARAMETRICUNIT;
+<span class="lineNum">     132 </span>            :     static const std::string BASEVERTCRS;
+<span class="lineNum">     133 </span>            :     static const std::string BASEENGCRS;
+<span class="lineNum">     134 </span>            :     static const std::string BASEPARAMCRS;
+<span class="lineNum">     135 </span>            :     static const std::string BASETIMECRS;
+<span class="lineNum">     136 </span>            :     static const std::string VERSION;
+<span class="lineNum">     137 </span>            :     static const std::string GEOIDMODEL; // WKT2-2019
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            :     // WKT2 alternate (longer or shorter)
+<span class="lineNum">     140 </span>            :     static const std::string GEODETICCRS;
+<span class="lineNum">     141 </span>            :     static const std::string GEODETICDATUM;
+<span class="lineNum">     142 </span>            :     static const std::string PROJECTEDCRS;
+<span class="lineNum">     143 </span>            :     static const std::string PRIMEMERIDIAN;
+<span class="lineNum">     144 </span>            :     static const std::string GEOGRAPHICCRS; // WKT2-2019
+<span class="lineNum">     145 </span>            :     static const std::string TRF;           // WKT2-2019
+<span class="lineNum">     146 </span>            :     static const std::string VERTICALCRS;
+<span class="lineNum">     147 </span>            :     static const std::string VERTICALDATUM;
+<span class="lineNum">     148 </span>            :     static const std::string VRF; // WKT2-2019
+<span class="lineNum">     149 </span>            :     static const std::string TIMEDATUM;
+<span class="lineNum">     150 </span>            :     static const std::string TEMPORALQUANTITY;
+<span class="lineNum">     151 </span>            :     static const std::string ENGINEERINGDATUM;
+<span class="lineNum">     152 </span>            :     static const std::string ENGINEERINGCRS;
+<span class="lineNum">     153 </span>            :     static const std::string PARAMETRICDATUM;
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            :     static const std::vector&lt;std::string&gt; &amp;constants() { return constants_; }
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            :   private:
+<span class="lineNum">     158 </span>            :     static std::vector&lt;std::string&gt; constants_;
+<span class="lineNum">     159 </span>            :     static const char *createAndAddToConstantList(const char *text);
+<span class="lineNum">     160 </span>            : };
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            : } // namespace io
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            : NS_PROJ_END
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            : /** Auxiliary structure to PJ_CONTEXT storing C++ context stuff. */
+<span class="lineNum">     169 </span><span class="lineCov">        648 : struct projCppContext {</span>
+<span class="lineNum">     170 </span>            :   private:
+<span class="lineNum">     171 </span>            :     NS_PROJ::io::DatabaseContextPtr databaseContext_{};
+<span class="lineNum">     172 </span>            :     PJ_CONTEXT *ctx_ = nullptr;
+<span class="lineNum">     173 </span>            :     std::string dbPath_{};
+<span class="lineNum">     174 </span>            :     std::vector&lt;std::string&gt; auxDbPaths_{};
+<span class="lineNum">     175 </span>            :     bool autoCloseDb_ = false;
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            :     projCppContext(const projCppContext &amp;) = delete;
+<span class="lineNum">     178 </span>            :     projCppContext &amp;operator=(const projCppContext &amp;) = delete;
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            :   public:
+<span class="lineNum">     181 </span>            :     std::string lastDbPath_{};
+<span class="lineNum">     182 </span>            :     std::string lastDbMetadataItem_{};
+<span class="lineNum">     183 </span>            :     std::string lastUOMName_{};
+<span class="lineNum">     184 </span>            :     std::string lastGridFullName_{};
+<span class="lineNum">     185 </span>            :     std::string lastGridPackageName_{};
+<span class="lineNum">     186 </span>            :     std::string lastGridUrl_{};
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span>            :     static std::vector&lt;std::string&gt; toVector(const char *const *auxDbPaths);
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span>            :     explicit projCppContext(PJ_CONTEXT *ctx, const char *dbPath = nullptr,
+<span class="lineNum">     191 </span>            :                             const std::vector&lt;std::string&gt; &amp;auxDbPaths = {});
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span>            :     // cppcheck-suppress functionStatic
+<span class="lineNum">     194 </span><span class="lineCov">          3 :     inline const std::string &amp;getDbPath() const { return dbPath_; }</span>
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :     // cppcheck-suppress functionStatic
+<span class="lineNum">     197 </span>            :     inline const std::vector&lt;std::string&gt; &amp;getAuxDbPaths() const {
+<span class="lineNum">     198 </span><span class="lineCov">          3 :         return auxDbPaths_;</span>
+<span class="lineNum">     199 </span>            :     }
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span><span class="lineCov">         10 :     void setAutoCloseDb(bool autoClose) { autoCloseDb_ = autoClose; }</span>
+<span class="lineNum">     202 </span>            :     inline bool getAutoCloseDb() const { return autoCloseDb_; }
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :     // cppcheck-suppress functionStatic
+<span class="lineNum">     205 </span>            :     void closeDb();
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span>            :     void autoCloseDbIfNeeded();
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span>            :     NS_PROJ::io::DatabaseContextNNPtr getDatabaseContext();
+<span class="lineNum">     210 </span>            : };
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            : //! @endcond
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            : #endif // IO_INTERNAL_HH_INCLUDED
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

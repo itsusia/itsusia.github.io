@@ -1,0 +1,293 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - build/man/RhumbSolve.usage</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">build/man</a> - RhumbSolve.usage<span style="font-size: 80%;"> (source / <a href="RhumbSolve.usage.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span><span class="lineNoCov">          0 : int usage(int retval, bool brief) {</span></a>
+<span class="lineNum">       2 </span><span class="lineNoCov">          0 :   if (brief)</span>
+<span class="lineNum">       3 </span><span class="lineNoCov">          0 :     ( retval ? std::cerr : std::cout ) &lt;&lt; &quot;Usage:\n&quot;</span>
+<span class="lineNum">       4 </span>            : &quot;    RhumbSolve [ -i | -L lat1 lon1 azi12 ] [ -e a f ] [ -d | -: ] [ -w ] [\n&quot;
+<span class="lineNum">       5 </span>            : &quot;    -p prec ] [ -s ] [ --comment-delimiter commentdelim ] [ --version | -h\n&quot;
+<span class="lineNum">       6 </span>            : &quot;    | --help ] [ --input-file infile | --input-string instring ] [\n&quot;
+<span class="lineNum">       7 </span>            : &quot;    --line-separator linesep ] [ --output-file outfile ]\n&quot;
+<span class="lineNum">       8 </span>            : &quot;\n&quot;
+<span class="lineNum">       9 </span>            : &quot;For full documentation type:\n&quot;
+<span class="lineNum">      10 </span>            : &quot;    RhumbSolve --help\n&quot;
+<span class="lineNum">      11 </span>            : &quot;or visit:\n&quot;
+<span class="lineNum">      12 </span><span class="lineNoCov">          0 : &quot;    https://geographiclib.sourceforge.io/1.49/RhumbSolve.1.html\n&quot;;</span>
+<span class="lineNum">      13 </span>            :   else
+<span class="lineNum">      14 </span><span class="lineNoCov">          0 :     ( retval ? std::cerr : std::cout ) &lt;&lt; &quot;Man page:\n&quot;</span>
+<span class="lineNum">      15 </span>            : &quot;NAME\n&quot;
+<span class="lineNum">      16 </span>            : &quot;       RhumbSolve -- perform rhumb line calculations\n&quot;
+<span class="lineNum">      17 </span>            : &quot;\n&quot;
+<span class="lineNum">      18 </span>            : &quot;SYNOPSIS\n&quot;
+<span class="lineNum">      19 </span>            : &quot;       RhumbSolve [ -i | -L lat1 lon1 azi12 ] [ -e a f ] [ -d | -: ] [ -w ] [\n&quot;
+<span class="lineNum">      20 </span>            : &quot;       -p prec ] [ -s ] [ --comment-delimiter commentdelim ] [ --version | -h\n&quot;
+<span class="lineNum">      21 </span>            : &quot;       | --help ] [ --input-file infile | --input-string instring ] [\n&quot;
+<span class="lineNum">      22 </span>            : &quot;       --line-separator linesep ] [ --output-file outfile ]\n&quot;
+<span class="lineNum">      23 </span>            : &quot;\n&quot;
+<span class="lineNum">      24 </span>            : &quot;DESCRIPTION\n&quot;
+<span class="lineNum">      25 </span>            : &quot;       The path with constant heading between two points on the ellipsoid at\n&quot;
+<span class="lineNum">      26 </span>            : &quot;       (lat1, lon1) and (lat2, lon2) is called the rhumb line or loxodrome.\n&quot;
+<span class="lineNum">      27 </span>            : &quot;       Its length is s12 and the rhumb line has a forward azimuth azi12 along\n&quot;
+<span class="lineNum">      28 </span>            : &quot;       its length.  Also computed is S12 is the area between the rhumb line\n&quot;
+<span class="lineNum">      29 </span>            : &quot;       from point 1 to point 2 and the equator; i.e., it is the area, measured\n&quot;
+<span class="lineNum">      30 </span>            : &quot;       counter-clockwise, of the geodesic quadrilateral with corners\n&quot;
+<span class="lineNum">      31 </span>            : &quot;       (lat1,lon1), (0,lon1), (0,lon2), and (lat2,lon2).  A point at a pole is\n&quot;
+<span class="lineNum">      32 </span>            : &quot;       treated as a point a tiny distance away from the pole on the given line\n&quot;
+<span class="lineNum">      33 </span>            : &quot;       of longitude.  The longitude becomes indeterminate when a rhumb line\n&quot;
+<span class="lineNum">      34 </span>            : &quot;       passes through a pole, and RhumbSolve reports NaNs for the longitude\n&quot;
+<span class="lineNum">      35 </span>            : &quot;       and the area in this case.\n&quot;
+<span class="lineNum">      36 </span>            : &quot;\n&quot;
+<span class="lineNum">      37 </span>            : &quot;       NOTE: the rhumb line is not the shortest path between two points; that\n&quot;
+<span class="lineNum">      38 </span>            : &quot;       is the geodesic and it is calculated by GeodSolve(1).\n&quot;
+<span class="lineNum">      39 </span>            : &quot;\n&quot;
+<span class="lineNum">      40 </span>            : &quot;       RhumbSolve operates in one of three modes:\n&quot;
+<span class="lineNum">      41 </span>            : &quot;\n&quot;
+<span class="lineNum">      42 </span>            : &quot;       1.  By default, RhumbSolve accepts lines on the standard input\n&quot;
+<span class="lineNum">      43 </span>            : &quot;           containing lat1 lon1 azi12 s12 and prints lat2 lon2 S12 on standard\n&quot;
+<span class="lineNum">      44 </span>            : &quot;           output.  This is the direct calculation.\n&quot;
+<span class="lineNum">      45 </span>            : &quot;\n&quot;
+<span class="lineNum">      46 </span>            : &quot;       2.  With the -i command line argument, RhumbSolve performs the inverse\n&quot;
+<span class="lineNum">      47 </span>            : &quot;           calculation.  It reads lines containing lat1 lon1 lat2 lon2 and\n&quot;
+<span class="lineNum">      48 </span>            : &quot;           prints the values of azi12 s12 S12 for the corresponding shortest\n&quot;
+<span class="lineNum">      49 </span>            : &quot;           rhumb lines.  If the end points are on opposite meridians, there\n&quot;
+<span class="lineNum">      50 </span>            : &quot;           are two shortest rhumb lines and the east-going one is chosen.\n&quot;
+<span class="lineNum">      51 </span>            : &quot;\n&quot;
+<span class="lineNum">      52 </span>            : &quot;       3.  Command line arguments -L lat1 lon1 azi12 specify a rhumb line.\n&quot;
+<span class="lineNum">      53 </span>            : &quot;           RhumbSolve then accepts a sequence of s12 values (one per line) on\n&quot;
+<span class="lineNum">      54 </span>            : &quot;           standard input and prints lat2 lon2 S12 for each.  This generates a\n&quot;
+<span class="lineNum">      55 </span>            : &quot;           sequence of points on a rhumb line.\n&quot;
+<span class="lineNum">      56 </span>            : &quot;\n&quot;
+<span class="lineNum">      57 </span>            : &quot;OPTIONS\n&quot;
+<span class="lineNum">      58 </span>            : &quot;       -i  perform an inverse calculation (see 2 above).\n&quot;
+<span class="lineNum">      59 </span>            : &quot;\n&quot;
+<span class="lineNum">      60 </span>            : &quot;       -L lat1 lon1 azi12\n&quot;
+<span class="lineNum">      61 </span>            : &quot;           line mode (see 3 above); generate a sequence of points along the\n&quot;
+<span class="lineNum">      62 </span>            : &quot;           rhumb line specified by lat1 lon1 azi12.  The -w flag can be used\n&quot;
+<span class="lineNum">      63 </span>            : &quot;           to swap the default order of the 2 geographic coordinates, provided\n&quot;
+<span class="lineNum">      64 </span>            : &quot;           that it appears before -L.  (-l is an alternative, deprecated,\n&quot;
+<span class="lineNum">      65 </span>            : &quot;           spelling of this flag.)\n&quot;
+<span class="lineNum">      66 </span>            : &quot;\n&quot;
+<span class="lineNum">      67 </span>            : &quot;       -e a f\n&quot;
+<span class="lineNum">      68 </span>            : &quot;           specify the ellipsoid via the equatorial radius, a and the\n&quot;
+<span class="lineNum">      69 </span>            : &quot;           flattening, f.  Setting f = 0 results in a sphere.  Specify f &lt; 0\n&quot;
+<span class="lineNum">      70 </span>            : &quot;           for a prolate ellipsoid.  A simple fraction, e.g., 1/297, is\n&quot;
+<span class="lineNum">      71 </span>            : &quot;           allowed for f.  By default, the WGS84 ellipsoid is used, a =\n&quot;
+<span class="lineNum">      72 </span>            : &quot;           6378137 m, f = 1/298.257223563.\n&quot;
+<span class="lineNum">      73 </span>            : &quot;\n&quot;
+<span class="lineNum">      74 </span>            : &quot;       -d  output angles as degrees, minutes, seconds instead of decimal\n&quot;
+<span class="lineNum">      75 </span>            : &quot;           degrees.\n&quot;
+<span class="lineNum">      76 </span>            : &quot;\n&quot;
+<span class="lineNum">      77 </span>            : &quot;       -:  like -d, except use : as a separator instead of the d, ', and \&quot;\n&quot;
+<span class="lineNum">      78 </span>            : &quot;           delimiters.\n&quot;
+<span class="lineNum">      79 </span>            : &quot;\n&quot;
+<span class="lineNum">      80 </span>            : &quot;       -w  on input and output, longitude precedes latitude (except that on\n&quot;
+<span class="lineNum">      81 </span>            : &quot;           input this can be overridden by a hemisphere designator, N, S, E,\n&quot;
+<span class="lineNum">      82 </span>            : &quot;           W).\n&quot;
+<span class="lineNum">      83 </span>            : &quot;\n&quot;
+<span class="lineNum">      84 </span>            : &quot;       -p prec\n&quot;
+<span class="lineNum">      85 </span>            : &quot;           set the output precision to prec (default 3); prec is the precision\n&quot;
+<span class="lineNum">      86 </span>            : &quot;           relative to 1 m.  See \&quot;PRECISION\&quot;.\n&quot;
+<span class="lineNum">      87 </span>            : &quot;\n&quot;
+<span class="lineNum">      88 </span>            : &quot;       -s  By default, the rhumb line calculations are carried out exactly in\n&quot;
+<span class="lineNum">      89 </span>            : &quot;           terms of elliptic integrals.  This includes the use of the addition\n&quot;
+<span class="lineNum">      90 </span>            : &quot;           theorem for elliptic integrals to compute the divided difference of\n&quot;
+<span class="lineNum">      91 </span>            : &quot;           the isometric and rectifying latitudes.  If -s is supplied this\n&quot;
+<span class="lineNum">      92 </span>            : &quot;           divided difference is computed using Krueger series for the\n&quot;
+<span class="lineNum">      93 </span>            : &quot;           transverse Mercator projection which is only accurate for |f| &lt;\n&quot;
+<span class="lineNum">      94 </span>            : &quot;           0.01.  See \&quot;ACCURACY\&quot;.\n&quot;
+<span class="lineNum">      95 </span>            : &quot;\n&quot;
+<span class="lineNum">      96 </span>            : &quot;       --comment-delimiter commentdelim\n&quot;
+<span class="lineNum">      97 </span>            : &quot;           set the comment delimiter to commentdelim (e.g., \&quot;#\&quot; or \&quot;//\&quot;).  If\n&quot;
+<span class="lineNum">      98 </span>            : &quot;           set, the input lines will be scanned for this delimiter and, if\n&quot;
+<span class="lineNum">      99 </span>            : &quot;           found, the delimiter and the rest of the line will be removed prior\n&quot;
+<span class="lineNum">     100 </span>            : &quot;           to processing and subsequently appended to the output line\n&quot;
+<span class="lineNum">     101 </span>            : &quot;           (separated by a space).\n&quot;
+<span class="lineNum">     102 </span>            : &quot;\n&quot;
+<span class="lineNum">     103 </span>            : &quot;       --version\n&quot;
+<span class="lineNum">     104 </span>            : &quot;           print version and exit.\n&quot;
+<span class="lineNum">     105 </span>            : &quot;\n&quot;
+<span class="lineNum">     106 </span>            : &quot;       -h  print usage and exit.\n&quot;
+<span class="lineNum">     107 </span>            : &quot;\n&quot;
+<span class="lineNum">     108 </span>            : &quot;       --help\n&quot;
+<span class="lineNum">     109 </span>            : &quot;           print full documentation and exit.\n&quot;
+<span class="lineNum">     110 </span>            : &quot;\n&quot;
+<span class="lineNum">     111 </span>            : &quot;       --input-file infile\n&quot;
+<span class="lineNum">     112 </span>            : &quot;           read input from the file infile instead of from standard input; a\n&quot;
+<span class="lineNum">     113 </span>            : &quot;           file name of \&quot;-\&quot; stands for standard input.\n&quot;
+<span class="lineNum">     114 </span>            : &quot;\n&quot;
+<span class="lineNum">     115 </span>            : &quot;       --input-string instring\n&quot;
+<span class="lineNum">     116 </span>            : &quot;           read input from the string instring instead of from standard input.\n&quot;
+<span class="lineNum">     117 </span>            : &quot;           All occurrences of the line separator character (default is a\n&quot;
+<span class="lineNum">     118 </span>            : &quot;           semicolon) in instring are converted to newlines before the reading\n&quot;
+<span class="lineNum">     119 </span>            : &quot;           begins.\n&quot;
+<span class="lineNum">     120 </span>            : &quot;\n&quot;
+<span class="lineNum">     121 </span>            : &quot;       --line-separator linesep\n&quot;
+<span class="lineNum">     122 </span>            : &quot;           set the line separator character to linesep.  By default this is a\n&quot;
+<span class="lineNum">     123 </span>            : &quot;           semicolon.\n&quot;
+<span class="lineNum">     124 </span>            : &quot;\n&quot;
+<span class="lineNum">     125 </span>            : &quot;       --output-file outfile\n&quot;
+<span class="lineNum">     126 </span>            : &quot;           write output to the file outfile instead of to standard output; a\n&quot;
+<span class="lineNum">     127 </span>            : &quot;           file name of \&quot;-\&quot; stands for standard output.\n&quot;
+<span class="lineNum">     128 </span>            : &quot;\n&quot;
+<span class="lineNum">     129 </span>            : &quot;INPUT\n&quot;
+<span class="lineNum">     130 </span>            : &quot;       RhumbSolve measures all angles in degrees, all lengths (s12) in meters,\n&quot;
+<span class="lineNum">     131 </span>            : &quot;       and all areas (S12) in meters^2.  On input angles (latitude, longitude,\n&quot;
+<span class="lineNum">     132 </span>            : &quot;       azimuth, arc length) can be as decimal degrees or degrees, minutes,\n&quot;
+<span class="lineNum">     133 </span>            : &quot;       seconds.  For example, \&quot;40d30\&quot;, \&quot;40d30'\&quot;, \&quot;40:30\&quot;, \&quot;40.5d\&quot;, and 40.5\n&quot;
+<span class="lineNum">     134 </span>            : &quot;       are all equivalent.  By default, latitude precedes longitude for each\n&quot;
+<span class="lineNum">     135 </span>            : &quot;       point (the -w flag switches this convention); however on input either\n&quot;
+<span class="lineNum">     136 </span>            : &quot;       may be given first by appending (or prepending) N or S to the latitude\n&quot;
+<span class="lineNum">     137 </span>            : &quot;       and E or W to the longitude.  Azimuths are measured clockwise from\n&quot;
+<span class="lineNum">     138 </span>            : &quot;       north; however this may be overridden with E or W.\n&quot;
+<span class="lineNum">     139 </span>            : &quot;\n&quot;
+<span class="lineNum">     140 </span>            : &quot;       For details on the allowed formats for angles, see the \&quot;GEOGRAPHIC\n&quot;
+<span class="lineNum">     141 </span>            : &quot;       COORDINATES\&quot; section of GeoConvert(1).\n&quot;
+<span class="lineNum">     142 </span>            : &quot;\n&quot;
+<span class="lineNum">     143 </span>            : &quot;PRECISION\n&quot;
+<span class="lineNum">     144 </span>            : &quot;       prec gives precision of the output with prec = 0 giving 1 m precision,\n&quot;
+<span class="lineNum">     145 </span>            : &quot;       prec = 3 giving 1 mm precision, etc.  prec is the number of digits\n&quot;
+<span class="lineNum">     146 </span>            : &quot;       after the decimal point for lengths.  For decimal degrees, the number\n&quot;
+<span class="lineNum">     147 </span>            : &quot;       of digits after the decimal point is prec + 5.  For DMS (degree,\n&quot;
+<span class="lineNum">     148 </span>            : &quot;       minute, seconds) output, the number of digits after the decimal point\n&quot;
+<span class="lineNum">     149 </span>            : &quot;       in the seconds component is prec + 1.  The minimum value of prec is 0\n&quot;
+<span class="lineNum">     150 </span>            : &quot;       and the maximum is 10.\n&quot;
+<span class="lineNum">     151 </span>            : &quot;\n&quot;
+<span class="lineNum">     152 </span>            : &quot;ERRORS\n&quot;
+<span class="lineNum">     153 </span>            : &quot;       An illegal line of input will print an error message to standard output\n&quot;
+<span class="lineNum">     154 </span>            : &quot;       beginning with \&quot;ERROR:\&quot; and causes RhumbSolve to return an exit code of\n&quot;
+<span class="lineNum">     155 </span>            : &quot;       1.  However, an error does not cause RhumbSolve to terminate; following\n&quot;
+<span class="lineNum">     156 </span>            : &quot;       lines will be converted.\n&quot;
+<span class="lineNum">     157 </span>            : &quot;\n&quot;
+<span class="lineNum">     158 </span>            : &quot;ACCURACY\n&quot;
+<span class="lineNum">     159 </span>            : &quot;       The algorithm used by RhumbSolve uses exact formulas for converting\n&quot;
+<span class="lineNum">     160 </span>            : &quot;       between the latitude, rectifying latitude (mu), and isometric latitude\n&quot;
+<span class="lineNum">     161 </span>            : &quot;       (psi).  These formulas are accurate for any value of the flattening.\n&quot;
+<span class="lineNum">     162 </span>            : &quot;       The computation of rhumb lines involves the ratio (psi1 - psi2) / (mu1\n&quot;
+<span class="lineNum">     163 </span>            : &quot;       - mu2) and this is subject to large round-off errors if lat1 is close\n&quot;
+<span class="lineNum">     164 </span>            : &quot;       to lat2.  So this ratio is computed using divided differences using one\n&quot;
+<span class="lineNum">     165 </span>            : &quot;       of two methods: by default, this uses the addition theorem for elliptic\n&quot;
+<span class="lineNum">     166 </span>            : &quot;       integrals (accurate for all values of f); however, with the -s options,\n&quot;
+<span class="lineNum">     167 </span>            : &quot;       it is computed using the series expansions used by\n&quot;
+<span class="lineNum">     168 </span>            : &quot;       TransverseMercatorProj(1) for the conversions between rectifying and\n&quot;
+<span class="lineNum">     169 </span>            : &quot;       conformal latitudes (accurate for |f| &lt; 0.01).  For the WGS84\n&quot;
+<span class="lineNum">     170 </span>            : &quot;       ellipsoid, the error is about 10 nanometers using either method.\n&quot;
+<span class="lineNum">     171 </span>            : &quot;\n&quot;
+<span class="lineNum">     172 </span>            : &quot;EXAMPLES\n&quot;
+<span class="lineNum">     173 </span>            : &quot;       Route from JFK Airport to Singapore Changi Airport:\n&quot;
+<span class="lineNum">     174 </span>            : &quot;\n&quot;
+<span class="lineNum">     175 </span>            : &quot;          echo 40:38:23N 073:46:44W 01:21:33N 103:59:22E |\n&quot;
+<span class="lineNum">     176 </span>            : &quot;          RhumbSolve -i -: -p 0\n&quot;
+<span class="lineNum">     177 </span>            : &quot;\n&quot;
+<span class="lineNum">     178 </span>            : &quot;          103:34:58.2 18523563\n&quot;
+<span class="lineNum">     179 </span>            : &quot;\n&quot;
+<span class="lineNum">     180 </span>            : &quot;       N.B. This is not the route typically taken by aircraft because it's\n&quot;
+<span class="lineNum">     181 </span>            : &quot;       considerably longer than the geodesic given by GeodSolve(1).\n&quot;
+<span class="lineNum">     182 </span>            : &quot;\n&quot;
+<span class="lineNum">     183 </span>            : &quot;       Waypoints on the route at intervals of 2000km:\n&quot;
+<span class="lineNum">     184 </span>            : &quot;\n&quot;
+<span class="lineNum">     185 </span>            : &quot;          for ((i = 0; i &lt;= 20; i += 2)); do echo ${i}000000;done |\n&quot;
+<span class="lineNum">     186 </span>            : &quot;          RhumbSolve -L 40:38:23N 073:46:44W 103:34:58.2 -: -p 0\n&quot;
+<span class="lineNum">     187 </span>            : &quot;\n&quot;
+<span class="lineNum">     188 </span>            : &quot;          40:38:23.0N 073:46:44.0W 0\n&quot;
+<span class="lineNum">     189 </span>            : &quot;          36:24:30.3N 051:28:26.4W 9817078307821\n&quot;
+<span class="lineNum">     190 </span>            : &quot;          32:10:26.8N 030:20:57.3W 18224745682005\n&quot;
+<span class="lineNum">     191 </span>            : &quot;          27:56:13.2N 010:10:54.2W 25358020327741\n&quot;
+<span class="lineNum">     192 </span>            : &quot;          23:41:50.1N 009:12:45.5E 31321269267102\n&quot;
+<span class="lineNum">     193 </span>            : &quot;          19:27:18.7N 027:59:22.1E 36195163180159\n&quot;
+<span class="lineNum">     194 </span>            : &quot;          15:12:40.2N 046:17:01.1E 40041499143669\n&quot;
+<span class="lineNum">     195 </span>            : &quot;          10:57:55.9N 064:12:52.8E 42906570007050\n&quot;
+<span class="lineNum">     196 </span>            : &quot;          06:43:07.3N 081:53:28.8E 44823504180200\n&quot;
+<span class="lineNum">     197 </span>            : &quot;          02:28:16.2N 099:24:54.5E 45813843358737\n&quot;
+<span class="lineNum">     198 </span>            : &quot;          01:46:36.0S 116:52:59.7E 45888525219677\n&quot;
+<span class="lineNum">     199 </span>            : &quot;\n&quot;
+<span class="lineNum">     200 </span>            : &quot;SEE ALSO\n&quot;
+<span class="lineNum">     201 </span>            : &quot;       GeoConvert(1), GeodSolve(1), TransverseMercatorProj(1).\n&quot;
+<span class="lineNum">     202 </span>            : &quot;\n&quot;
+<span class="lineNum">     203 </span>            : &quot;       An online version of this utility is availbable at\n&quot;
+<span class="lineNum">     204 </span>            : &quot;       &lt;https://geographiclib.sourceforge.io/cgi-bin/RhumbSolve&gt;.\n&quot;
+<span class="lineNum">     205 </span>            : &quot;\n&quot;
+<span class="lineNum">     206 </span>            : &quot;       The Wikipedia page, Rhumb line,\n&quot;
+<span class="lineNum">     207 </span>            : &quot;       &lt;https://en.wikipedia.org/wiki/Rhumb_line&gt;.\n&quot;
+<span class="lineNum">     208 </span>            : &quot;\n&quot;
+<span class="lineNum">     209 </span>            : &quot;AUTHOR\n&quot;
+<span class="lineNum">     210 </span>            : &quot;       RhumbSolve was written by Charles Karney.\n&quot;
+<span class="lineNum">     211 </span>            : &quot;\n&quot;
+<span class="lineNum">     212 </span>            : &quot;HISTORY\n&quot;
+<span class="lineNum">     213 </span>            : &quot;       RhumbSolve was added to GeographicLib,\n&quot;
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 : &quot;       &lt;https://geographiclib.sourceforge.io&gt;, in version 1.37.\n&quot;</span>
+<span class="lineNum">     215 </span>            : ;
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :   return retval;</span>
+<span class="lineNum">     217 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

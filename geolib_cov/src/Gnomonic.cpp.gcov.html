@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/Gnomonic.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - Gnomonic.cpp<span style="font-size: 80%;"> (source / <a href="Gnomonic.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">28</td>
+            <td class="headerCovTableEntryLo">14.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">33.3 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file Gnomonic.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::Gnomonic class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2010-2015) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;GeographicLib/Gnomonic.hpp&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      13 </span>            : // Squelch warnings about potentially uninitialized local variables and
+<span class="lineNum">      14 </span>            : // constant conditional expressions
+<span class="lineNum">      15 </span>            : #  pragma warning (disable: 4701 4127)
+<span class="lineNum">      16 </span>            : #endif
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : namespace GeographicLib {
+<span class="lineNum">      19 </span>            : 
+<a name="20"><span class="lineNum">      20 </span>            :   using namespace std;</a>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineCov">          1 :   Gnomonic::Gnomonic(const Geodesic&amp; earth)</span>
+<span class="lineNum">      23 </span>            :     : eps0_(numeric_limits&lt;real&gt;::epsilon())
+<span class="lineNum">      24 </span>            :     , eps_(real(0.01) * sqrt(eps0_))
+<span class="lineNum">      25 </span>            :     , _earth(earth)
+<span class="lineNum">      26 </span><span class="lineCov">          1 :     , _a(_earth.MajorRadius())</span>
+<span class="lineNum">      27 </span><span class="lineCov">          2 :     , _f(_earth.Flattening())</span>
+<a name="28"><span class="lineNum">      28 </span><span class="lineCov">          1 :   {}</span></a>
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :   void Gnomonic::Forward(real lat0, real lon0, real lat, real lon,</span>
+<span class="lineNum">      31 </span>            :                          real&amp; x, real&amp; y, real&amp; azi, real&amp; rk) const {
+<span class="lineNum">      32 </span>            :     real azi0, m, M, t;
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :     _earth.GenInverse(lat0, lon0, lat, lon,</span>
+<span class="lineNum">      34 </span>            :                       Geodesic::AZIMUTH | Geodesic::REDUCEDLENGTH |
+<span class="lineNum">      35 </span>            :                       Geodesic::GEODESICSCALE,
+<span class="lineNum">      36 </span>            :                       t, azi0, azi, m, M, t, t);
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :     rk = M;</span>
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :     if (M &lt;= 0)</span>
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :       x = y = Math::NaN();</span>
+<span class="lineNum">      40 </span>            :     else {
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :       real rho = m/M;</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :       Math::sincosd(azi0, x, y);</span>
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :       x *= rho; y *= rho;</span>
+<span class="lineNum">      44 </span>            :     }
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :   void Gnomonic::Reverse(real lat0, real lon0, real x, real y,</span>
+<span class="lineNum">      48 </span>            :                          real&amp; lat, real&amp; lon, real&amp; azi, real&amp; rk) const {
+<span class="lineNum">      49 </span>            :     real
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :       azi0 = Math::atan2d(x, y),</span>
+<span class="lineNum">      51 </span>            :       rho = Math::hypot(x, y),
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :       s = _a * atan(rho/_a);</span>
+<span class="lineNum">      53 </span>            :     bool little = rho &lt;= _a;
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :     if (!little)</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :       rho = 1/rho;</span>
+<span class="lineNum">      56 </span>            :     GeodesicLine line(_earth.Line(lat0, lon0, azi0,
+<span class="lineNum">      57 </span>            :                                   Geodesic::LATITUDE | Geodesic::LONGITUDE |
+<span class="lineNum">      58 </span>            :                                   Geodesic::AZIMUTH | Geodesic::DISTANCE_IN |
+<span class="lineNum">      59 </span>            :                                   Geodesic::REDUCEDLENGTH |
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :                                   Geodesic::GEODESICSCALE));</span>
+<span class="lineNum">      61 </span>            :     int count = numit_, trip = 0;
+<span class="lineNum">      62 </span>            :     real lat1, lon1, azi1, M;
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :     while (count-- || GEOGRAPHICLIB_PANIC) {</span>
+<span class="lineNum">      64 </span>            :       real m, t;
+<span class="lineNum">      65 </span>            :       line.Position(s, lat1, lon1, azi1, m, M, t);
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :       if (trip)</span>
+<span class="lineNum">      67 </span>            :         break;
+<span class="lineNum">      68 </span>            :       // If little, solve rho(s) = rho with drho(s)/ds = 1/M^2
+<span class="lineNum">      69 </span>            :       // else solve 1/rho(s) = 1/rho with d(1/rho(s))/ds = -1/m^2
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :       real ds = little ? (m/M - rho) * M * M : (rho - M/m) * m * m;</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :       s -= ds;</span>
+<span class="lineNum">      72 </span>            :       // Reversed test to allow escape with NaNs
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :       if (!(abs(ds) &gt;= eps_ * _a))</span>
+<span class="lineNum">      74 </span>            :         ++trip;
+<span class="lineNum">      75 </span>            :     }
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :     if (trip) {</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :       lat = lat1; lon = lon1; azi = azi1; rk = M;</span>
+<span class="lineNum">      78 </span>            :     } else
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :       lat = lon = azi = rk = Math::NaN();</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">      81 </span>            :   }
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/GeodesicLineExact.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - GeodesicLineExact.cpp<span style="font-size: 80%;"> (source / <a href="GeodesicLineExact.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">128</td>
+            <td class="headerCovTableEntry">133</td>
+            <td class="headerCovTableEntryHi">96.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryMed">85.7 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file GeodesicLineExact.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::GeodesicLineExact class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2012-2016) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  *
+<span class="lineNum">       9 </span>            :  * This is a reformulation of the geodesic problem.  The notation is as
+<span class="lineNum">      10 </span>            :  * follows:
+<span class="lineNum">      11 </span>            :  * - at a general point (no suffix or 1 or 2 as suffix)
+<span class="lineNum">      12 </span>            :  *   - phi = latitude
+<span class="lineNum">      13 </span>            :  *   - beta = latitude on auxiliary sphere
+<span class="lineNum">      14 </span>            :  *   - omega = longitude on auxiliary sphere
+<span class="lineNum">      15 </span>            :  *   - lambda = longitude
+<span class="lineNum">      16 </span>            :  *   - alpha = azimuth of great circle
+<span class="lineNum">      17 </span>            :  *   - sigma = arc length along great circle
+<span class="lineNum">      18 </span>            :  *   - s = distance
+<span class="lineNum">      19 </span>            :  *   - tau = scaled distance (= sigma at multiples of pi/2)
+<span class="lineNum">      20 </span>            :  * - at northwards equator crossing
+<span class="lineNum">      21 </span>            :  *   - beta = phi = 0
+<span class="lineNum">      22 </span>            :  *   - omega = lambda = 0
+<span class="lineNum">      23 </span>            :  *   - alpha = alpha0
+<span class="lineNum">      24 </span>            :  *   - sigma = s = 0
+<span class="lineNum">      25 </span>            :  * - a 12 suffix means a difference, e.g., s12 = s2 - s1.
+<span class="lineNum">      26 </span>            :  * - s and c prefixes mean sin and cos
+<span class="lineNum">      27 </span>            :  **********************************************************************/
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #include &lt;GeographicLib/GeodesicLineExact.hpp&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : namespace GeographicLib {
+<span class="lineNum">      32 </span>            : 
+<a name="33"><span class="lineNum">      33 </span>            :   using namespace std;</a>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineCov">         10 :   void GeodesicLineExact::LineInit(const GeodesicExact&amp; g,</span>
+<span class="lineNum">      36 </span>            :                                    real lat1, real lon1,
+<span class="lineNum">      37 </span>            :                                    real azi1, real salp1, real calp1,
+<span class="lineNum">      38 </span>            :                                    unsigned caps) {
+<span class="lineNum">      39 </span><span class="lineCov">         10 :     tiny_ = g.tiny_;</span>
+<span class="lineNum">      40 </span><span class="lineCov">         10 :     _lat1 = Math::LatFix(lat1);</span>
+<span class="lineNum">      41 </span><span class="lineCov">         10 :     _lon1 = lon1;</span>
+<span class="lineNum">      42 </span><span class="lineCov">         10 :     _azi1 = azi1;</span>
+<span class="lineNum">      43 </span><span class="lineCov">         10 :     _salp1 = salp1;</span>
+<span class="lineNum">      44 </span><span class="lineCov">         10 :     _calp1 = calp1;</span>
+<span class="lineNum">      45 </span><span class="lineCov">         10 :     _a = g._a;</span>
+<span class="lineNum">      46 </span><span class="lineCov">         10 :     _f = g._f;</span>
+<span class="lineNum">      47 </span><span class="lineCov">         10 :     _b = g._b;</span>
+<span class="lineNum">      48 </span><span class="lineCov">         10 :     _c2 = g._c2;</span>
+<span class="lineNum">      49 </span><span class="lineCov">         10 :     _f1 = g._f1;</span>
+<span class="lineNum">      50 </span><span class="lineCov">         10 :     _e2 = g._e2;</span>
+<span class="lineNum">      51 </span>            :     // Always allow latitude and azimuth and unrolling of longitude
+<span class="lineNum">      52 </span><span class="lineCov">         10 :     _caps = caps | LATITUDE | AZIMUTH | LONG_UNROLL;</span>
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :     real cbet1, sbet1;
+<span class="lineNum">      55 </span><span class="lineCov">         10 :     Math::sincosd(Math::AngRound(_lat1), sbet1, cbet1); sbet1 *= _f1;</span>
+<span class="lineNum">      56 </span>            :     // Ensure cbet1 = +epsilon at poles
+<span class="lineNum">      57 </span><span class="lineCov">         20 :     Math::norm(sbet1, cbet1); cbet1 = max(tiny_, cbet1);</span>
+<span class="lineNum">      58 </span><span class="lineCov">         20 :     _dn1 = (_f &gt;= 0 ? sqrt(1 + g._ep2 * Math::sq(sbet1)) :</span>
+<span class="lineNum">      59 </span><span class="lineCov">          2 :             sqrt(1 - _e2 * Math::sq(cbet1)) / _f1);</span>
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :     // Evaluate alp0 from sin(alp1) * cos(bet1) = sin(alp0),
+<span class="lineNum">      62 </span><span class="lineCov">         10 :     _salp0 = _salp1 * cbet1; // alp0 in [0, pi/2 - |bet1|]</span>
+<span class="lineNum">      63 </span>            :     // Alt: calp0 = hypot(sbet1, calp1 * cbet1).  The following
+<span class="lineNum">      64 </span>            :     // is slightly better (consider the case salp1 = 0).
+<span class="lineNum">      65 </span><span class="lineCov">         20 :     _calp0 = Math::hypot(_calp1, _salp1 * sbet1);</span>
+<span class="lineNum">      66 </span>            :     // Evaluate sig with tan(bet1) = tan(sig1) * cos(alp1).
+<span class="lineNum">      67 </span>            :     // sig = 0 is nearest northward crossing of equator.
+<span class="lineNum">      68 </span>            :     // With bet1 = 0, alp1 = pi/2, we have sig1 = 0 (equatorial line).
+<span class="lineNum">      69 </span>            :     // With bet1 =  pi/2, alp1 = -pi, sig1 =  pi/2
+<span class="lineNum">      70 </span>            :     // With bet1 = -pi/2, alp1 =  0 , sig1 = -pi/2
+<span class="lineNum">      71 </span>            :     // Evaluate omg1 with tan(omg1) = sin(alp0) * tan(sig1).
+<span class="lineNum">      72 </span>            :     // With alp0 in (0, pi/2], quadrants for sig and omg coincide.
+<span class="lineNum">      73 </span>            :     // No atan2(0,0) ambiguity at poles since cbet1 = +epsilon.
+<span class="lineNum">      74 </span>            :     // With alp0 = 0, omg1 = 0 for alp1 = 0, omg1 = pi for alp1 = pi.
+<span class="lineNum">      75 </span><span class="lineCov">         10 :     _ssig1 = sbet1; _somg1 = _salp0 * sbet1;</span>
+<span class="lineNum">      76 </span><span class="lineCov">         10 :     _csig1 = _comg1 = sbet1 != 0 || _calp1 != 0 ? cbet1 * _calp1 : 1;</span>
+<span class="lineNum">      77 </span>            :     // Without normalization we have schi1 = somg1.
+<span class="lineNum">      78 </span><span class="lineCov">         10 :     _cchi1 = _f1 * _dn1 * _comg1;</span>
+<span class="lineNum">      79 </span>            :     Math::norm(_ssig1, _csig1); // sig1 in (-pi, pi]
+<span class="lineNum">      80 </span>            :     // Math::norm(_somg1, _comg1); -- don't need to normalize!
+<span class="lineNum">      81 </span>            :     // Math::norm(_schi1, _cchi1); -- don't need to normalize!
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span><span class="lineCov">         20 :     _k2 = Math::sq(_calp0) * g._ep2;</span>
+<span class="lineNum">      84 </span><span class="lineCov">         10 :     _E.Reset(-_k2, -g._ep2, 1 + _k2, 1 + g._ep2);</span>
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineCov">         10 :     if (_caps &amp; CAP_E) {</span>
+<span class="lineNum">      87 </span><span class="lineCov">         10 :       _E0 = _E.E() / (Math::pi() / 2);</span>
+<span class="lineNum">      88 </span><span class="lineCov">         10 :       _E1 = _E.deltaE(_ssig1, _csig1, _dn1);</span>
+<span class="lineNum">      89 </span><span class="lineCov">         10 :       real s = sin(_E1), c = cos(_E1);</span>
+<span class="lineNum">      90 </span>            :       // tau1 = sig1 + B11
+<span class="lineNum">      91 </span><span class="lineCov">         10 :       _stau1 = _ssig1 * c + _csig1 * s;</span>
+<span class="lineNum">      92 </span><span class="lineCov">         10 :       _ctau1 = _csig1 * c - _ssig1 * s;</span>
+<span class="lineNum">      93 </span>            :       // Not necessary because Einv inverts E
+<span class="lineNum">      94 </span>            :       //    _E1 = -_E.deltaEinv(_stau1, _ctau1);
+<span class="lineNum">      95 </span>            :     }
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span><span class="lineCov">         10 :     if (_caps &amp; CAP_D) {</span>
+<span class="lineNum">      98 </span><span class="lineCov">          2 :       _D0 = _E.D() / (Math::pi() / 2);</span>
+<span class="lineNum">      99 </span><span class="lineCov">          2 :       _D1 = _E.deltaD(_ssig1, _csig1, _dn1);</span>
+<span class="lineNum">     100 </span>            :     }
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span><span class="lineCov">         10 :     if (_caps &amp; CAP_H) {</span>
+<span class="lineNum">     103 </span><span class="lineCov">         10 :       _H0 = _E.H() / (Math::pi() / 2);</span>
+<span class="lineNum">     104 </span><span class="lineCov">         10 :       _H1 = _E.deltaH(_ssig1, _csig1, _dn1);</span>
+<span class="lineNum">     105 </span>            :     }
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">         10 :     if (_caps &amp; CAP_C4) {</span>
+<span class="lineNum">     108 </span><span class="lineCov">          2 :       real eps = _k2 / (2 * (1 + sqrt(1 + _k2)) + _k2);</span>
+<span class="lineNum">     109 </span><span class="lineCov">          2 :       g.C4f(eps, _C4a);</span>
+<span class="lineNum">     110 </span>            :       // Multiplier = a^2 * e^2 * cos(alpha0) * sin(alpha0)
+<span class="lineNum">     111 </span><span class="lineCov">          4 :       _A4 = Math::sq(_a) * _calp0 * _salp0 * _e2;</span>
+<span class="lineNum">     112 </span><span class="lineCov">          2 :       _B41 = GeodesicExact::CosSeries(_ssig1, _csig1, _C4a, nC4_);</span>
+<span class="lineNum">     113 </span>            :     }
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineCov">         10 :     _a13 = _s13 = Math::NaN();</span>
+<a name="116"><span class="lineNum">     116 </span><span class="lineCov">         10 :   }</span></a>
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span><span class="lineCov">          6 :   GeodesicLineExact::GeodesicLineExact(const GeodesicExact&amp; g,</span>
+<span class="lineNum">     119 </span>            :                                        real lat1, real lon1, real azi1,
+<span class="lineNum">     120 </span><span class="lineCov">          6 :                                        unsigned caps) {</span>
+<span class="lineNum">     121 </span>            :     azi1 = Math::AngNormalize(azi1);
+<span class="lineNum">     122 </span>            :     real salp1, calp1;
+<span class="lineNum">     123 </span>            :     // Guard against underflow in salp0.  Also -0 is converted to +0.
+<span class="lineNum">     124 </span><span class="lineCov">          6 :     Math::sincosd(Math::AngRound(azi1), salp1, calp1);</span>
+<span class="lineNum">     125 </span><span class="lineCov">          6 :     LineInit(g, lat1, lon1, azi1, salp1, calp1, caps);</span>
+<a name="126"><span class="lineNum">     126 </span><span class="lineCov">          6 :   }</span></a>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">          4 :   GeodesicLineExact::GeodesicLineExact(const GeodesicExact&amp; g,</span>
+<span class="lineNum">     129 </span>            :                                        real lat1, real lon1,
+<span class="lineNum">     130 </span>            :                                        real azi1, real salp1, real calp1,
+<span class="lineNum">     131 </span>            :                                        unsigned caps,
+<span class="lineNum">     132 </span><span class="lineCov">          4 :                                        bool arcmode, real s13_a13) {</span>
+<span class="lineNum">     133 </span><span class="lineCov">          4 :     LineInit(g, lat1, lon1, azi1, salp1, calp1, caps);</span>
+<span class="lineNum">     134 </span><span class="lineCov">          4 :     GenSetDistance(arcmode, s13_a13);</span>
+<a name="135"><span class="lineNum">     135 </span><span class="lineCov">          4 :   }</span></a>
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span><span class="lineCov">         15 :   Math::real GeodesicLineExact::GenPosition(bool arcmode, real s12_a12,</span>
+<span class="lineNum">     138 </span>            :                                             unsigned outmask,
+<span class="lineNum">     139 </span>            :                                             real&amp; lat2, real&amp; lon2, real&amp; azi2,
+<span class="lineNum">     140 </span>            :                                             real&amp; s12, real&amp; m12,
+<span class="lineNum">     141 </span>            :                                             real&amp; M12, real&amp; M21,
+<span class="lineNum">     142 </span>            :                                             real&amp; S12) const {
+<span class="lineNum">     143 </span><span class="lineCov">         15 :     outmask &amp;= _caps &amp; OUT_MASK;</span>
+<span class="lineNum">     144 </span><span class="lineCov">         15 :     if (!( Init() &amp;&amp; (arcmode || (_caps &amp; (OUT_MASK &amp; DISTANCE_IN))) ))</span>
+<span class="lineNum">     145 </span>            :       // Uninitialized or impossible distance calculation requested
+<span class="lineNum">     146 </span>            :       return Math::NaN();
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            :     // Avoid warning about uninitialized B12.
+<span class="lineNum">     149 </span>            :     real sig12, ssig12, csig12, E2 = 0, AB1 = 0;
+<span class="lineNum">     150 </span><span class="lineCov">         15 :     if (arcmode) {</span>
+<span class="lineNum">     151 </span>            :       // Interpret s12_a12 as spherical arc length
+<span class="lineNum">     152 </span><span class="lineCov">          4 :       sig12 = s12_a12 * Math::degree();</span>
+<span class="lineNum">     153 </span>            :       real s12a = abs(s12_a12);
+<span class="lineNum">     154 </span><span class="lineCov">          4 :       s12a -= 180 * floor(s12a / 180);</span>
+<span class="lineNum">     155 </span><span class="lineCov">          4 :       ssig12 = s12a ==  0 ? 0 : sin(sig12);</span>
+<span class="lineNum">     156 </span><span class="lineCov">          4 :       csig12 = s12a == 90 ? 0 : cos(sig12);</span>
+<span class="lineNum">     157 </span>            :     } else {
+<span class="lineNum">     158 </span>            :       // Interpret s12_a12 as distance
+<span class="lineNum">     159 </span>            :       real
+<span class="lineNum">     160 </span><span class="lineCov">         11 :         tau12 = s12_a12 / (_b * _E0),</span>
+<span class="lineNum">     161 </span><span class="lineCov">         11 :         s = sin(tau12),</span>
+<span class="lineNum">     162 </span><span class="lineCov">         11 :         c = cos(tau12);</span>
+<span class="lineNum">     163 </span>            :       // tau2 = tau1 + tau12
+<span class="lineNum">     164 </span><span class="lineCov">         11 :       E2 = - _E.deltaEinv(_stau1 * c + _ctau1 * s, _ctau1 * c - _stau1 * s);</span>
+<span class="lineNum">     165 </span><span class="lineCov">         11 :       sig12 = tau12 - (E2 - _E1);</span>
+<span class="lineNum">     166 </span><span class="lineCov">         11 :       ssig12 = sin(sig12);</span>
+<span class="lineNum">     167 </span><span class="lineCov">         11 :       csig12 = cos(sig12);</span>
+<span class="lineNum">     168 </span>            :     }
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            :     real ssig2, csig2, sbet2, cbet2, salp2, calp2;
+<span class="lineNum">     171 </span>            :     // sig2 = sig1 + sig12
+<span class="lineNum">     172 </span><span class="lineCov">         15 :     ssig2 = _ssig1 * csig12 + _csig1 * ssig12;</span>
+<span class="lineNum">     173 </span><span class="lineCov">         15 :     csig2 = _csig1 * csig12 - _ssig1 * ssig12;</span>
+<span class="lineNum">     174 </span><span class="lineCov">         15 :     real dn2 = _E.Delta(ssig2, csig2);</span>
+<span class="lineNum">     175 </span><span class="lineCov">         15 :     if (outmask &amp; (DISTANCE | REDUCEDLENGTH | GEODESICSCALE)) {</span>
+<span class="lineNum">     176 </span><span class="lineCov">          7 :       if (arcmode) {</span>
+<span class="lineNum">     177 </span><span class="lineCov">          4 :         E2 = _E.deltaE(ssig2, csig2, dn2);</span>
+<span class="lineNum">     178 </span>            :       }
+<span class="lineNum">     179 </span><span class="lineCov">          7 :       AB1 = _E0 * (E2 - _E1);</span>
+<span class="lineNum">     180 </span>            :     }
+<span class="lineNum">     181 </span>            :     // sin(bet2) = cos(alp0) * sin(sig2)
+<span class="lineNum">     182 </span><span class="lineCov">         15 :     sbet2 = _calp0 * ssig2;</span>
+<span class="lineNum">     183 </span>            :     // Alt: cbet2 = hypot(csig2, salp0 * ssig2);
+<span class="lineNum">     184 </span><span class="lineCov">         15 :     cbet2 = Math::hypot(_salp0, _calp0 * csig2);</span>
+<span class="lineNum">     185 </span><span class="lineCov">         15 :     if (cbet2 == 0)</span>
+<span class="lineNum">     186 </span>            :       // I.e., salp0 = 0, csig2 = 0.  Break the degeneracy in this case
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :       cbet2 = csig2 = tiny_;</span>
+<span class="lineNum">     188 </span>            :     // tan(alp0) = cos(sig2)*tan(alp2)
+<span class="lineNum">     189 </span><span class="lineCov">         15 :     salp2 = _salp0; calp2 = _calp0 * csig2; // No need to normalize</span>
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span><span class="lineCov">         15 :     if (outmask &amp; DISTANCE)</span>
+<span class="lineNum">     192 </span><span class="lineCov">          7 :       s12 = arcmode ? _b * (_E0 * sig12 + AB1) : s12_a12;</span>
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span><span class="lineCov">         15 :     if (outmask &amp; LONGITUDE) {</span>
+<span class="lineNum">     195 </span><span class="lineCov">         11 :       real somg2 = _salp0 * ssig2, comg2 = csig2,  // No need to normalize</span>
+<span class="lineNum">     196 </span>            :         E = Math::copysign(real(1), _salp0);       // east-going?
+<span class="lineNum">     197 </span>            :       // Without normalization we have schi2 = somg2.
+<span class="lineNum">     198 </span><span class="lineCov">         11 :       real cchi2 =  _f1 * dn2 *  comg2;</span>
+<span class="lineNum">     199 </span><span class="lineCov">         11 :       real chi12 = outmask &amp; LONG_UNROLL</span>
+<span class="lineNum">     200 </span><span class="lineCov">         22 :         ? E * (sig12</span>
+<span class="lineNum">     201 </span><span class="lineCov">          8 :                - (atan2(    ssig2, csig2) - atan2(    _ssig1, _csig1))</span>
+<span class="lineNum">     202 </span><span class="lineCov">          8 :                + (atan2(E * somg2, cchi2) - atan2(E * _somg1, _cchi1)))</span>
+<span class="lineNum">     203 </span><span class="lineCov">          3 :         : atan2(somg2 * _cchi1 - cchi2 * _somg1,</span>
+<span class="lineNum">     204 </span><span class="lineCov">          3 :                 cchi2 * _cchi1 + somg2 * _somg1);</span>
+<span class="lineNum">     205 </span>            :       real lam12 = chi12 -
+<span class="lineNum">     206 </span><span class="lineCov">         22 :         _e2/_f1 * _salp0 * _H0 *</span>
+<span class="lineNum">     207 </span><span class="lineCov">         22 :         (sig12 + (_E.deltaH(ssig2, csig2, dn2) - _H1));</span>
+<span class="lineNum">     208 </span><span class="lineCov">         11 :       real lon12 = lam12 / Math::degree();</span>
+<span class="lineNum">     209 </span><span class="lineCov">         22 :       lon2 = outmask &amp; LONG_UNROLL ? _lon1 + lon12 :</span>
+<span class="lineNum">     210 </span><span class="lineCov">          6 :         Math::AngNormalize(Math::AngNormalize(_lon1) +</span>
+<span class="lineNum">     211 </span>            :                            Math::AngNormalize(lon12));
+<span class="lineNum">     212 </span>            :     }
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span><span class="lineCov">         15 :     if (outmask &amp; LATITUDE)</span>
+<span class="lineNum">     215 </span><span class="lineCov">         11 :       lat2 = Math::atan2d(sbet2, _f1 * cbet2);</span>
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span><span class="lineCov">         15 :     if (outmask &amp; AZIMUTH)</span>
+<span class="lineNum">     218 </span><span class="lineCov">         11 :       azi2 = Math::atan2d(salp2, calp2);</span>
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span><span class="lineCov">         15 :     if (outmask &amp; (REDUCEDLENGTH | GEODESICSCALE)) {</span>
+<span class="lineNum">     221 </span><span class="lineCov">          3 :       real J12 = _k2 * _D0 * (sig12 + (_E.deltaD(ssig2, csig2, dn2) - _D1));</span>
+<span class="lineNum">     222 </span><span class="lineCov">          3 :       if (outmask &amp; REDUCEDLENGTH)</span>
+<span class="lineNum">     223 </span>            :         // Add parens around (_csig1 * ssig2) and (_ssig1 * csig2) to ensure
+<span class="lineNum">     224 </span>            :         // accurate cancellation in the case of coincident points.
+<span class="lineNum">     225 </span><span class="lineCov">          6 :         m12 = _b * ((dn2 * (_csig1 * ssig2) - _dn1 * (_ssig1 * csig2))</span>
+<span class="lineNum">     226 </span><span class="lineCov">          3 :                   - _csig1 * csig2 * J12);</span>
+<span class="lineNum">     227 </span><span class="lineCov">          3 :       if (outmask &amp; GEODESICSCALE) {</span>
+<span class="lineNum">     228 </span><span class="lineCov">          3 :         real t = _k2 * (ssig2 - _ssig1) * (ssig2 + _ssig1) / (_dn1 + dn2);</span>
+<span class="lineNum">     229 </span><span class="lineCov">          3 :         M12 = csig12 + (t *  ssig2 -  csig2 * J12) * _ssig1 / _dn1;</span>
+<span class="lineNum">     230 </span><span class="lineCov">          3 :         M21 = csig12 - (t * _ssig1 - _csig1 * J12) *  ssig2 /  dn2;</span>
+<span class="lineNum">     231 </span>            :       }
+<span class="lineNum">     232 </span>            :     }
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span><span class="lineCov">         15 :     if (outmask &amp; AREA) {</span>
+<span class="lineNum">     235 </span>            :       real
+<span class="lineNum">     236 </span><span class="lineCov">          3 :         B42 = GeodesicExact::CosSeries(ssig2, csig2, _C4a, nC4_);</span>
+<span class="lineNum">     237 </span>            :       real salp12, calp12;
+<span class="lineNum">     238 </span><span class="lineCov">          3 :       if (_calp0 == 0 || _salp0 == 0) {</span>
+<span class="lineNum">     239 </span>            :         // alp12 = alp2 - alp1, used in atan2 so no need to normalize
+<span class="lineNum">     240 </span><span class="lineCov">          2 :         salp12 = salp2 * _calp1 - calp2 * _salp1;</span>
+<span class="lineNum">     241 </span><span class="lineCov">          2 :         calp12 = calp2 * _calp1 + salp2 * _salp1;</span>
+<span class="lineNum">     242 </span>            :         // We used to include here some patch up code that purported to deal
+<span class="lineNum">     243 </span>            :         // with nearly meridional geodesics properly.  However, this turned out
+<span class="lineNum">     244 </span>            :         // to be wrong once _salp1 = -0 was allowed (via
+<span class="lineNum">     245 </span>            :         // GeodesicExact::InverseLine).  In fact, the calculation of {s,c}alp12
+<span class="lineNum">     246 </span>            :         // was already correct (following the IEEE rules for handling signed
+<span class="lineNum">     247 </span>            :         // zeros).  So the patch up code was unnecessary (as well as
+<span class="lineNum">     248 </span>            :         // dangerous).
+<span class="lineNum">     249 </span>            :       } else {
+<span class="lineNum">     250 </span>            :         // tan(alp) = tan(alp0) * sec(sig)
+<span class="lineNum">     251 </span>            :         // tan(alp2-alp1) = (tan(alp2) -tan(alp1)) / (tan(alp2)*tan(alp1)+1)
+<span class="lineNum">     252 </span>            :         // = calp0 * salp0 * (csig1-csig2) / (salp0^2 + calp0^2 * csig1*csig2)
+<span class="lineNum">     253 </span>            :         // If csig12 &gt; 0, write
+<span class="lineNum">     254 </span>            :         //   csig1 - csig2 = ssig12 * (csig1 * ssig12 / (1 + csig12) + ssig1)
+<span class="lineNum">     255 </span>            :         // else
+<span class="lineNum">     256 </span>            :         //   csig1 - csig2 = csig1 * (1 - csig12) + ssig12 * ssig1
+<span class="lineNum">     257 </span>            :         // No need to normalize
+<span class="lineNum">     258 </span><span class="lineCov">          2 :         salp12 = _calp0 * _salp0 *</span>
+<span class="lineNum">     259 </span><span class="lineCov">          2 :           (csig12 &lt;= 0 ? _csig1 * (1 - csig12) + ssig12 * _ssig1 :</span>
+<span class="lineNum">     260 </span><span class="lineCov">          1 :            ssig12 * (_csig1 * ssig12 / (1 + csig12) + _ssig1));</span>
+<span class="lineNum">     261 </span><span class="lineCov">          1 :         calp12 = Math::sq(_salp0) + Math::sq(_calp0) * _csig1 * csig2;</span>
+<span class="lineNum">     262 </span>            :       }
+<span class="lineNum">     263 </span><span class="lineCov">          3 :       S12 = _c2 * atan2(salp12, calp12) + _A4 * (B42 - _B41);</span>
+<span class="lineNum">     264 </span>            :     }
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span><span class="lineCov">         26 :     return arcmode ? s12_a12 : sig12 / Math::degree();</span>
+<a name="267"><span class="lineNum">     267 </span>            :   }</a>
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :   void GeodesicLineExact::SetDistance(real s13) {</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :     _s13 = s13;</span>
+<span class="lineNum">     271 </span>            :     real t;
+<span class="lineNum">     272 </span>            :     // This will set _a13 to NaN if the GeodesicLineExact doesn't have the
+<span class="lineNum">     273 </span>            :     // DISTANCE_IN capability.
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :     _a13 = GenPosition(false, _s13, 0u, t, t, t, t, t, t, t, t);</span>
+<a name="275"><span class="lineNum">     275 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span><span class="lineCov">          4 :   void GeodesicLineExact::SetArc(real a13) {</span>
+<span class="lineNum">     278 </span><span class="lineCov">          4 :     _a13 = a13;</span>
+<span class="lineNum">     279 </span>            :     // In case the GeodesicLineExact doesn't have the DISTANCE capability.
+<span class="lineNum">     280 </span><span class="lineCov">          4 :     _s13 = Math::NaN();</span>
+<span class="lineNum">     281 </span>            :     real t;
+<span class="lineNum">     282 </span><span class="lineCov">          4 :     GenPosition(true, _a13, DISTANCE, t, t, t, _s13, t, t, t, t);</span>
+<a name="283"><span class="lineNum">     283 </span><span class="lineCov">          4 :   }</span></a>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span><span class="lineCov">          4 :   void GeodesicLineExact::GenSetDistance(bool arcmode, real s13_a13) {</span>
+<span class="lineNum">     286 </span><span class="lineCov">          4 :     arcmode ? SetArc(s13_a13) : SetDistance(s13_a13);</span>
+<span class="lineNum">     287 </span><span class="lineCov">          4 :   }</span>
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

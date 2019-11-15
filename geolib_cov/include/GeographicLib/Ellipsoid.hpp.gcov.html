@@ -1,0 +1,612 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/Ellipsoid.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - Ellipsoid.hpp<span style="font-size: 80%;"> (source / <a href="Ellipsoid.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file Ellipsoid.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::Ellipsoid class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2012-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_ELLIPSOID_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_ELLIPSOID_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/TransverseMercator.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;GeographicLib/EllipticFunction.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;GeographicLib/AlbersEqualArea.hpp&gt;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : namespace GeographicLib {
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            :   /**
+<span class="lineNum">      21 </span>            :    * \brief Properties of an ellipsoid
+<span class="lineNum">      22 </span>            :    *
+<span class="lineNum">      23 </span>            :    * This class returns various properties of the ellipsoid and converts
+<span class="lineNum">      24 </span>            :    * between various types of latitudes.  The latitude conversions are also
+<span class="lineNum">      25 </span>            :    * possible using the various projections supported by %GeographicLib; but
+<span class="lineNum">      26 </span>            :    * Ellipsoid provides more direct access (sometimes using private functions
+<span class="lineNum">      27 </span>            :    * of the projection classes).  Ellipsoid::RectifyingLatitude,
+<span class="lineNum">      28 </span>            :    * Ellipsoid::InverseRectifyingLatitude, and Ellipsoid::MeridianDistance
+<span class="lineNum">      29 </span>            :    * provide functionality which can be provided by the Geodesic class.
+<span class="lineNum">      30 </span>            :    * However Geodesic uses a series approximation (valid for abs \e f &lt; 1/150),
+<span class="lineNum">      31 </span>            :    * whereas Ellipsoid computes these quantities using EllipticFunction which
+<span class="lineNum">      32 </span>            :    * provides accurate results even when \e f is large.  Use of this class
+<span class="lineNum">      33 </span>            :    * should be limited to &amp;minus;3 &lt; \e f &lt; 3/4 (i.e., 1/4 &lt; b/a &lt; 4).
+<span class="lineNum">      34 </span>            :    *
+<span class="lineNum">      35 </span>            :    * Example of use:
+<span class="lineNum">      36 </span>            :    * \include example-Ellipsoid.cpp
+<span class="lineNum">      37 </span>            :    **********************************************************************/
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            :   class GEOGRAPHICLIB_EXPORT Ellipsoid {
+<span class="lineNum">      40 </span>            :   private:
+<span class="lineNum">      41 </span>            :     typedef Math::real real;
+<span class="lineNum">      42 </span>            :     static const int numit_ = 10;
+<span class="lineNum">      43 </span>            :     real stol_;
+<span class="lineNum">      44 </span>            :     real _a, _f, _f1, _f12, _e2, _es, _e12, _n, _b;
+<span class="lineNum">      45 </span>            :     TransverseMercator _tm;
+<span class="lineNum">      46 </span>            :     EllipticFunction _ell;
+<span class="lineNum">      47 </span>            :     AlbersEqualArea _au;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :     // These are the alpha and beta coefficients in the Krueger series from
+<span class="lineNum">      50 </span>            :     // TransverseMercator.  Thy are used by RhumbSolve to compute
+<span class="lineNum">      51 </span>            :     // (psi2-psi1)/(mu2-mu1).
+<span class="lineNum">      52 </span><span class="lineCov">          1 :     const Math::real* ConformalToRectifyingCoeffs() const { return _tm._alp; }</span>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :     const Math::real* RectifyingToConformalCoeffs() const { return _tm._bet; }</span>
+<span class="lineNum">      54 </span>            :     friend class Rhumb; friend class RhumbLine;
+<span class="lineNum">      55 </span>            :   public:
+<span class="lineNum">      56 </span>            :     /** \name Constructor
+<span class="lineNum">      57 </span>            :      **********************************************************************/
+<span class="lineNum">      58 </span>            :     ///@{
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            :     /**
+<span class="lineNum">      61 </span>            :      * Constructor for a ellipsoid with
+<span class="lineNum">      62 </span>            :      *
+<span class="lineNum">      63 </span>            :      * @param[in] a equatorial radius (meters).
+<span class="lineNum">      64 </span>            :      * @param[in] f flattening of ellipsoid.  Setting \e f = 0 gives a sphere.
+<span class="lineNum">      65 </span>            :      *   Negative \e f gives a prolate ellipsoid.
+<span class="lineNum">      66 </span>            :      * @exception GeographicErr if \e a or (1 &amp;minus; \e f) \e a is not
+<span class="lineNum">      67 </span>            :      *   positive.
+<span class="lineNum">      68 </span>            :      **********************************************************************/
+<span class="lineNum">      69 </span>            :     Ellipsoid(real a, real f);
+<span class="lineNum">      70 </span>            :     ///@}
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :     /** \name %Ellipsoid dimensions.
+<span class="lineNum">      73 </span>            :      **********************************************************************/
+<span class="lineNum">      74 </span>            :     ///@{
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :     /**
+<span class="lineNum">      77 </span>            :      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
+<span class="lineNum">      78 </span>            :      *   the value used in the constructor.
+<span class="lineNum">      79 </span>            :      **********************************************************************/
+<span class="lineNum">      80 </span>            :     Math::real MajorRadius() const { return _a; }
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :     /**
+<span class="lineNum">      83 </span>            :      * @return \e b the polar semi-axis (meters).
+<span class="lineNum">      84 </span>            :      **********************************************************************/
+<span class="lineNum">      85 </span>            :     Math::real MinorRadius() const { return _b; }
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :     /**
+<span class="lineNum">      88 </span>            :      * @return \e L the distance between the equator and a pole along a
+<span class="lineNum">      89 </span>            :      *   meridian (meters).  For a sphere \e L = (&amp;pi;/2) \e a.  The radius
+<span class="lineNum">      90 </span>            :      *   of a sphere with the same meridian length is \e L / (&amp;pi;/2).
+<span class="lineNum">      91 </span>            :      **********************************************************************/
+<span class="lineNum">      92 </span>            :     Math::real QuarterMeridian() const;
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :     /**
+<span class="lineNum">      95 </span>            :      * @return \e A the total area of the ellipsoid (meters&lt;sup&gt;2&lt;/sup&gt;).  For
+<span class="lineNum">      96 </span>            :      *   a sphere \e A = 4&amp;pi; &lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;.  The radius of a sphere
+<span class="lineNum">      97 </span>            :      *   with the same area is sqrt(\e A / (4&amp;pi;)).
+<span class="lineNum">      98 </span>            :      **********************************************************************/
+<span class="lineNum">      99 </span>            :     Math::real Area() const;
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            :     /**
+<span class="lineNum">     102 </span>            :      * @return \e V the total volume of the ellipsoid (meters&lt;sup&gt;3&lt;/sup&gt;).
+<span class="lineNum">     103 </span>            :      *   For a sphere \e V = (4&amp;pi; / 3) &lt;i&gt;a&lt;/i&gt;&lt;sup&gt;3&lt;/sup&gt;.  The radius of
+<span class="lineNum">     104 </span>            :      *   a sphere with the same volume is cbrt(\e V / (4&amp;pi;/3)).
+<span class="lineNum">     105 </span>            :      **********************************************************************/
+<span class="lineNum">     106 </span>            :     Math::real Volume() const
+<span class="lineNum">     107 </span>            :     { return (4 * Math::pi()) * Math::sq(_a) * _b / 3; }
+<span class="lineNum">     108 </span>            :     ///@}
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            :     /** \name %Ellipsoid shape
+<span class="lineNum">     111 </span>            :      **********************************************************************/
+<span class="lineNum">     112 </span>            :     ///@{
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :     /**
+<span class="lineNum">     115 </span>            :      * @return \e f = (\e a &amp;minus; \e b) / \e a, the flattening of the
+<span class="lineNum">     116 </span>            :      *   ellipsoid.  This is the value used in the constructor.  This is zero,
+<span class="lineNum">     117 </span>            :      *   positive, or negative for a sphere, oblate ellipsoid, or prolate
+<span class="lineNum">     118 </span>            :      *   ellipsoid.
+<span class="lineNum">     119 </span>            :      **********************************************************************/
+<span class="lineNum">     120 </span>            :     Math::real Flattening() const { return _f; }
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            :     /**
+<span class="lineNum">     123 </span>            :      * @return \e f ' = (\e a &amp;minus; \e b) / \e b, the second flattening of
+<span class="lineNum">     124 </span>            :      *   the ellipsoid.  This is zero, positive, or negative for a sphere,
+<span class="lineNum">     125 </span>            :      *   oblate ellipsoid, or prolate ellipsoid.
+<span class="lineNum">     126 </span>            :      **********************************************************************/
+<span class="lineNum">     127 </span>            :     Math::real SecondFlattening() const { return _f / (1 - _f); }
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            :     /**
+<span class="lineNum">     130 </span>            :      * @return \e n = (\e a &amp;minus; \e b) / (\e a + \e b), the third flattening
+<span class="lineNum">     131 </span>            :      *   of the ellipsoid.  This is zero, positive, or negative for a sphere,
+<span class="lineNum">     132 </span>            :      *   oblate ellipsoid, or prolate ellipsoid.
+<span class="lineNum">     133 </span>            :      **********************************************************************/
+<span class="lineNum">     134 </span>            :     Math::real ThirdFlattening() const { return _n; }
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            :     /**
+<span class="lineNum">     137 </span>            :      * @return &lt;i&gt;e&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; = (&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; &amp;minus;
+<span class="lineNum">     138 </span>            :      *   &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;) / &lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;, the eccentricity squared
+<span class="lineNum">     139 </span>            :      *   of the ellipsoid.  This is zero, positive, or negative for a sphere,
+<span class="lineNum">     140 </span>            :      *   oblate ellipsoid, or prolate ellipsoid.
+<span class="lineNum">     141 </span>            :      **********************************************************************/
+<span class="lineNum">     142 </span>            :     Math::real EccentricitySq() const { return _e2; }
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span>            :     /**
+<span class="lineNum">     145 </span>            :      * @return &lt;i&gt;e'&lt;/i&gt; &lt;sup&gt;2&lt;/sup&gt; = (&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; &amp;minus;
+<span class="lineNum">     146 </span>            :      *   &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;) / &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;, the second eccentricity
+<span class="lineNum">     147 </span>            :      *   squared of the ellipsoid.  This is zero, positive, or negative for a
+<span class="lineNum">     148 </span>            :      *   sphere, oblate ellipsoid, or prolate ellipsoid.
+<span class="lineNum">     149 </span>            :      **********************************************************************/
+<span class="lineNum">     150 </span>            :     Math::real SecondEccentricitySq() const { return _e12; }
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            :     /**
+<span class="lineNum">     153 </span>            :      * @return &lt;i&gt;e''&lt;/i&gt; &lt;sup&gt;2&lt;/sup&gt; = (&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; &amp;minus;
+<span class="lineNum">     154 </span>            :      *   &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;) / (&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; + &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;),
+<span class="lineNum">     155 </span>            :      *   the third eccentricity squared of the ellipsoid.  This is zero,
+<span class="lineNum">     156 </span>            :      *   positive, or negative for a sphere, oblate ellipsoid, or prolate
+<span class="lineNum">     157 </span>            :      *   ellipsoid.
+<span class="lineNum">     158 </span>            :      **********************************************************************/
+<span class="lineNum">     159 </span>            :     Math::real ThirdEccentricitySq() const { return _e2 / (2 - _e2); }
+<span class="lineNum">     160 </span>            :     ///@}
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            :     /** \name Latitude conversion.
+<span class="lineNum">     163 </span>            :      **********************************************************************/
+<span class="lineNum">     164 </span>            :     ///@{
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :     /**
+<span class="lineNum">     167 </span>            :      * @param[in] phi the geographic latitude (degrees).
+<span class="lineNum">     168 </span>            :      * @return &amp;beta; the parametric latitude (degrees).
+<span class="lineNum">     169 </span>            :      *
+<span class="lineNum">     170 </span>            :      * The geographic latitude, &amp;phi;, is the angle beween the equatorial
+<span class="lineNum">     171 </span>            :      * plane and a vector normal to the surface of the ellipsoid.
+<span class="lineNum">     172 </span>            :      *
+<span class="lineNum">     173 </span>            :      * The parametric latitude (also called the reduced latitude), &amp;beta;,
+<span class="lineNum">     174 </span>            :      * allows the cartesian coordinated of a meridian to be expressed
+<span class="lineNum">     175 </span>            :      * conveniently in parametric form as
+<span class="lineNum">     176 </span>            :      * - \e R = \e a cos &amp;beta;
+<span class="lineNum">     177 </span>            :      * - \e Z = \e b sin &amp;beta;
+<span class="lineNum">     178 </span>            :      * .
+<span class="lineNum">     179 </span>            :      * where \e a and \e b are the equatorial radius and the polar semi-axis.
+<span class="lineNum">     180 </span>            :      * For a sphere &amp;beta; = &amp;phi;.
+<span class="lineNum">     181 </span>            :      *
+<span class="lineNum">     182 </span>            :      * &amp;phi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     183 </span>            :      * result is undefined if this condition does not hold.  The returned value
+<span class="lineNum">     184 </span>            :      * &amp;beta; lies in [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     185 </span>            :      **********************************************************************/
+<span class="lineNum">     186 </span>            :     Math::real ParametricLatitude(real phi) const;
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span>            :     /**
+<span class="lineNum">     189 </span>            :      * @param[in] beta the parametric latitude (degrees).
+<span class="lineNum">     190 </span>            :      * @return &amp;phi; the geographic latitude (degrees).
+<span class="lineNum">     191 </span>            :      *
+<span class="lineNum">     192 </span>            :      * &amp;beta; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     193 </span>            :      * result is undefined if this condition does not hold.  The returned value
+<span class="lineNum">     194 </span>            :      * &amp;phi; lies in [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     195 </span>            :      **********************************************************************/
+<span class="lineNum">     196 </span>            :     Math::real InverseParametricLatitude(real beta) const;
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            :     /**
+<span class="lineNum">     199 </span>            :      * @param[in] phi the geographic latitude (degrees).
+<span class="lineNum">     200 </span>            :      * @return &amp;theta; the geocentric latitude (degrees).
+<span class="lineNum">     201 </span>            :      *
+<span class="lineNum">     202 </span>            :      * The geocentric latitude, &amp;theta;, is the angle beween the equatorial
+<span class="lineNum">     203 </span>            :      * plane and a line between the center of the ellipsoid and a point on the
+<span class="lineNum">     204 </span>            :      * ellipsoid.  For a sphere &amp;theta; = &amp;phi;.
+<span class="lineNum">     205 </span>            :      *
+<span class="lineNum">     206 </span>            :      * &amp;phi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     207 </span>            :      * result is undefined if this condition does not hold.  The returned value
+<span class="lineNum">     208 </span>            :      * &amp;theta; lies in [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     209 </span>            :      **********************************************************************/
+<span class="lineNum">     210 </span>            :     Math::real GeocentricLatitude(real phi) const;
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            :     /**
+<span class="lineNum">     213 </span>            :      * @param[in] theta the geocentric latitude (degrees).
+<span class="lineNum">     214 </span>            :      * @return &amp;phi; the geographic latitude (degrees).
+<span class="lineNum">     215 </span>            :      *
+<span class="lineNum">     216 </span>            :      * &amp;theta; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     217 </span>            :      * result is undefined if this condition does not hold.  The returned value
+<span class="lineNum">     218 </span>            :      * &amp;phi; lies in [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     219 </span>            :      **********************************************************************/
+<span class="lineNum">     220 </span>            :     Math::real InverseGeocentricLatitude(real theta) const;
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            :     /**
+<span class="lineNum">     223 </span>            :      * @param[in] phi the geographic latitude (degrees).
+<span class="lineNum">     224 </span>            :      * @return &amp;mu; the rectifying latitude (degrees).
+<span class="lineNum">     225 </span>            :      *
+<span class="lineNum">     226 </span>            :      * The rectifying latitude, &amp;mu;, has the property that the distance along
+<span class="lineNum">     227 </span>            :      * a meridian of the ellipsoid between two points with rectifying latitudes
+<span class="lineNum">     228 </span>            :      * &amp;mu;&lt;sub&gt;1&lt;/sub&gt; and &amp;mu;&lt;sub&gt;2&lt;/sub&gt; is equal to
+<span class="lineNum">     229 </span>            :      * (&amp;mu;&lt;sub&gt;2&lt;/sub&gt; - &amp;mu;&lt;sub&gt;1&lt;/sub&gt;) \e L / 90&amp;deg;,
+<span class="lineNum">     230 </span>            :      * where \e L = QuarterMeridian().  For a sphere &amp;mu; = &amp;phi;.
+<span class="lineNum">     231 </span>            :      *
+<span class="lineNum">     232 </span>            :      * &amp;phi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     233 </span>            :      * result is undefined if this condition does not hold.  The returned value
+<span class="lineNum">     234 </span>            :      * &amp;mu; lies in [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     235 </span>            :      **********************************************************************/
+<span class="lineNum">     236 </span>            :     Math::real RectifyingLatitude(real phi) const;
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            :     /**
+<span class="lineNum">     239 </span>            :      * @param[in] mu the rectifying latitude (degrees).
+<span class="lineNum">     240 </span>            :      * @return &amp;phi; the geographic latitude (degrees).
+<span class="lineNum">     241 </span>            :      *
+<span class="lineNum">     242 </span>            :      * &amp;mu; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     243 </span>            :      * result is undefined if this condition does not hold.  The returned value
+<span class="lineNum">     244 </span>            :      * &amp;phi; lies in [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     245 </span>            :      **********************************************************************/
+<span class="lineNum">     246 </span>            :     Math::real InverseRectifyingLatitude(real mu) const;
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span>            :     /**
+<span class="lineNum">     249 </span>            :      * @param[in] phi the geographic latitude (degrees).
+<span class="lineNum">     250 </span>            :      * @return &amp;xi; the authalic latitude (degrees).
+<span class="lineNum">     251 </span>            :      *
+<span class="lineNum">     252 </span>            :      * The authalic latitude, &amp;xi;, has the property that the area of the
+<span class="lineNum">     253 </span>            :      * ellipsoid between two circles with authalic latitudes
+<span class="lineNum">     254 </span>            :      * &amp;xi;&lt;sub&gt;1&lt;/sub&gt; and &amp;xi;&lt;sub&gt;2&lt;/sub&gt; is equal to (sin
+<span class="lineNum">     255 </span>            :      * &amp;xi;&lt;sub&gt;2&lt;/sub&gt; - sin &amp;xi;&lt;sub&gt;1&lt;/sub&gt;) \e A / 2, where \e A
+<span class="lineNum">     256 </span>            :      * = Area().  For a sphere &amp;xi; = &amp;phi;.
+<span class="lineNum">     257 </span>            :      *
+<span class="lineNum">     258 </span>            :      * &amp;phi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     259 </span>            :      * result is undefined if this condition does not hold.  The returned value
+<span class="lineNum">     260 </span>            :      * &amp;xi; lies in [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     261 </span>            :      **********************************************************************/
+<span class="lineNum">     262 </span>            :     Math::real AuthalicLatitude(real phi) const;
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span>            :     /**
+<span class="lineNum">     265 </span>            :      * @param[in] xi the authalic latitude (degrees).
+<span class="lineNum">     266 </span>            :      * @return &amp;phi; the geographic latitude (degrees).
+<span class="lineNum">     267 </span>            :      *
+<span class="lineNum">     268 </span>            :      * &amp;xi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     269 </span>            :      * result is undefined if this condition does not hold.  The returned value
+<span class="lineNum">     270 </span>            :      * &amp;phi; lies in [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     271 </span>            :      **********************************************************************/
+<span class="lineNum">     272 </span>            :     Math::real InverseAuthalicLatitude(real xi) const;
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            :     /**
+<span class="lineNum">     275 </span>            :      * @param[in] phi the geographic latitude (degrees).
+<span class="lineNum">     276 </span>            :      * @return &amp;chi; the conformal latitude (degrees).
+<span class="lineNum">     277 </span>            :      *
+<span class="lineNum">     278 </span>            :      * The conformal latitude, &amp;chi;, gives the mapping of the ellipsoid to a
+<span class="lineNum">     279 </span>            :      * sphere which which is conformal (angles are preserved) and in which the
+<span class="lineNum">     280 </span>            :      * equator of the ellipsoid maps to the equator of the sphere.  For a
+<span class="lineNum">     281 </span>            :      * sphere &amp;chi; = &amp;phi;.
+<span class="lineNum">     282 </span>            :      *
+<span class="lineNum">     283 </span>            :      * &amp;phi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     284 </span>            :      * result is undefined if this condition does not hold.  The returned value
+<span class="lineNum">     285 </span>            :      * &amp;chi; lies in [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     286 </span>            :      **********************************************************************/
+<span class="lineNum">     287 </span>            :     Math::real ConformalLatitude(real phi) const;
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            :     /**
+<span class="lineNum">     290 </span>            :      * @param[in] chi the conformal latitude (degrees).
+<span class="lineNum">     291 </span>            :      * @return &amp;phi; the geographic latitude (degrees).
+<span class="lineNum">     292 </span>            :      *
+<span class="lineNum">     293 </span>            :      * &amp;chi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     294 </span>            :      * result is undefined if this condition does not hold.  The returned value
+<span class="lineNum">     295 </span>            :      * &amp;phi; lies in [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     296 </span>            :      **********************************************************************/
+<span class="lineNum">     297 </span>            :     Math::real InverseConformalLatitude(real chi) const;
+<span class="lineNum">     298 </span>            : 
+<span class="lineNum">     299 </span>            :     /**
+<span class="lineNum">     300 </span>            :      * @param[in] phi the geographic latitude (degrees).
+<span class="lineNum">     301 </span>            :      * @return &amp;psi; the isometric latitude (degrees).
+<span class="lineNum">     302 </span>            :      *
+<span class="lineNum">     303 </span>            :      * The isometric latitude gives the mapping of the ellipsoid to a plane
+<span class="lineNum">     304 </span>            :      * which which is conformal (angles are preserved) and in which the equator
+<span class="lineNum">     305 </span>            :      * of the ellipsoid maps to a straight line of constant scale; this mapping
+<span class="lineNum">     306 </span>            :      * defines the Mercator projection.  For a sphere &amp;psi; =
+<span class="lineNum">     307 </span>            :      * sinh&lt;sup&gt;&amp;minus;1&lt;/sup&gt; tan &amp;phi;.
+<span class="lineNum">     308 </span>            :      *
+<span class="lineNum">     309 </span>            :      * &amp;phi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the result is
+<span class="lineNum">     310 </span>            :      * undefined if this condition does not hold.  The value returned for &amp;phi;
+<span class="lineNum">     311 </span>            :      * = &amp;plusmn;90&amp;deg; is some (positive or negative) large but finite value,
+<span class="lineNum">     312 </span>            :      * such that InverseIsometricLatitude returns the original value of &amp;phi;.
+<span class="lineNum">     313 </span>            :      **********************************************************************/
+<span class="lineNum">     314 </span>            :     Math::real IsometricLatitude(real phi) const;
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :     /**
+<span class="lineNum">     317 </span>            :      * @param[in] psi the isometric latitude (degrees).
+<span class="lineNum">     318 </span>            :      * @return &amp;phi; the geographic latitude (degrees).
+<span class="lineNum">     319 </span>            :      *
+<span class="lineNum">     320 </span>            :      * The returned value &amp;phi; lies in [&amp;minus;90&amp;deg;, 90&amp;deg;].  For a
+<span class="lineNum">     321 </span>            :      * sphere &amp;phi; = tan&lt;sup&gt;&amp;minus;1&lt;/sup&gt; sinh &amp;psi;.
+<span class="lineNum">     322 </span>            :      **********************************************************************/
+<span class="lineNum">     323 </span>            :     Math::real InverseIsometricLatitude(real psi) const;
+<span class="lineNum">     324 </span>            :     ///@}
+<span class="lineNum">     325 </span>            : 
+<span class="lineNum">     326 </span>            :     /** \name Other quantities.
+<span class="lineNum">     327 </span>            :      **********************************************************************/
+<span class="lineNum">     328 </span>            :     ///@{
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span>            :     /**
+<span class="lineNum">     331 </span>            :      * @param[in] phi the geographic latitude (degrees).
+<span class="lineNum">     332 </span>            :      * @return \e R = \e a cos &amp;beta; the radius of a circle of latitude
+<span class="lineNum">     333 </span>            :      *   &amp;phi; (meters).  \e R (&amp;pi;/180&amp;deg;) gives meters per degree
+<span class="lineNum">     334 </span>            :      *   longitude measured along a circle of latitude.
+<span class="lineNum">     335 </span>            :      *
+<span class="lineNum">     336 </span>            :      * &amp;phi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     337 </span>            :      * result is undefined if this condition does not hold.
+<span class="lineNum">     338 </span>            :      **********************************************************************/
+<span class="lineNum">     339 </span>            :     Math::real CircleRadius(real phi) const;
+<span class="lineNum">     340 </span>            : 
+<span class="lineNum">     341 </span>            :     /**
+<span class="lineNum">     342 </span>            :      * @param[in] phi the geographic latitude (degrees).
+<span class="lineNum">     343 </span>            :      * @return \e Z = \e b sin &amp;beta; the distance of a circle of latitude
+<span class="lineNum">     344 </span>            :      *   &amp;phi; from the equator measured parallel to the ellipsoid axis
+<span class="lineNum">     345 </span>            :      *   (meters).
+<span class="lineNum">     346 </span>            :      *
+<span class="lineNum">     347 </span>            :      * &amp;phi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     348 </span>            :      * result is undefined if this condition does not hold.
+<span class="lineNum">     349 </span>            :      **********************************************************************/
+<span class="lineNum">     350 </span>            :     Math::real CircleHeight(real phi) const;
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span>            :     /**
+<span class="lineNum">     353 </span>            :      * @param[in] phi the geographic latitude (degrees).
+<span class="lineNum">     354 </span>            :      * @return \e s the distance along a meridian
+<span class="lineNum">     355 </span>            :      *   between the equator and a point of latitude &amp;phi; (meters).  \e s is
+<span class="lineNum">     356 </span>            :      *   given by \e s = &amp;mu; \e L / 90&amp;deg;, where \e L =
+<span class="lineNum">     357 </span>            :      *   QuarterMeridian()).
+<span class="lineNum">     358 </span>            :      *
+<span class="lineNum">     359 </span>            :      * &amp;phi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     360 </span>            :      * result is undefined if this condition does not hold.
+<span class="lineNum">     361 </span>            :      **********************************************************************/
+<span class="lineNum">     362 </span>            :     Math::real MeridianDistance(real phi) const;
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span>            :     /**
+<span class="lineNum">     365 </span>            :      * @param[in] phi the geographic latitude (degrees).
+<span class="lineNum">     366 </span>            :      * @return &amp;rho; the meridional radius of curvature of the ellipsoid at
+<span class="lineNum">     367 </span>            :      *   latitude &amp;phi; (meters); this is the curvature of the meridian.  \e
+<span class="lineNum">     368 </span>            :      *   rho is given by &amp;rho; = (180&amp;deg;/&amp;pi;) d\e s / d&amp;phi;,
+<span class="lineNum">     369 </span>            :      *   where \e s = MeridianDistance(); thus &amp;rho; (&amp;pi;/180&amp;deg;)
+<span class="lineNum">     370 </span>            :      *   gives meters per degree latitude measured along a meridian.
+<span class="lineNum">     371 </span>            :      *
+<span class="lineNum">     372 </span>            :      * &amp;phi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     373 </span>            :      * result is undefined if this condition does not hold.
+<span class="lineNum">     374 </span>            :      **********************************************************************/
+<span class="lineNum">     375 </span>            :     Math::real MeridionalCurvatureRadius(real phi) const;
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span>            :     /**
+<span class="lineNum">     378 </span>            :      * @param[in] phi the geographic latitude (degrees).
+<span class="lineNum">     379 </span>            :      * @return &amp;nu; the transverse radius of curvature of the ellipsoid at
+<span class="lineNum">     380 </span>            :      *   latitude &amp;phi; (meters); this is the curvature of a curve on the
+<span class="lineNum">     381 </span>            :      *   ellipsoid which also lies in a plane perpendicular to the ellipsoid
+<span class="lineNum">     382 </span>            :      *   and to the meridian.  &amp;nu; is related to \e R = CircleRadius() by \e
+<span class="lineNum">     383 </span>            :      *   R = &amp;nu; cos &amp;phi;.
+<span class="lineNum">     384 </span>            :      *
+<span class="lineNum">     385 </span>            :      * &amp;phi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the
+<span class="lineNum">     386 </span>            :      * result is undefined if this condition does not hold.
+<span class="lineNum">     387 </span>            :      **********************************************************************/
+<span class="lineNum">     388 </span>            :     Math::real TransverseCurvatureRadius(real phi) const;
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span>            :     /**
+<span class="lineNum">     391 </span>            :      * @param[in] phi the geographic latitude (degrees).
+<span class="lineNum">     392 </span>            :      * @param[in] azi the angle between the meridian and the normal section
+<span class="lineNum">     393 </span>            :      *   (degrees).
+<span class="lineNum">     394 </span>            :      * @return the radius of curvature of the ellipsoid in the normal
+<span class="lineNum">     395 </span>            :      *   section at latitude &amp;phi; inclined at an angle \e azi to the
+<span class="lineNum">     396 </span>            :      *   meridian (meters).
+<span class="lineNum">     397 </span>            :      *
+<span class="lineNum">     398 </span>            :      * &amp;phi; must lie in the range [&amp;minus;90&amp;deg;, 90&amp;deg;]; the result is
+<span class="lineNum">     399 </span>            :      * undefined this condition does not hold.
+<span class="lineNum">     400 </span>            :      **********************************************************************/
+<span class="lineNum">     401 </span>            :     Math::real NormalCurvatureRadius(real phi, real azi) const;
+<span class="lineNum">     402 </span>            :     ///@}
+<span class="lineNum">     403 </span>            : 
+<span class="lineNum">     404 </span>            :     /** \name Eccentricity conversions.
+<span class="lineNum">     405 </span>            :      **********************************************************************/
+<span class="lineNum">     406 </span>            :     ///@{
+<span class="lineNum">     407 </span>            : 
+<span class="lineNum">     408 </span>            :     /**
+<span class="lineNum">     409 </span>            :      * @param[in] fp = \e f ' = (\e a &amp;minus; \e b) / \e b, the second
+<span class="lineNum">     410 </span>            :      *   flattening.
+<span class="lineNum">     411 </span>            :      * @return \e f = (\e a &amp;minus; \e b) / \e a, the flattening.
+<span class="lineNum">     412 </span>            :      *
+<span class="lineNum">     413 </span>            :      * \e f ' should lie in (&amp;minus;1, &amp;infin;).
+<span class="lineNum">     414 </span>            :      * The returned value \e f lies in (&amp;minus;&amp;infin;, 1).
+<span class="lineNum">     415 </span>            :      **********************************************************************/
+<span class="lineNum">     416 </span>            :     static Math::real SecondFlatteningToFlattening(real fp)
+<span class="lineNum">     417 </span>            :     { return fp / (1 + fp); }
+<span class="lineNum">     418 </span>            : 
+<span class="lineNum">     419 </span>            :     /**
+<span class="lineNum">     420 </span>            :      * @param[in] f = (\e a &amp;minus; \e b) / \e a, the flattening.
+<span class="lineNum">     421 </span>            :      * @return \e f ' = (\e a &amp;minus; \e b) / \e b, the second flattening.
+<span class="lineNum">     422 </span>            :      *
+<span class="lineNum">     423 </span>            :      * \e f should lie in (&amp;minus;&amp;infin;, 1).
+<span class="lineNum">     424 </span>            :      * The returned value \e f ' lies in (&amp;minus;1, &amp;infin;).
+<span class="lineNum">     425 </span>            :      **********************************************************************/
+<span class="lineNum">     426 </span>            :     static Math::real FlatteningToSecondFlattening(real f)
+<span class="lineNum">     427 </span>            :     { return f / (1 - f); }
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span>            :     /**
+<span class="lineNum">     430 </span>            :      * @param[in] n = (\e a &amp;minus; \e b) / (\e a + \e b), the third
+<span class="lineNum">     431 </span>            :      *   flattening.
+<span class="lineNum">     432 </span>            :      * @return \e f = (\e a &amp;minus; \e b) / \e a, the flattening.
+<span class="lineNum">     433 </span>            :      *
+<span class="lineNum">     434 </span>            :      * \e n should lie in (&amp;minus;1, 1).
+<span class="lineNum">     435 </span>            :      * The returned value \e f lies in (&amp;minus;&amp;infin;, 1).
+<span class="lineNum">     436 </span>            :      **********************************************************************/
+<span class="lineNum">     437 </span>            :     static Math::real ThirdFlatteningToFlattening(real n)
+<span class="lineNum">     438 </span>            :     { return 2 * n / (1 + n); }
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span>            :     /**
+<span class="lineNum">     441 </span>            :      * @param[in] f = (\e a &amp;minus; \e b) / \e a, the flattening.
+<span class="lineNum">     442 </span>            :      * @return \e n = (\e a &amp;minus; \e b) / (\e a + \e b), the third
+<span class="lineNum">     443 </span>            :      *   flattening.
+<span class="lineNum">     444 </span>            :      *
+<span class="lineNum">     445 </span>            :      * \e f should lie in (&amp;minus;&amp;infin;, 1).
+<span class="lineNum">     446 </span>            :      * The returned value \e n lies in (&amp;minus;1, 1).
+<span class="lineNum">     447 </span>            :      **********************************************************************/
+<span class="lineNum">     448 </span>            :     static Math::real FlatteningToThirdFlattening(real f)
+<span class="lineNum">     449 </span>            :     { return f / (2 - f); }
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span>            :     /**
+<span class="lineNum">     452 </span>            :      * @param[in] e2 = &lt;i&gt;e&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; = (&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; &amp;minus;
+<span class="lineNum">     453 </span>            :      *   &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;) / &lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;, the eccentricity
+<span class="lineNum">     454 </span>            :      *   squared.
+<span class="lineNum">     455 </span>            :      * @return \e f = (\e a &amp;minus; \e b) / \e a, the flattening.
+<span class="lineNum">     456 </span>            :      *
+<span class="lineNum">     457 </span>            :      * &lt;i&gt;e&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; should lie in (&amp;minus;&amp;infin;, 1).
+<span class="lineNum">     458 </span>            :      * The returned value \e f lies in (&amp;minus;&amp;infin;, 1).
+<span class="lineNum">     459 </span>            :      **********************************************************************/
+<span class="lineNum">     460 </span>            :     static Math::real EccentricitySqToFlattening(real e2)
+<span class="lineNum">     461 </span>            :     { using std::sqrt; return e2 / (sqrt(1 - e2) + 1); }
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span>            :     /**
+<span class="lineNum">     464 </span>            :      * @param[in] f = (\e a &amp;minus; \e b) / \e a, the flattening.
+<span class="lineNum">     465 </span>            :      * @return &lt;i&gt;e&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; = (&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; &amp;minus;
+<span class="lineNum">     466 </span>            :      *   &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;) / &lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;, the eccentricity
+<span class="lineNum">     467 </span>            :      *   squared.
+<span class="lineNum">     468 </span>            :      *
+<span class="lineNum">     469 </span>            :      * \e f should lie in (&amp;minus;&amp;infin;, 1).
+<span class="lineNum">     470 </span>            :      * The returned value &lt;i&gt;e&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; lies in (&amp;minus;&amp;infin;, 1).
+<span class="lineNum">     471 </span>            :      **********************************************************************/
+<span class="lineNum">     472 </span>            :     static Math::real FlatteningToEccentricitySq(real f)
+<span class="lineNum">     473 </span>            :     { return f * (2 - f); }
+<span class="lineNum">     474 </span>            : 
+<span class="lineNum">     475 </span>            :     /**
+<span class="lineNum">     476 </span>            :      * @param[in] ep2 = &lt;i&gt;e'&lt;/i&gt; &lt;sup&gt;2&lt;/sup&gt; = (&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; &amp;minus;
+<span class="lineNum">     477 </span>            :      *   &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;) / &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;, the second eccentricity
+<span class="lineNum">     478 </span>            :      *   squared.
+<span class="lineNum">     479 </span>            :      * @return \e f = (\e a &amp;minus; \e b) / \e a, the flattening.
+<span class="lineNum">     480 </span>            :      *
+<span class="lineNum">     481 </span>            :      * &lt;i&gt;e'&lt;/i&gt; &lt;sup&gt;2&lt;/sup&gt; should lie in (&amp;minus;1, &amp;infin;).
+<span class="lineNum">     482 </span>            :      * The returned value \e f lies in (&amp;minus;&amp;infin;, 1).
+<span class="lineNum">     483 </span>            :      **********************************************************************/
+<span class="lineNum">     484 </span>            :     static Math::real SecondEccentricitySqToFlattening(real ep2)
+<span class="lineNum">     485 </span>            :     { using std::sqrt; return ep2 / (sqrt(1 + ep2) + 1 + ep2); }
+<span class="lineNum">     486 </span>            : 
+<span class="lineNum">     487 </span>            :     /**
+<span class="lineNum">     488 </span>            :      * @param[in] f = (\e a &amp;minus; \e b) / \e a, the flattening.
+<span class="lineNum">     489 </span>            :      * @return &lt;i&gt;e'&lt;/i&gt; &lt;sup&gt;2&lt;/sup&gt; = (&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; &amp;minus;
+<span class="lineNum">     490 </span>            :      *   &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;) / &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;, the second eccentricity
+<span class="lineNum">     491 </span>            :      *   squared.
+<span class="lineNum">     492 </span>            :      *
+<span class="lineNum">     493 </span>            :      * \e f should lie in (&amp;minus;&amp;infin;, 1).
+<span class="lineNum">     494 </span>            :      * The returned value &lt;i&gt;e'&lt;/i&gt; &lt;sup&gt;2&lt;/sup&gt; lies in (&amp;minus;1, &amp;infin;).
+<span class="lineNum">     495 </span>            :      **********************************************************************/
+<span class="lineNum">     496 </span>            :     static Math::real FlatteningToSecondEccentricitySq(real f)
+<span class="lineNum">     497 </span>            :     { return f * (2 - f) / Math::sq(1 - f); }
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span>            :     /**
+<span class="lineNum">     500 </span>            :      * @param[in] epp2 = &lt;i&gt;e''&lt;/i&gt; &lt;sup&gt;2&lt;/sup&gt; = (&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     501 </span>            :      *   &amp;minus; &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;) / (&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; +
+<span class="lineNum">     502 </span>            :      *   &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;), the third eccentricity squared.
+<span class="lineNum">     503 </span>            :      * @return \e f = (\e a &amp;minus; \e b) / \e a, the flattening.
+<span class="lineNum">     504 </span>            :      *
+<span class="lineNum">     505 </span>            :      * &lt;i&gt;e''&lt;/i&gt; &lt;sup&gt;2&lt;/sup&gt; should lie in (&amp;minus;1, 1).
+<span class="lineNum">     506 </span>            :      * The returned value \e f lies in (&amp;minus;&amp;infin;, 1).
+<span class="lineNum">     507 </span>            :      **********************************************************************/
+<span class="lineNum">     508 </span>            :     static Math::real ThirdEccentricitySqToFlattening(real epp2) {
+<span class="lineNum">     509 </span>            :       using std::sqrt;
+<span class="lineNum">     510 </span>            :       return 2 * epp2 / (sqrt((1 - epp2) * (1 + epp2)) + 1 + epp2);
+<span class="lineNum">     511 </span>            :     }
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span>            :     /**
+<span class="lineNum">     514 </span>            :      * @param[in] f = (\e a &amp;minus; \e b) / \e a, the flattening.
+<span class="lineNum">     515 </span>            :      * @return &lt;i&gt;e''&lt;/i&gt; &lt;sup&gt;2&lt;/sup&gt; = (&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; &amp;minus;
+<span class="lineNum">     516 </span>            :      *   &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;) / (&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; + &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;),
+<span class="lineNum">     517 </span>            :      *   the third eccentricity squared.
+<span class="lineNum">     518 </span>            :      *
+<span class="lineNum">     519 </span>            :      * \e f should lie in (&amp;minus;&amp;infin;, 1).
+<span class="lineNum">     520 </span>            :      * The returned value &lt;i&gt;e''&lt;/i&gt; &lt;sup&gt;2&lt;/sup&gt; lies in (&amp;minus;1, 1).
+<span class="lineNum">     521 </span>            :      **********************************************************************/
+<span class="lineNum">     522 </span>            :     static Math::real FlatteningToThirdEccentricitySq(real f)
+<span class="lineNum">     523 </span>            :     { return f * (2 - f) / (1 + Math::sq(1 - f)); }
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span>            :     ///@}
+<span class="lineNum">     526 </span>            : 
+<span class="lineNum">     527 </span>            :     /**
+<span class="lineNum">     528 </span>            :      * A global instantiation of Ellipsoid with the parameters for the WGS84
+<span class="lineNum">     529 </span>            :      * ellipsoid.
+<span class="lineNum">     530 </span>            :      **********************************************************************/
+<span class="lineNum">     531 </span>            :     static const Ellipsoid&amp; WGS84();
+<span class="lineNum">     532 </span>            :   };
+<span class="lineNum">     533 </span>            : 
+<span class="lineNum">     534 </span>            : } // namespace GeographicLib
+<span class="lineNum">     535 </span>            : 
+<span class="lineNum">     536 </span>            : #endif  // GEOGRAPHICLIB_ELLIPSOID_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

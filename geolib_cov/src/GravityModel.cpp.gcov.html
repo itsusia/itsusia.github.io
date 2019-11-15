@@ -1,0 +1,438 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/GravityModel.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - GravityModel.cpp<span style="font-size: 80%;"> (source / <a href="GravityModel.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">211</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file GravityModel.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::GravityModel class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2011-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;GeographicLib/GravityModel.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;fstream&gt;
+<span class="lineNum">      12 </span>            : #include &lt;GeographicLib/SphericalEngine.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/GravityCircle.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/Utility.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : #if !defined(GEOGRAPHICLIB_DATA)
+<span class="lineNum">      17 </span>            : #  if defined(_WIN32)
+<span class="lineNum">      18 </span>            : #    define GEOGRAPHICLIB_DATA &quot;C:/ProgramData/GeographicLib&quot;
+<span class="lineNum">      19 </span>            : #  else
+<span class="lineNum">      20 </span>            : #    define GEOGRAPHICLIB_DATA &quot;/usr/local/share/GeographicLib&quot;
+<span class="lineNum">      21 </span>            : #  endif
+<span class="lineNum">      22 </span>            : #endif
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #if !defined(GEOGRAPHICLIB_GRAVITY_DEFAULT_NAME)
+<span class="lineNum">      25 </span>            : #  define GEOGRAPHICLIB_GRAVITY_DEFAULT_NAME &quot;egm96&quot;
+<span class="lineNum">      26 </span>            : #endif
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      29 </span>            : // Squelch warnings about unsafe use of getenv
+<span class="lineNum">      30 </span>            : #  pragma warning (disable: 4996)
+<span class="lineNum">      31 </span>            : #endif
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : namespace GeographicLib {
+<span class="lineNum">      34 </span>            : 
+<a name="35"><span class="lineNum">      35 </span>            :   using namespace std;</a>
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :   GravityModel::GravityModel(const std::string&amp; name,const std::string&amp; path)</span>
+<span class="lineNum">      38 </span>            :     : _name(name)
+<span class="lineNum">      39 </span>            :     , _dir(path)
+<span class="lineNum">      40 </span>            :     , _description(&quot;NONE&quot;)
+<span class="lineNum">      41 </span>            :     , _date(&quot;UNKNOWN&quot;)
+<span class="lineNum">      42 </span>            :     , _amodel(Math::NaN())
+<span class="lineNum">      43 </span>            :     , _GMmodel(Math::NaN())
+<span class="lineNum">      44 </span>            :     , _zeta0(0)
+<span class="lineNum">      45 </span>            :     , _corrmult(1)
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :     , _norm(SphericalHarmonic::FULL)</span>
+<span class="lineNum">      47 </span>            :   {
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :     if (_dir.empty())</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :       _dir = DefaultGravityPath();</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :     ReadMetadata(_name);</span>
+<span class="lineNum">      51 </span>            :     {
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :       string coeff = _filename + &quot;.cof&quot;;</span>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :       ifstream coeffstr(coeff.c_str(), ios::binary);</span>
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :       if (!coeffstr.good())</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Error opening &quot; + coeff);</span>
+<span class="lineNum">      56 </span>            :       char id[idlength_ + 1];
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :       coeffstr.read(id, idlength_);</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :       if (!coeffstr.good())</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;No header in &quot; + coeff);</span>
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :       id[idlength_] = '\0';</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :       if (_id != string(id))</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;ID mismatch: &quot; + _id + &quot; vs &quot; + id);</span>
+<span class="lineNum">      63 </span>            :       int N, M;
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :       SphericalEngine::coeff::readcoeffs(coeffstr, N, M, _Cx, _Sx);</span>
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :       if (!(N &gt;= 0 &amp;&amp; M &gt;= 0))</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Degree and order must be at least 0&quot;);</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :       if (_Cx[0] != 0)</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;A degree 0 term should be zero&quot;);</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :       _Cx[0] = 1;               // Include the 1/r term in the sum</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :       _gravitational = SphericalHarmonic(_Cx, _Sx, N, N, M, _amodel, _norm);</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :       SphericalEngine::coeff::readcoeffs(coeffstr, N, M, _CC, _CS);</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :       if (N &lt; 0) {</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :         N = M = 0;</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :         _CC.resize(1, real(0));</span>
+<span class="lineNum">      75 </span>            :       }
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :       _CC[0] += _zeta0 / _corrmult;</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :       _correction = SphericalHarmonic(_CC, _CS, N, N, M, real(1), _norm);</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :       int pos = int(coeffstr.tellg());</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :       coeffstr.seekg(0, ios::end);</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :       if (pos != coeffstr.tellg())</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Extra data in &quot; + coeff);</span>
+<span class="lineNum">      82 </span>            :     }
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :     int nmx = _gravitational.Coefficients().nmx();</span>
+<span class="lineNum">      84 </span>            :     // Adjust the normalization of the normal potential to match the model.
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     real mult = _earth._GM / _GMmodel;</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :     real amult = Math::sq(_earth._a / _amodel);</span>
+<span class="lineNum">      87 </span>            :     // The 0th term in _zonal should be is 1 + _dzonal0.  Instead set it to 1
+<span class="lineNum">      88 </span>            :     // to give exact cancellation with the (0,0) term in the model and account
+<span class="lineNum">      89 </span>            :     // for _dzonal0 separately.
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :     _zonal.clear(); _zonal.push_back(1);</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :     _dzonal0 = (_earth.MassConstant() - _GMmodel) / _GMmodel;</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :     for (int n = 2; n &lt;= nmx; n += 2) {</span>
+<span class="lineNum">      93 </span>            :       // Only include as many normal zonal terms as matter.  Figuring the limit
+<span class="lineNum">      94 </span>            :       // in this way works because the coefficients of the normal potential
+<span class="lineNum">      95 </span>            :       // (which is smooth) decay much more rapidly that the corresponding
+<span class="lineNum">      96 </span>            :       // coefficient of the model potential (which is bumpy).  Typically this
+<span class="lineNum">      97 </span>            :       // goes out to n = 18.
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :       mult *= amult;</span>
+<span class="lineNum">      99 </span>            :       real
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :         r = _Cx[n],                                        // the model term</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :         s = - mult * _earth.Jn(n) / sqrt(real(2 * n + 1)), // the normal term</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :         t = r - s;                                         // the difference</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :       if (t == r)               // the normal term is negligible</span>
+<span class="lineNum">     104 </span>            :         break;
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :       _zonal.push_back(0);      // index = n - 1; the odd terms are 0</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :       _zonal.push_back(s);</span>
+<span class="lineNum">     107 </span>            :     }
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :     int nmx1 = int(_zonal.size()) - 1;</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :     _disturbing = SphericalHarmonic1(_Cx, _Sx,</span>
+<span class="lineNum">     110 </span>            :                                      _gravitational.Coefficients().N(),
+<span class="lineNum">     111 </span>            :                                      nmx, _gravitational.Coefficients().mmx(),
+<span class="lineNum">     112 </span>            :                                      _zonal,
+<span class="lineNum">     113 </span>            :                                      _zonal, // This is not accessed!
+<span class="lineNum">     114 </span>            :                                      nmx1, nmx1, 0,
+<span class="lineNum">     115 </span>            :                                      _amodel,
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :                                      SphericalHarmonic1::normalization(_norm));</span>
+<a name="117"><span class="lineNum">     117 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :   void GravityModel::ReadMetadata(const std::string&amp; name) {</span>
+<span class="lineNum">     120 </span>            :     const char* spaces = &quot; \t\n\v\f\r&quot;;
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :     _filename = _dir + &quot;/&quot; + name + &quot;.egm&quot;;</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :     ifstream metastr(_filename.c_str());</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :     if (!metastr.good())</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Cannot open &quot; + _filename);</span>
+<span class="lineNum">     125 </span>            :     string line;
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :     getline(metastr, line);</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :     if (!(line.size() &gt;= 6 &amp;&amp; line.substr(0,5) == &quot;EGMF-&quot;))</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :       throw GeographicErr(_filename + &quot; does not contain EGMF-n signature&quot;);</span>
+<span class="lineNum">     129 </span>            :     string::size_type n = line.find_first_of(spaces, 5);
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :     if (n != string::npos)</span>
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :       n -= 5;</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :     string version(line, 5, n);</span>
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :     if (version != &quot;1&quot;)</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Unknown version in &quot; + _filename + &quot;: &quot; + version);</span>
+<span class="lineNum">     135 </span>            :     string key, val;
+<span class="lineNum">     136 </span>            :     real a = Math::NaN(), GM = a, omega = a, f = a, J2 = a;
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :     while (getline(metastr, line)) {</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :       if (!Utility::ParseLine(line, key, val))</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :         continue;</span>
+<span class="lineNum">     140 </span>            :       // Process key words
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :       if (key == &quot;Name&quot;)</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :         _name = val;</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :       else if (key == &quot;Description&quot;)</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :         _description = val;</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :       else if (key == &quot;ReleaseDate&quot;)</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :         _date = val;</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :       else if (key == &quot;ModelRadius&quot;)</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :         _amodel = Utility::val&lt;real&gt;(val);</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :       else if (key == &quot;ModelMass&quot;)</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :         _GMmodel = Utility::val&lt;real&gt;(val);</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :       else if (key == &quot;AngularVelocity&quot;)</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :         omega = Utility::val&lt;real&gt;(val);</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :       else if (key == &quot;ReferenceRadius&quot;)</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :         a = Utility::val&lt;real&gt;(val);</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :       else if (key == &quot;ReferenceMass&quot;)</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :         GM = Utility::val&lt;real&gt;(val);</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :       else if (key == &quot;Flattening&quot;)</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :         f = Utility::fract&lt;real&gt;(val);</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :       else if (key == &quot;DynamicalFormFactor&quot;)</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :         J2 = Utility::fract&lt;real&gt;(val);</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :       else if (key == &quot;HeightOffset&quot;)</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :         _zeta0 = Utility::fract&lt;real&gt;(val);</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :       else if (key == &quot;CorrectionMultiplier&quot;)</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :         _corrmult = Utility::fract&lt;real&gt;(val);</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :       else if (key == &quot;Normalization&quot;) {</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :         if (val == &quot;FULL&quot; || val == &quot;Full&quot; || val == &quot;full&quot;)</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :           _norm = SphericalHarmonic::FULL;</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :         else if (val == &quot;SCHMIDT&quot; || val == &quot;Schmidt&quot; || val == &quot;schmidt&quot;)</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :           _norm = SphericalHarmonic::SCHMIDT;</span>
+<span class="lineNum">     170 </span>            :         else
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;Unknown normalization &quot; + val);</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :       } else if (key == &quot;ByteOrder&quot;) {</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :         if (val == &quot;Big&quot; || val == &quot;big&quot;)</span>
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;Only little-endian ordering is supported&quot;);</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :         else if (!(val == &quot;Little&quot; || val == &quot;little&quot;))</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;Unknown byte ordering &quot; + val);</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :       } else if (key == &quot;ID&quot;)</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :         _id = val;</span>
+<span class="lineNum">     179 </span>            :       // else unrecognized keywords are skipped
+<span class="lineNum">     180 </span>            :     }
+<span class="lineNum">     181 </span>            :     // Check values
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(_amodel) &amp;&amp; _amodel &gt; 0))</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Model radius must be positive&quot;);</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(_GMmodel) &amp;&amp; _GMmodel &gt; 0))</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Model mass constant must be positive&quot;);</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(_corrmult) &amp;&amp; _corrmult &gt; 0))</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Correction multiplier must be positive&quot;);</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(_zeta0)))</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Height offset must be finite&quot;);</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :     if (int(_id.size()) != idlength_)</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Invalid ID&quot;);</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :     if (Math::isfinite(f) &amp;&amp; Math::isfinite(J2))</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Cannot specify both f and J2&quot;);</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :     _earth = NormalGravity(a, GM, omega,</span>
+<span class="lineNum">     195 </span>            :                            Math::isfinite(f) ? f : J2, Math::isfinite(f));
+<a name="196"><span class="lineNum">     196 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :   Math::real GravityModel::InternalT(real X, real Y, real Z,</span>
+<span class="lineNum">     199 </span>            :                                      real&amp; deltaX, real&amp; deltaY, real&amp; deltaZ,
+<span class="lineNum">     200 </span>            :                                      bool gradp, bool correct) const {
+<span class="lineNum">     201 </span>            :     // If correct, then produce the correct T = W - U.  Otherwise, neglect the
+<span class="lineNum">     202 </span>            :     // n = 0 term (which is proportial to the difference in the model and
+<span class="lineNum">     203 </span>            :     // reference values of GM).
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :     if (_dzonal0 == 0)</span>
+<span class="lineNum">     205 </span>            :       // No need to do the correction
+<span class="lineNum">     206 </span>            :       correct = false;
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :     real T, invR = correct ? 1 / Math::hypot(Math::hypot(X, Y), Z) : 1;</span>
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :     if (gradp) {</span>
+<span class="lineNum">     209 </span>            :       // initial values to suppress warnings
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :       deltaX = deltaY = deltaZ = 0;</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :       T = _disturbing(-1, X, Y, Z, deltaX, deltaY, deltaZ);</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :       real f = _GMmodel / _amodel;</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :       deltaX *= f;</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :       deltaY *= f;</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :       deltaZ *= f;</span>
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :       if (correct) {</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :         invR = _GMmodel * _dzonal0 * invR * invR * invR;</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :         deltaX += X * invR;</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :         deltaY += Y * invR;</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :         deltaZ += Z * invR;</span>
+<span class="lineNum">     221 </span>            :       }
+<span class="lineNum">     222 </span>            :     } else
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :       T = _disturbing(-1, X, Y, Z);</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :     T = (T / _amodel - (correct ? _dzonal0 : 0) * invR) * _GMmodel;</span>
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :     return T;</span>
+<a name="226"><span class="lineNum">     226 </span>            :   }</a>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :   Math::real GravityModel::V(real X, real Y, real Z,</span>
+<span class="lineNum">     229 </span>            :                              real&amp; GX, real&amp; GY, real&amp; GZ) const {
+<span class="lineNum">     230 </span>            :     real
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :       Vres = _gravitational(X, Y, Z, GX, GY, GZ),</span>
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :       f = _GMmodel / _amodel;</span>
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :     Vres *= f;</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :     GX *= f;</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :     GY *= f;</span>
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :     GZ *= f;</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :     return Vres;</span>
+<a name="238"><span class="lineNum">     238 </span>            :   }</a>
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :   Math::real GravityModel::W(real X, real Y, real Z,</span>
+<span class="lineNum">     241 </span>            :                              real&amp; gX, real&amp; gY, real&amp; gZ) const {
+<span class="lineNum">     242 </span>            :     real fX, fY,
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :       Wres = V(X, Y, Z, gX, gY, gZ) + _earth.Phi(X, Y, fX, fY);</span>
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :     gX += fX;</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :     gY += fY;</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :     return Wres;</span>
+<a name="247"><span class="lineNum">     247 </span>            :   }</a>
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :   void GravityModel::SphericalAnomaly(real lat, real lon, real h,</span>
+<span class="lineNum">     250 </span>            :                                       real&amp; Dg01, real&amp; xi, real&amp; eta) const {
+<span class="lineNum">     251 </span>            :     real X, Y, Z, M[Geocentric::dim2_];
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :     _earth.Earth().IntForward(lat, lon, h, X, Y, Z, M);</span>
+<span class="lineNum">     253 </span>            :     real
+<span class="lineNum">     254 </span>            :       deltax, deltay, deltaz,
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :       T = InternalT(X, Y, Z, deltax, deltay, deltaz, true, false),</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :       clam = M[3], slam = -M[0],</span>
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :       P = Math::hypot(X, Y),</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :       R = Math::hypot(P, Z),</span>
+<span class="lineNum">     259 </span>            :       // psi is geocentric latitude
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :       cpsi = R != 0 ? P / R : M[7],</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :       spsi = R != 0 ? Z / R : M[8];</span>
+<span class="lineNum">     262 </span>            :     // Rotate cartesian into spherical coordinates
+<span class="lineNum">     263 </span>            :     real MC[Geocentric::dim2_];
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :     Geocentric::Rotation(spsi, cpsi, slam, clam, MC);</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :     Geocentric::Unrotate(MC, deltax, deltay, deltaz, deltax, deltay, deltaz);</span>
+<span class="lineNum">     266 </span>            :     // H+M, Eq 2-151c
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :     Dg01 = - deltaz - 2 * T / R;</span>
+<span class="lineNum">     268 </span>            :     real gammaX, gammaY, gammaZ;
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :     _earth.U(X, Y, Z, gammaX, gammaY, gammaZ);</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :     real gamma = Math::hypot( Math::hypot(gammaX, gammaY), gammaZ);</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :     xi  = -(deltay/gamma) / Math::degree();</span>
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :     eta = -(deltax/gamma) / Math::degree();</span>
+<a name="273"><span class="lineNum">     273 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :   Math::real GravityModel::GeoidHeight(real lat, real lon) const</span>
+<span class="lineNum">     276 </span>            :   {
+<span class="lineNum">     277 </span>            :     real X, Y, Z;
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :     _earth.Earth().IntForward(lat, lon, 0, X, Y, Z, NULL);</span>
+<span class="lineNum">     279 </span>            :     real
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :       gamma0 = _earth.SurfaceGravity(lat),</span>
+<span class="lineNum">     281 </span>            :       dummy,
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :       T = InternalT(X, Y, Z, dummy, dummy, dummy, false, false),</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :       invR = 1 / Math::hypot(Math::hypot(X, Y), Z),</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :       correction = _corrmult * _correction(invR * X, invR * Y, invR * Z);</span>
+<span class="lineNum">     285 </span>            :     // _zeta0 has been included in _correction
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :     return T/gamma0 + correction;</span>
+<a name="287"><span class="lineNum">     287 </span>            :   }</a>
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :   Math::real GravityModel::Gravity(real lat, real lon, real h,</span>
+<span class="lineNum">     290 </span>            :                                    real&amp; gx, real&amp; gy, real&amp; gz) const {
+<span class="lineNum">     291 </span>            :     real X, Y, Z, M[Geocentric::dim2_];
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :     _earth.Earth().IntForward(lat, lon, h, X, Y, Z, M);</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :     real Wres = W(X, Y, Z, gx, gy, gz);</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :     Geocentric::Unrotate(M, gx, gy, gz, gx, gy, gz);</span>
+<a name="295"><span class="lineNum">     295 </span><span class="lineNoCov">          0 :     return Wres;</span></a>
+<span class="lineNum">     296 </span>            :   }
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :   Math::real GravityModel::Disturbance(real lat, real lon, real h,</span>
+<span class="lineNum">     298 </span>            :                                        real&amp; deltax, real&amp; deltay,
+<span class="lineNum">     299 </span>            :                                        real&amp; deltaz) const {
+<span class="lineNum">     300 </span>            :     real X, Y, Z, M[Geocentric::dim2_];
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :     _earth.Earth().IntForward(lat, lon, h, X, Y, Z, M);</span>
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :     real Tres = InternalT(X, Y, Z, deltax, deltay, deltaz, true, true);</span>
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :     Geocentric::Unrotate(M, deltax, deltay, deltaz, deltax, deltay, deltaz);</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :     return Tres;</span>
+<a name="305"><span class="lineNum">     305 </span>            :   }</a>
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :   GravityCircle GravityModel::Circle(real lat, real h, unsigned caps) const {</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :     if (h != 0)</span>
+<span class="lineNum">     309 </span>            :       // Disallow invoking GeoidHeight unless h is zero.
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :       caps &amp;= ~(CAP_GAMMA0 | CAP_C);</span>
+<span class="lineNum">     311 </span>            :     real X, Y, Z, M[Geocentric::dim2_];
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :     _earth.Earth().IntForward(lat, 0, h, X, Y, Z, M);</span>
+<span class="lineNum">     313 </span>            :     // Y = 0, cphi = M[7], sphi = M[8];
+<span class="lineNum">     314 </span>            :     real
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :       invR = 1 / Math::hypot(X, Z),</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :       gamma0 = (caps &amp; CAP_GAMMA0 ?_earth.SurfaceGravity(lat)</span>
+<span class="lineNum">     317 </span>            :                 : Math::NaN()),
+<span class="lineNum">     318 </span>            :       fx, fy, fz, gamma;
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :     if (caps &amp; CAP_GAMMA) {</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :       _earth.U(X, Y, Z, fx, fy, fz); // fy = 0</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :       gamma = Math::hypot(fx, fz);</span>
+<span class="lineNum">     322 </span>            :     } else
+<span class="lineNum">     323 </span>            :       gamma = Math::NaN();
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :     _earth.Phi(X, Y, fx, fy);</span>
+<span class="lineNum">     325 </span>            :     return GravityCircle(GravityCircle::mask(caps),
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :                          _earth._a, _earth._f, lat, h, Z, X, M[7], M[8],</span>
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :                          _amodel, _GMmodel, _dzonal0, _corrmult,</span>
+<span class="lineNum">     328 </span>            :                          gamma0, gamma, fx,
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :                          caps &amp; CAP_G ?</span>
+<span class="lineNum">     330 </span>            :                          _gravitational.Circle(X, Z, true) :
+<span class="lineNum">     331 </span>            :                          CircularEngine(),
+<span class="lineNum">     332 </span>            :                          // N.B. If CAP_DELTA is set then CAP_T should be too.
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :                          caps &amp; CAP_T ?</span>
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :                          _disturbing.Circle(-1, X, Z, (caps&amp;CAP_DELTA) != 0) :</span>
+<span class="lineNum">     335 </span>            :                          CircularEngine(),
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :                          caps &amp; CAP_C ?</span>
+<span class="lineNum">     337 </span>            :                          _correction.Circle(invR * X, invR * Z, false) :
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :                          CircularEngine());</span>
+<a name="339"><span class="lineNum">     339 </span>            :   }</a>
+<span class="lineNum">     340 </span>            : 
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :   std::string GravityModel::DefaultGravityPath() {</span>
+<span class="lineNum">     342 </span>            :     string path;
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :     char* gravitypath = getenv(&quot;GEOGRAPHICLIB_GRAVITY_PATH&quot;);</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :     if (gravitypath)</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :       path = string(gravitypath);</span>
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :     if (!path.empty())</span>
+<span class="lineNum">     347 </span>            :       return path;
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :     char* datapath = getenv(&quot;GEOGRAPHICLIB_DATA&quot;);</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :     if (datapath)</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :       path = string(datapath);</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :     return (!path.empty() ? path : string(GEOGRAPHICLIB_DATA)) + &quot;/gravity&quot;;</span>
+<a name="352"><span class="lineNum">     352 </span>            :   }</a>
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :   std::string GravityModel::DefaultGravityName() {</span>
+<span class="lineNum">     355 </span>            :     string name;
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :     char* gravityname = getenv(&quot;GEOGRAPHICLIB_GRAVITY_NAME&quot;);</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :     if (gravityname)</span>
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :       name = string(gravityname);</span>
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :     return !name.empty() ? name : string(GEOGRAPHICLIB_GRAVITY_DEFAULT_NAME);</span>
+<span class="lineNum">     360 </span>            :   }
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

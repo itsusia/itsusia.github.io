@@ -1,0 +1,273 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - build/man/Planimeter.usage</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">build/man</a> - Planimeter.usage<span style="font-size: 80%;"> (source / <a href="Planimeter.usage.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span><span class="lineNoCov">          0 : int usage(int retval, bool brief) {</span></a>
+<span class="lineNum">       2 </span><span class="lineNoCov">          0 :   if (brief)</span>
+<span class="lineNum">       3 </span><span class="lineNoCov">          0 :     ( retval ? std::cerr : std::cout ) &lt;&lt; &quot;Usage:\n&quot;</span>
+<span class="lineNum">       4 </span>            : &quot;    Planimeter [ -r ] [ -s ] [ -l ] [ -e a f ] [ -w ] [ -p prec ] [ -G | -E\n&quot;
+<span class="lineNum">       5 </span>            : &quot;    | -Q | -R ] [ --comment-delimiter commentdelim ] [ --version | -h |\n&quot;
+<span class="lineNum">       6 </span>            : &quot;    --help ] [ --input-file infile | --input-string instring ] [\n&quot;
+<span class="lineNum">       7 </span>            : &quot;    --line-separator linesep ] [ --output-file outfile ]\n&quot;
+<span class="lineNum">       8 </span>            : &quot;\n&quot;
+<span class="lineNum">       9 </span>            : &quot;For full documentation type:\n&quot;
+<span class="lineNum">      10 </span>            : &quot;    Planimeter --help\n&quot;
+<span class="lineNum">      11 </span>            : &quot;or visit:\n&quot;
+<span class="lineNum">      12 </span><span class="lineNoCov">          0 : &quot;    https://geographiclib.sourceforge.io/1.49/Planimeter.1.html\n&quot;;</span>
+<span class="lineNum">      13 </span>            :   else
+<span class="lineNum">      14 </span><span class="lineNoCov">          0 :     ( retval ? std::cerr : std::cout ) &lt;&lt; &quot;Man page:\n&quot;</span>
+<span class="lineNum">      15 </span>            : &quot;NAME\n&quot;
+<span class="lineNum">      16 </span>            : &quot;       Planimeter -- compute the area of geodesic polygons\n&quot;
+<span class="lineNum">      17 </span>            : &quot;\n&quot;
+<span class="lineNum">      18 </span>            : &quot;SYNOPSIS\n&quot;
+<span class="lineNum">      19 </span>            : &quot;       Planimeter [ -r ] [ -s ] [ -l ] [ -e a f ] [ -w ] [ -p prec ] [ -G | -E\n&quot;
+<span class="lineNum">      20 </span>            : &quot;       | -Q | -R ] [ --comment-delimiter commentdelim ] [ --version | -h |\n&quot;
+<span class="lineNum">      21 </span>            : &quot;       --help ] [ --input-file infile | --input-string instring ] [\n&quot;
+<span class="lineNum">      22 </span>            : &quot;       --line-separator linesep ] [ --output-file outfile ]\n&quot;
+<span class="lineNum">      23 </span>            : &quot;\n&quot;
+<span class="lineNum">      24 </span>            : &quot;DESCRIPTION\n&quot;
+<span class="lineNum">      25 </span>            : &quot;       Measure the area of a geodesic polygon.  Reads polygon vertices from\n&quot;
+<span class="lineNum">      26 </span>            : &quot;       standard input, one per line.  Vertices may be given as latitude and\n&quot;
+<span class="lineNum">      27 </span>            : &quot;       longitude, UTM/UPS, or MGRS coordinates, interpreted in the same way as\n&quot;
+<span class="lineNum">      28 </span>            : &quot;       GeoConvert(1).  (MGRS coordinates signify the center of the\n&quot;
+<span class="lineNum">      29 </span>            : &quot;       corresponding MGRS square.)  The end of input, a blank line, or a line\n&quot;
+<span class="lineNum">      30 </span>            : &quot;       which can't be interpreted as a vertex signals the end of one polygon\n&quot;
+<span class="lineNum">      31 </span>            : &quot;       and the start of the next.  For each polygon print a summary line with\n&quot;
+<span class="lineNum">      32 </span>            : &quot;       the number of points, the perimeter (in meters), and the area (in\n&quot;
+<span class="lineNum">      33 </span>            : &quot;       meters^2).\n&quot;
+<span class="lineNum">      34 </span>            : &quot;\n&quot;
+<span class="lineNum">      35 </span>            : &quot;       The edges of the polygon are given by the shortest geodesic between\n&quot;
+<span class="lineNum">      36 </span>            : &quot;       consecutive vertices.  In certain cases, there may be two or many such\n&quot;
+<span class="lineNum">      37 </span>            : &quot;       shortest geodesics, and in that case, the polygon is not uniquely\n&quot;
+<span class="lineNum">      38 </span>            : &quot;       specified by its vertices.  This only happens with very long edges (for\n&quot;
+<span class="lineNum">      39 </span>            : &quot;       the WGS84 ellipsoid, any edge shorter than 19970 km is uniquely\n&quot;
+<span class="lineNum">      40 </span>            : &quot;       specified by its end points).  In such cases, insert an additional\n&quot;
+<span class="lineNum">      41 </span>            : &quot;       vertex near the middle of the long edge to define the boundary of the\n&quot;
+<span class="lineNum">      42 </span>            : &quot;       polygon.\n&quot;
+<span class="lineNum">      43 </span>            : &quot;\n&quot;
+<span class="lineNum">      44 </span>            : &quot;       By default, polygons traversed in a counter-clockwise direction return\n&quot;
+<span class="lineNum">      45 </span>            : &quot;       a positive area and those traversed in a clockwise direction return a\n&quot;
+<span class="lineNum">      46 </span>            : &quot;       negative area.  This sign convention is reversed if the -r option is\n&quot;
+<span class="lineNum">      47 </span>            : &quot;       given.\n&quot;
+<span class="lineNum">      48 </span>            : &quot;\n&quot;
+<span class="lineNum">      49 </span>            : &quot;       Of course, encircling an area in the clockwise direction is equivalent\n&quot;
+<span class="lineNum">      50 </span>            : &quot;       to encircling the rest of the ellipsoid in the counter-clockwise\n&quot;
+<span class="lineNum">      51 </span>            : &quot;       direction.  The default interpretation used by Planimeter is the one\n&quot;
+<span class="lineNum">      52 </span>            : &quot;       that results in a smaller magnitude of area; i.e., the magnitude of the\n&quot;
+<span class="lineNum">      53 </span>            : &quot;       area is less than or equal to one half the total area of the ellipsoid.\n&quot;
+<span class="lineNum">      54 </span>            : &quot;       If the -s option is given, then the interpretation used is the one that\n&quot;
+<span class="lineNum">      55 </span>            : &quot;       results in a positive area; i.e., the area is positive and less than\n&quot;
+<span class="lineNum">      56 </span>            : &quot;       the total area of the ellipsoid.\n&quot;
+<span class="lineNum">      57 </span>            : &quot;\n&quot;
+<span class="lineNum">      58 </span>            : &quot;       Only simple (i.e., non-self-intersecting) polygons are supported for\n&quot;
+<span class="lineNum">      59 </span>            : &quot;       the area computation.  Polygons may include one or both poles.  There\n&quot;
+<span class="lineNum">      60 </span>            : &quot;       is no need to close the polygon.\n&quot;
+<span class="lineNum">      61 </span>            : &quot;\n&quot;
+<span class="lineNum">      62 </span>            : &quot;OPTIONS\n&quot;
+<span class="lineNum">      63 </span>            : &quot;       -r  toggle whether counter-clockwise traversal of the polygon returns a\n&quot;
+<span class="lineNum">      64 </span>            : &quot;           positive (the default) or negative result.\n&quot;
+<span class="lineNum">      65 </span>            : &quot;\n&quot;
+<span class="lineNum">      66 </span>            : &quot;       -s  toggle whether to return a signed result (the default) or not.\n&quot;
+<span class="lineNum">      67 </span>            : &quot;\n&quot;
+<span class="lineNum">      68 </span>            : &quot;       -l  toggle whether the vertices represent a polygon (the default) or a\n&quot;
+<span class="lineNum">      69 </span>            : &quot;           polyline.  For a polyline, the number of points and the length of\n&quot;
+<span class="lineNum">      70 </span>            : &quot;           the path joining them is returned; the path is not closed and the\n&quot;
+<span class="lineNum">      71 </span>            : &quot;           area is not reported.\n&quot;
+<span class="lineNum">      72 </span>            : &quot;\n&quot;
+<span class="lineNum">      73 </span>            : &quot;       -e a f\n&quot;
+<span class="lineNum">      74 </span>            : &quot;           specify the ellipsoid via the equatorial radius, a and the\n&quot;
+<span class="lineNum">      75 </span>            : &quot;           flattening, f.  Setting f = 0 results in a sphere.  Specify f &lt; 0\n&quot;
+<span class="lineNum">      76 </span>            : &quot;           for a prolate ellipsoid.  A simple fraction, e.g., 1/297, is\n&quot;
+<span class="lineNum">      77 </span>            : &quot;           allowed for f.  By default, the WGS84 ellipsoid is used, a =\n&quot;
+<span class="lineNum">      78 </span>            : &quot;           6378137 m, f = 1/298.257223563.  If entering vertices as UTM/UPS or\n&quot;
+<span class="lineNum">      79 </span>            : &quot;           MGRS coordinates, use the default ellipsoid, since the conversion\n&quot;
+<span class="lineNum">      80 </span>            : &quot;           of these coordinates to latitude and longitude always uses the\n&quot;
+<span class="lineNum">      81 </span>            : &quot;           WGS84 parameters.\n&quot;
+<span class="lineNum">      82 </span>            : &quot;\n&quot;
+<span class="lineNum">      83 </span>            : &quot;       -w  toggle the longitude first flag (it starts off); if the flag is on,\n&quot;
+<span class="lineNum">      84 </span>            : &quot;           then when reading geographic coordinates, longitude precedes\n&quot;
+<span class="lineNum">      85 </span>            : &quot;           latitude (this can be overridden by a hemisphere designator, N, S,\n&quot;
+<span class="lineNum">      86 </span>            : &quot;           E, W).\n&quot;
+<span class="lineNum">      87 </span>            : &quot;\n&quot;
+<span class="lineNum">      88 </span>            : &quot;       -p prec\n&quot;
+<span class="lineNum">      89 </span>            : &quot;           set the output precision to prec (default 6); the perimeter is\n&quot;
+<span class="lineNum">      90 </span>            : &quot;           given (in meters) with prec digits after the decimal point; the\n&quot;
+<span class="lineNum">      91 </span>            : &quot;           area is given (in meters^2) with (prec - 5) digits after the\n&quot;
+<span class="lineNum">      92 </span>            : &quot;           decimal point.\n&quot;
+<span class="lineNum">      93 </span>            : &quot;\n&quot;
+<span class="lineNum">      94 </span>            : &quot;       -G  use the series formulation for the geodesics.  This is the default\n&quot;
+<span class="lineNum">      95 </span>            : &quot;           option and is recommended for terrestrial applications.  This\n&quot;
+<span class="lineNum">      96 </span>            : &quot;           option, -G, and the following three options, -E, -Q, and -R, are\n&quot;
+<span class="lineNum">      97 </span>            : &quot;           mutually exclusive.\n&quot;
+<span class="lineNum">      98 </span>            : &quot;\n&quot;
+<span class="lineNum">      99 </span>            : &quot;       -E  use \&quot;exact\&quot; algorithms (based on elliptic integrals) for the\n&quot;
+<span class="lineNum">     100 </span>            : &quot;           geodesic calculations.  These are more accurate than the (default)\n&quot;
+<span class="lineNum">     101 </span>            : &quot;           series expansions for |f| &gt; 0.02.  (But note that the\n&quot;
+<span class="lineNum">     102 </span>            : &quot;           implementation of areas in GeodesicExact uses a high order series\n&quot;
+<span class="lineNum">     103 </span>            : &quot;           and this is only accurate for modest flattenings.)\n&quot;
+<span class="lineNum">     104 </span>            : &quot;\n&quot;
+<span class="lineNum">     105 </span>            : &quot;       -Q  perform the calculation on the authalic sphere.  The area\n&quot;
+<span class="lineNum">     106 </span>            : &quot;           calculation is accurate even if the flattening is large, provided\n&quot;
+<span class="lineNum">     107 </span>            : &quot;           the edges are sufficiently short.  The perimeter calculation is not\n&quot;
+<span class="lineNum">     108 </span>            : &quot;           accurate.\n&quot;
+<span class="lineNum">     109 </span>            : &quot;\n&quot;
+<span class="lineNum">     110 </span>            : &quot;       -R  The lines joining the vertices are rhumb lines instead of\n&quot;
+<span class="lineNum">     111 </span>            : &quot;           geodesics.\n&quot;
+<span class="lineNum">     112 </span>            : &quot;\n&quot;
+<span class="lineNum">     113 </span>            : &quot;       --comment-delimiter commentdelim\n&quot;
+<span class="lineNum">     114 </span>            : &quot;           set the comment delimiter to commentdelim (e.g., \&quot;#\&quot; or \&quot;//\&quot;).  If\n&quot;
+<span class="lineNum">     115 </span>            : &quot;           set, the input lines will be scanned for this delimiter and, if\n&quot;
+<span class="lineNum">     116 </span>            : &quot;           found, the delimiter and the rest of the line will be removed prior\n&quot;
+<span class="lineNum">     117 </span>            : &quot;           to processing.  For a given polygon, the last such string found\n&quot;
+<span class="lineNum">     118 </span>            : &quot;           will be appended to the output line (separated by a space).\n&quot;
+<span class="lineNum">     119 </span>            : &quot;\n&quot;
+<span class="lineNum">     120 </span>            : &quot;       --version\n&quot;
+<span class="lineNum">     121 </span>            : &quot;           print version and exit.\n&quot;
+<span class="lineNum">     122 </span>            : &quot;\n&quot;
+<span class="lineNum">     123 </span>            : &quot;       -h  print usage and exit.\n&quot;
+<span class="lineNum">     124 </span>            : &quot;\n&quot;
+<span class="lineNum">     125 </span>            : &quot;       --help\n&quot;
+<span class="lineNum">     126 </span>            : &quot;           print full documentation and exit.\n&quot;
+<span class="lineNum">     127 </span>            : &quot;\n&quot;
+<span class="lineNum">     128 </span>            : &quot;       --input-file infile\n&quot;
+<span class="lineNum">     129 </span>            : &quot;           read input from the file infile instead of from standard input; a\n&quot;
+<span class="lineNum">     130 </span>            : &quot;           file name of \&quot;-\&quot; stands for standard input.\n&quot;
+<span class="lineNum">     131 </span>            : &quot;\n&quot;
+<span class="lineNum">     132 </span>            : &quot;       --input-string instring\n&quot;
+<span class="lineNum">     133 </span>            : &quot;           read input from the string instring instead of from standard input.\n&quot;
+<span class="lineNum">     134 </span>            : &quot;           All occurrences of the line separator character (default is a\n&quot;
+<span class="lineNum">     135 </span>            : &quot;           semicolon) in instring are converted to newlines before the reading\n&quot;
+<span class="lineNum">     136 </span>            : &quot;           begins.\n&quot;
+<span class="lineNum">     137 </span>            : &quot;\n&quot;
+<span class="lineNum">     138 </span>            : &quot;       --line-separator linesep\n&quot;
+<span class="lineNum">     139 </span>            : &quot;           set the line separator character to linesep.  By default this is a\n&quot;
+<span class="lineNum">     140 </span>            : &quot;           semicolon.\n&quot;
+<span class="lineNum">     141 </span>            : &quot;\n&quot;
+<span class="lineNum">     142 </span>            : &quot;       --output-file outfile\n&quot;
+<span class="lineNum">     143 </span>            : &quot;           write output to the file outfile instead of to standard output; a\n&quot;
+<span class="lineNum">     144 </span>            : &quot;           file name of \&quot;-\&quot; stands for standard output.\n&quot;
+<span class="lineNum">     145 </span>            : &quot;\n&quot;
+<span class="lineNum">     146 </span>            : &quot;EXAMPLES\n&quot;
+<span class="lineNum">     147 </span>            : &quot;       Example (the area of the 100km MGRS square 18SWK)\n&quot;
+<span class="lineNum">     148 </span>            : &quot;\n&quot;
+<span class="lineNum">     149 </span>            : &quot;          Planimeter &lt;&lt;EOF\n&quot;
+<span class="lineNum">     150 </span>            : &quot;          18n 500000 4400000\n&quot;
+<span class="lineNum">     151 </span>            : &quot;          18n 600000 4400000\n&quot;
+<span class="lineNum">     152 </span>            : &quot;          18n 600000 4500000\n&quot;
+<span class="lineNum">     153 </span>            : &quot;          18n 500000 4500000\n&quot;
+<span class="lineNum">     154 </span>            : &quot;          EOF\n&quot;
+<span class="lineNum">     155 </span>            : &quot;          =&gt; 4 400139.53295860 10007388597.1913\n&quot;
+<span class="lineNum">     156 </span>            : &quot;\n&quot;
+<span class="lineNum">     157 </span>            : &quot;       The following code takes the output from gdalinfo and reports the area\n&quot;
+<span class="lineNum">     158 </span>            : &quot;       covered by the data (assuming the edges of the image are geodesics).\n&quot;
+<span class="lineNum">     159 </span>            : &quot;\n&quot;
+<span class="lineNum">     160 </span>            : &quot;          #! /bin/sh\n&quot;
+<span class="lineNum">     161 </span>            : &quot;          egrep '^((Upper|Lower) (Left|Right)|Center) ' |\n&quot;
+<span class="lineNum">     162 </span>            : &quot;          sed -e 's/d /d/g' -e \&quot;s/' /'/g\&quot; | tr -s '(),\\r\\t' ' ' | awk '{\n&quot;
+<span class="lineNum">     163 </span>            : &quot;              if ($1 $2 == \&quot;UpperLeft\&quot;)\n&quot;
+<span class="lineNum">     164 </span>            : &quot;                  ul = $6 \&quot; \&quot; $5;\n&quot;
+<span class="lineNum">     165 </span>            : &quot;              else if ($1 $2 == \&quot;LowerLeft\&quot;)\n&quot;
+<span class="lineNum">     166 </span>            : &quot;                  ll = $6 \&quot; \&quot; $5;\n&quot;
+<span class="lineNum">     167 </span>            : &quot;              else if ($1 $2 == \&quot;UpperRight\&quot;)\n&quot;
+<span class="lineNum">     168 </span>            : &quot;                  ur = $6 \&quot; \&quot; $5;\n&quot;
+<span class="lineNum">     169 </span>            : &quot;              else if ($1 $2 == \&quot;LowerRight\&quot;)\n&quot;
+<span class="lineNum">     170 </span>            : &quot;                  lr = $6 \&quot; \&quot; $5;\n&quot;
+<span class="lineNum">     171 </span>            : &quot;              else if ($1 == \&quot;Center\&quot;) {\n&quot;
+<span class="lineNum">     172 </span>            : &quot;                  printf \&quot;%s\\n%s\\n%s\\n%s\\n\\n\&quot;, ul, ll, lr, ur;\n&quot;
+<span class="lineNum">     173 </span>            : &quot;                  ul = ll = ur = lr = \&quot;\&quot;;\n&quot;
+<span class="lineNum">     174 </span>            : &quot;              }\n&quot;
+<span class="lineNum">     175 </span>            : &quot;          }\n&quot;
+<span class="lineNum">     176 </span>            : &quot;          ' | Planimeter | cut -f3 -d' '\n&quot;
+<span class="lineNum">     177 </span>            : &quot;\n&quot;
+<span class="lineNum">     178 </span>            : &quot;SEE ALSO\n&quot;
+<span class="lineNum">     179 </span>            : &quot;       GeoConvert(1), GeodSolve(1).\n&quot;
+<span class="lineNum">     180 </span>            : &quot;\n&quot;
+<span class="lineNum">     181 </span>            : &quot;       An online version of this utility is availbable at\n&quot;
+<span class="lineNum">     182 </span>            : &quot;       &lt;https://geographiclib.sourceforge.io/cgi-bin/Planimeter&gt;.\n&quot;
+<span class="lineNum">     183 </span>            : &quot;\n&quot;
+<span class="lineNum">     184 </span>            : &quot;       The algorithm for the area of geodesic polygon is given in Section 6 of\n&quot;
+<span class="lineNum">     185 </span>            : &quot;       C. F. F. Karney, Algorithms for geodesics, J. Geodesy 87, 43-55 (2013);\n&quot;
+<span class="lineNum">     186 </span>            : &quot;       DOI &lt;https://doi.org/10.1007/s00190-012-0578-z&gt;; addenda:\n&quot;
+<span class="lineNum">     187 </span>            : &quot;       &lt;https://geographiclib.sourceforge.io/geod-addenda.html&gt;.\n&quot;
+<span class="lineNum">     188 </span>            : &quot;\n&quot;
+<span class="lineNum">     189 </span>            : &quot;AUTHOR\n&quot;
+<span class="lineNum">     190 </span>            : &quot;       Planimeter was written by Charles Karney.\n&quot;
+<span class="lineNum">     191 </span>            : &quot;\n&quot;
+<span class="lineNum">     192 </span>            : &quot;HISTORY\n&quot;
+<span class="lineNum">     193 </span>            : &quot;       Planimeter was added to GeographicLib,\n&quot;
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 : &quot;       &lt;https://geographiclib.sourceforge.io&gt;, in version 1.4.\n&quot;</span>
+<span class="lineNum">     195 </span>            : ;
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :   return retval;</span>
+<span class="lineNum">     197 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

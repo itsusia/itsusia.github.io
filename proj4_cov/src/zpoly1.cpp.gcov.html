@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/zpoly1.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - zpoly1.cpp<span style="font-size: 80%;"> (source / <a href="zpoly1.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* evaluate complex polynomial */</a>
+<span class="lineNum">       2 </span>            : #include &quot;proj.h&quot;
+<span class="lineNum">       3 </span>            : #include &quot;proj_internal.h&quot;
+<span class="lineNum">       4 </span>            : /* note: coefficients are always from C_1 to C_n
+<span class="lineNum">       5 </span>            : **      i.e. C_0 == (0., 0)
+<span class="lineNum">       6 </span>            : **      n should always be &gt;= 1 though no checks are made
+<a name="7"><span class="lineNum">       7 </span>            : */</a>
+<span class="lineNum">       8 </span>            :         COMPLEX
+<span class="lineNum">       9 </span><span class="lineCov">         33 : pj_zpoly1(COMPLEX z, const COMPLEX *C, int n) {</span>
+<span class="lineNum">      10 </span>            :         COMPLEX a;
+<span class="lineNum">      11 </span>            :         double t;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span><span class="lineCov">         33 :         a = *(C += n);</span>
+<span class="lineNum">      14 </span><span class="lineCov">        371 :         while (n-- &gt; 0) {</span>
+<span class="lineNum">      15 </span><span class="lineCov">        169 :                 a.r = (--C)-&gt;r + z.r * (t = a.r) - z.i * a.i;</span>
+<span class="lineNum">      16 </span><span class="lineCov">        169 :                 a.i = C-&gt;i + z.r * a.i + z.i * t;</span>
+<span class="lineNum">      17 </span>            :         }
+<span class="lineNum">      18 </span><span class="lineCov">         33 :         a.r = z.r * (t = a.r) - z.i * a.i;</span>
+<span class="lineNum">      19 </span><span class="lineCov">         33 :         a.i = z.r * a.i + z.i * t;</span>
+<span class="lineNum">      20 </span><span class="lineCov">         33 :         return a;</span>
+<span class="lineNum">      21 </span>            : }
+<a name="22"><span class="lineNum">      22 </span>            : /* evaluate complex polynomial and derivative */</a>
+<span class="lineNum">      23 </span>            :         COMPLEX
+<span class="lineNum">      24 </span><span class="lineCov">        140 : pj_zpolyd1(COMPLEX z, const COMPLEX *C, int n, COMPLEX *der) {</span>
+<span class="lineNum">      25 </span>            :         COMPLEX a, b;
+<span class="lineNum">      26 </span>            :         double t;
+<span class="lineNum">      27 </span>            :         int first = 1;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span><span class="lineCov">        140 :         a = *(C += n);</span>
+<span class="lineNum">      30 </span>            :         b = a;
+<span class="lineNum">      31 </span><span class="lineCov">       1658 :         while (n-- &gt; 0) {</span>
+<span class="lineNum">      32 </span><span class="lineCov">        759 :                 if (first) {</span>
+<span class="lineNum">      33 </span>            :                         first = 0;
+<span class="lineNum">      34 </span>            :                 } else {
+<span class="lineNum">      35 </span><span class="lineCov">        619 :                         b.r = a.r + z.r * (t = b.r) - z.i * b.i;</span>
+<span class="lineNum">      36 </span><span class="lineCov">        619 :                         b.i = a.i + z.r * b.i + z.i * t;</span>
+<span class="lineNum">      37 </span>            :                 }
+<span class="lineNum">      38 </span><span class="lineCov">        759 :                 a.r = (--C)-&gt;r + z.r * (t = a.r) - z.i * a.i;</span>
+<span class="lineNum">      39 </span><span class="lineCov">        759 :                 a.i = C-&gt;i + z.r * a.i + z.i * t;</span>
+<span class="lineNum">      40 </span>            :         }
+<span class="lineNum">      41 </span><span class="lineCov">        140 :         b.r = a.r + z.r * (t = b.r) - z.i * b.i;</span>
+<span class="lineNum">      42 </span><span class="lineCov">        140 :         b.i = a.i + z.r * b.i + z.i * t;</span>
+<span class="lineNum">      43 </span><span class="lineCov">        140 :         a.r = z.r * (t = a.r) - z.i * a.i;</span>
+<span class="lineNum">      44 </span><span class="lineCov">        140 :         a.i = z.r * a.i + z.i * t;</span>
+<span class="lineNum">      45 </span><span class="lineCov">        140 :         *der = b;</span>
+<span class="lineNum">      46 </span><span class="lineCov">        140 :         return a;</span>
+<span class="lineNum">      47 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

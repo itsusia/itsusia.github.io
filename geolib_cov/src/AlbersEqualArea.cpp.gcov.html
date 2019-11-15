@@ -1,0 +1,521 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/AlbersEqualArea.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - AlbersEqualArea.cpp<span style="font-size: 80%;"> (source / <a href="AlbersEqualArea.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">158</td>
+            <td class="headerCovTableEntry">230</td>
+            <td class="headerCovTableEntryLo">68.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntryLo">57.1 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file AlbersEqualArea.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::AlbersEqualArea class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2010-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;GeographicLib/AlbersEqualArea.hpp&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      13 </span>            : // Squelch warnings about constant conditional expressions
+<span class="lineNum">      14 </span>            : #  pragma warning (disable: 4127)
+<span class="lineNum">      15 </span>            : #endif
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : namespace GeographicLib {
+<span class="lineNum">      18 </span>            : 
+<a name="19"><span class="lineNum">      19 </span>            :   using namespace std;</a>
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span><span class="lineNoCov">          0 :   AlbersEqualArea::AlbersEqualArea(real a, real f, real stdlat, real k0)</span>
+<span class="lineNum">      22 </span>            :     : eps_(numeric_limits&lt;real&gt;::epsilon())
+<span class="lineNum">      23 </span>            :     , epsx_(Math::sq(eps_))
+<span class="lineNum">      24 </span>            :     , epsx2_(Math::sq(epsx_))
+<span class="lineNum">      25 </span>            :     , tol_(sqrt(eps_))
+<span class="lineNum">      26 </span>            :     , tol0_(tol_ * sqrt(sqrt(eps_)))
+<span class="lineNum">      27 </span>            :     , _a(a)
+<span class="lineNum">      28 </span>            :     , _f(f)
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :     , _fm(1 - _f)</span>
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :     , _e2(_f * (2 - _f))</span>
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 :     , _e(sqrt(abs(_e2)))</span>
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :     , _e2m(1 - _e2)</span>
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :     , _qZ(1 + _e2m * atanhee(real(1)))</span>
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 :     , _qx(_qZ / ( 2 * _e2m ))</span>
+<span class="lineNum">      35 </span>            :   {
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(_a) &amp;&amp; _a &gt; 0))</span>
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Equatorial radius is not positive&quot;);</span>
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(_f) &amp;&amp; _f &lt; 1))</span>
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Polar semi-axis is not positive&quot;);</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(k0) &amp;&amp; k0 &gt; 0))</span>
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale is not positive&quot;);</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :     if (!(abs(stdlat) &lt;= 90))</span>
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Standard latitude not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">      44 </span>            :     real sphi, cphi;
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :     Math::sincosd(stdlat, sphi, cphi);</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :     Init(sphi, cphi, sphi, cphi, k0);</span>
+<a name="47"><span class="lineNum">      47 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span><span class="lineCov">          9 :   AlbersEqualArea::AlbersEqualArea(real a, real f, real stdlat1, real stdlat2,</span>
+<span class="lineNum">      50 </span><span class="lineCov">          9 :                                    real k1)</span>
+<span class="lineNum">      51 </span>            :     : eps_(numeric_limits&lt;real&gt;::epsilon())
+<span class="lineNum">      52 </span>            :     , epsx_(Math::sq(eps_))
+<span class="lineNum">      53 </span>            :     , epsx2_(Math::sq(epsx_))
+<span class="lineNum">      54 </span>            :     , tol_(sqrt(eps_))
+<span class="lineNum">      55 </span>            :     , tol0_(tol_ * sqrt(sqrt(eps_)))
+<span class="lineNum">      56 </span>            :     , _a(a)
+<span class="lineNum">      57 </span>            :     , _f(f)
+<span class="lineNum">      58 </span><span class="lineCov">          9 :     , _fm(1 - _f)</span>
+<span class="lineNum">      59 </span><span class="lineCov">          9 :     , _e2(_f * (2 - _f))</span>
+<span class="lineNum">      60 </span><span class="lineCov">          9 :     , _e(sqrt(abs(_e2)))</span>
+<span class="lineNum">      61 </span><span class="lineCov">          9 :     , _e2m(1 - _e2)</span>
+<span class="lineNum">      62 </span><span class="lineCov">          9 :     , _qZ(1 + _e2m * atanhee(real(1)))</span>
+<span class="lineNum">      63 </span><span class="lineCov">         54 :     , _qx(_qZ / ( 2 * _e2m ))</span>
+<span class="lineNum">      64 </span>            :   {
+<span class="lineNum">      65 </span><span class="lineCov">         18 :     if (!(Math::isfinite(_a) &amp;&amp; _a &gt; 0))</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Equatorial radius is not positive&quot;);</span>
+<span class="lineNum">      67 </span><span class="lineCov">         27 :     if (!(Math::isfinite(_f) &amp;&amp; _f &lt; 1))</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Polar semi-axis is not positive&quot;);</span>
+<span class="lineNum">      69 </span><span class="lineCov">         18 :     if (!(Math::isfinite(k1) &amp;&amp; k1 &gt; 0))</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale is not positive&quot;);</span>
+<span class="lineNum">      71 </span>            :     if (!(abs(stdlat1) &lt;= 90))
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Standard latitude 1 not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">      73 </span><span class="lineCov">          9 :     if (!(abs(stdlat2) &lt;= 90))</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Standard latitude 2 not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">      75 </span>            :     real sphi1, cphi1, sphi2, cphi2;
+<span class="lineNum">      76 </span><span class="lineCov">          9 :     Math::sincosd(stdlat1, sphi1, cphi1);</span>
+<span class="lineNum">      77 </span><span class="lineCov">          9 :     Math::sincosd(stdlat2, sphi2, cphi2);</span>
+<span class="lineNum">      78 </span><span class="lineCov">          9 :     Init(sphi1, cphi1, sphi2, cphi2, k1);</span>
+<a name="79"><span class="lineNum">      79 </span><span class="lineCov">          9 :   }</span></a>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineCov">         32 :   AlbersEqualArea::AlbersEqualArea(real a, real f,</span>
+<span class="lineNum">      82 </span>            :                                    real sinlat1, real coslat1,
+<span class="lineNum">      83 </span>            :                                    real sinlat2, real coslat2,
+<span class="lineNum">      84 </span><span class="lineCov">         32 :                                    real k1)</span>
+<span class="lineNum">      85 </span>            :     : eps_(numeric_limits&lt;real&gt;::epsilon())
+<span class="lineNum">      86 </span>            :     , epsx_(Math::sq(eps_))
+<span class="lineNum">      87 </span>            :     , epsx2_(Math::sq(epsx_))
+<span class="lineNum">      88 </span>            :     , tol_(sqrt(eps_))
+<span class="lineNum">      89 </span>            :     , tol0_(tol_ * sqrt(sqrt(eps_)))
+<span class="lineNum">      90 </span>            :     , _a(a)
+<span class="lineNum">      91 </span>            :     , _f(f)
+<span class="lineNum">      92 </span><span class="lineCov">         32 :     , _fm(1 - _f)</span>
+<span class="lineNum">      93 </span><span class="lineCov">         32 :     , _e2(_f * (2 - _f))</span>
+<span class="lineNum">      94 </span><span class="lineCov">         32 :     , _e(sqrt(abs(_e2)))</span>
+<span class="lineNum">      95 </span><span class="lineCov">         32 :     , _e2m(1 - _e2)</span>
+<span class="lineNum">      96 </span><span class="lineCov">         32 :     , _qZ(1 + _e2m * atanhee(real(1)))</span>
+<span class="lineNum">      97 </span><span class="lineCov">        192 :     , _qx(_qZ / ( 2 * _e2m ))</span>
+<span class="lineNum">      98 </span>            :   {
+<span class="lineNum">      99 </span><span class="lineCov">         64 :     if (!(Math::isfinite(_a) &amp;&amp; _a &gt; 0))</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Equatorial radius is not positive&quot;);</span>
+<span class="lineNum">     101 </span><span class="lineCov">         96 :     if (!(Math::isfinite(_f) &amp;&amp; _f &lt; 1))</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Polar semi-axis is not positive&quot;);</span>
+<span class="lineNum">     103 </span><span class="lineCov">         64 :     if (!(Math::isfinite(k1) &amp;&amp; k1 &gt; 0))</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale is not positive&quot;);</span>
+<span class="lineNum">     105 </span><span class="lineCov">         32 :     if (!(coslat1 &gt;= 0))</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Standard latitude 1 not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">     107 </span><span class="lineCov">         32 :     if (!(coslat2 &gt;= 0))</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Standard latitude 2 not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">     109 </span><span class="lineCov">         32 :     if (!(abs(sinlat1) &lt;= 1 &amp;&amp; coslat1 &lt;= 1) || (coslat1 == 0 &amp;&amp; sinlat1 == 0))</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Bad sine/cosine of standard latitude 1&quot;);</span>
+<span class="lineNum">     111 </span><span class="lineCov">         64 :     if (!(abs(sinlat2) &lt;= 1 &amp;&amp; coslat2 &lt;= 1) || (coslat2 == 0 &amp;&amp; sinlat2 == 0))</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Bad sine/cosine of standard latitude 2&quot;);</span>
+<span class="lineNum">     113 </span><span class="lineCov">         32 :     if (coslat1 == 0 &amp;&amp; coslat2 == 0 &amp;&amp; sinlat1 * sinlat2 &lt;= 0)</span>
+<span class="lineNum">     114 </span>            :       throw GeographicErr
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :         (&quot;Standard latitudes cannot be opposite poles&quot;);</span>
+<span class="lineNum">     116 </span><span class="lineCov">         32 :     Init(sinlat1, coslat1, sinlat2, coslat2, k1);</span>
+<a name="117"><span class="lineNum">     117 </span><span class="lineCov">         32 :   }</span></a>
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span><span class="lineCov">         41 :   void AlbersEqualArea::Init(real sphi1, real cphi1,</span>
+<span class="lineNum">     120 </span>            :                              real sphi2, real cphi2, real k1) {
+<span class="lineNum">     121 </span>            :     {
+<span class="lineNum">     122 </span>            :       real r;
+<span class="lineNum">     123 </span><span class="lineCov">         41 :       r = Math::hypot(sphi1, cphi1);</span>
+<span class="lineNum">     124 </span><span class="lineCov">         41 :       sphi1 /= r; cphi1 /= r;</span>
+<span class="lineNum">     125 </span><span class="lineCov">         41 :       r = Math::hypot(sphi2, cphi2);</span>
+<span class="lineNum">     126 </span><span class="lineCov">         41 :       sphi2 /= r; cphi2 /= r;</span>
+<span class="lineNum">     127 </span>            :     }
+<span class="lineNum">     128 </span><span class="lineCov">         41 :     bool polar = (cphi1 == 0);</span>
+<span class="lineNum">     129 </span><span class="lineCov">         82 :     cphi1 = max(epsx_, cphi1);   // Avoid singularities at poles</span>
+<span class="lineNum">     130 </span><span class="lineCov">         41 :     cphi2 = max(epsx_, cphi2);</span>
+<span class="lineNum">     131 </span>            :     // Determine hemisphere of tangent latitude
+<span class="lineNum">     132 </span><span class="lineCov">         41 :     _sign = sphi1 + sphi2 &gt;= 0 ? 1 : -1;</span>
+<span class="lineNum">     133 </span>            :     // Internally work with tangent latitude positive
+<span class="lineNum">     134 </span><span class="lineCov">         41 :     sphi1 *= _sign; sphi2 *= _sign;</span>
+<span class="lineNum">     135 </span><span class="lineCov">         41 :     if (sphi1 &gt; sphi2) {</span>
+<span class="lineNum">     136 </span>            :       swap(sphi1, sphi2); swap(cphi1, cphi2); // Make phi1 &lt; phi2
+<span class="lineNum">     137 </span>            :     }
+<span class="lineNum">     138 </span>            :     real
+<span class="lineNum">     139 </span><span class="lineCov">         41 :       tphi1 = sphi1/cphi1, tphi2 = sphi2/cphi2;</span>
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :     // q = (1-e^2)*(sphi/(1-e^2*sphi^2) - atanhee(sphi))
+<span class="lineNum">     142 </span>            :     // qZ = q(pi/2) = (1 + (1-e^2)*atanhee(1))
+<span class="lineNum">     143 </span>            :     // atanhee(x) = atanh(e*x)/e
+<span class="lineNum">     144 </span>            :     // q = sxi * qZ
+<span class="lineNum">     145 </span>            :     // dq/dphi = 2*(1-e^2)*cphi/(1-e^2*sphi^2)^2
+<span class="lineNum">     146 </span>            :     //
+<span class="lineNum">     147 </span>            :     // n = (m1^2-m2^2)/(q2-q1) -&gt; sin(phi0) for phi1, phi2 -&gt; phi0
+<span class="lineNum">     148 </span>            :     // C = m1^2 + n*q1 = (m1^2*q2-m2^2*q1)/(q2-q1)
+<span class="lineNum">     149 </span>            :     // let
+<span class="lineNum">     150 </span>            :     //   rho(pi/2)/rho(-pi/2) = (1-s)/(1+s)
+<span class="lineNum">     151 </span>            :     //   s = n*qZ/C
+<span class="lineNum">     152 </span>            :     //     = qZ * (m1^2-m2^2)/(m1^2*q2-m2^2*q1)
+<span class="lineNum">     153 </span>            :     //     = qZ * (scbet2^2 - scbet1^2)/(scbet2^2*q2 - scbet1^2*q1)
+<span class="lineNum">     154 </span>            :     //     = (scbet2^2 - scbet1^2)/(scbet2^2*sxi2 - scbet1^2*sxi1)
+<span class="lineNum">     155 </span>            :     //     = (tbet2^2 - tbet1^2)/(scbet2^2*sxi2 - scbet1^2*sxi1)
+<span class="lineNum">     156 </span>            :     // 1-s = -((1-sxi2)*scbet2^2 - (1-sxi1)*scbet1^2)/
+<span class="lineNum">     157 </span>            :     //         (scbet2^2*sxi2 - scbet1^2*sxi1)
+<span class="lineNum">     158 </span>            :     //
+<span class="lineNum">     159 </span>            :     // Define phi0 to give same value of s, i.e.,
+<span class="lineNum">     160 </span>            :     //  s = sphi0 * qZ / (m0^2 + sphi0*q0)
+<span class="lineNum">     161 </span>            :     //    = sphi0 * scbet0^2 / (1/qZ + sphi0 * scbet0^2 * sxi0)
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            :     real tphi0, C;
+<span class="lineNum">     164 </span><span class="lineCov">         41 :     if (polar || tphi1 == tphi2) {</span>
+<span class="lineNum">     165 </span>            :       tphi0 = tphi2;
+<span class="lineNum">     166 </span>            :       C = 1;                    // ignored
+<span class="lineNum">     167 </span>            :     } else {
+<span class="lineNum">     168 </span>            :       real
+<span class="lineNum">     169 </span><span class="lineCov">          2 :         tbet1 = _fm * tphi1, scbet12 = 1 + Math::sq(tbet1),</span>
+<span class="lineNum">     170 </span><span class="lineCov">          2 :         tbet2 = _fm * tphi2, scbet22 = 1 + Math::sq(tbet2),</span>
+<span class="lineNum">     171 </span><span class="lineCov">          2 :         txi1 = txif(tphi1), cxi1 = 1/hyp(txi1), sxi1 = txi1 * cxi1,</span>
+<span class="lineNum">     172 </span><span class="lineCov">          2 :         txi2 = txif(tphi2), cxi2 = 1/hyp(txi2), sxi2 = txi2 * cxi2,</span>
+<span class="lineNum">     173 </span><span class="lineCov">          1 :         dtbet2 = _fm * (tbet1 + tbet2),</span>
+<span class="lineNum">     174 </span><span class="lineCov">          3 :         es1 = 1 - _e2 * Math::sq(sphi1), es2 = 1 - _e2 * Math::sq(sphi2),</span>
+<span class="lineNum">     175 </span>            :         /*
+<span class="lineNum">     176 </span>            :         dsxi = ( (_e2 * sq(sphi2 + sphi1) + es2 + es1) / (2 * es2 * es1) +
+<span class="lineNum">     177 </span>            :                  Datanhee(sphi2, sphi1) ) * Dsn(tphi2, tphi1, sphi2, sphi1) /
+<span class="lineNum">     178 </span>            :         ( 2 * _qx ),
+<span class="lineNum">     179 </span>            :         */
+<span class="lineNum">     180 </span><span class="lineCov">          2 :         dsxi = ( (1 + _e2 * sphi1 * sphi2) / (es2 * es1) +</span>
+<span class="lineNum">     181 </span><span class="lineCov">          2 :                  Datanhee(sphi2, sphi1) ) * Dsn(tphi2, tphi1, sphi2, sphi1) /</span>
+<span class="lineNum">     182 </span><span class="lineCov">          1 :         ( 2 * _qx ),</span>
+<span class="lineNum">     183 </span><span class="lineCov">          1 :         den = (sxi2 + sxi1) * dtbet2 + (scbet22 + scbet12) * dsxi,</span>
+<span class="lineNum">     184 </span>            :         // s = (sq(tbet2) - sq(tbet1)) / (scbet22*sxi2 - scbet12*sxi1)
+<span class="lineNum">     185 </span><span class="lineCov">          1 :         s = 2 * dtbet2 / den,</span>
+<span class="lineNum">     186 </span>            :         // 1-s = -(sq(scbet2)*(1-sxi2) - sq(scbet1)*(1-sxi1)) /
+<span class="lineNum">     187 </span>            :         //        (scbet22*sxi2 - scbet12*sxi1)
+<span class="lineNum">     188 </span>            :         // Write
+<span class="lineNum">     189 </span>            :         //   sq(scbet)*(1-sxi) = sq(scbet)*(1-sphi) * (1-sxi)/(1-sphi)
+<span class="lineNum">     190 </span><span class="lineCov">          2 :         sm1 = -Dsn(tphi2, tphi1, sphi2, sphi1) *</span>
+<span class="lineNum">     191 </span><span class="lineCov">          3 :         ( -( ((sphi2 &lt;= 0 ? (1 - sxi2) / (1 - sphi2) :</span>
+<span class="lineNum">     192 </span><span class="lineCov">          3 :                Math::sq(cxi2/cphi2) * (1 + sphi2) / (1 + sxi2)) +</span>
+<span class="lineNum">     193 </span><span class="lineCov">          2 :               (sphi1 &lt;= 0 ? (1 - sxi1) / (1 - sphi1) :</span>
+<span class="lineNum">     194 </span><span class="lineCov">          3 :                Math::sq(cxi1/cphi1) * (1 + sphi1) / (1 + sxi1))) ) *</span>
+<span class="lineNum">     195 </span><span class="lineCov">          2 :           (1 + _e2 * (sphi1 + sphi2 + sphi1 * sphi2)) /</span>
+<span class="lineNum">     196 </span><span class="lineCov">          2 :           (1 +       (sphi1 + sphi2 + sphi1 * sphi2)) +</span>
+<span class="lineNum">     197 </span><span class="lineCov">          2 :           (scbet22 * (sphi2 &lt;= 0 ? 1 - sphi2 :</span>
+<span class="lineNum">     198 </span><span class="lineCov">          2 :                       Math::sq(cphi2) / ( 1 + sphi2)) +</span>
+<span class="lineNum">     199 </span><span class="lineCov">          2 :            scbet12 * (sphi1 &lt;= 0 ? 1 - sphi1 : Math::sq(cphi1) / ( 1 + sphi1)))</span>
+<span class="lineNum">     200 </span><span class="lineCov">          2 :           * (_e2 * (1 + sphi1 + sphi2 + _e2 * sphi1 * sphi2)/(es1 * es2)</span>
+<span class="lineNum">     201 </span><span class="lineCov">          3 :           +_e2m * DDatanhee(sphi1, sphi2) ) / _qZ ) / den;</span>
+<span class="lineNum">     202 </span>            :       // C = (scbet22*sxi2 - scbet12*sxi1) / (scbet22 * scbet12 * (sx2 - sx1))
+<span class="lineNum">     203 </span><span class="lineCov">          1 :       C = den / (2 * scbet12 * scbet22 * dsxi);</span>
+<span class="lineNum">     204 </span><span class="lineCov">          1 :       tphi0 = (tphi2 + tphi1)/2;</span>
+<span class="lineNum">     205 </span><span class="lineCov">          3 :       real stol = tol0_ * max(real(1), abs(tphi0));</span>
+<span class="lineNum">     206 </span><span class="lineCov">          5 :       for (int i = 0; i &lt; 2*numit0_ || GEOGRAPHICLIB_PANIC; ++i) {</span>
+<span class="lineNum">     207 </span>            :         // Solve (scbet0^2 * sphi0) / (1/qZ + scbet0^2 * sphi0 * sxi0) = s
+<span class="lineNum">     208 </span>            :         // for tphi0 by Newton's method on
+<span class="lineNum">     209 </span>            :         // v(tphi0) = (scbet0^2 * sphi0) - s * (1/qZ + scbet0^2 * sphi0 * sxi0)
+<span class="lineNum">     210 </span>            :         //          = 0
+<span class="lineNum">     211 </span>            :         // Alt:
+<span class="lineNum">     212 </span>            :         // (scbet0^2 * sphi0) / (1/qZ - scbet0^2 * sphi0 * (1-sxi0))
+<span class="lineNum">     213 </span>            :         //          = s / (1-s)
+<span class="lineNum">     214 </span>            :         // w(tphi0) = (1-s) * (scbet0^2 * sphi0)
+<span class="lineNum">     215 </span>            :         //             - s  * (1/qZ - scbet0^2 * sphi0 * (1-sxi0))
+<span class="lineNum">     216 </span>            :         //          = (1-s) * (scbet0^2 * sphi0)
+<span class="lineNum">     217 </span>            :         //             - S/qZ  * (1 - scbet0^2 * sphi0 * (qZ-q0))
+<span class="lineNum">     218 </span>            :         // Now
+<span class="lineNum">     219 </span>            :         // qZ-q0 = (1+e2*sphi0)*(1-sphi0)/(1-e2*sphi0^2) +
+<span class="lineNum">     220 </span>            :         //         (1-e2)*atanhee((1-sphi0)/(1-e2*sphi0))
+<span class="lineNum">     221 </span>            :         // In limit sphi0 -&gt; 1, qZ-q0 -&gt; 2*(1-sphi0)/(1-e2), so wrte
+<span class="lineNum">     222 </span>            :         // qZ-q0 = 2*(1-sphi0)/(1-e2) + A + B
+<span class="lineNum">     223 </span>            :         // A = (1-sphi0)*( (1+e2*sphi0)/(1-e2*sphi0^2) - (1+e2)/(1-e2) )
+<span class="lineNum">     224 </span>            :         //   = -e2 *(1-sphi0)^2 * (2+(1+e2)*sphi0) / ((1-e2)*(1-e2*sphi0^2))
+<span class="lineNum">     225 </span>            :         // B = (1-e2)*atanhee((1-sphi0)/(1-e2*sphi0)) - (1-sphi0)
+<span class="lineNum">     226 </span>            :         //   = (1-sphi0)*(1-e2)/(1-e2*sphi0)*
+<span class="lineNum">     227 </span>            :         //     ((atanhee(x)/x-1) - e2*(1-sphi0)/(1-e2))
+<span class="lineNum">     228 </span>            :         // x = (1-sphi0)/(1-e2*sphi0), atanhee(x)/x = atanh(e*x)/(e*x)
+<span class="lineNum">     229 </span>            :         //
+<span class="lineNum">     230 </span>            :         // 1 - scbet0^2 * sphi0 * (qZ-q0)
+<span class="lineNum">     231 </span>            :         //   = 1 - scbet0^2 * sphi0 * (2*(1-sphi0)/(1-e2) + A + B)
+<span class="lineNum">     232 </span>            :         //   = D - scbet0^2 * sphi0 * (A + B)
+<span class="lineNum">     233 </span>            :         // D = 1 - scbet0^2 * sphi0 * 2*(1-sphi0)/(1-e2)
+<span class="lineNum">     234 </span>            :         //   = (1-sphi0)*(1-e2*(1+2*sphi0*(1+sphi0)))/((1-e2)*(1+sphi0))
+<span class="lineNum">     235 </span>            :         // dD/dsphi0 = -2*(1-e2*sphi0^2*(2*sphi0+3))/((1-e2)*(1+sphi0)^2)
+<span class="lineNum">     236 </span>            :         // d(A+B)/dsphi0 = 2*(1-sphi0^2)*e2*(2-e2*(1+sphi0^2))/
+<span class="lineNum">     237 </span>            :         //                 ((1-e2)*(1-e2*sphi0^2)^2)
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            :         real
+<span class="lineNum">     240 </span><span class="lineCov">          3 :           scphi02 = 1 + Math::sq(tphi0), scphi0 = sqrt(scphi02),</span>
+<span class="lineNum">     241 </span>            :           // sphi0m = 1-sin(phi0) = 1/( sec(phi0) * (tan(phi0) + sec(phi0)) )
+<span class="lineNum">     242 </span><span class="lineCov">          3 :           sphi0 = tphi0 / scphi0, sphi0m = 1/(scphi0 * (tphi0 + scphi0)),</span>
+<span class="lineNum">     243 </span>            :           // scbet0^2 * sphi0
+<span class="lineNum">     244 </span><span class="lineCov">          6 :           g = (1 + Math::sq( _fm * tphi0 )) * sphi0,</span>
+<span class="lineNum">     245 </span>            :           // dg/dsphi0 = dg/dtphi0 * scphi0^3
+<span class="lineNum">     246 </span><span class="lineCov">          3 :           dg = _e2m * scphi02 * (1 + 2 * Math::sq(tphi0)) + _e2,</span>
+<span class="lineNum">     247 </span><span class="lineCov">          3 :           D = sphi0m * (1 - _e2*(1 + 2*sphi0*(1+sphi0))) / (_e2m * (1+sphi0)),</span>
+<span class="lineNum">     248 </span>            :           // dD/dsphi0
+<span class="lineNum">     249 </span><span class="lineCov">          3 :           dD = -2 * (1 - _e2*Math::sq(sphi0) * (2*sphi0+3)) /</span>
+<span class="lineNum">     250 </span><span class="lineCov">          3 :                (_e2m * Math::sq(1+sphi0)),</span>
+<span class="lineNum">     251 </span><span class="lineCov">          6 :           A = -_e2 * Math::sq(sphi0m) * (2+(1+_e2)*sphi0) /</span>
+<span class="lineNum">     252 </span><span class="lineCov">          3 :               (_e2m*(1-_e2*Math::sq(sphi0))),</span>
+<span class="lineNum">     253 </span><span class="lineCov">          3 :           B = (sphi0m * _e2m / (1 - _e2*sphi0) *</span>
+<span class="lineNum">     254 </span><span class="lineCov">          3 :                (atanhxm1(_e2 *</span>
+<span class="lineNum">     255 </span><span class="lineCov">          6 :                          Math::sq(sphi0m / (1-_e2*sphi0))) - _e2*sphi0m/_e2m)),</span>
+<span class="lineNum">     256 </span>            :           // d(A+B)/dsphi0
+<span class="lineNum">     257 </span><span class="lineCov">          3 :           dAB = (2 * _e2 * (2 - _e2 * (1 + Math::sq(sphi0))) /</span>
+<span class="lineNum">     258 </span><span class="lineCov">          6 :                  (_e2m * Math::sq(1 - _e2*Math::sq(sphi0)) * scphi02)),</span>
+<span class="lineNum">     259 </span><span class="lineCov">          3 :           u = sm1 * g - s/_qZ * ( D - g * (A + B) ),</span>
+<span class="lineNum">     260 </span>            :           // du/dsphi0
+<span class="lineNum">     261 </span><span class="lineCov">          3 :           du = sm1 * dg - s/_qZ * (dD - dg * (A + B) - g * dAB),</span>
+<span class="lineNum">     262 </span><span class="lineCov">          3 :           dtu = -u/du * (scphi0 * scphi02);</span>
+<span class="lineNum">     263 </span><span class="lineCov">          3 :         tphi0 += dtu;</span>
+<span class="lineNum">     264 </span><span class="lineCov">          3 :         if (!(abs(dtu) &gt;= stol))</span>
+<span class="lineNum">     265 </span>            :           break;
+<span class="lineNum">     266 </span>            :       }
+<span class="lineNum">     267 </span>            :     }
+<span class="lineNum">     268 </span><span class="lineCov">         82 :     _txi0 = txif(tphi0); _scxi0 = hyp(_txi0); _sxi0 = _txi0 / _scxi0;</span>
+<span class="lineNum">     269 </span><span class="lineCov">         41 :     _n0 = tphi0/hyp(tphi0);</span>
+<span class="lineNum">     270 </span><span class="lineCov">         82 :     _m02 = 1 / (1 + Math::sq(_fm * tphi0));</span>
+<span class="lineNum">     271 </span><span class="lineCov">         41 :     _nrho0 = polar ? 0 : _a * sqrt(_m02);</span>
+<span class="lineNum">     272 </span><span class="lineCov">         41 :     _k0 = sqrt(tphi1 == tphi2 ? 1 : C / (_m02 + _n0 * _qZ * _sxi0)) * k1;</span>
+<span class="lineNum">     273 </span><span class="lineCov">         41 :     _k2 = Math::sq(_k0);</span>
+<span class="lineNum">     274 </span><span class="lineCov">         82 :     _lat0 = _sign * atan(tphi0)/Math::degree();</span>
+<a name="275"><span class="lineNum">     275 </span><span class="lineCov">         41 :   }</span></a>
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :   const AlbersEqualArea&amp; AlbersEqualArea::CylindricalEqualArea() {</span>
+<span class="lineNum">     278 </span>            :     static const AlbersEqualArea
+<span class="lineNum">     279 </span>            :       cylindricalequalarea(Constants::WGS84_a(), Constants::WGS84_f(),
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :                            real(0), real(1), real(0), real(1), real(1));</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :     return cylindricalequalarea;</span>
+<a name="282"><span class="lineNum">     282 </span>            :   }</a>
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :   const AlbersEqualArea&amp; AlbersEqualArea::AzimuthalEqualAreaNorth() {</span>
+<span class="lineNum">     285 </span>            :     static const AlbersEqualArea
+<span class="lineNum">     286 </span>            :       azimuthalequalareanorth(Constants::WGS84_a(), Constants::WGS84_f(),
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :                               real(1), real(0), real(1), real(0), real(1));</span>
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :     return azimuthalequalareanorth;</span>
+<a name="289"><span class="lineNum">     289 </span>            :   }</a>
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :   const AlbersEqualArea&amp; AlbersEqualArea::AzimuthalEqualAreaSouth() {</span>
+<span class="lineNum">     292 </span>            :     static const AlbersEqualArea
+<span class="lineNum">     293 </span>            :       azimuthalequalareasouth(Constants::WGS84_a(), Constants::WGS84_f(),
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :                               real(-1), real(0), real(-1), real(0), real(1));</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :     return azimuthalequalareasouth;</span>
+<a name="296"><span class="lineNum">     296 </span>            :   }</a>
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span><span class="lineCov">         48 :   Math::real AlbersEqualArea::txif(real tphi) const {</span>
+<span class="lineNum">     299 </span>            :     // sxi = ( sphi/(1-e2*sphi^2) + atanhee(sphi) ) /
+<span class="lineNum">     300 </span>            :     //       ( 1/(1-e2) + atanhee(1) )
+<span class="lineNum">     301 </span>            :     //
+<span class="lineNum">     302 </span>            :     // txi = ( sphi/(1-e2*sphi^2) + atanhee(sphi) ) /
+<span class="lineNum">     303 </span>            :     //       sqrt( ( (1+e2*sphi)*(1-sphi)/( (1-e2*sphi^2) * (1-e2) ) +
+<span class="lineNum">     304 </span>            :     //               atanhee((1-sphi)/(1-e2*sphi)) ) *
+<span class="lineNum">     305 </span>            :     //             ( (1-e2*sphi)*(1+sphi)/( (1-e2*sphi^2) * (1-e2) ) +
+<span class="lineNum">     306 </span>            :     //               atanhee((1+sphi)/(1+e2*sphi)) ) )
+<span class="lineNum">     307 </span>            :     //
+<span class="lineNum">     308 </span>            :     // subst 1-sphi = cphi^2/(1+sphi)
+<span class="lineNum">     309 </span><span class="lineCov">         48 :     int s = tphi &lt; 0 ? -1 : 1;  // Enforce odd parity</span>
+<span class="lineNum">     310 </span><span class="lineCov">         48 :     tphi *= s;</span>
+<span class="lineNum">     311 </span>            :     real
+<span class="lineNum">     312 </span><span class="lineCov">         48 :       cphi2 = 1 / (1 + Math::sq(tphi)),</span>
+<span class="lineNum">     313 </span><span class="lineCov">         48 :       sphi = tphi * sqrt(cphi2),</span>
+<span class="lineNum">     314 </span><span class="lineCov">         48 :       es1 = _e2 * sphi,</span>
+<span class="lineNum">     315 </span><span class="lineCov">         48 :       es2m1 = 1 - es1 * sphi,</span>
+<span class="lineNum">     316 </span><span class="lineCov">         48 :       sp1 = 1 + sphi,</span>
+<span class="lineNum">     317 </span><span class="lineCov">         48 :       es1m1 = (1 - es1) * sp1,</span>
+<span class="lineNum">     318 </span><span class="lineCov">         48 :       es2m1a = _e2m * es2m1,</span>
+<span class="lineNum">     319 </span><span class="lineCov">         48 :       es1p1 = sp1 / (1 + es1);</span>
+<span class="lineNum">     320 </span><span class="lineCov">         48 :     return s * ( sphi / es2m1 + atanhee(sphi) ) /</span>
+<span class="lineNum">     321 </span><span class="lineCov">         96 :       sqrt( ( cphi2 / (es1p1 * es2m1a) + atanhee(cphi2 / es1m1) ) *</span>
+<span class="lineNum">     322 </span><span class="lineCov">         96 :             ( es1m1 / es2m1a + atanhee(es1p1) ) );</span>
+<a name="323"><span class="lineNum">     323 </span>            :   }</a>
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span><span class="lineCov">          2 :   Math::real AlbersEqualArea::tphif(real txi) const {</span>
+<span class="lineNum">     326 </span>            :     real
+<span class="lineNum">     327 </span>            :       tphi = txi,
+<span class="lineNum">     328 </span><span class="lineCov">          6 :       stol = tol_ * max(real(1), abs(txi));</span>
+<span class="lineNum">     329 </span>            :     // CHECK: min iterations = 1, max iterations = 2; mean = 1.99
+<span class="lineNum">     330 </span><span class="lineCov">          8 :     for (int i = 0; i &lt; numit_ || GEOGRAPHICLIB_PANIC; ++i) {</span>
+<span class="lineNum">     331 </span>            :       // dtxi/dtphi = (scxi/scphi)^3 * 2*(1-e^2)/(qZ*(1-e^2*sphi^2)^2)
+<span class="lineNum">     332 </span>            :       real
+<span class="lineNum">     333 </span><span class="lineCov">          5 :         txia = txif(tphi),</span>
+<span class="lineNum">     334 </span>            :         tphi2 = Math::sq(tphi),
+<span class="lineNum">     335 </span><span class="lineCov">          5 :         scphi2 = 1 + tphi2,</span>
+<span class="lineNum">     336 </span><span class="lineCov">          5 :         scterm = scphi2/(1 + Math::sq(txia)),</span>
+<span class="lineNum">     337 </span><span class="lineCov">         10 :         dtphi = (txi - txia) * scterm * sqrt(scterm) *</span>
+<span class="lineNum">     338 </span><span class="lineCov">         15 :         _qx * Math::sq(1 - _e2 * tphi2 / scphi2);</span>
+<span class="lineNum">     339 </span><span class="lineCov">          5 :       tphi += dtphi;</span>
+<span class="lineNum">     340 </span><span class="lineCov">          5 :       if (!(abs(dtphi) &gt;= stol))</span>
+<span class="lineNum">     341 </span>            :         break;
+<span class="lineNum">     342 </span>            :     }
+<span class="lineNum">     343 </span><span class="lineCov">          2 :     return tphi;</span>
+<span class="lineNum">     344 </span>            :   }
+<span class="lineNum">     345 </span>            : 
+<a name="346"><span class="lineNum">     346 </span>            :   // return atanh(sqrt(x))/sqrt(x) - 1 = y/3 + y^2/5 + y^3/7 + ...</a>
+<span class="lineNum">     347 </span>            :   // typical x &lt; e^2 = 2*f
+<span class="lineNum">     348 </span><span class="lineCov">          3 :   Math::real AlbersEqualArea::atanhxm1(real x) {</span>
+<span class="lineNum">     349 </span>            :     real s = 0;
+<span class="lineNum">     350 </span><span class="lineCov">          3 :     if (abs(x) &lt; real(0.5)) {</span>
+<span class="lineNum">     351 </span>            :       real os = -1, y = 1, k = 1;
+<span class="lineNum">     352 </span><span class="lineCov">         39 :       while (os != s) {</span>
+<span class="lineNum">     353 </span>            :         os = s;
+<span class="lineNum">     354 </span><span class="lineCov">         18 :         y *= x;                 // y = x^n</span>
+<span class="lineNum">     355 </span><span class="lineCov">         18 :         k += 2;                 // k = 2*n + 1</span>
+<span class="lineNum">     356 </span><span class="lineCov">         18 :         s += y/k;               // sum( x^n/(2*n + 1) )</span>
+<span class="lineNum">     357 </span>            :       }
+<span class="lineNum">     358 </span>            :     } else {
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :       real xs = sqrt(abs(x));</span>
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :       s = (x &gt; 0 ? Math::atanh(xs) : atan(xs)) / xs - 1;</span>
+<span class="lineNum">     361 </span>            :     }
+<span class="lineNum">     362 </span><span class="lineCov">          3 :     return s;</span>
+<span class="lineNum">     363 </span>            :   }
+<a name="364"><span class="lineNum">     364 </span>            : </a>
+<span class="lineNum">     365 </span>            :   // return (Datanhee(1,y) - Datanhee(1,x))/(y-x)
+<span class="lineNum">     366 </span><span class="lineCov">          1 :   Math::real AlbersEqualArea::DDatanhee(real x, real y) const {</span>
+<span class="lineNum">     367 </span>            :     real s = 0;
+<span class="lineNum">     368 </span><span class="lineCov">          2 :     if (_e2 * (abs(x) + abs(y)) &lt; real(0.5)) {</span>
+<span class="lineNum">     369 </span>            :       real os = -1, z = 1, k = 1, t = 0, c = 0, en = 1;
+<span class="lineNum">     370 </span><span class="lineCov">         19 :       while (os != s) {</span>
+<span class="lineNum">     371 </span>            :         os = s;
+<span class="lineNum">     372 </span><span class="lineCov">          9 :         t = y * t + z; c += t; z *= x;</span>
+<span class="lineNum">     373 </span><span class="lineCov">          9 :         t = y * t + z; c += t; z *= x;</span>
+<span class="lineNum">     374 </span><span class="lineCov">          9 :         k += 2; en *= _e2;</span>
+<span class="lineNum">     375 </span>            :         // Here en[l] = e2^l, k[l] = 2*l + 1,
+<span class="lineNum">     376 </span>            :         // c[l] = sum( x^i * y^j; i &gt;= 0, j &gt;= 0, i+j &lt; 2*l)
+<span class="lineNum">     377 </span><span class="lineCov">          9 :         s += en * c / k;</span>
+<span class="lineNum">     378 </span>            :       }
+<span class="lineNum">     379 </span>            :       // Taylor expansion is
+<span class="lineNum">     380 </span>            :       // s = sum( c[l] * e2^l / (2*l + 1), l, 1, N)
+<span class="lineNum">     381 </span>            :     } else
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :       s = (Datanhee(1, y) - Datanhee(x, y))/(1 - x);</span>
+<span class="lineNum">     383 </span><span class="lineCov">          1 :     return s;</span>
+<a name="384"><span class="lineNum">     384 </span>            :   }</a>
+<span class="lineNum">     385 </span>            : 
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :   void AlbersEqualArea::Forward(real lon0, real lat, real lon,</span>
+<span class="lineNum">     387 </span>            :                                 real&amp; x, real&amp; y, real&amp; gamma, real&amp; k) const {
+<span class="lineNum">     388 </span>            :     lon = Math::AngDiff(lon0, lon);
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :     lat *= _sign;</span>
+<span class="lineNum">     390 </span>            :     real sphi, cphi;
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :     Math::sincosd(Math::LatFix(lat) * _sign, sphi, cphi);</span>
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :     cphi = max(epsx_, cphi);</span>
+<span class="lineNum">     393 </span>            :     real
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :       lam = lon * Math::degree(),</span>
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 :       tphi = sphi/cphi, txi = txif(tphi), sxi = txi/hyp(txi),</span>
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :       dq = _qZ * Dsn(txi, _txi0, sxi, _sxi0) * (txi - _txi0),</span>
+<span class="lineNum">     397 </span><span class="lineNoCov">          0 :       drho = - _a * dq / (sqrt(_m02 - _n0 * dq) + _nrho0 / _a),</span>
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :       theta = _k2 * _n0 * lam, stheta = sin(theta), ctheta = cos(theta),</span>
+<span class="lineNum">     399 </span><span class="lineNoCov">          0 :       t = _nrho0 + _n0 * drho;</span>
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :     x = t * (_n0 != 0 ? stheta / _n0 : _k2 * lam) / _k0;</span>
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :     y = (_nrho0 *</span>
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :          (_n0 != 0 ?</span>
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :           (ctheta &lt; 0 ? 1 - ctheta : Math::sq(stheta)/(1 + ctheta)) / _n0 :</span>
+<span class="lineNum">     404 </span>            :           0)
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :          - drho * ctheta) / _k0;</span>
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :     k = _k0 * (t != 0 ? t * hyp(_fm * tphi) / _a : 1);</span>
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :     y *= _sign;</span>
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 :     gamma = _sign * theta / Math::degree();</span>
+<a name="409"><span class="lineNum">     409 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     410 </span>            : 
+<span class="lineNum">     411 </span><span class="lineCov">          2 :   void AlbersEqualArea::Reverse(real lon0, real x, real y,</span>
+<span class="lineNum">     412 </span>            :                                 real&amp; lat, real&amp; lon,
+<span class="lineNum">     413 </span>            :                                 real&amp; gamma, real&amp; k) const {
+<span class="lineNum">     414 </span><span class="lineCov">          2 :     y *= _sign;</span>
+<span class="lineNum">     415 </span>            :     real
+<span class="lineNum">     416 </span><span class="lineCov">          2 :       nx = _k0 * _n0 * x, ny = _k0 * _n0 * y, y1 =  _nrho0 - ny,</span>
+<span class="lineNum">     417 </span><span class="lineCov">          2 :       den = Math::hypot(nx, y1) + _nrho0, // 0 implies origin with polar aspect</span>
+<span class="lineNum">     418 </span><span class="lineCov">          2 :       drho = den != 0 ? (_k0*x*nx - 2*_k0*y*_nrho0 + _k0*y*ny) / den : 0,</span>
+<span class="lineNum">     419 </span>            :       // dsxia = scxi0 * dsxi
+<span class="lineNum">     420 </span><span class="lineCov">          2 :       dsxia = - _scxi0 * (2 * _nrho0 + _n0 * drho) * drho /</span>
+<span class="lineNum">     421 </span><span class="lineCov">          4 :               (Math::sq(_a) * _qZ),</span>
+<span class="lineNum">     422 </span><span class="lineCov">          4 :       txi = (_txi0 + dsxia) / sqrt(max(1 - dsxia * (2*_txi0 + dsxia), epsx2_)),</span>
+<span class="lineNum">     423 </span><span class="lineCov">          2 :       tphi = tphif(txi),</span>
+<span class="lineNum">     424 </span><span class="lineCov">          2 :       theta = atan2(nx, y1),</span>
+<span class="lineNum">     425 </span><span class="lineCov">          2 :       lam = _n0 != 0 ? theta / (_k2 * _n0) : x / (y1 * _k0);</span>
+<span class="lineNum">     426 </span><span class="lineCov">          4 :     gamma = _sign * theta / Math::degree();</span>
+<span class="lineNum">     427 </span><span class="lineCov">          4 :     lat = Math::atand(_sign * tphi);</span>
+<span class="lineNum">     428 </span><span class="lineCov">          2 :     lon = lam / Math::degree();</span>
+<span class="lineNum">     429 </span><span class="lineCov">          4 :     lon = Math::AngNormalize(lon + Math::AngNormalize(lon0));</span>
+<span class="lineNum">     430 </span><span class="lineCov">          4 :     k = _k0 * (den != 0 ? (_nrho0 + _n0 * drho) * hyp(_fm * tphi) / _a : 1);</span>
+<a name="431"><span class="lineNum">     431 </span><span class="lineCov">          2 :   }</span></a>
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span><span class="lineNoCov">          0 :   void AlbersEqualArea::SetScale(real lat, real k) {</span>
+<span class="lineNum">     434 </span><span class="lineNoCov">          0 :     if (!(Math::isfinite(k) &amp;&amp; k &gt; 0))</span>
+<span class="lineNum">     435 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale is not positive&quot;);</span>
+<span class="lineNum">     436 </span><span class="lineNoCov">          0 :     if (!(abs(lat) &lt; 90))</span>
+<span class="lineNum">     437 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Latitude for SetScale not in (-90d, 90d)&quot;);</span>
+<span class="lineNum">     438 </span>            :     real x, y, gamma, kold;
+<span class="lineNum">     439 </span><span class="lineNoCov">          0 :     Forward(0, lat, 0, x, y, gamma, kold);</span>
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :     k /= kold;</span>
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 :     _k0 *= k;</span>
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :     _k2 = Math::sq(_k0);</span>
+<span class="lineNum">     443 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     444 </span>            : 
+<span class="lineNum">     445 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

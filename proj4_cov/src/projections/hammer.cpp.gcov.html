@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/projections/hammer.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/projections</a> - hammer.cpp<span style="font-size: 80%;"> (source / <a href="hammer.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">34</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntryMed">87.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #define PJ_LIB__</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">       4 </span>            : #include &lt;math.h&gt;
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &quot;proj.h&quot;
+<span class="lineNum">       7 </span>            : #include &quot;proj_internal.h&quot;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : PROJ_HEAD(hammer, &quot;Hammer &amp; Eckert-Greifendorff&quot;)
+<span class="lineNum">      10 </span>            :     &quot;\n\tMisc Sph, \n\tW= M=&quot;;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #define EPS 1.0e-10
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : namespace { // anonymous namespace
+<span class="lineNum">      15 </span>            : struct pj_opaque {
+<span class="lineNum">      16 </span>            :     double w;
+<span class="lineNum">      17 </span>            :     double m, rm;
+<span class="lineNum">      18 </span>            : };
+<span class="lineNum">      19 </span>            : } // anonymous namespace
+<a name="20"><span class="lineNum">      20 </span>            : </a>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineCov">          8 : static PJ_XY hammer_s_forward (PJ_LP lp, PJ *P) {           /* Spheroidal, forward */</span>
+<span class="lineNum">      23 </span>            :     PJ_XY xy = {0.0,0.0};
+<span class="lineNum">      24 </span><span class="lineCov">          8 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">      25 </span>            :     double cosphi, d;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span><span class="lineCov">          8 :     cosphi = cos(lp.phi);</span>
+<span class="lineNum">      28 </span><span class="lineCov">          8 :     lp.lam *= Q-&gt;w;</span>
+<span class="lineNum">      29 </span><span class="lineCov">          8 :     double denom = 1. + cosphi * cos(lp.lam);</span>
+<span class="lineNum">      30 </span><span class="lineCov">          8 :     if( denom == 0.0 ) {</span>
+<span class="lineNum">      31 </span><span class="lineCov">          1 :         proj_errno_set(P, PJD_ERR_TOLERANCE_CONDITION);</span>
+<span class="lineNum">      32 </span><span class="lineCov">          1 :         return proj_coord_error().xy;</span>
+<span class="lineNum">      33 </span>            :     }
+<span class="lineNum">      34 </span><span class="lineCov">          7 :     d = sqrt(2./denom);</span>
+<span class="lineNum">      35 </span><span class="lineCov">          7 :     xy.x = Q-&gt;m * d * cosphi * sin(lp.lam);</span>
+<span class="lineNum">      36 </span><span class="lineCov">          7 :     xy.y = Q-&gt;rm * d * sin(lp.phi);</span>
+<span class="lineNum">      37 </span><span class="lineCov">          7 :     return xy;</span>
+<span class="lineNum">      38 </span>            : }
+<a name="39"><span class="lineNum">      39 </span>            : </a>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineCov">          7 : static PJ_LP hammer_s_inverse (PJ_XY xy, PJ *P) {           /* Spheroidal, inverse */</span>
+<span class="lineNum">      42 </span>            :     PJ_LP lp = {0.0,0.0};
+<span class="lineNum">      43 </span><span class="lineCov">          7 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">      44 </span>            :     double z;
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span><span class="lineCov">          7 :     z = sqrt(1. - 0.25*Q-&gt;w*Q-&gt;w*xy.x*xy.x - 0.25*xy.y*xy.y);</span>
+<span class="lineNum">      47 </span><span class="lineCov">          7 :     if (fabs(2.*z*z-1.) &lt; EPS) {</span>
+<span class="lineNum">      48 </span>            :         lp.lam = HUGE_VAL;
+<span class="lineNum">      49 </span>            :         lp.phi = HUGE_VAL;
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :         proj_errno_set(P, PJD_ERR_LAT_OR_LON_EXCEED_LIMIT);</span>
+<span class="lineNum">      51 </span>            :     } else {
+<span class="lineNum">      52 </span><span class="lineCov">          7 :         lp.lam = aatan2(Q-&gt;w * xy.x * z,2. * z * z - 1)/Q-&gt;w;</span>
+<span class="lineNum">      53 </span><span class="lineCov">          7 :         lp.phi = aasin(P-&gt;ctx,z * xy.y);</span>
+<span class="lineNum">      54 </span>            :     }
+<span class="lineNum">      55 </span><span class="lineCov">          7 :     return lp;</span>
+<span class="lineNum">      56 </span>            : }
+<a name="57"><span class="lineNum">      57 </span>            : </a>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineCov">         30 : PJ *PROJECTION(hammer) {</span>
+<span class="lineNum">      60 </span><span class="lineCov">         10 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(pj_calloc (1, sizeof (struct pj_opaque)));</span>
+<span class="lineNum">      61 </span><span class="lineCov">         10 :     if (nullptr==Q)</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :         return pj_default_destructor (P, ENOMEM);</span>
+<span class="lineNum">      63 </span><span class="lineCov">         10 :     P-&gt;opaque = Q;</span>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineCov">         10 :     if (pj_param(P-&gt;ctx, P-&gt;params, &quot;tW&quot;).i) {</span>
+<span class="lineNum">      66 </span><span class="lineCov">          2 :         if ((Q-&gt;w = fabs(pj_param(P-&gt;ctx, P-&gt;params, &quot;dW&quot;).f)) &lt;= 0.)</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :             return pj_default_destructor (P, PJD_ERR_W_OR_M_ZERO_OR_LESS);</span>
+<span class="lineNum">      68 </span>            :     } else
+<span class="lineNum">      69 </span><span class="lineCov">          8 :         Q-&gt;w = .5;</span>
+<span class="lineNum">      70 </span><span class="lineCov">         10 :     if (pj_param(P-&gt;ctx, P-&gt;params, &quot;tM&quot;).i) {</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :         if ((Q-&gt;m = fabs(pj_param(P-&gt;ctx, P-&gt;params, &quot;dM&quot;).f)) &lt;= 0.)</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :             return pj_default_destructor (P, PJD_ERR_W_OR_M_ZERO_OR_LESS);</span>
+<span class="lineNum">      73 </span>            :     } else
+<span class="lineNum">      74 </span><span class="lineCov">         10 :         Q-&gt;m = 1.;</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineCov">         10 :     Q-&gt;rm = 1. / Q-&gt;m;</span>
+<span class="lineNum">      77 </span><span class="lineCov">         10 :     Q-&gt;m /= Q-&gt;w;</span>
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span><span class="lineCov">         10 :     P-&gt;es = 0.;</span>
+<span class="lineNum">      80 </span><span class="lineCov">         10 :     P-&gt;fwd = hammer_s_forward;</span>
+<span class="lineNum">      81 </span><span class="lineCov">         10 :     P-&gt;inv = hammer_s_inverse;</span>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span><span class="lineCov">         10 :     return P;</span>
+<span class="lineNum">      84 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

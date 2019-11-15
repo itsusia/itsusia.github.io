@@ -1,0 +1,276 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/TransverseMercator.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - TransverseMercator.hpp<span style="font-size: 80%;"> (source / <a href="TransverseMercator.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file TransverseMercator.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::TransverseMercator class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2008-2016) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_TRANSVERSEMERCATOR_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_TRANSVERSEMERCATOR_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : #if !defined(GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER)
+<span class="lineNum">      16 </span>            : /**
+<span class="lineNum">      17 </span>            :  * The order of the series approximation used in TransverseMercator.
+<span class="lineNum">      18 </span>            :  * GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER can be set to any integer in [4, 8].
+<span class="lineNum">      19 </span>            :  **********************************************************************/
+<span class="lineNum">      20 </span>            : #  define GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER \
+<span class="lineNum">      21 </span>            :   (GEOGRAPHICLIB_PRECISION == 2 ? 6 : \
+<span class="lineNum">      22 </span>            :    (GEOGRAPHICLIB_PRECISION == 1 ? 4 : 8))
+<span class="lineNum">      23 </span>            : #endif
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : namespace GeographicLib {
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            :   /**
+<span class="lineNum">      28 </span>            :    * \brief Transverse Mercator projection
+<span class="lineNum">      29 </span>            :    *
+<span class="lineNum">      30 </span>            :    * This uses Kr&amp;uuml;ger's method which evaluates the projection and its
+<span class="lineNum">      31 </span>            :    * inverse in terms of a series.  See
+<span class="lineNum">      32 </span>            :    *  - L. Kr&amp;uuml;ger,
+<span class="lineNum">      33 </span>            :    *    &lt;a href=&quot;https://doi.org/10.2312/GFZ.b103-krueger28&quot;&gt; Konforme
+<span class="lineNum">      34 </span>            :    *    Abbildung des Erdellipsoids in der Ebene&lt;/a&gt; (Conformal mapping of the
+<span class="lineNum">      35 </span>            :    *    ellipsoidal earth to the plane), Royal Prussian Geodetic Institute, New
+<span class="lineNum">      36 </span>            :    *    Series 52, 172 pp. (1912).
+<span class="lineNum">      37 </span>            :    *  - C. F. F. Karney,
+<span class="lineNum">      38 </span>            :    *    &lt;a href=&quot;https://doi.org/10.1007/s00190-011-0445-3&quot;&gt;
+<span class="lineNum">      39 </span>            :    *    Transverse Mercator with an accuracy of a few nanometers,&lt;/a&gt;
+<span class="lineNum">      40 </span>            :    *    J. Geodesy 85(8), 475--485 (Aug. 2011);
+<span class="lineNum">      41 </span>            :    *    preprint
+<span class="lineNum">      42 </span>            :    *    &lt;a href=&quot;https://arxiv.org/abs/1002.1417&quot;&gt;arXiv:1002.1417&lt;/a&gt;.
+<span class="lineNum">      43 </span>            :    *
+<span class="lineNum">      44 </span>            :    * Kr&amp;uuml;ger's method has been extended from 4th to 6th order.  The maximum
+<span class="lineNum">      45 </span>            :    * error is 5 nm (5 nanometers), ground distance, for all positions within 35
+<span class="lineNum">      46 </span>            :    * degrees of the central meridian.  The error in the convergence is 2
+<span class="lineNum">      47 </span>            :    * &amp;times; 10&lt;sup&gt;&amp;minus;15&lt;/sup&gt;&amp;quot; and the relative error in the scale
+<span class="lineNum">      48 </span>            :    * is 6 &amp;times; 10&lt;sup&gt;&amp;minus;12&lt;/sup&gt;%%.  See Sec. 4 of
+<span class="lineNum">      49 </span>            :    * &lt;a href=&quot;https://arxiv.org/abs/1002.1417&quot;&gt;arXiv:1002.1417&lt;/a&gt; for details.
+<span class="lineNum">      50 </span>            :    * The speed penalty in going to 6th order is only about 1%.
+<span class="lineNum">      51 </span>            :    *
+<span class="lineNum">      52 </span>            :    * There's a singularity in the projection at &amp;phi; = 0&amp;deg;, &amp;lambda;
+<span class="lineNum">      53 </span>            :    * &amp;minus; &amp;lambda;&lt;sub&gt;0&lt;/sub&gt; = &amp;plusmn;(1 &amp;minus; \e e)90&amp;deg; (&amp;asymp;
+<span class="lineNum">      54 </span>            :    * &amp;plusmn;82.6&amp;deg; for the WGS84 ellipsoid), where \e e is the
+<span class="lineNum">      55 </span>            :    * eccentricity.  Beyond this point, the series ceases to converge and the
+<span class="lineNum">      56 </span>            :    * results from this method will be garbage.  To be on the safe side, don't
+<span class="lineNum">      57 </span>            :    * use this method if the angular distance from the central meridian exceeds
+<span class="lineNum">      58 </span>            :    * (1 &amp;minus; 2e)90&amp;deg; (&amp;asymp; 75&amp;deg; for the WGS84 ellipsoid)
+<span class="lineNum">      59 </span>            :    *
+<span class="lineNum">      60 </span>            :    * TransverseMercatorExact is an alternative implementation of the projection
+<span class="lineNum">      61 </span>            :    * using exact formulas which yield accurate (to 8 nm) results over the
+<span class="lineNum">      62 </span>            :    * entire ellipsoid.
+<span class="lineNum">      63 </span>            :    *
+<span class="lineNum">      64 </span>            :    * The ellipsoid parameters and the central scale are set in the constructor.
+<span class="lineNum">      65 </span>            :    * The central meridian (which is a trivial shift of the longitude) is
+<span class="lineNum">      66 </span>            :    * specified as the \e lon0 argument of the TransverseMercator::Forward and
+<span class="lineNum">      67 </span>            :    * TransverseMercator::Reverse functions.  The latitude of origin is taken to
+<span class="lineNum">      68 </span>            :    * be the equator.  There is no provision in this class for specifying a
+<span class="lineNum">      69 </span>            :    * false easting or false northing or a different latitude of origin.
+<span class="lineNum">      70 </span>            :    * However these are can be simply included by the calling function.  For
+<span class="lineNum">      71 </span>            :    * example, the UTMUPS class applies the false easting and false northing for
+<span class="lineNum">      72 </span>            :    * the UTM projections.  A more complicated example is the British National
+<span class="lineNum">      73 </span>            :    * Grid (&lt;a href=&quot;http://www.spatialreference.org/ref/epsg/7405/&quot;&gt;
+<span class="lineNum">      74 </span>            :    * EPSG:7405&lt;/a&gt;) which requires the use of a latitude of origin.  This is
+<span class="lineNum">      75 </span>            :    * implemented by the GeographicLib::OSGB class.
+<span class="lineNum">      76 </span>            :    *
+<span class="lineNum">      77 </span>            :    * This class also returns the meridian convergence \e gamma and scale \e k.
+<span class="lineNum">      78 </span>            :    * The meridian convergence is the bearing of grid north (the \e y axis)
+<span class="lineNum">      79 </span>            :    * measured clockwise from true north.
+<span class="lineNum">      80 </span>            :    *
+<span class="lineNum">      81 </span>            :    * See TransverseMercator.cpp for more information on the implementation.
+<span class="lineNum">      82 </span>            :    *
+<span class="lineNum">      83 </span>            :    * See \ref transversemercator for a discussion of this projection.
+<span class="lineNum">      84 </span>            :    *
+<span class="lineNum">      85 </span>            :    * Example of use:
+<span class="lineNum">      86 </span>            :    * \include example-TransverseMercator.cpp
+<span class="lineNum">      87 </span>            :    *
+<span class="lineNum">      88 </span>            :    * &lt;a href=&quot;TransverseMercatorProj.1.html&quot;&gt;TransverseMercatorProj&lt;/a&gt; is a
+<span class="lineNum">      89 </span>            :    * command-line utility providing access to the functionality of
+<span class="lineNum">      90 </span>            :    * TransverseMercator and TransverseMercatorExact.
+<span class="lineNum">      91 </span>            :    **********************************************************************/
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :   class GEOGRAPHICLIB_EXPORT TransverseMercator {
+<span class="lineNum">      94 </span>            :   private:
+<span class="lineNum">      95 </span>            :     typedef Math::real real;
+<span class="lineNum">      96 </span>            :     static const int maxpow_ = GEOGRAPHICLIB_TRANSVERSEMERCATOR_ORDER;
+<span class="lineNum">      97 </span>            :     static const int numit_ = 5;
+<span class="lineNum">      98 </span>            :     real _a, _f, _k0, _e2, _es, _e2m,  _c, _n;
+<span class="lineNum">      99 </span>            :     // _alp[0] and _bet[0] unused
+<span class="lineNum">     100 </span>            :     real _a1, _b1, _alp[maxpow_ + 1], _bet[maxpow_ + 1];
+<span class="lineNum">     101 </span>            :     friend class Ellipsoid;           // For access to taupf, tauf.
+<span class="lineNum">     102 </span>            :   public:
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            :     /**
+<span class="lineNum">     105 </span>            :      * Constructor for a ellipsoid with
+<span class="lineNum">     106 </span>            :      *
+<span class="lineNum">     107 </span>            :      * @param[in] a equatorial radius (meters).
+<span class="lineNum">     108 </span>            :      * @param[in] f flattening of ellipsoid.  Setting \e f = 0 gives a sphere.
+<span class="lineNum">     109 </span>            :      *   Negative \e f gives a prolate ellipsoid.
+<span class="lineNum">     110 </span>            :      * @param[in] k0 central scale factor.
+<span class="lineNum">     111 </span>            :      * @exception GeographicErr if \e a, (1 &amp;minus; \e f) \e a, or \e k0 is
+<span class="lineNum">     112 </span>            :      *   not positive.
+<span class="lineNum">     113 </span>            :      **********************************************************************/
+<span class="lineNum">     114 </span>            :     TransverseMercator(real a, real f, real k0);
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :     /**
+<span class="lineNum">     117 </span>            :      * Forward projection, from geographic to transverse Mercator.
+<span class="lineNum">     118 </span>            :      *
+<span class="lineNum">     119 </span>            :      * @param[in] lon0 central meridian of the projection (degrees).
+<span class="lineNum">     120 </span>            :      * @param[in] lat latitude of point (degrees).
+<span class="lineNum">     121 </span>            :      * @param[in] lon longitude of point (degrees).
+<span class="lineNum">     122 </span>            :      * @param[out] x easting of point (meters).
+<span class="lineNum">     123 </span>            :      * @param[out] y northing of point (meters).
+<span class="lineNum">     124 </span>            :      * @param[out] gamma meridian convergence at point (degrees).
+<span class="lineNum">     125 </span>            :      * @param[out] k scale of projection at point.
+<span class="lineNum">     126 </span>            :      *
+<span class="lineNum">     127 </span>            :      * No false easting or northing is added. \e lat should be in the range
+<span class="lineNum">     128 </span>            :      * [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     129 </span>            :      **********************************************************************/
+<span class="lineNum">     130 </span>            :     void Forward(real lon0, real lat, real lon,
+<span class="lineNum">     131 </span>            :                  real&amp; x, real&amp; y, real&amp; gamma, real&amp; k) const;
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            :     /**
+<span class="lineNum">     134 </span>            :      * Reverse projection, from transverse Mercator to geographic.
+<span class="lineNum">     135 </span>            :      *
+<span class="lineNum">     136 </span>            :      * @param[in] lon0 central meridian of the projection (degrees).
+<span class="lineNum">     137 </span>            :      * @param[in] x easting of point (meters).
+<span class="lineNum">     138 </span>            :      * @param[in] y northing of point (meters).
+<span class="lineNum">     139 </span>            :      * @param[out] lat latitude of point (degrees).
+<span class="lineNum">     140 </span>            :      * @param[out] lon longitude of point (degrees).
+<span class="lineNum">     141 </span>            :      * @param[out] gamma meridian convergence at point (degrees).
+<span class="lineNum">     142 </span>            :      * @param[out] k scale of projection at point.
+<span class="lineNum">     143 </span>            :      *
+<span class="lineNum">     144 </span>            :      * No false easting or northing is added.  The value of \e lon returned is
+<span class="lineNum">     145 </span>            :      * in the range [&amp;minus;180&amp;deg;, 180&amp;deg;].
+<span class="lineNum">     146 </span>            :      **********************************************************************/
+<span class="lineNum">     147 </span>            :     void Reverse(real lon0, real x, real y,
+<span class="lineNum">     148 </span>            :                  real&amp; lat, real&amp; lon, real&amp; gamma, real&amp; k) const;
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            :     /**
+<span class="lineNum">     151 </span>            :      * TransverseMercator::Forward without returning the convergence and scale.
+<span class="lineNum">     152 </span>            :      **********************************************************************/
+<span class="lineNum">     153 </span>            :     void Forward(real lon0, real lat, real lon,
+<span class="lineNum">     154 </span>            :                  real&amp; x, real&amp; y) const {
+<span class="lineNum">     155 </span>            :       real gamma, k;
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :       Forward(lon0, lat, lon, x, y, gamma, k);</span>
+<span class="lineNum">     157 </span>            :     }
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            :     /**
+<span class="lineNum">     160 </span>            :      * TransverseMercator::Reverse without returning the convergence and scale.
+<span class="lineNum">     161 </span>            :      **********************************************************************/
+<span class="lineNum">     162 </span>            :     void Reverse(real lon0, real x, real y,
+<span class="lineNum">     163 </span>            :                  real&amp; lat, real&amp; lon) const {
+<span class="lineNum">     164 </span>            :       real gamma, k;
+<span class="lineNum">     165 </span>            :       Reverse(lon0, x, y, lat, lon, gamma, k);
+<span class="lineNum">     166 </span>            :     }
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            :     /** \name Inspector functions
+<span class="lineNum">     169 </span>            :      **********************************************************************/
+<span class="lineNum">     170 </span>            :     ///@{
+<span class="lineNum">     171 </span>            :     /**
+<span class="lineNum">     172 </span>            :      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
+<span class="lineNum">     173 </span>            :      *   the value used in the constructor.
+<span class="lineNum">     174 </span>            :      **********************************************************************/
+<span class="lineNum">     175 </span>            :     Math::real MajorRadius() const { return _a; }
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            :     /**
+<span class="lineNum">     178 </span>            :      * @return \e f the flattening of the ellipsoid.  This is the value used in
+<span class="lineNum">     179 </span>            :      *   the constructor.
+<span class="lineNum">     180 </span>            :      **********************************************************************/
+<span class="lineNum">     181 </span>            :     Math::real Flattening() const { return _f; }
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            :     /**
+<span class="lineNum">     184 </span>            :      * @return \e k0 central scale for the projection.  This is the value of \e
+<span class="lineNum">     185 </span>            :      *   k0 used in the constructor and is the scale on the central meridian.
+<span class="lineNum">     186 </span>            :      **********************************************************************/
+<span class="lineNum">     187 </span>            :     Math::real CentralScale() const { return _k0; }
+<span class="lineNum">     188 </span>            :     ///@}
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span>            :     /**
+<span class="lineNum">     191 </span>            :      * A global instantiation of TransverseMercator with the WGS84 ellipsoid
+<span class="lineNum">     192 </span>            :      * and the UTM scale factor.  However, unlike UTM, no false easting or
+<span class="lineNum">     193 </span>            :      * northing is added.
+<span class="lineNum">     194 </span>            :      **********************************************************************/
+<span class="lineNum">     195 </span>            :     static const TransverseMercator&amp; UTM();
+<span class="lineNum">     196 </span>            :   };
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            : } // namespace GeographicLib
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            : #endif  // GEOGRAPHICLIB_TRANSVERSEMERCATOR_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

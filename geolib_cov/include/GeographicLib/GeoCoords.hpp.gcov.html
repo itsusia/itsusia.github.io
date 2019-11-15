@@ -1,0 +1,623 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/GeoCoords.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - GeoCoords.hpp<span style="font-size: 80%;"> (source / <a href="GeoCoords.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryMed">75.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file GeoCoords.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::GeoCoords class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2008-2016) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_GEOCOORDS_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_GEOCOORDS_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/UTMUPS.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : namespace GeographicLib {
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            :   /**
+<span class="lineNum">      19 </span>            :    * \brief Conversion between geographic coordinates
+<span class="lineNum">      20 </span>            :    *
+<span class="lineNum">      21 </span>            :    * This class stores a geographic position which may be set via the
+<span class="lineNum">      22 </span>            :    * constructors or Reset via
+<span class="lineNum">      23 </span>            :    * - latitude and longitude
+<span class="lineNum">      24 </span>            :    * - UTM or UPS coordinates
+<span class="lineNum">      25 </span>            :    * - a string representation of these or an MGRS coordinate string
+<span class="lineNum">      26 </span>            :    *
+<span class="lineNum">      27 </span>            :    * The state consists of the latitude and longitude and the supplied UTM or
+<span class="lineNum">      28 </span>            :    * UPS coordinates (possibly derived from the MGRS coordinates).  If latitude
+<span class="lineNum">      29 </span>            :    * and longitude were given then the UTM/UPS coordinates follows the standard
+<span class="lineNum">      30 </span>            :    * conventions.
+<span class="lineNum">      31 </span>            :    *
+<span class="lineNum">      32 </span>            :    * The mutable state consists of the UTM or UPS coordinates for a alternate
+<span class="lineNum">      33 </span>            :    * zone.  A method SetAltZone is provided to set the alternate UPS/UTM zone.
+<span class="lineNum">      34 </span>            :    *
+<span class="lineNum">      35 </span>            :    * Methods are provided to return the geographic coordinates, the input UTM
+<span class="lineNum">      36 </span>            :    * or UPS coordinates (and associated meridian convergence and scale), or
+<span class="lineNum">      37 </span>            :    * alternate UTM or UPS coordinates (and their associated meridian
+<span class="lineNum">      38 </span>            :    * convergence and scale).
+<span class="lineNum">      39 </span>            :    *
+<span class="lineNum">      40 </span>            :    * Once the input string has been parsed, you can print the result out in any
+<span class="lineNum">      41 </span>            :    * of the formats, decimal degrees, degrees minutes seconds, MGRS, UTM/UPS.
+<span class="lineNum">      42 </span>            :    *
+<span class="lineNum">      43 </span>            :    * Example of use:
+<span class="lineNum">      44 </span>            :    * \include example-GeoCoords.cpp
+<span class="lineNum">      45 </span>            :    *
+<span class="lineNum">      46 </span>            :    * &lt;a href=&quot;GeoConvert.1.html&quot;&gt;GeoConvert&lt;/a&gt; is a command-line utility
+<span class="lineNum">      47 </span>            :    * providing access to the functionality of GeoCoords.
+<span class="lineNum">      48 </span>            :    **********************************************************************/
+<span class="lineNum">      49 </span>            :   class GEOGRAPHICLIB_EXPORT GeoCoords {
+<span class="lineNum">      50 </span>            :   private:
+<span class="lineNum">      51 </span>            :     typedef Math::real real;
+<span class="lineNum">      52 </span>            :     real _lat, _long, _easting, _northing, _gamma, _k;
+<span class="lineNum">      53 </span>            :     bool _northp;
+<span class="lineNum">      54 </span>            :     int _zone;                  // See UTMUPS::zonespec
+<span class="lineNum">      55 </span>            :     mutable real _alt_easting, _alt_northing, _alt_gamma, _alt_k;
+<span class="lineNum">      56 </span>            :     mutable int _alt_zone;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :     void CopyToAlt() const {
+<span class="lineNum">      59 </span><span class="lineCov">         98 :       _alt_easting = _easting;</span>
+<span class="lineNum">      60 </span><span class="lineCov">         98 :       _alt_northing = _northing;</span>
+<span class="lineNum">      61 </span><span class="lineCov">         98 :       _alt_gamma = _gamma;</span>
+<span class="lineNum">      62 </span><span class="lineCov">         98 :       _alt_k = _k;</span>
+<span class="lineNum">      63 </span><span class="lineCov">         98 :       _alt_zone = _zone;</span>
+<span class="lineNum">      64 </span>            :     }
+<span class="lineNum">      65 </span>            :     static void UTMUPSString(int zone, bool northp,
+<span class="lineNum">      66 </span>            :                              real easting, real northing,
+<span class="lineNum">      67 </span>            :                              int prec, bool abbrev, std::string&amp; utm);
+<span class="lineNum">      68 </span>            :     void FixHemisphere();
+<span class="lineNum">      69 </span>            :   public:
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :     /** \name Initializing the GeoCoords object
+<span class="lineNum">      72 </span>            :      **********************************************************************/
+<span class="lineNum">      73 </span>            :     ///@{
+<span class="lineNum">      74 </span>            :     /**
+<span class="lineNum">      75 </span>            :      * The default constructor sets the coordinate as undefined.
+<span class="lineNum">      76 </span>            :      **********************************************************************/
+<span class="lineNum">      77 </span>            :     GeoCoords()
+<span class="lineNum">      78 </span><span class="lineCov">         32 :       : _lat(Math::NaN())</span>
+<span class="lineNum">      79 </span>            :       , _long(Math::NaN())
+<span class="lineNum">      80 </span>            :       , _easting(Math::NaN())
+<span class="lineNum">      81 </span>            :       , _northing(Math::NaN())
+<span class="lineNum">      82 </span>            :       , _gamma(Math::NaN())
+<span class="lineNum">      83 </span>            :       , _k(Math::NaN())
+<span class="lineNum">      84 </span>            :       , _northp(false)
+<span class="lineNum">      85 </span><span class="lineCov">         32 :       , _zone(UTMUPS::INVALID)</span>
+<span class="lineNum">      86 </span>            :     { CopyToAlt(); }
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :     /**
+<span class="lineNum">      89 </span>            :      * Construct from a string.
+<span class="lineNum">      90 </span>            :      *
+<span class="lineNum">      91 </span>            :      * @param[in] s 1-element, 2-element, or 3-element string representation of
+<span class="lineNum">      92 </span>            :      *   the position.
+<span class="lineNum">      93 </span>            :      * @param[in] centerp governs the interpretation of MGRS coordinates (see
+<span class="lineNum">      94 </span>            :      *   below).
+<span class="lineNum">      95 </span>            :      * @param[in] longfirst governs the interpretation of geographic
+<span class="lineNum">      96 </span>            :      *   coordinates (see below).
+<span class="lineNum">      97 </span>            :      * @exception GeographicErr if the \e s is malformed (see below).
+<span class="lineNum">      98 </span>            :      *
+<span class="lineNum">      99 </span>            :      * Parse as a string and interpret it as a geographic position.  The input
+<span class="lineNum">     100 </span>            :      * string is broken into space (or comma) separated pieces and Basic
+<span class="lineNum">     101 </span>            :      * decision on which format is based on number of components
+<span class="lineNum">     102 </span>            :      * -# MGRS
+<span class="lineNum">     103 </span>            :      * -# &quot;Lat Long&quot; or &quot;Long Lat&quot;
+<span class="lineNum">     104 </span>            :      * -# &quot;Zone Easting Northing&quot; or &quot;Easting Northing Zone&quot;
+<span class="lineNum">     105 </span>            :      *
+<span class="lineNum">     106 </span>            :      * The following inputs are approximately the same (Ar Ramadi Bridge, Iraq)
+<span class="lineNum">     107 </span>            :      * - Latitude and Longitude
+<span class="lineNum">     108 </span>            :      *   -  33.44      43.27
+<span class="lineNum">     109 </span>            :      *   -  N33d26.4'  E43d16.2'
+<span class="lineNum">     110 </span>            :      *   -  43d16'12&amp;quot;E 33d26'24&amp;quot;N
+<span class="lineNum">     111 </span>            :      *   -  43:16:12E  33:26:24
+<span class="lineNum">     112 </span>            :      * - MGRS
+<span class="lineNum">     113 </span>            :      *   -  38SLC30
+<span class="lineNum">     114 </span>            :      *   -  38SLC391014
+<span class="lineNum">     115 </span>            :      *   -  38SLC3918701405
+<span class="lineNum">     116 </span>            :      *   -  37SHT9708
+<span class="lineNum">     117 </span>            :      * - UTM
+<span class="lineNum">     118 </span>            :      *   -  38n 339188 3701405
+<span class="lineNum">     119 </span>            :      *   -  897039 3708229 37n
+<span class="lineNum">     120 </span>            :      *
+<span class="lineNum">     121 </span>            :      * &lt;b&gt;Latitude and Longitude parsing&lt;/b&gt;: Latitude precedes longitude,
+<span class="lineNum">     122 </span>            :      * unless a N, S, E, W hemisphere designator is used on one or both
+<span class="lineNum">     123 </span>            :      * coordinates.  If \e longfirst = true (default is false), then
+<span class="lineNum">     124 </span>            :      * longitude precedes latitude in the absence of a hemisphere designator.
+<span class="lineNum">     125 </span>            :      * Thus (with \e longfirst = false)
+<span class="lineNum">     126 </span>            :      * - 40 -75
+<span class="lineNum">     127 </span>            :      * - N40 W75
+<span class="lineNum">     128 </span>            :      * - -75 N40
+<span class="lineNum">     129 </span>            :      * - 75W 40N
+<span class="lineNum">     130 </span>            :      * - E-75 -40S
+<span class="lineNum">     131 </span>            :      * .
+<span class="lineNum">     132 </span>            :      * are all the same position.  The coordinates may be given in
+<span class="lineNum">     133 </span>            :      * decimal degrees, degrees and decimal minutes, degrees, minutes,
+<span class="lineNum">     134 </span>            :      * seconds, etc.  Use d, ', and &amp;quot; to mark off the degrees,
+<span class="lineNum">     135 </span>            :      * minutes and seconds.  Various alternative symbols for degrees, minutes,
+<span class="lineNum">     136 </span>            :      * and seconds are allowed.  Alternatively, use : to separate these
+<span class="lineNum">     137 </span>            :      * components.  A single addition or subtraction is allowed.  (See
+<span class="lineNum">     138 </span>            :      * DMS::Decode for details.)  Thus
+<span class="lineNum">     139 </span>            :      * - 40d30'30&amp;quot;
+<span class="lineNum">     140 </span>            :      * - 40d30'30
+<span class="lineNum">     141 </span>            :      * - 40&amp;deg;30'30
+<span class="lineNum">     142 </span>            :      * - 40d30.5'
+<span class="lineNum">     143 </span>            :      * - 40d30.5
+<span class="lineNum">     144 </span>            :      * - 40:30:30
+<span class="lineNum">     145 </span>            :      * - 40:30.5
+<span class="lineNum">     146 </span>            :      * - 40.508333333
+<span class="lineNum">     147 </span>            :      * - 40:30+0:0:30
+<span class="lineNum">     148 </span>            :      * - 40:31-0:0.5
+<span class="lineNum">     149 </span>            :      * .
+<span class="lineNum">     150 </span>            :      * all specify the same angle.  The leading sign applies to the following
+<span class="lineNum">     151 </span>            :      * components so -1d30 is -(1+30/60) = &amp;minus;1.5.  However, note
+<span class="lineNum">     152 </span>            :      * that -1:30-0:0:15 is parsed as (-1:30) + (-0:0:15) = &amp;minus;(1+30/60)
+<span class="lineNum">     153 </span>            :      * &amp;minus; (15/3600).  Latitudes must be in the range [&amp;minus;90&amp;deg;,
+<span class="lineNum">     154 </span>            :      * 90&amp;deg;].  Internally longitudes are reduced to the range
+<span class="lineNum">     155 </span>            :      * [&amp;minus;180&amp;deg;, 180&amp;deg;].
+<span class="lineNum">     156 </span>            :      *
+<span class="lineNum">     157 </span>            :      * &lt;b&gt;UTM/UPS parsing&lt;/b&gt;: For UTM zones (&amp;minus;80&amp;deg; &amp;le; Lat &lt;
+<span class="lineNum">     158 </span>            :      * 84&amp;deg;), the zone designator is made up of a zone number (for 1 to 60)
+<span class="lineNum">     159 </span>            :      * and a hemisphere letter (n or s), e.g., 38n (38north can also be used).
+<span class="lineNum">     160 </span>            :      * The latitude band designer ([C--M] in the southern hemisphere and [N--X]
+<span class="lineNum">     161 </span>            :      * in the northern) should NOT be used.  (This is part of the MGRS
+<span class="lineNum">     162 </span>            :      * coordinate.)  The zone designator for the poles (where UPS is employed)
+<span class="lineNum">     163 </span>            :      * is a hemisphere letter by itself, i.e., n or s (north or south can also
+<span class="lineNum">     164 </span>            :      * be used).
+<span class="lineNum">     165 </span>            :      *
+<span class="lineNum">     166 </span>            :      * &lt;b&gt;MGRS parsing&lt;/b&gt; interprets the grid references as square area at the
+<span class="lineNum">     167 </span>            :      * specified precision (1m, 10m, 100m, etc.).  If \e centerp = true (the
+<span class="lineNum">     168 </span>            :      * default), the center of this square is then taken to be the precise
+<span class="lineNum">     169 </span>            :      * position; thus:
+<span class="lineNum">     170 </span>            :      * - 38SMB           = 38n 450000 3650000
+<span class="lineNum">     171 </span>            :      * - 38SMB4484       = 38n 444500 3684500
+<span class="lineNum">     172 </span>            :      * - 38SMB44148470   = 38n 444145 3684705
+<span class="lineNum">     173 </span>            :      * .
+<span class="lineNum">     174 </span>            :      * Otherwise, the &quot;south-west&quot; corner of the square is used, i.e.,
+<span class="lineNum">     175 </span>            :      * - 38SMB           = 38n 400000 3600000
+<span class="lineNum">     176 </span>            :      * - 38SMB4484       = 38n 444000 3684000
+<span class="lineNum">     177 </span>            :      * - 38SMB44148470   = 38n 444140 3684700
+<span class="lineNum">     178 </span>            :      **********************************************************************/
+<span class="lineNum">     179 </span>            :     explicit GeoCoords(const std::string&amp; s,
+<span class="lineNum">     180 </span>            :                        bool centerp = true, bool longfirst = false)
+<span class="lineNum">     181 </span>            :     { Reset(s, centerp, longfirst); }
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            :     /**
+<span class="lineNum">     184 </span>            :      * Construct from geographic coordinates.
+<span class="lineNum">     185 </span>            :      *
+<span class="lineNum">     186 </span>            :      * @param[in] latitude (degrees).
+<span class="lineNum">     187 </span>            :      * @param[in] longitude (degrees).
+<span class="lineNum">     188 </span>            :      * @param[in] zone if specified, force the UTM/UPS representation to use a
+<span class="lineNum">     189 </span>            :      *   specified zone using the rules given in UTMUPS::zonespec.
+<span class="lineNum">     190 </span>            :      * @exception GeographicErr if \e latitude is not in [&amp;minus;90&amp;deg;,
+<span class="lineNum">     191 </span>            :      *   90&amp;deg;].
+<span class="lineNum">     192 </span>            :      * @exception GeographicErr if \e zone cannot be used for this location.
+<span class="lineNum">     193 </span>            :      **********************************************************************/
+<span class="lineNum">     194 </span>            :     GeoCoords(real latitude, real longitude, int zone = UTMUPS::STANDARD) {
+<span class="lineNum">     195 </span>            :       Reset(latitude, longitude, zone);
+<span class="lineNum">     196 </span>            :     }
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            :     /**
+<span class="lineNum">     199 </span>            :      * Construct from UTM/UPS coordinates.
+<span class="lineNum">     200 </span>            :      *
+<span class="lineNum">     201 </span>            :      * @param[in] zone UTM zone (zero means UPS).
+<span class="lineNum">     202 </span>            :      * @param[in] northp hemisphere (true means north, false means south).
+<span class="lineNum">     203 </span>            :      * @param[in] easting (meters).
+<span class="lineNum">     204 </span>            :      * @param[in] northing (meters).
+<span class="lineNum">     205 </span>            :      * @exception GeographicErr if \e zone, \e easting, or \e northing is
+<span class="lineNum">     206 </span>            :      *   outside its allowed range.
+<span class="lineNum">     207 </span>            :      **********************************************************************/
+<span class="lineNum">     208 </span>            :     GeoCoords(int zone, bool northp, real easting, real northing) {
+<span class="lineNum">     209 </span>            :       Reset(zone, northp, easting, northing);
+<span class="lineNum">     210 </span>            :     }
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            :     /**
+<span class="lineNum">     213 </span>            :      * Reset the location from a string.  See
+<span class="lineNum">     214 </span>            :      * GeoCoords(const std::string&amp; s, bool centerp, bool longfirst).
+<span class="lineNum">     215 </span>            :      *
+<span class="lineNum">     216 </span>            :      * @param[in] s 1-element, 2-element, or 3-element string representation of
+<span class="lineNum">     217 </span>            :      *   the position.
+<span class="lineNum">     218 </span>            :      * @param[in] centerp governs the interpretation of MGRS coordinates.
+<span class="lineNum">     219 </span>            :      * @param[in] longfirst governs the interpretation of geographic
+<span class="lineNum">     220 </span>            :      *   coordinates.
+<span class="lineNum">     221 </span>            :      * @exception GeographicErr if the \e s is malformed.
+<span class="lineNum">     222 </span>            :      **********************************************************************/
+<span class="lineNum">     223 </span>            :     void Reset(const std::string&amp; s,
+<span class="lineNum">     224 </span>            :                bool centerp = true, bool longfirst = false);
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            :     /**
+<span class="lineNum">     227 </span>            :      * Reset the location in terms of geographic coordinates.  See
+<span class="lineNum">     228 </span>            :      * GeoCoords(real latitude, real longitude, int zone).
+<span class="lineNum">     229 </span>            :      *
+<span class="lineNum">     230 </span>            :      * @param[in] latitude (degrees).
+<span class="lineNum">     231 </span>            :      * @param[in] longitude (degrees).
+<span class="lineNum">     232 </span>            :      * @param[in] zone if specified, force the UTM/UPS representation to use a
+<span class="lineNum">     233 </span>            :      *   specified zone using the rules given in UTMUPS::zonespec.
+<span class="lineNum">     234 </span>            :      * @exception GeographicErr if \e latitude is not in [&amp;minus;90&amp;deg;,
+<span class="lineNum">     235 </span>            :      *   90&amp;deg;].
+<span class="lineNum">     236 </span>            :      * @exception GeographicErr if \e zone cannot be used for this location.
+<span class="lineNum">     237 </span>            :      **********************************************************************/
+<span class="lineNum">     238 </span>            :     void Reset(real latitude, real longitude, int zone = UTMUPS::STANDARD) {
+<span class="lineNum">     239 </span>            :       UTMUPS::Forward(latitude, longitude,
+<span class="lineNum">     240 </span>            :                       _zone, _northp, _easting, _northing, _gamma, _k,
+<span class="lineNum">     241 </span>            :                       zone);
+<span class="lineNum">     242 </span>            :       _lat = latitude;
+<span class="lineNum">     243 </span>            :       _long = longitude;
+<span class="lineNum">     244 </span>            :       if (_long &gt;= 180) _long -= 360;
+<span class="lineNum">     245 </span>            :       else if (_long &lt; -180) _long += 360;
+<span class="lineNum">     246 </span>            :       CopyToAlt();
+<span class="lineNum">     247 </span>            :     }
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :     /**
+<span class="lineNum">     250 </span>            :      * Reset the location in terms of UPS/UPS coordinates.  See
+<span class="lineNum">     251 </span>            :      * GeoCoords(int zone, bool northp, real easting, real northing).
+<span class="lineNum">     252 </span>            :      *
+<span class="lineNum">     253 </span>            :      * @param[in] zone UTM zone (zero means UPS).
+<span class="lineNum">     254 </span>            :      * @param[in] northp hemisphere (true means north, false means south).
+<span class="lineNum">     255 </span>            :      * @param[in] easting (meters).
+<span class="lineNum">     256 </span>            :      * @param[in] northing (meters).
+<span class="lineNum">     257 </span>            :      * @exception GeographicErr if \e zone, \e easting, or \e northing is
+<span class="lineNum">     258 </span>            :      *   outside its allowed range.
+<span class="lineNum">     259 </span>            :      **********************************************************************/
+<span class="lineNum">     260 </span>            :     void Reset(int zone, bool northp, real easting, real northing) {
+<span class="lineNum">     261 </span>            :       UTMUPS::Reverse(zone, northp, easting, northing,
+<span class="lineNum">     262 </span>            :                       _lat, _long, _gamma, _k);
+<span class="lineNum">     263 </span>            :       _zone = zone;
+<span class="lineNum">     264 </span>            :       _northp = northp;
+<span class="lineNum">     265 </span>            :       _easting = easting;
+<span class="lineNum">     266 </span>            :       _northing = northing;
+<span class="lineNum">     267 </span>            :       FixHemisphere();
+<span class="lineNum">     268 </span>            :       CopyToAlt();
+<span class="lineNum">     269 </span>            :     }
+<span class="lineNum">     270 </span>            :     ///@}
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span>            :     /** \name Querying the GeoCoords object
+<span class="lineNum">     273 </span>            :      **********************************************************************/
+<span class="lineNum">     274 </span>            :     ///@{
+<span class="lineNum">     275 </span>            :     /**
+<span class="lineNum">     276 </span>            :      * @return latitude (degrees)
+<span class="lineNum">     277 </span>            :      **********************************************************************/
+<span class="lineNum">     278 </span>            :     Math::real Latitude() const { return _lat; }
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span>            :     /**
+<span class="lineNum">     281 </span>            :      * @return longitude (degrees)
+<span class="lineNum">     282 </span>            :      **********************************************************************/
+<span class="lineNum">     283 </span>            :     Math::real Longitude() const { return _long; }
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            :     /**
+<span class="lineNum">     286 </span>            :      * @return easting (meters)
+<span class="lineNum">     287 </span>            :      **********************************************************************/
+<span class="lineNum">     288 </span>            :     Math::real Easting() const { return _easting; }
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span>            :     /**
+<span class="lineNum">     291 </span>            :      * @return northing (meters)
+<span class="lineNum">     292 </span>            :      **********************************************************************/
+<span class="lineNum">     293 </span>            :     Math::real Northing() const { return _northing; }
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span>            :     /**
+<span class="lineNum">     296 </span>            :      * @return meridian convergence (degrees) for the UTM/UPS projection.
+<span class="lineNum">     297 </span>            :      **********************************************************************/
+<span class="lineNum">     298 </span>            :     Math::real Convergence() const { return _gamma; }
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :     /**
+<span class="lineNum">     301 </span>            :      * @return scale for the UTM/UPS projection.
+<span class="lineNum">     302 </span>            :      **********************************************************************/
+<span class="lineNum">     303 </span>            :     Math::real Scale() const { return _k; }
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            :     /**
+<span class="lineNum">     306 </span>            :      * @return hemisphere (false means south, true means north).
+<span class="lineNum">     307 </span>            :      **********************************************************************/
+<span class="lineNum">     308 </span>            :     bool Northp() const { return _northp; }
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            :     /**
+<span class="lineNum">     311 </span>            :      * @return hemisphere letter n or s.
+<span class="lineNum">     312 </span>            :      **********************************************************************/
+<span class="lineNum">     313 </span>            :     char Hemisphere() const { return _northp ? 'n' : 's'; }
+<span class="lineNum">     314 </span>            : 
+<span class="lineNum">     315 </span>            :     /**
+<span class="lineNum">     316 </span>            :      * @return the zone corresponding to the input (return 0 for UPS).
+<span class="lineNum">     317 </span>            :      **********************************************************************/
+<span class="lineNum">     318 </span>            :     int Zone() const { return _zone; }
+<span class="lineNum">     319 </span>            : 
+<span class="lineNum">     320 </span>            :     ///@}
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            :     /** \name Setting and querying the alternate zone
+<span class="lineNum">     323 </span>            :      **********************************************************************/
+<span class="lineNum">     324 </span>            :     ///@{
+<span class="lineNum">     325 </span>            :     /**
+<span class="lineNum">     326 </span>            :      * Specify alternate zone number.
+<span class="lineNum">     327 </span>            :      *
+<span class="lineNum">     328 </span>            :      * @param[in] zone zone number for the alternate representation.
+<span class="lineNum">     329 </span>            :      * @exception GeographicErr if \e zone cannot be used for this location.
+<span class="lineNum">     330 </span>            :      *
+<span class="lineNum">     331 </span>            :      * See UTMUPS::zonespec for more information on the interpretation of \e
+<span class="lineNum">     332 </span>            :      * zone.  Note that \e zone == UTMUPS::STANDARD (the default) use the
+<span class="lineNum">     333 </span>            :      * standard UPS or UTM zone, UTMUPS::MATCH does nothing retaining the
+<span class="lineNum">     334 </span>            :      * existing alternate representation.  Before this is called the alternate
+<a name="335"><span class="lineNum">     335 </span>            :      * zone is the input zone.</a>
+<span class="lineNum">     336 </span>            :      **********************************************************************/
+<span class="lineNum">     337 </span><span class="lineCov">         13 :     void SetAltZone(int zone = UTMUPS::STANDARD) const {</span>
+<span class="lineNum">     338 </span><span class="lineCov">         13 :       if (zone == UTMUPS::MATCH)</span>
+<span class="lineNum">     339 </span>            :         return;
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :       zone = UTMUPS::StandardZone(_lat, _long, zone);</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :       if (zone == _zone)</span>
+<span class="lineNum">     342 </span>            :         CopyToAlt();
+<span class="lineNum">     343 </span>            :       else {
+<span class="lineNum">     344 </span>            :         bool northp;
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :         UTMUPS::Forward(_lat, _long,</span>
+<span class="lineNum">     346 </span>            :                         _alt_zone, northp,
+<span class="lineNum">     347 </span>            :                         _alt_easting, _alt_northing, _alt_gamma, _alt_k,
+<span class="lineNum">     348 </span>            :                         zone);
+<span class="lineNum">     349 </span>            :       }
+<span class="lineNum">     350 </span>            :     }
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span>            :     /**
+<span class="lineNum">     353 </span>            :      * @return current alternate zone (return 0 for UPS).
+<span class="lineNum">     354 </span>            :      **********************************************************************/
+<span class="lineNum">     355 </span>            :     int AltZone() const { return _alt_zone; }
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span>            :     /**
+<span class="lineNum">     358 </span>            :      * @return easting (meters) for alternate zone.
+<span class="lineNum">     359 </span>            :      **********************************************************************/
+<span class="lineNum">     360 </span>            :     Math::real AltEasting() const { return _alt_easting; }
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span>            :     /**
+<span class="lineNum">     363 </span>            :      * @return northing (meters) for alternate zone.
+<span class="lineNum">     364 </span>            :      **********************************************************************/
+<span class="lineNum">     365 </span>            :     Math::real AltNorthing() const { return _alt_northing; }
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span>            :     /**
+<span class="lineNum">     368 </span>            :      * @return meridian convergence (degrees) for alternate zone.
+<span class="lineNum">     369 </span>            :      **********************************************************************/
+<span class="lineNum">     370 </span>            :     Math::real AltConvergence() const { return _alt_gamma; }
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span>            :     /**
+<span class="lineNum">     373 </span>            :      * @return scale for alternate zone.
+<span class="lineNum">     374 </span>            :      **********************************************************************/
+<span class="lineNum">     375 </span>            :     Math::real AltScale() const { return _alt_k; }
+<span class="lineNum">     376 </span>            :     ///@}
+<span class="lineNum">     377 </span>            : 
+<span class="lineNum">     378 </span>            :     /** \name String representations of the GeoCoords object
+<span class="lineNum">     379 </span>            :      **********************************************************************/
+<span class="lineNum">     380 </span>            :     ///@{
+<span class="lineNum">     381 </span>            :     /**
+<span class="lineNum">     382 </span>            :      * String representation with latitude and longitude as signed decimal
+<span class="lineNum">     383 </span>            :      * degrees.
+<span class="lineNum">     384 </span>            :      *
+<span class="lineNum">     385 </span>            :      * @param[in] prec precision (relative to about 1m).
+<span class="lineNum">     386 </span>            :      * @param[in] longfirst if true give longitude first (default = false)
+<span class="lineNum">     387 </span>            :      * @exception std::bad_alloc if memory for the string can't be allocated.
+<span class="lineNum">     388 </span>            :      * @return decimal latitude/longitude string representation.
+<span class="lineNum">     389 </span>            :      *
+<span class="lineNum">     390 </span>            :      * Precision specifies accuracy of representation as follows:
+<span class="lineNum">     391 </span>            :      * - prec = &amp;minus;5 (min), 1&amp;deg;
+<span class="lineNum">     392 </span>            :      * - prec = 0, 10&lt;sup&gt;&amp;minus;5&lt;/sup&gt;&amp;deg; (about 1m)
+<span class="lineNum">     393 </span>            :      * - prec = 3, 10&lt;sup&gt;&amp;minus;8&lt;/sup&gt;&amp;deg;
+<span class="lineNum">     394 </span>            :      * - prec = 9 (max), 10&lt;sup&gt;&amp;minus;14&lt;/sup&gt;&amp;deg;
+<span class="lineNum">     395 </span>            :      **********************************************************************/
+<span class="lineNum">     396 </span>            :     std::string GeoRepresentation(int prec = 0, bool longfirst = false) const;
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span>            :     /**
+<span class="lineNum">     399 </span>            :      * String representation with latitude and longitude as degrees, minutes,
+<span class="lineNum">     400 </span>            :      * seconds, and hemisphere.
+<span class="lineNum">     401 </span>            :      *
+<span class="lineNum">     402 </span>            :      * @param[in] prec precision (relative to about 1m)
+<span class="lineNum">     403 </span>            :      * @param[in] longfirst if true give longitude first (default = false)
+<span class="lineNum">     404 </span>            :      * @param[in] dmssep if non-null, use as the DMS separator character
+<span class="lineNum">     405 </span>            :      *   (instead of d, ', &amp;quot; delimiters).
+<span class="lineNum">     406 </span>            :      * @exception std::bad_alloc if memory for the string can't be allocated.
+<span class="lineNum">     407 </span>            :      * @return DMS latitude/longitude string representation.
+<span class="lineNum">     408 </span>            :      *
+<span class="lineNum">     409 </span>            :      * Precision specifies accuracy of representation as follows:
+<span class="lineNum">     410 </span>            :      * - prec = &amp;minus;5 (min), 1&amp;deg;
+<span class="lineNum">     411 </span>            :      * - prec = &amp;minus;4, 0.1&amp;deg;
+<span class="lineNum">     412 </span>            :      * - prec = &amp;minus;3, 1'
+<span class="lineNum">     413 </span>            :      * - prec = &amp;minus;2, 0.1'
+<span class="lineNum">     414 </span>            :      * - prec = &amp;minus;1, 1&amp;quot;
+<span class="lineNum">     415 </span>            :      * - prec = 0, 0.1&amp;quot; (about 3m)
+<span class="lineNum">     416 </span>            :      * - prec = 1, 0.01&amp;quot;
+<span class="lineNum">     417 </span>            :      * - prec = 10 (max), 10&lt;sup&gt;&amp;minus;11&lt;/sup&gt;&amp;quot;
+<span class="lineNum">     418 </span>            :      **********************************************************************/
+<span class="lineNum">     419 </span>            :     std::string DMSRepresentation(int prec = 0, bool longfirst = false,
+<span class="lineNum">     420 </span>            :                                   char dmssep = char(0))
+<span class="lineNum">     421 </span>            :       const;
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span>            :     /**
+<span class="lineNum">     424 </span>            :      * MGRS string.
+<span class="lineNum">     425 </span>            :      *
+<span class="lineNum">     426 </span>            :      * @param[in] prec precision (relative to about 1m).
+<span class="lineNum">     427 </span>            :      * @exception std::bad_alloc if memory for the string can't be allocated.
+<span class="lineNum">     428 </span>            :      * @return MGRS string.
+<span class="lineNum">     429 </span>            :      *
+<span class="lineNum">     430 </span>            :      * This gives the coordinates of the enclosing grid square with size given
+<span class="lineNum">     431 </span>            :      * by the precision.  Thus 38n 444180 3684790 converted to a MGRS
+<span class="lineNum">     432 </span>            :      * coordinate at precision &amp;minus;2 (100m) is 38SMB441847 and not
+<span class="lineNum">     433 </span>            :      * 38SMB442848.  \e prec specifies the precision of the MGRS string as
+<span class="lineNum">     434 </span>            :      * follows:
+<span class="lineNum">     435 </span>            :      * - prec = &amp;minus;6 (min), only the grid zone is returned, e.g., 38S
+<span class="lineNum">     436 </span>            :      * - prec = &amp;minus;5, 100km, e.g., 38SMB
+<span class="lineNum">     437 </span>            :      * - prec = &amp;minus;4, 10km
+<span class="lineNum">     438 </span>            :      * - prec = &amp;minus;3, 1km
+<span class="lineNum">     439 </span>            :      * - prec = &amp;minus;2, 100m
+<span class="lineNum">     440 </span>            :      * - prec = &amp;minus;1, 10m
+<span class="lineNum">     441 </span>            :      * - prec = 0, 1m
+<span class="lineNum">     442 </span>            :      * - prec = 1, 0.1m
+<span class="lineNum">     443 </span>            :      * - prec = 6 (max), 1&amp;mu;m
+<span class="lineNum">     444 </span>            :      **********************************************************************/
+<span class="lineNum">     445 </span>            :     std::string MGRSRepresentation(int prec = 0) const;
+<span class="lineNum">     446 </span>            : 
+<span class="lineNum">     447 </span>            :     /**
+<span class="lineNum">     448 </span>            :      * UTM/UPS string.
+<span class="lineNum">     449 </span>            :      *
+<span class="lineNum">     450 </span>            :      * @param[in] prec precision (relative to about 1m)
+<span class="lineNum">     451 </span>            :      * @param[in] abbrev if true (the default) use abbreviated (n/s) notation
+<span class="lineNum">     452 </span>            :      *   for hemisphere; otherwise spell out the hemisphere (north/south)
+<span class="lineNum">     453 </span>            :      * @exception std::bad_alloc if memory for the string can't be allocated.
+<span class="lineNum">     454 </span>            :      * @return UTM/UPS string representation: zone designator, easting, and
+<span class="lineNum">     455 </span>            :      *   northing.
+<span class="lineNum">     456 </span>            :      *
+<span class="lineNum">     457 </span>            :      * Precision specifies accuracy of representation as follows:
+<span class="lineNum">     458 </span>            :      * - prec = &amp;minus;5 (min), 100km
+<span class="lineNum">     459 </span>            :      * - prec = &amp;minus;3, 1km
+<span class="lineNum">     460 </span>            :      * - prec = 0, 1m
+<span class="lineNum">     461 </span>            :      * - prec = 3, 1mm
+<span class="lineNum">     462 </span>            :      * - prec = 6, 1&amp;mu;m
+<span class="lineNum">     463 </span>            :      * - prec = 9 (max), 1nm
+<span class="lineNum">     464 </span>            :      **********************************************************************/
+<span class="lineNum">     465 </span>            :     std::string UTMUPSRepresentation(int prec = 0, bool abbrev = true) const;
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span>            :     /**
+<span class="lineNum">     468 </span>            :      * UTM/UPS string with hemisphere override.
+<span class="lineNum">     469 </span>            :      *
+<span class="lineNum">     470 </span>            :      * @param[in] northp hemisphere override
+<span class="lineNum">     471 </span>            :      * @param[in] prec precision (relative to about 1m)
+<span class="lineNum">     472 </span>            :      * @param[in] abbrev if true (the default) use abbreviated (n/s) notation
+<span class="lineNum">     473 </span>            :      *   for hemisphere; otherwise spell out the hemisphere (north/south)
+<span class="lineNum">     474 </span>            :      * @exception GeographicErr if the hemisphere override attempts to change
+<span class="lineNum">     475 </span>            :      *   UPS N to UPS S or vice versa.
+<span class="lineNum">     476 </span>            :      * @exception std::bad_alloc if memory for the string can't be allocated.
+<span class="lineNum">     477 </span>            :      * @return UTM/UPS string representation: zone designator, easting, and
+<span class="lineNum">     478 </span>            :      *   northing.
+<span class="lineNum">     479 </span>            :      **********************************************************************/
+<span class="lineNum">     480 </span>            :     std::string UTMUPSRepresentation(bool northp, int prec = 0,
+<span class="lineNum">     481 </span>            :                                      bool abbrev = true) const;
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span>            :     /**
+<span class="lineNum">     484 </span>            :      * MGRS string for the alternate zone.  See GeoCoords::MGRSRepresentation.
+<span class="lineNum">     485 </span>            :      *
+<span class="lineNum">     486 </span>            :      * @param[in] prec precision (relative to about 1m).
+<span class="lineNum">     487 </span>            :      * @exception std::bad_alloc if memory for the string can't be allocated.
+<span class="lineNum">     488 </span>            :      * @return MGRS string.
+<span class="lineNum">     489 </span>            :      **********************************************************************/
+<span class="lineNum">     490 </span>            :     std::string AltMGRSRepresentation(int prec = 0) const;
+<span class="lineNum">     491 </span>            : 
+<span class="lineNum">     492 </span>            :     /**
+<span class="lineNum">     493 </span>            :      * UTM/UPS string for the alternate zone.  See
+<span class="lineNum">     494 </span>            :      * GeoCoords::UTMUPSRepresentation.
+<span class="lineNum">     495 </span>            :      *
+<span class="lineNum">     496 </span>            :      * @param[in] prec precision (relative to about 1m)
+<span class="lineNum">     497 </span>            :      * @param[in] abbrev if true (the default) use abbreviated (n/s) notation
+<span class="lineNum">     498 </span>            :      *   for hemisphere; otherwise spell out the hemisphere (north/south)
+<span class="lineNum">     499 </span>            :      * @exception std::bad_alloc if memory for the string can't be allocated.
+<span class="lineNum">     500 </span>            :      * @return UTM/UPS string representation: zone designator, easting, and
+<span class="lineNum">     501 </span>            :      *   northing.
+<span class="lineNum">     502 </span>            :      **********************************************************************/
+<span class="lineNum">     503 </span>            :     std::string AltUTMUPSRepresentation(int prec = 0, bool abbrev = true)
+<span class="lineNum">     504 </span>            :       const;
+<span class="lineNum">     505 </span>            : 
+<span class="lineNum">     506 </span>            :     /**
+<span class="lineNum">     507 </span>            :      * UTM/UPS string for the alternate zone, with hemisphere override.
+<span class="lineNum">     508 </span>            :      *
+<span class="lineNum">     509 </span>            :      * @param[in] northp hemisphere override
+<span class="lineNum">     510 </span>            :      * @param[in] prec precision (relative to about 1m)
+<span class="lineNum">     511 </span>            :      * @param[in] abbrev if true (the default) use abbreviated (n/s) notation
+<span class="lineNum">     512 </span>            :      *   for hemisphere; otherwise spell out the hemisphere (north/south)
+<span class="lineNum">     513 </span>            :      * @exception GeographicErr if the hemisphere override attempts to change
+<span class="lineNum">     514 </span>            :      *   UPS n to UPS s or vice verse.
+<span class="lineNum">     515 </span>            :      * @exception std::bad_alloc if memory for the string can't be allocated.
+<span class="lineNum">     516 </span>            :      * @return UTM/UPS string representation: zone designator, easting, and
+<span class="lineNum">     517 </span>            :      *   northing.
+<span class="lineNum">     518 </span>            :      **********************************************************************/
+<span class="lineNum">     519 </span>            :     std::string AltUTMUPSRepresentation(bool northp, int prec = 0,
+<span class="lineNum">     520 </span>            :                                         bool abbrev = true) const;
+<span class="lineNum">     521 </span>            :     ///@}
+<span class="lineNum">     522 </span>            : 
+<span class="lineNum">     523 </span>            :     /** \name Inspector functions
+<span class="lineNum">     524 </span>            :      **********************************************************************/
+<span class="lineNum">     525 </span>            :     ///@{
+<span class="lineNum">     526 </span>            :     /**
+<span class="lineNum">     527 </span>            :      * @return \e a the equatorial radius of the WGS84 ellipsoid (meters).
+<span class="lineNum">     528 </span>            :      *
+<span class="lineNum">     529 </span>            :      * (The WGS84 value is returned because the UTM and UPS projections are
+<span class="lineNum">     530 </span>            :      * based on this ellipsoid.)
+<span class="lineNum">     531 </span>            :      **********************************************************************/
+<span class="lineNum">     532 </span>            :     Math::real MajorRadius() const { return UTMUPS::MajorRadius(); }
+<span class="lineNum">     533 </span>            : 
+<span class="lineNum">     534 </span>            :     /**
+<span class="lineNum">     535 </span>            :      * @return \e f the flattening of the WGS84 ellipsoid.
+<span class="lineNum">     536 </span>            :      *
+<span class="lineNum">     537 </span>            :      * (The WGS84 value is returned because the UTM and UPS projections are
+<span class="lineNum">     538 </span>            :      * based on this ellipsoid.)
+<span class="lineNum">     539 </span>            :      **********************************************************************/
+<span class="lineNum">     540 </span>            :     Math::real Flattening() const { return UTMUPS::Flattening(); }
+<span class="lineNum">     541 </span>            :     ///@}
+<span class="lineNum">     542 </span>            : 
+<span class="lineNum">     543 </span>            :   };
+<span class="lineNum">     544 </span>            : 
+<span class="lineNum">     545 </span>            : } // namespace GeographicLib
+<span class="lineNum">     546 </span>            : 
+<span class="lineNum">     547 </span>            : #endif  // GEOGRAPHICLIB_GEOCOORDS_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

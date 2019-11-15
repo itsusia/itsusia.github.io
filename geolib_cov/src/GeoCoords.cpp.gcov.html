@@ -1,0 +1,252 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/GeoCoords.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - GeoCoords.cpp<span style="font-size: 80%;"> (source / <a href="GeoCoords.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">55</td>
+            <td class="headerCovTableEntry">86</td>
+            <td class="headerCovTableEntryLo">64.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntryLo">63.6 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file GeoCoords.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::GeoCoords class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2008-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;GeographicLib/GeoCoords.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;GeographicLib/MGRS.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;GeographicLib/DMS.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/Utility.hpp&gt;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : namespace GeographicLib {
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            :   using namespace std;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span><span class="lineCov">         70 :   void GeoCoords::Reset(const std::string&amp; s, bool centerp, bool longfirst) {</span>
+<span class="lineNum">      20 </span><span class="lineCov">         70 :     vector&lt;string&gt; sa;</span>
+<span class="lineNum">      21 </span>            :     const char* spaces = &quot; \t\n\v\f\r,&quot;; // Include comma as a space
+<span class="lineNum">      22 </span><span class="lineCov">        352 :     for (string::size_type pos0 = 0, pos1; pos0 != string::npos;) {</span>
+<span class="lineNum">      23 </span>            :       pos1 = s.find_first_not_of(spaces, pos0);
+<span class="lineNum">      24 </span><span class="lineCov">        141 :       if (pos1 == string::npos)</span>
+<span class="lineNum">      25 </span>            :         break;
+<span class="lineNum">      26 </span>            :       pos0 = s.find_first_of(spaces, pos1);
+<span class="lineNum">      27 </span><span class="lineCov">        286 :       sa.push_back(s.substr(pos1, pos0 == string::npos ? pos0 : pos0 - pos1));</span>
+<span class="lineNum">      28 </span>            :     }
+<span class="lineNum">      29 </span><span class="lineCov">        140 :     if (sa.size() == 1) {</span>
+<span class="lineNum">      30 </span>            :       int prec;
+<span class="lineNum">      31 </span><span class="lineCov">          2 :       MGRS::Reverse(sa[0], _zone, _northp, _easting, _northing, prec, centerp);</span>
+<span class="lineNum">      32 </span><span class="lineCov">          1 :       UTMUPS::Reverse(_zone, _northp, _easting, _northing,</span>
+<span class="lineNum">      33 </span>            :                       _lat, _long, _gamma, _k);
+<span class="lineNum">      34 </span><span class="lineCov">         68 :     } else if (sa.size() == 2) {</span>
+<span class="lineNum">      35 </span><span class="lineCov">        130 :       DMS::DecodeLatLon(sa[0], sa[1], _lat, _long, longfirst);</span>
+<span class="lineNum">      36 </span><span class="lineCov">        124 :       _long = Math::AngNormalize(_long);</span>
+<span class="lineNum">      37 </span><span class="lineCov">         62 :       UTMUPS::Forward( _lat, _long,</span>
+<span class="lineNum">      38 </span>            :                        _zone, _northp, _easting, _northing, _gamma, _k);
+<span class="lineNum">      39 </span><span class="lineCov">          3 :     } else if (sa.size() == 3) {</span>
+<span class="lineNum">      40 </span>            :       unsigned zoneind, coordind;
+<span class="lineNum">      41 </span><span class="lineCov">          6 :       if (sa[0].size() &gt; 0 &amp;&amp; isalpha(sa[0][sa[0].size() - 1])) {</span>
+<span class="lineNum">      42 </span>            :         zoneind = 0;
+<span class="lineNum">      43 </span>            :         coordind = 1;
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :       } else if (sa[2].size() &gt; 0 &amp;&amp; isalpha(sa[2][sa[2].size() - 1])) {</span>
+<span class="lineNum">      45 </span>            :         zoneind = 2;
+<span class="lineNum">      46 </span>            :         coordind = 0;
+<span class="lineNum">      47 </span>            :       } else
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Neither &quot; + sa[0] + &quot; nor &quot; + sa[2]</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :                             + &quot; of the form UTM/UPS Zone + Hemisphere&quot;</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :                             + &quot; (ex: 38n, 09s, n)&quot;);</span>
+<span class="lineNum">      51 </span><span class="lineCov">          6 :       UTMUPS::DecodeZone(sa[zoneind], _zone, _northp);</span>
+<span class="lineNum">      52 </span><span class="lineCov">         15 :       for (unsigned i = 0; i &lt; 2; ++i)</span>
+<span class="lineNum">      53 </span><span class="lineCov">         12 :         (i ? _northing : _easting) = Utility::val&lt;real&gt;(sa[coordind + i]);</span>
+<span class="lineNum">      54 </span><span class="lineCov">          3 :       UTMUPS::Reverse(_zone, _northp, _easting, _northing,</span>
+<span class="lineNum">      55 </span>            :                       _lat, _long, _gamma, _k);
+<span class="lineNum">      56 </span><span class="lineCov">          3 :       FixHemisphere();</span>
+<span class="lineNum">      57 </span>            :     } else
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Coordinate requires 1, 2, or 3 elements&quot;);</span>
+<span class="lineNum">      59 </span>            :     CopyToAlt();
+<a name="60"><span class="lineNum">      60 </span><span class="lineCov">         66 :   }</span></a>
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span><span class="lineCov">          5 :   string GeoCoords::GeoRepresentation(int prec, bool longfirst) const {</span>
+<span class="lineNum">      63 </span><span class="lineCov">         15 :     prec = max(0, min(9 + Math::extra_digits(), prec) + 5);</span>
+<span class="lineNum">      64 </span><span class="lineCov">         10 :     ostringstream os;</span>
+<span class="lineNum">      65 </span>            :     os &lt;&lt; fixed &lt;&lt; setprecision(prec);
+<span class="lineNum">      66 </span><span class="lineCov">          5 :     real a = longfirst ? _long : _lat;</span>
+<span class="lineNum">      67 </span><span class="lineCov">          5 :     real b = longfirst ? _lat : _long;</span>
+<span class="lineNum">      68 </span>            :     if (!Math::isnan(a))
+<span class="lineNum">      69 </span>            :       os &lt;&lt; a;
+<span class="lineNum">      70 </span>            :     else
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :       os &lt;&lt; &quot;nan&quot;;</span>
+<span class="lineNum">      72 </span><span class="lineCov">          5 :     os &lt;&lt; &quot; &quot;;</span>
+<span class="lineNum">      73 </span>            :     if (!Math::isnan(b))
+<span class="lineNum">      74 </span>            :       os &lt;&lt; b;
+<span class="lineNum">      75 </span>            :     else
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :       os &lt;&lt; &quot;nan&quot;;</span>
+<span class="lineNum">      77 </span><span class="lineCov">          5 :     return os.str();</span>
+<span class="lineNum">      78 </span>            :   }
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span><span class="lineCov">          3 :   string GeoCoords::DMSRepresentation(int prec, bool longfirst,</span>
+<span class="lineNum">      81 </span>            :                                       char dmssep) const {
+<span class="lineNum">      82 </span><span class="lineCov">          9 :     prec = max(0, min(10 + Math::extra_digits(), prec) + 5);</span>
+<span class="lineNum">      83 </span><span class="lineCov">          6 :     return DMS::Encode(longfirst ? _long : _lat, unsigned(prec),</span>
+<span class="lineNum">      84 </span><span class="lineCov">          6 :                        longfirst ? DMS::LONGITUDE : DMS::LATITUDE, dmssep) +</span>
+<span class="lineNum">      85 </span><span class="lineCov">          6 :       &quot; &quot; + DMS::Encode(longfirst ? _lat : _long, unsigned(prec),</span>
+<span class="lineNum">      86 </span><span class="lineCov">          6 :                         longfirst ? DMS::LATITUDE : DMS::LONGITUDE, dmssep);</span>
+<span class="lineNum">      87 </span>            :   }
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :   string GeoCoords::MGRSRepresentation(int prec) const {</span>
+<span class="lineNum">      90 </span>            :     // Max precision is um
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :     prec = max(-1, min(6, prec) + 5);</span>
+<span class="lineNum">      92 </span>            :     string mgrs;
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :     MGRS::Forward(_zone, _northp, _easting, _northing, _lat, prec, mgrs);</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :     return mgrs;</span>
+<span class="lineNum">      95 </span>            :   }
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span><span class="lineCov">          4 :   string GeoCoords::AltMGRSRepresentation(int prec) const {</span>
+<span class="lineNum">      98 </span>            :     // Max precision is um
+<span class="lineNum">      99 </span><span class="lineCov">         12 :     prec = max(-1, min(6, prec) + 5);</span>
+<span class="lineNum">     100 </span>            :     string mgrs;
+<span class="lineNum">     101 </span><span class="lineCov">          4 :     MGRS::Forward(_alt_zone, _northp, _alt_easting, _alt_northing, _lat, prec,</span>
+<span class="lineNum">     102 </span>            :                   mgrs);
+<span class="lineNum">     103 </span><span class="lineCov">          4 :     return mgrs;</span>
+<span class="lineNum">     104 </span>            :   }
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span><span class="lineCov">          1 :   void GeoCoords::UTMUPSString(int zone, bool northp,</span>
+<span class="lineNum">     107 </span>            :                                real easting, real northing, int prec,
+<span class="lineNum">     108 </span>            :                                bool abbrev, std::string&amp; utm) {
+<span class="lineNum">     109 </span><span class="lineCov">          2 :     ostringstream os;</span>
+<span class="lineNum">     110 </span><span class="lineCov">          3 :     prec = max(-5, min(9 + Math::extra_digits(), prec));</span>
+<span class="lineNum">     111 </span>            :     // Need extra real because, since C++11, pow(float, int) returns double
+<span class="lineNum">     112 </span><span class="lineCov">          1 :     real scale = prec &lt; 0 ? real(pow(real(10), -prec)) : real(1);</span>
+<span class="lineNum">     113 </span><span class="lineCov">          2 :     os &lt;&lt; UTMUPS::EncodeZone(zone, northp, abbrev) &lt;&lt; fixed &lt;&lt; setfill('0');</span>
+<span class="lineNum">     114 </span><span class="lineCov">          1 :     if (Math::isfinite(easting)) {</span>
+<span class="lineNum">     115 </span><span class="lineCov">          3 :       os &lt;&lt; &quot; &quot; &lt;&lt; Utility::str(easting / scale, max(0, prec));</span>
+<span class="lineNum">     116 </span><span class="lineCov">          1 :       if (prec &lt; 0 &amp;&amp; abs(easting / scale) &gt; real(0.5))</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :         os &lt;&lt; setw(-prec) &lt;&lt; 0;</span>
+<span class="lineNum">     118 </span>            :     } else
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :       os &lt;&lt; &quot; nan&quot;;</span>
+<span class="lineNum">     120 </span><span class="lineCov">          1 :     if (Math::isfinite(northing)) {</span>
+<span class="lineNum">     121 </span><span class="lineCov">          3 :       os &lt;&lt; &quot; &quot; &lt;&lt; Utility::str(northing / scale, max(0, prec));</span>
+<span class="lineNum">     122 </span><span class="lineCov">          1 :       if (prec &lt; 0 &amp;&amp; abs(northing / scale) &gt; real(0.5))</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :         os &lt;&lt; setw(-prec) &lt;&lt; 0;</span>
+<span class="lineNum">     124 </span>            :     } else
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :       os &lt;&lt; &quot; nan&quot;;</span>
+<span class="lineNum">     126 </span><span class="lineCov">          2 :     utm = os.str();</span>
+<span class="lineNum">     127 </span><span class="lineCov">          1 :   }</span>
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :   string GeoCoords::UTMUPSRepresentation(int prec, bool abbrev) const {</span>
+<span class="lineNum">     130 </span>            :     string utm;
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :     UTMUPSString(_zone, _northp, _easting, _northing, prec, abbrev, utm);</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :     return utm;</span>
+<span class="lineNum">     133 </span>            :   }
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :   string GeoCoords::UTMUPSRepresentation(bool northp, int prec,</span>
+<span class="lineNum">     136 </span>            :                                          bool abbrev) const {
+<span class="lineNum">     137 </span>            :     real e, n;
+<span class="lineNum">     138 </span>            :     int z;
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :     UTMUPS::Transfer(_zone, _northp, _easting, _northing,</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :                      _zone,  northp,  e,        n,       z);</span>
+<span class="lineNum">     141 </span>            :     string utm;
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :     UTMUPSString(_zone, northp, e, n, prec, abbrev, utm);</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :     return utm;</span>
+<span class="lineNum">     144 </span>            :   }
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span><span class="lineCov">          1 :   string GeoCoords::AltUTMUPSRepresentation(int prec, bool abbrev) const {</span>
+<span class="lineNum">     147 </span>            :     string utm;
+<span class="lineNum">     148 </span><span class="lineCov">          1 :     UTMUPSString(_alt_zone, _northp, _alt_easting, _alt_northing, prec,</span>
+<span class="lineNum">     149 </span>            :                  abbrev, utm);
+<span class="lineNum">     150 </span><span class="lineCov">          1 :     return utm;</span>
+<span class="lineNum">     151 </span>            :   }
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :   string GeoCoords::AltUTMUPSRepresentation(bool northp, int prec,</span>
+<span class="lineNum">     154 </span>            :                                             bool abbrev) const {
+<span class="lineNum">     155 </span>            :     real e, n;
+<span class="lineNum">     156 </span>            :     int z;
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :     UTMUPS::Transfer(_alt_zone, _northp, _alt_easting, _alt_northing,</span>
+<span class="lineNum">     158 </span>            :                      _alt_zone,  northp,      e,            n,       z);
+<span class="lineNum">     159 </span>            :     string utm;
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :     UTMUPSString(_alt_zone, northp, e, n, prec, abbrev, utm);</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :     return utm;</span>
+<span class="lineNum">     162 </span>            :   }
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span><span class="lineCov">          3 :   void GeoCoords::FixHemisphere() {</span>
+<span class="lineNum">     165 </span><span class="lineCov">          3 :     if (_lat == 0 || (_northp &amp;&amp; _lat &gt;= 0) || (!_northp &amp;&amp; _lat &lt; 0) ||</span>
+<span class="lineNum">     166 </span>            :         Math::isnan(_lat))
+<span class="lineNum">     167 </span>            :       // Allow either hemisphere for equator
+<span class="lineNum">     168 </span>            :       return;
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :     if (_zone != UTMUPS::UPS) {</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :       _northing += (_northp ? 1 : -1) * UTMUPS::UTMShift();</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :       _northp = !_northp;</span>
+<span class="lineNum">     172 </span>            :     } else
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Hemisphere mixup&quot;);</span>
+<span class="lineNum">     174 </span>            :   }
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

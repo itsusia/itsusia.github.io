@@ -1,0 +1,459 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/DMS.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - DMS.cpp<span style="font-size: 80%;"> (source / <a href="DMS.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">178</td>
+            <td class="headerCovTableEntry">236</td>
+            <td class="headerCovTableEntryMed">75.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryMed">83.3 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file DMS.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::DMS class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2008-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;GeographicLib/DMS.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;GeographicLib/Utility.hpp&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      14 </span>            : // Squelch warnings about constant conditional expressions
+<span class="lineNum">      15 </span>            : #  pragma warning (disable: 4127)
+<span class="lineNum">      16 </span>            : #endif
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : namespace GeographicLib {
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            :   using namespace std;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            :   const char* const DMS::hemispheres_ = &quot;SNWE&quot;;
+<span class="lineNum">      23 </span>            :   const char* const DMS::signs_ = &quot;-+&quot;;
+<span class="lineNum">      24 </span>            :   const char* const DMS::digits_ = &quot;0123456789&quot;;
+<span class="lineNum">      25 </span>            :   const char* const DMS::dmsindicators_ = &quot;D'\&quot;:&quot;;
+<span class="lineNum">      26 </span>            :   const char* const DMS::components_[] = {&quot;degrees&quot;, &quot;minutes&quot;, &quot;seconds&quot;};
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span><span class="lineCov">        469 :   Math::real DMS::Decode(const std::string&amp; dms, flag&amp; ind) {</span>
+<span class="lineNum">      29 </span>            :     string dmsa = dms;
+<span class="lineNum">      30 </span><span class="lineCov">        938 :     replace(dmsa, &quot;\xc2\xb0&quot;, 'd');      // U+00b0 degree symbol</span>
+<span class="lineNum">      31 </span><span class="lineCov">        938 :     replace(dmsa, &quot;\xc2\xba&quot;, 'd');      // U+00ba alt symbol</span>
+<span class="lineNum">      32 </span><span class="lineCov">        938 :     replace(dmsa, &quot;\xe2\x81\xb0&quot;, 'd');  // U+2070 sup zero</span>
+<span class="lineNum">      33 </span><span class="lineCov">        938 :     replace(dmsa, &quot;\xcb\x9a&quot;, 'd');      // U+02da ring above</span>
+<span class="lineNum">      34 </span><span class="lineCov">        938 :     replace(dmsa, &quot;\xe2\x80\xb2&quot;, '\''); // U+2032 prime</span>
+<span class="lineNum">      35 </span><span class="lineCov">        938 :     replace(dmsa, &quot;\xc2\xb4&quot;, '\'');     // U+00b4 acute accent</span>
+<span class="lineNum">      36 </span><span class="lineCov">        938 :     replace(dmsa, &quot;\xe2\x80\x99&quot;, '\''); // U+2019 right single quote</span>
+<span class="lineNum">      37 </span><span class="lineCov">        938 :     replace(dmsa, &quot;\xe2\x80\xb3&quot;, '&quot;');  // U+2033 double prime</span>
+<span class="lineNum">      38 </span><span class="lineCov">        938 :     replace(dmsa, &quot;\xe2\x80\x9d&quot;, '&quot;');  // U+201d right double quote</span>
+<span class="lineNum">      39 </span><span class="lineCov">        938 :     replace(dmsa, &quot;\xe2\x88\x92&quot;, '-');  // U+2212 minus sign</span>
+<span class="lineNum">      40 </span><span class="lineCov">        938 :     replace(dmsa, &quot;\xb0&quot;, 'd');          // 0xb0 bare degree symbol</span>
+<span class="lineNum">      41 </span><span class="lineCov">        938 :     replace(dmsa, &quot;\xba&quot;, 'd');          // 0xba bare alt symbol</span>
+<span class="lineNum">      42 </span><span class="lineCov">        938 :     replace(dmsa, &quot;\xb4&quot;, '\'');         // 0xb4 bare acute accent</span>
+<span class="lineNum">      43 </span><span class="lineCov">        938 :     replace(dmsa, &quot;''&quot;, '&quot;');            // '' -&gt; &quot;</span>
+<span class="lineNum">      44 </span>            :     string::size_type
+<span class="lineNum">      45 </span>            :       beg = 0,
+<span class="lineNum">      46 </span><span class="lineCov">        469 :       end = unsigned(dmsa.size());</span>
+<span class="lineNum">      47 </span><span class="lineCov">        938 :     while (beg &lt; end &amp;&amp; isspace(dmsa[beg]))</span>
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :       ++beg;</span>
+<span class="lineNum">      49 </span><span class="lineCov">        938 :     while (beg &lt; end &amp;&amp; isspace(dmsa[end - 1]))</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :       --end;</span>
+<span class="lineNum">      51 </span>            :     // The trimmed string in [beg, end)
+<span class="lineNum">      52 </span>            :     real v = 0;
+<span class="lineNum">      53 </span>            :     int i = 0;
+<span class="lineNum">      54 </span>            :     flag ind1 = NONE;
+<span class="lineNum">      55 </span>            :     // p is pointer to the next piece that needs decoding
+<span class="lineNum">      56 </span><span class="lineCov">       1403 :     for (string::size_type p = beg, pb; p &lt; end; p = pb, ++i) {</span>
+<span class="lineNum">      57 </span>            :       string::size_type pa = p;
+<span class="lineNum">      58 </span>            :       // Skip over initial hemisphere letter (for i == 0)
+<span class="lineNum">      59 </span><span class="lineCov">        939 :       if (i == 0 &amp;&amp; Utility::lookup(hemispheres_, dmsa[pa]) &gt;= 0)</span>
+<span class="lineNum">      60 </span><span class="lineCov">          5 :         ++pa;</span>
+<span class="lineNum">      61 </span>            :       // Skip over initial sign (checking for it if i == 0)
+<span class="lineNum">      62 </span><span class="lineCov">        939 :       if (i &gt; 0 || (pa &lt; end &amp;&amp; Utility::lookup(signs_, dmsa[pa]) &gt;= 0))</span>
+<span class="lineNum">      63 </span><span class="lineCov">         68 :         ++pa;</span>
+<span class="lineNum">      64 </span>            :       // Find next sign
+<span class="lineNum">      65 </span><span class="lineCov">        940 :       pb = min(dmsa.find_first_of(signs_, pa), end);</span>
+<span class="lineNum">      66 </span><span class="lineCov">        470 :       flag ind2 = NONE;</span>
+<span class="lineNum">      67 </span><span class="lineCov">        940 :       v += InternalDecode(dmsa.substr(p, pb - p), ind2);</span>
+<span class="lineNum">      68 </span><span class="lineCov">        467 :       if (ind1 == NONE)</span>
+<span class="lineNum">      69 </span><span class="lineCov">        467 :         ind1 = ind2;</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :       else if (!(ind2 == NONE || ind1 == ind2))</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Incompatible hemisphere specifies in &quot; +</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :                             dmsa.substr(beg, pb - beg));</span>
+<span class="lineNum">      73 </span>            :     }
+<span class="lineNum">      74 </span><span class="lineCov">        466 :     if (i == 0)</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Empty or incomplete DMS string &quot; +</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :                           dmsa.substr(beg, end - beg));</span>
+<span class="lineNum">      77 </span><span class="lineCov">        466 :     ind = ind1;</span>
+<span class="lineNum">      78 </span><span class="lineCov">        466 :     return v;</span>
+<span class="lineNum">      79 </span>            :   }
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineCov">        470 :   Math::real DMS::InternalDecode(const std::string&amp; dmsa, flag&amp; ind) {</span>
+<span class="lineNum">      82 </span>            :     string errormsg;
+<span class="lineNum">      83 </span>            :     do {                       // Executed once (provides the ability to break)
+<span class="lineNum">      84 </span>            :       int sign = 1;
+<span class="lineNum">      85 </span>            :       unsigned
+<span class="lineNum">      86 </span>            :         beg = 0,
+<span class="lineNum">      87 </span><span class="lineCov">        470 :         end = unsigned(dmsa.size());</span>
+<span class="lineNum">      88 </span>            :       flag ind1 = NONE;
+<span class="lineNum">      89 </span>            :       int k = -1;
+<span class="lineNum">      90 </span><span class="lineCov">        940 :       if (end &gt; beg &amp;&amp; (k = Utility::lookup(hemispheres_, dmsa[beg])) &gt;= 0) {</span>
+<span class="lineNum">      91 </span><span class="lineCov">          5 :         ind1 = (k / 2) ? LONGITUDE : LATITUDE;</span>
+<span class="lineNum">      92 </span><span class="lineCov">          5 :         sign = k % 2 ? 1 : -1;</span>
+<span class="lineNum">      93 </span>            :         ++beg;
+<span class="lineNum">      94 </span>            :       }
+<span class="lineNum">      95 </span><span class="lineCov">        940 :       if (end &gt; beg &amp;&amp; (k = Utility::lookup(hemispheres_, dmsa[end-1])) &gt;= 0) {</span>
+<span class="lineNum">      96 </span>            :         if (k &gt;= 0) {
+<span class="lineNum">      97 </span><span class="lineCov">         26 :           if (ind1 != NONE) {</span>
+<span class="lineNum">      98 </span><span class="lineCov">         10 :             if (toupper(dmsa[beg - 1]) == toupper(dmsa[end - 1]))</span>
+<span class="lineNum">      99 </span><span class="lineCov">          5 :               errormsg = &quot;Repeated hemisphere indicators &quot;</span>
+<span class="lineNum">     100 </span><span class="lineCov">         15 :                 + Utility::str(dmsa[beg - 1])</span>
+<span class="lineNum">     101 </span><span class="lineCov">         28 :                 + &quot; in &quot; + dmsa.substr(beg - 1, end - beg + 1);</span>
+<span class="lineNum">     102 </span>            :             else
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :               errormsg = &quot;Contradictory hemisphere indicators &quot;</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :                 + Utility::str(dmsa[beg - 1]) + &quot; and &quot;</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :                 + Utility::str(dmsa[end - 1]) + &quot; in &quot;</span>
+<span class="lineNum">     106 </span><span class="lineCov">          3 :                 + dmsa.substr(beg - 1, end - beg + 1);</span>
+<span class="lineNum">     107 </span><span class="lineCov">          8 :             break;</span>
+<span class="lineNum">     108 </span>            :           }
+<span class="lineNum">     109 </span><span class="lineCov">         21 :           ind1 = (k / 2) ? LONGITUDE : LATITUDE;</span>
+<span class="lineNum">     110 </span><span class="lineCov">         21 :           sign = k % 2 ? 1 : -1;</span>
+<span class="lineNum">     111 </span>            :           --end;
+<span class="lineNum">     112 </span>            :         }
+<span class="lineNum">     113 </span>            :       }
+<span class="lineNum">     114 </span><span class="lineCov">        930 :       if (end &gt; beg &amp;&amp; (k = Utility::lookup(signs_, dmsa[beg])) &gt;= 0) {</span>
+<span class="lineNum">     115 </span>            :         if (k &gt;= 0) {
+<span class="lineNum">     116 </span><span class="lineCov">         68 :           sign *= k ? 1 : -1;</span>
+<span class="lineNum">     117 </span><span class="lineCov">         68 :           ++beg;</span>
+<span class="lineNum">     118 </span>            :         }
+<span class="lineNum">     119 </span>            :       }
+<span class="lineNum">     120 </span><span class="lineCov">        465 :       if (end == beg) {</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :         errormsg = &quot;Empty or incomplete DMS string &quot; + dmsa;</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">     123 </span>            :       }
+<span class="lineNum">     124 </span><span class="lineCov">        465 :       real ipieces[] = {0, 0, 0};</span>
+<span class="lineNum">     125 </span><span class="lineCov">        465 :       real fpieces[] = {0, 0, 0};</span>
+<span class="lineNum">     126 </span>            :       unsigned npiece = 0;
+<span class="lineNum">     127 </span>            :       real icurrent = 0;
+<span class="lineNum">     128 </span><span class="lineCov">        465 :       real fcurrent = 0;</span>
+<span class="lineNum">     129 </span>            :       unsigned ncurrent = 0, p = beg;
+<span class="lineNum">     130 </span>            :       bool pointseen = false;
+<span class="lineNum">     131 </span>            :       unsigned digcount = 0, intcount = 0;
+<span class="lineNum">     132 </span><span class="lineCov">       2114 :       while (p &lt; end) {</span>
+<span class="lineNum">     133 </span><span class="lineCov">       3298 :         char x = dmsa[p++];</span>
+<span class="lineNum">     134 </span><span class="lineCov">       1649 :         if ((k = Utility::lookup(digits_, x)) &gt;= 0) {</span>
+<span class="lineNum">     135 </span><span class="lineCov">       1525 :           ++ncurrent;</span>
+<span class="lineNum">     136 </span><span class="lineCov">       1525 :           if (digcount &gt; 0)</span>
+<span class="lineNum">     137 </span><span class="lineCov">        668 :             ++digcount;         // Count of decimal digits</span>
+<span class="lineNum">     138 </span>            :           else {
+<span class="lineNum">     139 </span><span class="lineCov">        857 :             icurrent = 10 * icurrent + k;</span>
+<span class="lineNum">     140 </span><span class="lineCov">        857 :             ++intcount;</span>
+<span class="lineNum">     141 </span>            :           }
+<span class="lineNum">     142 </span><span class="lineCov">        124 :         } else if (x == '.') {</span>
+<span class="lineNum">     143 </span><span class="lineCov">         78 :           if (pointseen) {</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :             errormsg = &quot;Multiple decimal points in &quot;</span>
+<span class="lineNum">     145 </span><span class="lineCov">          3 :               + dmsa.substr(beg, end - beg);</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     147 </span>            :           }
+<span class="lineNum">     148 </span>            :           pointseen = true;
+<span class="lineNum">     149 </span>            :           digcount = 1;
+<span class="lineNum">     150 </span><span class="lineCov">         46 :         } else if ((k = Utility::lookup(dmsindicators_, x)) &gt;= 0) {</span>
+<span class="lineNum">     151 </span><span class="lineCov">         46 :           if (k &gt;= 3) {</span>
+<span class="lineNum">     152 </span><span class="lineCov">         22 :             if (p == end) {</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :               errormsg = &quot;Illegal for : to appear at the end of &quot; +</span>
+<span class="lineNum">     154 </span><span class="lineCov">          3 :                 dmsa.substr(beg, end - beg);</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     156 </span>            :             }
+<span class="lineNum">     157 </span><span class="lineCov">         22 :             k = npiece;</span>
+<span class="lineNum">     158 </span>            :           }
+<span class="lineNum">     159 </span><span class="lineCov">         46 :           if (unsigned(k) == npiece - 1) {</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :             errormsg = &quot;Repeated &quot; + string(components_[k]) +</span>
+<span class="lineNum">     161 </span><span class="lineCov">          3 :               &quot; component in &quot; + dmsa.substr(beg, end - beg);</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     163 </span><span class="lineCov">         46 :           } else if (unsigned(k) &lt; npiece) {</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :             errormsg = string(components_[k]) + &quot; component follows &quot;</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :               + string(components_[npiece - 1]) + &quot; component in &quot;</span>
+<span class="lineNum">     166 </span><span class="lineCov">          3 :               + dmsa.substr(beg, end - beg);</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     168 </span>            :           }
+<span class="lineNum">     169 </span><span class="lineCov">         46 :           if (ncurrent == 0) {</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :             errormsg = &quot;Missing numbers in &quot; + string(components_[k]) +</span>
+<span class="lineNum">     171 </span><span class="lineCov">          3 :               &quot; component of &quot; + dmsa.substr(beg, end - beg);</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     173 </span>            :           }
+<span class="lineNum">     174 </span><span class="lineCov">         46 :           if (digcount &gt; 0) {</span>
+<span class="lineNum">     175 </span><span class="lineCov">          3 :             istringstream s(dmsa.substr(p - intcount - digcount - 1,</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :                                         intcount + digcount));</span>
+<span class="lineNum">     177 </span>            :             s &gt;&gt; fcurrent;
+<span class="lineNum">     178 </span>            :             icurrent = 0;
+<span class="lineNum">     179 </span>            :           }
+<span class="lineNum">     180 </span><span class="lineCov">         46 :           ipieces[k] = icurrent;</span>
+<span class="lineNum">     181 </span><span class="lineCov">         46 :           fpieces[k] = icurrent + fcurrent;</span>
+<span class="lineNum">     182 </span><span class="lineCov">         46 :           if (p &lt; end) {</span>
+<span class="lineNum">     183 </span><span class="lineCov">         40 :             npiece = k + 1;</span>
+<span class="lineNum">     184 </span><span class="lineCov">         40 :             icurrent = fcurrent = 0;</span>
+<span class="lineNum">     185 </span>            :             ncurrent = digcount = intcount = 0;
+<span class="lineNum">     186 </span>            :           }
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :         } else if (Utility::lookup(signs_, x) &gt;= 0) {</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :           errormsg = &quot;Internal sign in DMS string &quot;</span>
+<span class="lineNum">     189 </span><span class="lineCov">          3 :             + dmsa.substr(beg, end - beg);</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     191 </span>            :         } else {
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :           errormsg = &quot;Illegal character &quot; + Utility::str(x) + &quot; in DMS string &quot;</span>
+<span class="lineNum">     193 </span><span class="lineCov">          3 :             + dmsa.substr(beg, end - beg);</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     195 </span>            :         }
+<span class="lineNum">     196 </span>            :       }
+<span class="lineNum">     197 </span><span class="lineCov">        465 :       if (!errormsg.empty())</span>
+<span class="lineNum">     198 </span>            :         break;
+<span class="lineNum">     199 </span><span class="lineCov">        930 :       if (Utility::lookup(dmsindicators_, dmsa[p - 1]) &lt; 0) {</span>
+<span class="lineNum">     200 </span><span class="lineCov">        459 :         if (npiece &gt;= 3) {</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :           errormsg = &quot;Extra text following seconds in DMS string &quot;</span>
+<span class="lineNum">     202 </span><span class="lineCov">          3 :             + dmsa.substr(beg, end - beg);</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     204 </span>            :         }
+<span class="lineNum">     205 </span><span class="lineCov">        459 :         if (ncurrent == 0) {</span>
+<span class="lineNum">     206 </span><span class="lineCov">          1 :           errormsg = &quot;Missing numbers in trailing component of &quot;</span>
+<span class="lineNum">     207 </span><span class="lineCov">          6 :             + dmsa.substr(beg, end - beg);</span>
+<span class="lineNum">     208 </span><span class="lineCov">          1 :           break;</span>
+<span class="lineNum">     209 </span>            :         }
+<span class="lineNum">     210 </span><span class="lineCov">        458 :         if (digcount &gt; 0) {</span>
+<span class="lineNum">     211 </span><span class="lineCov">        157 :           istringstream s(dmsa.substr(p - intcount - digcount,</span>
+<span class="lineNum">     212 </span><span class="lineCov">        231 :                                       intcount + digcount));</span>
+<span class="lineNum">     213 </span>            :           s &gt;&gt; fcurrent;
+<span class="lineNum">     214 </span>            :           icurrent = 0;
+<span class="lineNum">     215 </span>            :         }
+<span class="lineNum">     216 </span><span class="lineCov">        458 :         ipieces[npiece] = icurrent;</span>
+<span class="lineNum">     217 </span><span class="lineCov">        458 :         fpieces[npiece] = icurrent + fcurrent;</span>
+<span class="lineNum">     218 </span>            :       }
+<span class="lineNum">     219 </span><span class="lineCov">        464 :       if (pointseen &amp;&amp; digcount == 0) {</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :         errormsg = &quot;Decimal point in non-terminal component of &quot;</span>
+<span class="lineNum">     221 </span><span class="lineCov">          3 :           + dmsa.substr(beg, end - beg);</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">     223 </span>            :       }
+<span class="lineNum">     224 </span>            :       // Note that we accept 59.999999... even though it rounds to 60.
+<span class="lineNum">     225 </span><span class="lineCov">        464 :       if (ipieces[1] &gt;= 60 || fpieces[1] &gt; 60 ) {</span>
+<span class="lineNum">     226 </span><span class="lineCov">         11 :         errormsg = &quot;Minutes &quot; + Utility::str(fpieces[1])</span>
+<span class="lineNum">     227 </span><span class="lineCov">          4 :           + &quot; not in range [0, 60)&quot;;</span>
+<span class="lineNum">     228 </span><span class="lineCov">          2 :         break;</span>
+<span class="lineNum">     229 </span>            :       }
+<span class="lineNum">     230 </span><span class="lineCov">        462 :       if (ipieces[2] &gt;= 60 || fpieces[2] &gt; 60) {</span>
+<span class="lineNum">     231 </span><span class="lineCov">          3 :         errormsg = &quot;Seconds &quot; + Utility::str(fpieces[2])</span>
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :           + &quot; not in range [0, 60)&quot;;</span>
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">     234 </span>            :       }
+<span class="lineNum">     235 </span><span class="lineCov">        462 :       ind = ind1;</span>
+<span class="lineNum">     236 </span>            :       // Assume check on range of result is made by calling routine (which
+<span class="lineNum">     237 </span>            :       // might be able to offer a better diagnostic).
+<span class="lineNum">     238 </span><span class="lineCov">        462 :       return real(sign) *</span>
+<span class="lineNum">     239 </span><span class="lineCov">        470 :         ( fpieces[2] != 0 ?</span>
+<span class="lineNum">     240 </span><span class="lineCov">          8 :           (60*(60*fpieces[0] + fpieces[1]) + fpieces[2]) / 3600 :</span>
+<span class="lineNum">     241 </span><span class="lineCov">        475 :           ( fpieces[1] != 0 ?</span>
+<span class="lineNum">     242 </span><span class="lineCov">        483 :             (60*fpieces[0] + fpieces[1]) / 60 : fpieces[0] ) );</span>
+<span class="lineNum">     243 </span>            :     } while (false);
+<span class="lineNum">     244 </span><span class="lineCov">          8 :     real val = Utility::nummatch&lt;real&gt;(dmsa);</span>
+<span class="lineNum">     245 </span><span class="lineCov">          8 :     if (val == 0)</span>
+<span class="lineNum">     246 </span><span class="lineCov">          6 :       throw GeographicErr(errormsg);</span>
+<span class="lineNum">     247 </span>            :     else
+<span class="lineNum">     248 </span><span class="lineCov">          5 :       ind = NONE;</span>
+<span class="lineNum">     249 </span><span class="lineCov">          5 :     return val;</span>
+<span class="lineNum">     250 </span>            :   }
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span><span class="lineCov">        217 :   void DMS::DecodeLatLon(const std::string&amp; stra, const std::string&amp; strb,</span>
+<span class="lineNum">     253 </span>            :                          real&amp; lat, real&amp; lon,
+<span class="lineNum">     254 </span>            :                          bool longfirst) {
+<span class="lineNum">     255 </span>            :     real a, b;
+<span class="lineNum">     256 </span>            :     flag ia, ib;
+<span class="lineNum">     257 </span><span class="lineCov">        217 :     a = Decode(stra, ia);</span>
+<span class="lineNum">     258 </span><span class="lineCov">        214 :     b = Decode(strb, ib);</span>
+<span class="lineNum">     259 </span><span class="lineCov">        214 :     if (ia == NONE &amp;&amp; ib == NONE) {</span>
+<span class="lineNum">     260 </span>            :       // Default to lat, long unless longfirst
+<span class="lineNum">     261 </span><span class="lineCov">        204 :       ia = longfirst ? LONGITUDE : LATITUDE;</span>
+<span class="lineNum">     262 </span><span class="lineCov">        204 :       ib = longfirst ? LATITUDE : LONGITUDE;</span>
+<span class="lineNum">     263 </span><span class="lineCov">         10 :     } else if (ia == NONE)</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :       ia = flag(LATITUDE + LONGITUDE - ib);</span>
+<span class="lineNum">     265 </span><span class="lineCov">         10 :     else if (ib == NONE)</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :       ib = flag(LATITUDE + LONGITUDE - ia);</span>
+<span class="lineNum">     267 </span><span class="lineCov">        214 :     if (ia == ib)</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Both &quot; + stra + &quot; and &quot;</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :                           + strb + &quot; interpreted as &quot;</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :                           + (ia == LATITUDE ? &quot;latitudes&quot; : &quot;longitudes&quot;));</span>
+<span class="lineNum">     271 </span>            :     real
+<span class="lineNum">     272 </span><span class="lineCov">        214 :       lat1 = ia == LATITUDE ? a : b,</span>
+<span class="lineNum">     273 </span><span class="lineCov">        214 :       lon1 = ia == LATITUDE ? b : a;</span>
+<span class="lineNum">     274 </span><span class="lineCov">        214 :     if (abs(lat1) &gt; 90)</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Latitude &quot; + Utility::str(lat1)</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :                           + &quot;d not in [-90d, 90d]&quot;);</span>
+<span class="lineNum">     277 </span><span class="lineCov">        214 :     lat = lat1;</span>
+<span class="lineNum">     278 </span><span class="lineCov">        214 :     lon = lon1;</span>
+<span class="lineNum">     279 </span><span class="lineCov">        214 :   }</span>
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :   Math::real DMS::DecodeAngle(const std::string&amp; angstr) {</span>
+<span class="lineNum">     282 </span>            :     flag ind;
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :     real ang = Decode(angstr, ind);</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :     if (ind != NONE)</span>
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Arc angle &quot; + angstr</span>
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :                           + &quot; includes a hemisphere, N/E/W/S&quot;);</span>
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :     return ang;</span>
+<span class="lineNum">     288 </span>            :   }
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span><span class="lineCov">         19 :   Math::real DMS::DecodeAzimuth(const std::string&amp; azistr) {</span>
+<span class="lineNum">     291 </span>            :     flag ind;
+<span class="lineNum">     292 </span><span class="lineCov">         19 :     real azi = Decode(azistr, ind);</span>
+<span class="lineNum">     293 </span><span class="lineCov">         19 :     if (ind == LATITUDE)</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Azimuth &quot; + azistr</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :                           + &quot; has a latitude hemisphere, N/S&quot;);</span>
+<span class="lineNum">     296 </span><span class="lineCov">         19 :     return Math::AngNormalize(azi);</span>
+<span class="lineNum">     297 </span>            :   }
+<span class="lineNum">     298 </span>            : 
+<span class="lineNum">     299 </span><span class="lineCov">          6 :   string DMS::Encode(real angle, component trailing, unsigned prec, flag ind,</span>
+<span class="lineNum">     300 </span>            :                      char dmssep) {
+<span class="lineNum">     301 </span>            :     // Assume check on range of input angle has been made by calling
+<span class="lineNum">     302 </span>            :     // routine (which might be able to offer a better diagnostic).
+<span class="lineNum">     303 </span><span class="lineCov">          6 :     if (!Math::isfinite(angle))</span>
+<span class="lineNum">     304 </span>            :       return angle &lt; 0 ? string(&quot;-inf&quot;) :
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :         (angle &gt; 0 ? string(&quot;inf&quot;) : string(&quot;nan&quot;));</span>
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            :     // 15 - 2 * trailing = ceiling(log10(2^53/90/60^trailing)).
+<span class="lineNum">     308 </span>            :     // This suffices to give full real precision for numbers in [-90,90]
+<span class="lineNum">     309 </span><span class="lineCov">         12 :     prec = min(15 + Math::extra_digits() - 2 * unsigned(trailing), prec);</span>
+<span class="lineNum">     310 </span>            :     real scale = 1;
+<span class="lineNum">     311 </span><span class="lineCov">         22 :     for (unsigned i = 0; i &lt; unsigned(trailing); ++i)</span>
+<span class="lineNum">     312 </span><span class="lineCov">          8 :       scale *= 60;</span>
+<span class="lineNum">     313 </span><span class="lineCov">         14 :     for (unsigned i = 0; i &lt; prec; ++i)</span>
+<span class="lineNum">     314 </span><span class="lineCov">          4 :       scale *= 10;</span>
+<span class="lineNum">     315 </span><span class="lineCov">          6 :     if (ind == AZIMUTH)</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :       angle -= floor(angle/360) * 360;</span>
+<span class="lineNum">     317 </span><span class="lineCov">          6 :     int sign = angle &lt; 0 ? -1 : 1;</span>
+<span class="lineNum">     318 </span><span class="lineCov">          6 :     angle *= sign;</span>
+<span class="lineNum">     319 </span>            : 
+<span class="lineNum">     320 </span>            :     // Break off integer part to preserve precision in manipulation of
+<span class="lineNum">     321 </span>            :     // fractional part.
+<span class="lineNum">     322 </span>            :     real
+<span class="lineNum">     323 </span><span class="lineCov">          6 :       idegree = floor(angle),</span>
+<span class="lineNum">     324 </span><span class="lineCov">          6 :       fdegree = (angle - idegree) * scale + real(0.5);</span>
+<span class="lineNum">     325 </span>            :     {
+<span class="lineNum">     326 </span>            :       // Implement the &quot;round ties to even&quot; rule
+<span class="lineNum">     327 </span><span class="lineCov">          6 :       real f = floor(fdegree);</span>
+<span class="lineNum">     328 </span><span class="lineCov">          6 :       fdegree = (f == fdegree &amp;&amp; fmod(f, real(2)) == 1) ? f - 1 : f;</span>
+<span class="lineNum">     329 </span>            :     }
+<span class="lineNum">     330 </span><span class="lineCov">          6 :     fdegree /= scale;</span>
+<span class="lineNum">     331 </span><span class="lineCov">          6 :     if (fdegree &gt;= 1) {</span>
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :       idegree += 1;</span>
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :       fdegree -= 1;</span>
+<span class="lineNum">     334 </span>            :     }
+<span class="lineNum">     335 </span><span class="lineCov">          6 :     real pieces[3] = {fdegree, 0, 0};</span>
+<span class="lineNum">     336 </span><span class="lineCov">         22 :     for (unsigned i = 1; i &lt;= unsigned(trailing); ++i) {</span>
+<span class="lineNum">     337 </span>            :       real
+<span class="lineNum">     338 </span><span class="lineCov">          8 :         ip = floor(pieces[i - 1]),</span>
+<span class="lineNum">     339 </span><span class="lineCov">          8 :         fp = pieces[i - 1] - ip;</span>
+<span class="lineNum">     340 </span><span class="lineCov">          8 :       pieces[i] = fp * 60;</span>
+<span class="lineNum">     341 </span><span class="lineCov">          8 :       pieces[i - 1] = ip;</span>
+<span class="lineNum">     342 </span>            :     }
+<span class="lineNum">     343 </span><span class="lineCov">          6 :     pieces[0] += idegree;</span>
+<span class="lineNum">     344 </span><span class="lineCov">         12 :     ostringstream s;</span>
+<span class="lineNum">     345 </span>            :     s &lt;&lt; fixed &lt;&lt; setfill('0');
+<span class="lineNum">     346 </span><span class="lineCov">          6 :     if (ind == NONE &amp;&amp; sign &lt; 0)</span>
+<span class="lineNum">     347 </span>            :       s &lt;&lt; '-';
+<span class="lineNum">     348 </span><span class="lineCov">          6 :     switch (trailing) {</span>
+<span class="lineNum">     349 </span><span class="lineCov">          2 :     case DEGREE:</span>
+<span class="lineNum">     350 </span><span class="lineCov">          2 :       if (ind != NONE)</span>
+<span class="lineNum">     351 </span><span class="lineCov">          6 :         s &lt;&lt; setw(1 + min(int(ind), 2) + prec + (prec ? 1 : 0));</span>
+<span class="lineNum">     352 </span><span class="lineCov">          4 :       s &lt;&lt; Utility::str(pieces[0], prec);</span>
+<span class="lineNum">     353 </span>            :       // Don't include degree designator (d) if it is the trailing component.
+<span class="lineNum">     354 </span><span class="lineCov">          2 :       break;</span>
+<span class="lineNum">     355 </span><span class="lineCov">          4 :     default:</span>
+<span class="lineNum">     356 </span><span class="lineCov">          4 :       if (ind != NONE)</span>
+<span class="lineNum">     357 </span><span class="lineCov">         12 :         s &lt;&lt; setw(1 + min(int(ind), 2));</span>
+<span class="lineNum">     358 </span>            :       s &lt;&lt; int(pieces[0])
+<span class="lineNum">     359 </span><span class="lineCov">          4 :         &lt;&lt; (dmssep ? dmssep : char(tolower(dmsindicators_[0])));</span>
+<span class="lineNum">     360 </span><span class="lineCov">          4 :       switch (trailing) {</span>
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :       case MINUTE:</span>
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :         s &lt;&lt; setw(2 + prec + (prec ? 1 : 0)) &lt;&lt; Utility::str(pieces[1], prec);</span>
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :         if (!dmssep)</span>
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 :           s &lt;&lt; char(tolower(dmsindicators_[1]));</span>
+<span class="lineNum">     365 </span>            :         break;
+<span class="lineNum">     366 </span>            :       case SECOND:
+<span class="lineNum">     367 </span>            :         s &lt;&lt; setw(2)
+<span class="lineNum">     368 </span><span class="lineCov">          4 :           &lt;&lt; int(pieces[1])</span>
+<span class="lineNum">     369 </span><span class="lineCov">          2 :           &lt;&lt; (dmssep ? dmssep : char(tolower(dmsindicators_[1])))</span>
+<span class="lineNum">     370 </span><span class="lineCov">         18 :           &lt;&lt; setw(2 + prec + (prec ? 1 : 0)) &lt;&lt; Utility::str(pieces[2], prec);</span>
+<span class="lineNum">     371 </span><span class="lineCov">          4 :         if (!dmssep)</span>
+<span class="lineNum">     372 </span><span class="lineCov">          2 :           s &lt;&lt; char(tolower(dmsindicators_[2]));</span>
+<span class="lineNum">     373 </span>            :         break;
+<span class="lineNum">     374 </span>            :       default:
+<span class="lineNum">     375 </span>            :         break;
+<span class="lineNum">     376 </span>            :       }
+<span class="lineNum">     377 </span>            :     }
+<span class="lineNum">     378 </span><span class="lineCov">          6 :     if (ind != NONE &amp;&amp; ind != AZIMUTH)</span>
+<span class="lineNum">     379 </span><span class="lineCov">          6 :       s &lt;&lt; hemispheres_[(ind == LATITUDE ? 0 : 2) + (sign &lt; 0 ? 0 : 1)];</span>
+<span class="lineNum">     380 </span>            :     return s.str();
+<span class="lineNum">     381 </span>            :   }
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

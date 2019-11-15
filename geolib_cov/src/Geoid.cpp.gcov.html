@@ -1,0 +1,585 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/Geoid.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - Geoid.cpp<span style="font-size: 80%;"> (source / <a href="Geoid.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">199</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file Geoid.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::Geoid class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2009-2015) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;GeographicLib/Geoid.hpp&gt;
+<span class="lineNum">      11 </span>            : // For getenv
+<span class="lineNum">      12 </span>            : #include &lt;cstdlib&gt;
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/Utility.hpp&gt;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : #if !defined(GEOGRAPHICLIB_DATA)
+<span class="lineNum">      16 </span>            : #  if defined(_WIN32)
+<span class="lineNum">      17 </span>            : #    define GEOGRAPHICLIB_DATA &quot;C:/ProgramData/GeographicLib&quot;
+<span class="lineNum">      18 </span>            : #  else
+<span class="lineNum">      19 </span>            : #    define GEOGRAPHICLIB_DATA &quot;/usr/local/share/GeographicLib&quot;
+<span class="lineNum">      20 </span>            : #  endif
+<span class="lineNum">      21 </span>            : #endif
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #if !defined(GEOGRAPHICLIB_GEOID_DEFAULT_NAME)
+<span class="lineNum">      24 </span>            : #  define GEOGRAPHICLIB_GEOID_DEFAULT_NAME &quot;egm96-5&quot;
+<span class="lineNum">      25 </span>            : #endif
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      28 </span>            : // Squelch warnings about unsafe use of getenv
+<span class="lineNum">      29 </span>            : #  pragma warning (disable: 4996)
+<span class="lineNum">      30 </span>            : #endif
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : namespace GeographicLib {
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            :   using namespace std;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            :   // This is the transfer matrix for a 3rd order fit with a 12-point stencil
+<span class="lineNum">      37 </span>            :   // with weights
+<span class="lineNum">      38 </span>            :   //
+<span class="lineNum">      39 </span>            :   //   \x -1  0  1  2
+<span class="lineNum">      40 </span>            :   //   y
+<span class="lineNum">      41 </span>            :   //  -1   .  1  1  .
+<span class="lineNum">      42 </span>            :   //   0   1  2  2  1
+<span class="lineNum">      43 </span>            :   //   1   1  2  2  1
+<span class="lineNum">      44 </span>            :   //   2   .  1  1  .
+<span class="lineNum">      45 </span>            :   //
+<span class="lineNum">      46 </span>            :   // A algorithm for n-dimensional polynomial fits is described in
+<span class="lineNum">      47 </span>            :   //   F. H. Lesh,
+<span class="lineNum">      48 </span>            :   //   Multi-dimensional least-squares polynomial curve fitting,
+<span class="lineNum">      49 </span>            :   //   CACM 2, 29-30 (1959).
+<span class="lineNum">      50 </span>            :   //
+<span class="lineNum">      51 </span>            :   // Here's the Maxima code to generate this matrix:
+<span class="lineNum">      52 </span>            :   //
+<span class="lineNum">      53 </span>            :   // /* The stencil and the weights */
+<span class="lineNum">      54 </span>            :   // xarr:[
+<span class="lineNum">      55 </span>            :   //     0, 1,
+<span class="lineNum">      56 </span>            :   // -1, 0, 1, 2,
+<span class="lineNum">      57 </span>            :   // -1, 0, 1, 2,
+<span class="lineNum">      58 </span>            :   //     0, 1]$
+<span class="lineNum">      59 </span>            :   // yarr:[
+<span class="lineNum">      60 </span>            :   //   -1,-1,
+<span class="lineNum">      61 </span>            :   // 0, 0, 0, 0,
+<span class="lineNum">      62 </span>            :   // 1, 1, 1, 1,
+<span class="lineNum">      63 </span>            :   //    2, 2]$
+<span class="lineNum">      64 </span>            :   // warr:[
+<span class="lineNum">      65 </span>            :   //    1, 1,
+<span class="lineNum">      66 </span>            :   // 1, 2, 2, 1,
+<span class="lineNum">      67 </span>            :   // 1, 2, 2, 1,
+<span class="lineNum">      68 </span>            :   //    1, 1]$
+<span class="lineNum">      69 </span>            :   //
+<span class="lineNum">      70 </span>            :   // /* [x exponent, y exponent] for cubic fit */
+<span class="lineNum">      71 </span>            :   // pows:[
+<span class="lineNum">      72 </span>            :   // [0,0],
+<span class="lineNum">      73 </span>            :   // [1,0],[0,1],
+<span class="lineNum">      74 </span>            :   // [2,0],[1,1],[0,2],
+<span class="lineNum">      75 </span>            :   // [3,0],[2,1],[1,2],[0,3]]$
+<span class="lineNum">      76 </span>            :   //
+<span class="lineNum">      77 </span>            :   // basisvec(x,y,pows):=map(lambda([ex],(if ex[1]=0 then 1 else x^ex[1])*
+<span class="lineNum">      78 </span>            :   //     (if ex[2]=0 then 1 else y^ex[2])),pows)$
+<span class="lineNum">      79 </span>            :   // addterm(x,y,f,w,pows):=block([a,b,bb:basisvec(x,y,pows)],
+<span class="lineNum">      80 </span>            :   //   a:w*(transpose(bb).bb),
+<span class="lineNum">      81 </span>            :   //   b:(w*f) * bb,
+<span class="lineNum">      82 </span>            :   //   [a,b])$
+<span class="lineNum">      83 </span>            :   //
+<span class="lineNum">      84 </span>            :   // c3row(k):=block([a,b,c,pows:pows,n],
+<span class="lineNum">      85 </span>            :   //   n:length(pows),
+<span class="lineNum">      86 </span>            :   //   a:zeromatrix(n,n),
+<span class="lineNum">      87 </span>            :   //   b:copylist(part(a,1)),
+<span class="lineNum">      88 </span>            :   //   c:[a,b],
+<span class="lineNum">      89 </span>            :   //   for i:1 thru length(xarr) do
+<span class="lineNum">      90 </span>            :   //   c:c+addterm(xarr[i],yarr[i],if i=k then 1 else 0,warr[i],pows),
+<span class="lineNum">      91 </span>            :   //   a:c[1],b:c[2],
+<span class="lineNum">      92 </span>            :   //   part(transpose( a^^-1 . transpose(b)),1))$
+<span class="lineNum">      93 </span>            :   // c3:[]$
+<span class="lineNum">      94 </span>            :   // for k:1 thru length(warr) do c3:endcons(c3row(k),c3)$
+<span class="lineNum">      95 </span>            :   // c3:apply(matrix,c3)$
+<span class="lineNum">      96 </span>            :   // c0:part(ratsimp(
+<span class="lineNum">      97 </span>            :   // genmatrix(yc,1,length(warr)).abs(c3).genmatrix(yd,length(pows),1)),2)$
+<span class="lineNum">      98 </span>            :   // c3:c0*c3$
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :   const int Geoid::c0_ = 240; // Common denominator
+<span class="lineNum">     101 </span>            :   const int Geoid::c3_[stencilsize_ * nterms_] = {
+<span class="lineNum">     102 </span>            :       9, -18, -88,    0,  96,   90,   0,   0, -60, -20,
+<span class="lineNum">     103 </span>            :      -9,  18,   8,    0, -96,   30,   0,   0,  60, -20,
+<span class="lineNum">     104 </span>            :       9, -88, -18,   90,  96,    0, -20, -60,   0,   0,
+<span class="lineNum">     105 </span>            :     186, -42, -42, -150, -96, -150,  60,  60,  60,  60,
+<span class="lineNum">     106 </span>            :      54, 162, -78,   30, -24,  -90, -60,  60, -60,  60,
+<span class="lineNum">     107 </span>            :      -9, -32,  18,   30,  24,    0,  20, -60,   0,   0,
+<span class="lineNum">     108 </span>            :      -9,   8,  18,   30, -96,    0, -20,  60,   0,   0,
+<span class="lineNum">     109 </span>            :      54, -78, 162,  -90, -24,   30,  60, -60,  60, -60,
+<span class="lineNum">     110 </span>            :     -54,  78,  78,   90, 144,   90, -60, -60, -60, -60,
+<span class="lineNum">     111 </span>            :       9,  -8, -18,  -30, -24,    0,  20,  60,   0,   0,
+<span class="lineNum">     112 </span>            :      -9,  18, -32,    0,  24,   30,   0,   0, -60,  20,
+<span class="lineNum">     113 </span>            :       9, -18,  -8,    0, -24,  -30,   0,   0,  60,  20,
+<span class="lineNum">     114 </span>            :   };
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :   // Like c3, but with the coeffs of x, x^2, and x^3 constrained to be zero.
+<span class="lineNum">     117 </span>            :   // Use this at the N pole so that the height in independent of the longitude
+<span class="lineNum">     118 </span>            :   // there.
+<span class="lineNum">     119 </span>            :   //
+<span class="lineNum">     120 </span>            :   // Here's the Maxima code to generate this matrix (continued from above).
+<span class="lineNum">     121 </span>            :   //
+<span class="lineNum">     122 </span>            :   // /* figure which terms to exclude so that fit is indep of x at y=0 */
+<span class="lineNum">     123 </span>            :   // mask:part(zeromatrix(1,length(pows)),1)+1$
+<span class="lineNum">     124 </span>            :   // for i:1 thru length(pows) do
+<span class="lineNum">     125 </span>            :   // if pows[i][1]&gt;0 and pows[i][2]=0 then mask[i]:0$
+<span class="lineNum">     126 </span>            :   //
+<span class="lineNum">     127 </span>            :   // /* Same as c3row but with masked pows. */
+<span class="lineNum">     128 </span>            :   // c3nrow(k):=block([a,b,c,powsa:[],n,d,e],
+<span class="lineNum">     129 </span>            :   //   for i:1 thru length(mask) do if mask[i]&gt;0 then
+<span class="lineNum">     130 </span>            :   //   powsa:endcons(pows[i],powsa),
+<span class="lineNum">     131 </span>            :   //   n:length(powsa),
+<span class="lineNum">     132 </span>            :   //   a:zeromatrix(n,n),
+<span class="lineNum">     133 </span>            :   //   b:copylist(part(a,1)),
+<span class="lineNum">     134 </span>            :   //   c:[a,b],
+<span class="lineNum">     135 </span>            :   //   for i:1 thru length(xarr) do
+<span class="lineNum">     136 </span>            :   //   c:c+addterm(xarr[i],yarr[i],if i=k then 1 else 0,warr[i],powsa),
+<span class="lineNum">     137 </span>            :   //   a:c[1],b:c[2],
+<span class="lineNum">     138 </span>            :   //   d:part(transpose( a^^-1 . transpose(b)),1),
+<span class="lineNum">     139 </span>            :   //   e:[],
+<span class="lineNum">     140 </span>            :   //   for i:1 thru length(mask) do
+<span class="lineNum">     141 </span>            :   //   if mask[i]&gt;0 then (e:endcons(first(d),e),d:rest(d)) else e:endcons(0,e),
+<span class="lineNum">     142 </span>            :   //   e)$
+<span class="lineNum">     143 </span>            :   // c3n:[]$
+<span class="lineNum">     144 </span>            :   // for k:1 thru length(warr) do c3n:endcons(c3nrow(k),c3n)$
+<span class="lineNum">     145 </span>            :   // c3n:apply(matrix,c3n)$
+<span class="lineNum">     146 </span>            :   // c0n:part(ratsimp(
+<span class="lineNum">     147 </span>            :   //    genmatrix(yc,1,length(warr)).abs(c3n).genmatrix(yd,length(pows),1)),2)$
+<span class="lineNum">     148 </span>            :   // c3n:c0n*c3n$
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            :   const int Geoid::c0n_ = 372; // Common denominator
+<span class="lineNum">     151 </span>            :   const int Geoid::c3n_[stencilsize_ * nterms_] = {
+<span class="lineNum">     152 </span>            :       0, 0, -131, 0,  138,  144, 0,   0, -102, -31,
+<span class="lineNum">     153 </span>            :       0, 0,    7, 0, -138,   42, 0,   0,  102, -31,
+<span class="lineNum">     154 </span>            :      62, 0,  -31, 0,    0,  -62, 0,   0,    0,  31,
+<span class="lineNum">     155 </span>            :     124, 0,  -62, 0,    0, -124, 0,   0,    0,  62,
+<span class="lineNum">     156 </span>            :     124, 0,  -62, 0,    0, -124, 0,   0,    0,  62,
+<span class="lineNum">     157 </span>            :      62, 0,  -31, 0,    0,  -62, 0,   0,    0,  31,
+<span class="lineNum">     158 </span>            :       0, 0,   45, 0, -183,   -9, 0,  93,   18,   0,
+<span class="lineNum">     159 </span>            :       0, 0,  216, 0,   33,   87, 0, -93,   12, -93,
+<span class="lineNum">     160 </span>            :       0, 0,  156, 0,  153,   99, 0, -93,  -12, -93,
+<span class="lineNum">     161 </span>            :       0, 0,  -45, 0,   -3,    9, 0,  93,  -18,   0,
+<span class="lineNum">     162 </span>            :       0, 0,  -55, 0,   48,   42, 0,   0,  -84,  31,
+<span class="lineNum">     163 </span>            :       0, 0,   -7, 0,  -48,  -42, 0,   0,   84,  31,
+<span class="lineNum">     164 </span>            :   };
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :   // Like c3n, but y -&gt; 1-y so that h is independent of x at y = 1.  Use this
+<span class="lineNum">     167 </span>            :   // at the S pole so that the height in independent of the longitude there.
+<span class="lineNum">     168 </span>            :   //
+<span class="lineNum">     169 </span>            :   // Here's the Maxima code to generate this matrix (continued from above).
+<span class="lineNum">     170 </span>            :   //
+<span class="lineNum">     171 </span>            :   // /* Transform c3n to c3s by transforming y -&gt; 1-y */
+<span class="lineNum">     172 </span>            :   // vv:[
+<span class="lineNum">     173 </span>            :   //      v[11],v[12],
+<span class="lineNum">     174 </span>            :   // v[7],v[8],v[9],v[10],
+<span class="lineNum">     175 </span>            :   // v[3],v[4],v[5],v[6],
+<span class="lineNum">     176 </span>            :   //      v[1],v[2]]$
+<span class="lineNum">     177 </span>            :   // poly:expand(vv.(c3n/c0n).transpose(basisvec(x,1-y,pows)))$
+<span class="lineNum">     178 </span>            :   // c3sf[i,j]:=coeff(coeff(coeff(poly,v[i]),x,pows[j][1]),y,pows[j][2])$
+<span class="lineNum">     179 </span>            :   // c3s:genmatrix(c3sf,length(vv),length(pows))$
+<span class="lineNum">     180 </span>            :   // c0s:part(ratsimp(
+<span class="lineNum">     181 </span>            :   //    genmatrix(yc,1,length(warr)).abs(c3s).genmatrix(yd,length(pows),1)),2)$
+<span class="lineNum">     182 </span>            :   // c3s:c0s*c3s$
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            :   const int Geoid::c0s_ = 372; // Common denominator
+<span class="lineNum">     185 </span>            :   const int Geoid::c3s_[stencilsize_ * nterms_] = {
+<span class="lineNum">     186 </span>            :      18,  -36, -122,   0,  120,  135, 0,   0,  -84, -31,
+<span class="lineNum">     187 </span>            :     -18,   36,   -2,   0, -120,   51, 0,   0,   84, -31,
+<span class="lineNum">     188 </span>            :      36, -165,  -27,  93,  147,   -9, 0, -93,   18,   0,
+<span class="lineNum">     189 </span>            :     210,   45, -111, -93,  -57, -192, 0,  93,   12,  93,
+<span class="lineNum">     190 </span>            :     162,  141,  -75, -93, -129, -180, 0,  93,  -12,  93,
+<span class="lineNum">     191 </span>            :     -36,  -21,   27,  93,   39,    9, 0, -93,  -18,   0,
+<span class="lineNum">     192 </span>            :       0,    0,   62,   0,    0,   31, 0,   0,    0, -31,
+<span class="lineNum">     193 </span>            :       0,    0,  124,   0,    0,   62, 0,   0,    0, -62,
+<span class="lineNum">     194 </span>            :       0,    0,  124,   0,    0,   62, 0,   0,    0, -62,
+<span class="lineNum">     195 </span>            :       0,    0,   62,   0,    0,   31, 0,   0,    0, -31,
+<span class="lineNum">     196 </span>            :     -18,   36,  -64,   0,   66,   51, 0,   0, -102,  31,
+<span class="lineNum">     197 </span>            :      18,  -36,    2,   0,  -66,  -51, 0,   0,  102,  31,
+<span class="lineNum">     198 </span>            :   };
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :   Geoid::Geoid(const std::string&amp; name, const std::string&amp; path, bool cubic,</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :                bool threadsafe)</span>
+<span class="lineNum">     202 </span>            :     : _name(name)
+<span class="lineNum">     203 </span>            :     , _dir(path)
+<span class="lineNum">     204 </span>            :     , _cubic(cubic)
+<span class="lineNum">     205 </span>            :     , _a( Constants::WGS84_a() )
+<span class="lineNum">     206 </span>            :     , _e2( (2 - Constants::WGS84_f()) * Constants::WGS84_f() )
+<span class="lineNum">     207 </span>            :     , _degree( Math::degree() )
+<span class="lineNum">     208 </span>            :     , _eps( sqrt(numeric_limits&lt;real&gt;::epsilon()) )
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :     , _threadsafe(false)        // Set after cache is read</span>
+<span class="lineNum">     210 </span>            :   {
+<span class="lineNum">     211 </span>            :     GEOGRAPHICLIB_STATIC_ASSERT(sizeof(pixel_t) == pixel_size_,
+<span class="lineNum">     212 </span>            :                                 &quot;pixel_t has the wrong size&quot;);
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :     if (_dir.empty())</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :       _dir = DefaultGeoidPath();</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :     _filename = _dir + &quot;/&quot; + _name + (pixel_size_ != 4 ? &quot;.pgm&quot; : &quot;.pgm4&quot;);</span>
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :     _file.open(_filename.c_str(), ios::binary);</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :     if (!(_file.good()))</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;File not readable &quot; + _filename);</span>
+<span class="lineNum">     219 </span>            :     string s;
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :     if (!(getline(_file, s) &amp;&amp; s == &quot;P5&quot;))</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;File not in PGM format &quot; + _filename);</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :     _offset = numeric_limits&lt;real&gt;::max();</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :     _scale = 0;</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :     _maxerror = _rmserror = -1;</span>
+<span class="lineNum">     225 </span>            :     _description = &quot;NONE&quot;;
+<span class="lineNum">     226 </span>            :     _datetime = &quot;UNKNOWN&quot;;
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :     while (getline(_file, s)) {</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :       if (s.empty())</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :         continue;</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :       if (s[0] == '#') {</span>
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :         istringstream is(s);</span>
+<span class="lineNum">     232 </span>            :         string commentid, key;
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :         if (!(is &gt;&gt; commentid &gt;&gt; key) || commentid != &quot;#&quot;)</span>
+<span class="lineNum">     234 </span>            :           continue;
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :         if (key == &quot;Description&quot; || key ==&quot;DateTime&quot;) {</span>
+<span class="lineNum">     236 </span>            :           string::size_type p =
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :             s.find_first_not_of(&quot; \t&quot;, unsigned(is.tellg()));</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :           if (p != string::npos)</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :             (key == &quot;Description&quot; ? _description : _datetime) = s.substr(p);</span>
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :         } else if (key == &quot;Offset&quot;) {</span>
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :           if (!(is &gt;&gt; _offset))</span>
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :             throw GeographicErr(&quot;Error reading offset &quot; + _filename);</span>
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :         } else if (key == &quot;Scale&quot;) {</span>
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :           if (!(is &gt;&gt; _scale))</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :             throw GeographicErr(&quot;Error reading scale &quot; + _filename);</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :         } else if (key == (_cubic ? &quot;MaxCubicError&quot; : &quot;MaxBilinearError&quot;)) {</span>
+<span class="lineNum">     247 </span>            :           // It's not an error if the error can't be read
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :           is &gt;&gt; _maxerror;</span>
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :         } else if (key == (_cubic ? &quot;RMSCubicError&quot; : &quot;RMSBilinearError&quot;)) {</span>
+<span class="lineNum">     250 </span>            :           // It's not an error if the error can't be read
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :           is &gt;&gt; _rmserror;</span>
+<span class="lineNum">     252 </span>            :         }
+<span class="lineNum">     253 </span>            :       } else {
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :         istringstream is(s);</span>
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :         if (!(is &gt;&gt; _width &gt;&gt; _height))</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :           throw GeographicErr(&quot;Error reading raster size &quot; + _filename);</span>
+<span class="lineNum">     257 </span>            :         break;
+<span class="lineNum">     258 </span>            :       }
+<span class="lineNum">     259 </span>            :     }
+<span class="lineNum">     260 </span>            :     {
+<span class="lineNum">     261 </span>            :       unsigned maxval;
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :       if (!(_file &gt;&gt; maxval))</span>
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Error reading maxval &quot; + _filename);</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :       if (maxval != pixel_max_)</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :         throw GeographicErr(&quot;Incorrect value of maxval &quot; + _filename);</span>
+<span class="lineNum">     266 </span>            :       // Add 1 for whitespace after maxval
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :       _datastart = (unsigned long long)(_file.tellg()) + 1ULL;</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :       _swidth = (unsigned long long)(_width);</span>
+<span class="lineNum">     269 </span>            :     }
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :     if (_offset == numeric_limits&lt;real&gt;::max())</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Offset not set &quot; + _filename);</span>
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :     if (_scale == 0)</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale not set &quot; + _filename);</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :     if (_scale &lt; 0)</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Scale must be positive &quot; + _filename);</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :     if (_height &lt; 2 || _width &lt; 2)</span>
+<span class="lineNum">     277 </span>            :       // Coarsest grid spacing is 180deg.
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Raster size too small &quot; + _filename);</span>
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :     if (_width &amp; 1)</span>
+<span class="lineNum">     280 </span>            :       // This is so that longitude grids can be extended thru the poles.
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Raster width is odd &quot; + _filename);</span>
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :     if (!(_height &amp; 1))</span>
+<span class="lineNum">     283 </span>            :       // This is so that latitude grid includes the equator.
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Raster height is even &quot; + _filename);</span>
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :     _file.seekg(0, ios::end);</span>
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :     if (!_file.good() ||</span>
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :         _datastart + pixel_size_ * _swidth * (unsigned long long)(_height) !=</span>
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :         (unsigned long long)(_file.tellg()))</span>
+<span class="lineNum">     289 </span>            :       // Possibly this test should be &quot;&lt;&quot; because the file contains, e.g., a
+<span class="lineNum">     290 </span>            :       // second image.  However, for now we are more strict.
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;File has the wrong length &quot; + _filename);</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :     _rlonres = _width / real(360);</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :     _rlatres = (_height - 1) / real(180);</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :     _cache = false;</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :     _ix = _width;</span>
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :     _iy = _height;</span>
+<span class="lineNum">     297 </span>            :     // Ensure that file errors throw exceptions
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :     _file.exceptions(ifstream::eofbit | ifstream::failbit | ifstream::badbit);</span>
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :     if (threadsafe) {</span>
+<span class="lineNum">     300 </span>            :       CacheAll();
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :       _file.close();</span>
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :       _threadsafe = true;</span>
+<span class="lineNum">     303 </span>            :     }
+<a name="304"><span class="lineNum">     304 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :   Math::real Geoid::height(real lat, real lon) const {</span>
+<span class="lineNum">     307 </span>            :     lat = Math::LatFix(lat);
+<span class="lineNum">     308 </span>            :     if (Math::isnan(lat) || Math::isnan(lon)) {
+<span class="lineNum">     309 </span>            :       return Math::NaN();
+<span class="lineNum">     310 </span>            :     }
+<span class="lineNum">     311 </span>            :     lon = Math::AngNormalize(lon);
+<span class="lineNum">     312 </span>            :     real
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :       fx =  lon * _rlonres,</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :       fy = -lat * _rlatres;</span>
+<span class="lineNum">     315 </span>            :     int
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :       ix = int(floor(fx)),</span>
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :       iy = min((_height - 1)/2 - 1, int(floor(fy)));</span>
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :     fx -= ix;</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :     fy -= iy;</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :     iy += (_height - 1)/2;</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :     ix += ix &lt; 0 ? _width : (ix &gt;= _width ? -_width : 0);</span>
+<span class="lineNum">     322 </span>            :     real v00 = 0, v01 = 0, v10 = 0, v11 = 0;
+<span class="lineNum">     323 </span>            :     real t[nterms_];
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :     if (_threadsafe || !(ix == _ix &amp;&amp; iy == _iy)) {</span>
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :       if (!_cubic) {</span>
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :         v00 = rawval(ix    , iy    );</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :         v01 = rawval(ix + 1, iy    );</span>
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :         v10 = rawval(ix    , iy + 1);</span>
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :         v11 = rawval(ix + 1, iy + 1);</span>
+<span class="lineNum">     331 </span>            :       } else {
+<span class="lineNum">     332 </span>            :         real v[stencilsize_];
+<span class="lineNum">     333 </span>            :         int k = 0;
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :         v[k++] = rawval(ix    , iy - 1);</span>
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :         v[k++] = rawval(ix + 1, iy - 1);</span>
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :         v[k++] = rawval(ix - 1, iy    );</span>
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :         v[k++] = rawval(ix    , iy    );</span>
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :         v[k++] = rawval(ix + 1, iy    );</span>
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :         v[k++] = rawval(ix + 2, iy    );</span>
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :         v[k++] = rawval(ix - 1, iy + 1);</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :         v[k++] = rawval(ix    , iy + 1);</span>
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :         v[k++] = rawval(ix + 1, iy + 1);</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :         v[k++] = rawval(ix + 2, iy + 1);</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :         v[k++] = rawval(ix    , iy + 2);</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :         v[k++] = rawval(ix + 1, iy + 2);</span>
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :         const int* c3x = iy == 0 ? c3n_ : (iy == _height - 2 ? c3s_ : c3_);</span>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :         int c0x = iy == 0 ? c0n_ : (iy == _height - 2 ? c0s_ : c0_);</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :         for (unsigned i = 0; i &lt; nterms_; ++i) {</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :           t[i] = 0;</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :           for (unsigned j = 0; j &lt; stencilsize_; ++j)</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :             t[i] += v[j] * c3x[nterms_ * j + i];</span>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :           t[i] /= c0x;</span>
+<span class="lineNum">     354 </span>            :         }
+<span class="lineNum">     355 </span>            :       }
+<span class="lineNum">     356 </span>            :     } else { // same cell; used cached coefficients
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :       if (!_cubic) {</span>
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :         v00 = _v00;</span>
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :         v01 = _v01;</span>
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :         v10 = _v10;</span>
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :         v11 = _v11;</span>
+<span class="lineNum">     362 </span>            :       } else
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :         copy(_t, _t + nterms_, t);</span>
+<span class="lineNum">     364 </span>            :     }
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :     if (!_cubic) {</span>
+<span class="lineNum">     366 </span>            :       real
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :         a = (1 - fx) * v00 + fx * v01,</span>
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :         b = (1 - fx) * v10 + fx * v11,</span>
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 :         c = (1 - fy) * a + fy * b,</span>
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :         h = _offset + _scale * c;</span>
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :       if (!_threadsafe) {</span>
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :         _ix = ix;</span>
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :         _iy = iy;</span>
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :         _v00 = v00;</span>
+<span class="lineNum">     375 </span><span class="lineNoCov">          0 :         _v01 = v01;</span>
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :         _v10 = v10;</span>
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 :         _v11 = v11;</span>
+<span class="lineNum">     378 </span>            :       }
+<span class="lineNum">     379 </span>            :       return h;
+<span class="lineNum">     380 </span>            :     } else {
+<span class="lineNum">     381 </span><span class="lineNoCov">          0 :       real h = t[0] + fx * (t[1] + fx * (t[3] + fx * t[6])) +</span>
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :         fy * (t[2] + fx * (t[4] + fx * t[7]) +</span>
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :              fy * (t[5] + fx * t[8] + fy * t[9]));</span>
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :       h = _offset + _scale * h;</span>
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :       if (!_threadsafe) {</span>
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :         _ix = ix;</span>
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :         _iy = iy;</span>
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :         copy(t, t + nterms_, _t);</span>
+<span class="lineNum">     389 </span>            :       }
+<span class="lineNum">     390 </span>            :       return h;
+<span class="lineNum">     391 </span>            :     }
+<span class="lineNum">     392 </span>            :   }
+<span class="lineNum">     393 </span>            : 
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :   void Geoid::CacheClear() const {</span>
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 :     if (!_threadsafe) {</span>
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :       _cache = false;</span>
+<span class="lineNum">     397 </span>            :       try {
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :         _data.clear();</span>
+<span class="lineNum">     399 </span>            :         // Use swap to release memory back to system
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :         vector&lt; vector&lt;pixel_t&gt; &gt;().swap(_data);</span>
+<span class="lineNum">     401 </span>            :       }
+<span class="lineNum">     402 </span>            :       catch (const exception&amp;) {
+<span class="lineNum">     403 </span>            :       }
+<span class="lineNum">     404 </span>            :     }
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :   void Geoid::CacheArea(real south, real west, real north, real east) const {</span>
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 :     if (_threadsafe)</span>
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Attempt to change cache of threadsafe Geoid&quot;);</span>
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :     if (south &gt; north) {</span>
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :       CacheClear();</span>
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :       return;</span>
+<span class="lineNum">     413 </span>            :     }
+<span class="lineNum">     414 </span>            :     south = Math::LatFix(south);
+<span class="lineNum">     415 </span>            :     north = Math::LatFix(north);
+<span class="lineNum">     416 </span>            :     west = Math::AngNormalize(west); // west in [-180, 180)
+<span class="lineNum">     417 </span>            :     east = Math::AngNormalize(east);
+<span class="lineNum">     418 </span><span class="lineNoCov">          0 :     if (east &lt;= west)</span>
+<span class="lineNum">     419 </span><span class="lineNoCov">          0 :       east += 360;              // east - west in (0, 360]</span>
+<span class="lineNum">     420 </span>            :     int
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :       iw = int(floor(west * _rlonres)),</span>
+<span class="lineNum">     422 </span><span class="lineNoCov">          0 :       ie = int(floor(east * _rlonres)),</span>
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :       in = int(floor(-north * _rlatres)) + (_height - 1)/2,</span>
+<span class="lineNum">     424 </span><span class="lineNoCov">          0 :       is = int(floor(-south * _rlatres)) + (_height - 1)/2;</span>
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :     in = max(0, min(_height - 2, in));</span>
+<span class="lineNum">     426 </span><span class="lineNoCov">          0 :     is = max(0, min(_height - 2, is));</span>
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :     is += 1;</span>
+<span class="lineNum">     428 </span><span class="lineNoCov">          0 :     ie += 1;</span>
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :     if (_cubic) {</span>
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 :       in -= 1;</span>
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :       is += 1;</span>
+<span class="lineNum">     432 </span><span class="lineNoCov">          0 :       iw -= 1;</span>
+<span class="lineNum">     433 </span><span class="lineNoCov">          0 :       ie += 1;</span>
+<span class="lineNum">     434 </span>            :     }
+<span class="lineNum">     435 </span><span class="lineNoCov">          0 :     if (ie - iw &gt;= _width - 1) {</span>
+<span class="lineNum">     436 </span>            :       // Include entire longitude range
+<span class="lineNum">     437 </span>            :       iw = 0;
+<span class="lineNum">     438 </span>            :       ie = _width - 1;
+<span class="lineNum">     439 </span>            :     } else {
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :       ie += iw &lt; 0 ? _width : (iw &gt;= _width ? -_width : 0);</span>
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 :       iw += iw &lt; 0 ? _width : (iw &gt;= _width ? -_width : 0);</span>
+<span class="lineNum">     442 </span>            :     }
+<span class="lineNum">     443 </span><span class="lineNoCov">          0 :     int oysize = int(_data.size());</span>
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 :     _xsize = ie - iw + 1;</span>
+<span class="lineNum">     445 </span><span class="lineNoCov">          0 :     _ysize = is - in + 1;</span>
+<span class="lineNum">     446 </span><span class="lineNoCov">          0 :     _xoffset = iw;</span>
+<span class="lineNum">     447 </span><span class="lineNoCov">          0 :     _yoffset = in;</span>
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span>            :     try {
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 :       _data.resize(_ysize, vector&lt;pixel_t&gt;(_xsize));</span>
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 :       for (int iy = min(oysize, _ysize); iy--;)</span>
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :         _data[iy].resize(_xsize);</span>
+<span class="lineNum">     453 </span>            :     }
+<span class="lineNum">     454 </span><span class="lineNoCov">          0 :     catch (const bad_alloc&amp;) {</span>
+<span class="lineNum">     455 </span><span class="lineNoCov">          0 :       CacheClear();</span>
+<span class="lineNum">     456 </span><span class="lineNoCov">          0 :       throw GeographicErr(&quot;Insufficient memory for caching &quot; + _filename);</span>
+<span class="lineNum">     457 </span>            :     }
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span>            :     try {
+<span class="lineNum">     460 </span><span class="lineNoCov">          0 :       for (int iy = in; iy &lt;= is; ++iy) {</span>
+<span class="lineNum">     461 </span>            :         int iy1 = iy, iw1 = iw;
+<span class="lineNum">     462 </span><span class="lineNoCov">          0 :         if (iy &lt; 0 || iy &gt;= _height) {</span>
+<span class="lineNum">     463 </span>            :           // Allow points &quot;beyond&quot; the poles to support interpolation
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :           iy1 = iy1 &lt; 0 ? -iy1 : 2 * (_height - 1) - iy1;</span>
+<span class="lineNum">     465 </span><span class="lineNoCov">          0 :           iw1 += _width/2;</span>
+<span class="lineNum">     466 </span><span class="lineNoCov">          0 :           if (iw1 &gt;= _width)</span>
+<span class="lineNum">     467 </span><span class="lineNoCov">          0 :             iw1 -= _width;</span>
+<span class="lineNum">     468 </span>            :         }
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :         int xs1 = min(_width - iw1, _xsize);</span>
+<span class="lineNum">     470 </span>            :         filepos(iw1, iy1);
+<span class="lineNum">     471 </span>            :         Utility::readarray&lt;pixel_t, pixel_t, true&gt;
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :           (_file, &amp;(_data[iy - in][0]), xs1);</span>
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 :         if (xs1 &lt; _xsize) {</span>
+<span class="lineNum">     474 </span>            :           // Wrap around longitude = 0
+<span class="lineNum">     475 </span>            :           filepos(0, iy1);
+<span class="lineNum">     476 </span>            :           Utility::readarray&lt;pixel_t, pixel_t, true&gt;
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :             (_file, &amp;(_data[iy - in][xs1]), _xsize - xs1);</span>
+<span class="lineNum">     478 </span>            :         }
+<span class="lineNum">     479 </span>            :       }
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :       _cache = true;</span>
+<span class="lineNum">     481 </span>            :     }
+<span class="lineNum">     482 </span><span class="lineNoCov">          0 :     catch (const exception&amp; e) {</span>
+<span class="lineNum">     483 </span><span class="lineNoCov">          0 :       CacheClear();</span>
+<span class="lineNum">     484 </span><span class="lineNoCov">          0 :       throw GeographicErr(string(&quot;Error filling cache &quot;) + e.what());</span>
+<span class="lineNum">     485 </span>            :     }
+<a name="486"><span class="lineNum">     486 </span>            :   }</a>
+<span class="lineNum">     487 </span>            : 
+<span class="lineNum">     488 </span><span class="lineNoCov">          0 :   std::string Geoid::DefaultGeoidPath() {</span>
+<span class="lineNum">     489 </span>            :     string path;
+<span class="lineNum">     490 </span><span class="lineNoCov">          0 :     char* geoidpath = getenv(&quot;GEOGRAPHICLIB_GEOID_PATH&quot;);</span>
+<span class="lineNum">     491 </span><span class="lineNoCov">          0 :     if (geoidpath)</span>
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :       path = string(geoidpath);</span>
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 :     if (!path.empty())</span>
+<span class="lineNum">     494 </span>            :       return path;
+<span class="lineNum">     495 </span><span class="lineNoCov">          0 :     char* datapath = getenv(&quot;GEOGRAPHICLIB_DATA&quot;);</span>
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :     if (datapath)</span>
+<span class="lineNum">     497 </span><span class="lineNoCov">          0 :       path = string(datapath);</span>
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :     return (!path.empty() ? path : string(GEOGRAPHICLIB_DATA)) + &quot;/geoids&quot;;</span>
+<a name="499"><span class="lineNum">     499 </span>            :   }</a>
+<span class="lineNum">     500 </span>            : 
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :   std::string Geoid::DefaultGeoidName() {</span>
+<span class="lineNum">     502 </span>            :     string name;
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :     char* geoidname = getenv(&quot;GEOGRAPHICLIB_GEOID_NAME&quot;);</span>
+<span class="lineNum">     504 </span><span class="lineNoCov">          0 :     if (geoidname)</span>
+<span class="lineNum">     505 </span><span class="lineNoCov">          0 :       name = string(geoidname);</span>
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :     return !name.empty() ? name : string(GEOGRAPHICLIB_GEOID_DEFAULT_NAME);</span>
+<span class="lineNum">     507 </span>            :   }
+<span class="lineNum">     508 </span>            : 
+<span class="lineNum">     509 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

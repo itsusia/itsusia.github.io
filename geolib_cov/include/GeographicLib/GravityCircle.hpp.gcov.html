@@ -1,0 +1,379 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/GravityCircle.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - GravityCircle.hpp<span style="font-size: 80%;"> (source / <a href="GravityCircle.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file GravityCircle.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::GravityCircle class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2011-2016) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_GRAVITYCIRCLE_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_GRAVITYCIRCLE_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;GeographicLib/CircularEngine.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;GeographicLib/GravityModel.hpp&gt;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : namespace GeographicLib {
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            :   /**
+<span class="lineNum">      21 </span>            :    * \brief Gravity on a circle of latitude
+<span class="lineNum">      22 </span>            :    *
+<span class="lineNum">      23 </span>            :    * Evaluate the earth's gravity field on a circle of constant height and
+<span class="lineNum">      24 </span>            :    * latitude.  This uses a CircularEngine to pre-evaluate the inner sum of the
+<span class="lineNum">      25 </span>            :    * spherical harmonic sum, allowing the values of the field at several
+<span class="lineNum">      26 </span>            :    * different longitudes to be evaluated rapidly.
+<span class="lineNum">      27 </span>            :    *
+<span class="lineNum">      28 </span>            :    * Use GravityModel::Circle to create a GravityCircle object.  (The
+<span class="lineNum">      29 </span>            :    * constructor for this class is private.)
+<span class="lineNum">      30 </span>            :    *
+<span class="lineNum">      31 </span>            :    * See \ref gravityparallel for an example of using GravityCircle (together
+<span class="lineNum">      32 </span>            :    * with OpenMP) to speed up the computation of geoid heights.
+<span class="lineNum">      33 </span>            :    *
+<span class="lineNum">      34 </span>            :    * Example of use:
+<span class="lineNum">      35 </span>            :    * \include example-GravityCircle.cpp
+<span class="lineNum">      36 </span>            :    *
+<span class="lineNum">      37 </span>            :    * &lt;a href=&quot;Gravity.1.html&quot;&gt;Gravity&lt;/a&gt; is a command-line utility providing
+<span class="lineNum">      38 </span>            :    * access to the functionality of GravityModel and GravityCircle.
+<span class="lineNum">      39 </span>            :    **********************************************************************/
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            :   class GEOGRAPHICLIB_EXPORT GravityCircle {
+<span class="lineNum">      42 </span>            :   private:
+<span class="lineNum">      43 </span>            :     typedef Math::real real;
+<span class="lineNum">      44 </span>            :     enum mask {
+<span class="lineNum">      45 </span>            :       NONE                 = GravityModel::NONE,
+<span class="lineNum">      46 </span>            :       GRAVITY              = GravityModel::GRAVITY,
+<span class="lineNum">      47 </span>            :       DISTURBANCE          = GravityModel::DISTURBANCE,
+<span class="lineNum">      48 </span>            :       DISTURBING_POTENTIAL = GravityModel::DISTURBING_POTENTIAL,
+<span class="lineNum">      49 </span>            :       GEOID_HEIGHT         = GravityModel::GEOID_HEIGHT,
+<span class="lineNum">      50 </span>            :       SPHERICAL_ANOMALY    = GravityModel::SPHERICAL_ANOMALY,
+<span class="lineNum">      51 </span>            :       ALL                  = GravityModel::ALL,
+<span class="lineNum">      52 </span>            :     };
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :     unsigned _caps;
+<span class="lineNum">      55 </span>            :     real _a, _f, _lat, _h, _Z, _Px, _invR, _cpsi, _spsi,
+<span class="lineNum">      56 </span>            :       _cphi, _sphi, _amodel, _GMmodel, _dzonal0,
+<span class="lineNum">      57 </span>            :       _corrmult, _gamma0, _gamma, _frot;
+<a name="58"><span class="lineNum">      58 </span>            :     CircularEngine _gravitational, _disturbing, _correction;</a>
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :     GravityCircle(mask caps, real a, real f, real lat, real h,</span>
+<span class="lineNum">      61 </span>            :                   real Z, real P, real cphi, real sphi,
+<span class="lineNum">      62 </span>            :                   real amodel, real GMmodel, real dzonal0, real corrmult,
+<span class="lineNum">      63 </span>            :                   real gamma0, real gamma, real frot,
+<span class="lineNum">      64 </span>            :                   const CircularEngine&amp; gravitational,
+<span class="lineNum">      65 </span>            :                   const CircularEngine&amp; disturbing,
+<span class="lineNum">      66 </span>            :                   const CircularEngine&amp; correction)
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :       : _caps(caps)</span>
+<span class="lineNum">      68 </span>            :       , _a(a)
+<span class="lineNum">      69 </span>            :       , _f(f)
+<span class="lineNum">      70 </span>            :       , _lat(Math::LatFix(lat))
+<span class="lineNum">      71 </span>            :       , _h(h)
+<span class="lineNum">      72 </span>            :       , _Z(Z)
+<span class="lineNum">      73 </span>            :       , _Px(P)
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :       , _invR(1 / Math::hypot(_Px, _Z))</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :       , _cpsi(_Px * _invR)</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :       , _spsi(_Z * _invR)</span>
+<span class="lineNum">      77 </span>            :       , _cphi(cphi)
+<span class="lineNum">      78 </span>            :       , _sphi(sphi)
+<span class="lineNum">      79 </span>            :       , _amodel(amodel)
+<span class="lineNum">      80 </span>            :       , _GMmodel(GMmodel)
+<span class="lineNum">      81 </span>            :       , _dzonal0(dzonal0)
+<span class="lineNum">      82 </span>            :       , _corrmult(corrmult)
+<span class="lineNum">      83 </span>            :       , _gamma0(gamma0)
+<span class="lineNum">      84 </span>            :       , _gamma(gamma)
+<span class="lineNum">      85 </span>            :       , _frot(frot)
+<span class="lineNum">      86 </span>            :       , _gravitational(gravitational)
+<span class="lineNum">      87 </span>            :       , _disturbing(disturbing)
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :       , _correction(correction)</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :     {}</span>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :     friend class GravityModel; // GravityModel calls the private constructor
+<span class="lineNum">      92 </span>            :     Math::real W(real slam, real clam,
+<span class="lineNum">      93 </span>            :                  real&amp; gX, real&amp; gY, real&amp; gZ) const;
+<span class="lineNum">      94 </span>            :     Math::real V(real slam, real clam,
+<span class="lineNum">      95 </span>            :                  real&amp; gX, real&amp; gY, real&amp; gZ) const;
+<span class="lineNum">      96 </span>            :     Math::real InternalT(real slam, real clam,
+<span class="lineNum">      97 </span>            :                          real&amp; deltaX, real&amp; deltaY, real&amp; deltaZ,
+<span class="lineNum">      98 </span>            :                          bool gradp, bool correct) const;
+<span class="lineNum">      99 </span>            :   public:
+<span class="lineNum">     100 </span>            :     /**
+<span class="lineNum">     101 </span>            :      * A default constructor for the normal gravity.  This sets up an
+<span class="lineNum">     102 </span>            :      * uninitialized object which can be later replaced by the
+<span class="lineNum">     103 </span>            :      * GravityModel::Circle.
+<span class="lineNum">     104 </span>            :      **********************************************************************/
+<span class="lineNum">     105 </span>            :     GravityCircle() : _a(-1) {}
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :     /** \name Compute the gravitational field
+<span class="lineNum">     108 </span>            :      **********************************************************************/
+<span class="lineNum">     109 </span>            :     ///@{
+<span class="lineNum">     110 </span>            :     /**
+<span class="lineNum">     111 </span>            :      * Evaluate the gravity.
+<span class="lineNum">     112 </span>            :      *
+<span class="lineNum">     113 </span>            :      * @param[in] lon the geographic longitude (degrees).
+<span class="lineNum">     114 </span>            :      * @param[out] gx the easterly component of the acceleration
+<span class="lineNum">     115 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     116 </span>            :      * @param[out] gy the northerly component of the acceleration
+<span class="lineNum">     117 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     118 </span>            :      * @param[out] gz the upward component of the acceleration
+<span class="lineNum">     119 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;); this is usually negative.
+<span class="lineNum">     120 </span>            :      * @return \e W the sum of the gravitational and centrifugal potentials
+<span class="lineNum">     121 </span>            :      *   (m&lt;sup&gt;2&lt;/sup&gt; s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     122 </span>            :      *
+<span class="lineNum">     123 </span>            :      * The function includes the effects of the earth's rotation.
+<span class="lineNum">     124 </span>            :      **********************************************************************/
+<span class="lineNum">     125 </span>            :     Math::real Gravity(real lon, real&amp; gx, real&amp; gy, real&amp; gz) const;
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :     /**
+<span class="lineNum">     128 </span>            :      * Evaluate the gravity disturbance vector.
+<span class="lineNum">     129 </span>            :      *
+<span class="lineNum">     130 </span>            :      * @param[in] lon the geographic longitude (degrees).
+<span class="lineNum">     131 </span>            :      * @param[out] deltax the easterly component of the disturbance vector
+<span class="lineNum">     132 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     133 </span>            :      * @param[out] deltay the northerly component of the disturbance vector
+<span class="lineNum">     134 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     135 </span>            :      * @param[out] deltaz the upward component of the disturbance vector
+<span class="lineNum">     136 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     137 </span>            :      * @return \e T the corresponding disturbing potential
+<span class="lineNum">     138 </span>            :      *   (m&lt;sup&gt;2&lt;/sup&gt; s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     139 </span>            :      **********************************************************************/
+<span class="lineNum">     140 </span>            :     Math::real Disturbance(real lon, real&amp; deltax, real&amp; deltay, real&amp; deltaz)
+<span class="lineNum">     141 </span>            :       const;
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :     /**
+<span class="lineNum">     144 </span>            :      * Evaluate the geoid height.
+<span class="lineNum">     145 </span>            :      *
+<span class="lineNum">     146 </span>            :      * @param[in] lon the geographic longitude (degrees).
+<span class="lineNum">     147 </span>            :      * @return \e N the height of the geoid above the reference ellipsoid
+<span class="lineNum">     148 </span>            :      *   (meters).
+<span class="lineNum">     149 </span>            :      *
+<span class="lineNum">     150 </span>            :      * Some approximations are made in computing the geoid height so that the
+<span class="lineNum">     151 </span>            :      * results of the NGA codes are reproduced accurately.  Details are given
+<span class="lineNum">     152 </span>            :      * in \ref gravitygeoid.
+<span class="lineNum">     153 </span>            :      **********************************************************************/
+<span class="lineNum">     154 </span>            :     Math::real GeoidHeight(real lon) const;
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            :     /**
+<span class="lineNum">     157 </span>            :      * Evaluate the components of the gravity anomaly vector using the
+<span class="lineNum">     158 </span>            :      * spherical approximation.
+<span class="lineNum">     159 </span>            :      *
+<span class="lineNum">     160 </span>            :      * @param[in] lon the geographic longitude (degrees).
+<span class="lineNum">     161 </span>            :      * @param[out] Dg01 the gravity anomaly (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     162 </span>            :      * @param[out] xi the northerly component of the deflection of the vertical
+<span class="lineNum">     163 </span>            :      *  (degrees).
+<span class="lineNum">     164 </span>            :      * @param[out] eta the easterly component of the deflection of the vertical
+<span class="lineNum">     165 </span>            :      *  (degrees).
+<span class="lineNum">     166 </span>            :      *
+<span class="lineNum">     167 </span>            :      * The spherical approximation (see Heiskanen and Moritz, Sec 2-14) is used
+<span class="lineNum">     168 </span>            :      * so that the results of the NGA codes are reproduced accurately.
+<span class="lineNum">     169 </span>            :      * approximations used here.  Details are given in \ref gravitygeoid.
+<span class="lineNum">     170 </span>            :      **********************************************************************/
+<span class="lineNum">     171 </span>            :     void SphericalAnomaly(real lon, real&amp; Dg01, real&amp; xi, real&amp; eta)
+<span class="lineNum">     172 </span>            :       const;
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            :     /**
+<span class="lineNum">     175 </span>            :      * Evaluate the components of the acceleration due to gravity and the
+<span class="lineNum">     176 </span>            :      * centrifugal acceleration in geocentric coordinates.
+<span class="lineNum">     177 </span>            :      *
+<span class="lineNum">     178 </span>            :      * @param[in] lon the geographic longitude (degrees).
+<span class="lineNum">     179 </span>            :      * @param[out] gX the \e X component of the acceleration
+<span class="lineNum">     180 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     181 </span>            :      * @param[out] gY the \e Y component of the acceleration
+<span class="lineNum">     182 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     183 </span>            :      * @param[out] gZ the \e Z component of the acceleration
+<span class="lineNum">     184 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     185 </span>            :      * @return \e W = \e V + &amp;Phi; the sum of the gravitational and
+<span class="lineNum">     186 </span>            :      *   centrifugal potentials (m&lt;sup&gt;2&lt;/sup&gt; s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     187 </span>            :      **********************************************************************/
+<span class="lineNum">     188 </span>            :     Math::real W(real lon, real&amp; gX, real&amp; gY, real&amp; gZ) const {
+<span class="lineNum">     189 </span>            :       real slam, clam;
+<span class="lineNum">     190 </span>            :       Math::sincosd(lon, slam, clam);
+<span class="lineNum">     191 </span>            :       return W(slam, clam, gX, gY, gZ);
+<span class="lineNum">     192 </span>            :     }
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span>            :     /**
+<span class="lineNum">     195 </span>            :      * Evaluate the components of the acceleration due to gravity in geocentric
+<span class="lineNum">     196 </span>            :      * coordinates.
+<span class="lineNum">     197 </span>            :      *
+<span class="lineNum">     198 </span>            :      * @param[in] lon the geographic longitude (degrees).
+<span class="lineNum">     199 </span>            :      * @param[out] GX the \e X component of the acceleration
+<span class="lineNum">     200 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     201 </span>            :      * @param[out] GY the \e Y component of the acceleration
+<span class="lineNum">     202 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     203 </span>            :      * @param[out] GZ the \e Z component of the acceleration
+<span class="lineNum">     204 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     205 </span>            :      * @return \e V = \e W - &amp;Phi; the gravitational potential
+<span class="lineNum">     206 </span>            :      *   (m&lt;sup&gt;2&lt;/sup&gt; s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     207 </span>            :      **********************************************************************/
+<span class="lineNum">     208 </span>            :     Math::real V(real lon, real&amp; GX, real&amp; GY, real&amp; GZ) const {
+<span class="lineNum">     209 </span>            :       real slam, clam;
+<span class="lineNum">     210 </span>            :       Math::sincosd(lon, slam, clam);
+<span class="lineNum">     211 </span>            :       return V(slam, clam, GX, GY, GZ);
+<span class="lineNum">     212 </span>            :     }
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            :     /**
+<span class="lineNum">     215 </span>            :      * Evaluate the components of the gravity disturbance in geocentric
+<span class="lineNum">     216 </span>            :      * coordinates.
+<span class="lineNum">     217 </span>            :      *
+<span class="lineNum">     218 </span>            :      * @param[in] lon the geographic longitude (degrees).
+<span class="lineNum">     219 </span>            :      * @param[out] deltaX the \e X component of the gravity disturbance
+<span class="lineNum">     220 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     221 </span>            :      * @param[out] deltaY the \e Y component of the gravity disturbance
+<span class="lineNum">     222 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     223 </span>            :      * @param[out] deltaZ the \e Z component of the gravity disturbance
+<span class="lineNum">     224 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     225 </span>            :      * @return \e T = \e W - \e U the disturbing potential (also called the
+<span class="lineNum">     226 </span>            :      *   anomalous potential) (m&lt;sup&gt;2&lt;/sup&gt; s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     227 </span>            :      **********************************************************************/
+<span class="lineNum">     228 </span>            :     Math::real T(real lon, real&amp; deltaX, real&amp; deltaY, real&amp; deltaZ)
+<span class="lineNum">     229 </span>            :       const {
+<span class="lineNum">     230 </span>            :       real slam, clam;
+<span class="lineNum">     231 </span>            :       Math::sincosd(lon, slam, clam);
+<span class="lineNum">     232 </span>            :       return InternalT(slam, clam, deltaX, deltaY, deltaZ, true, true);
+<span class="lineNum">     233 </span>            :     }
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span>            :     /**
+<span class="lineNum">     236 </span>            :      * Evaluate disturbing potential in geocentric coordinates.
+<span class="lineNum">     237 </span>            :      *
+<span class="lineNum">     238 </span>            :      * @param[in] lon the geographic longitude (degrees).
+<span class="lineNum">     239 </span>            :      * @return \e T = \e W - \e U the disturbing potential (also called the
+<span class="lineNum">     240 </span>            :      *   anomalous potential) (m&lt;sup&gt;2&lt;/sup&gt; s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     241 </span>            :      **********************************************************************/
+<span class="lineNum">     242 </span>            :     Math::real T(real lon) const {
+<span class="lineNum">     243 </span>            :       real slam, clam, dummy;
+<span class="lineNum">     244 </span>            :       Math::sincosd(lon, slam, clam);
+<span class="lineNum">     245 </span>            :       return InternalT(slam, clam, dummy, dummy, dummy, false, true);
+<span class="lineNum">     246 </span>            :     }
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span>            :     ///@}
+<span class="lineNum">     249 </span>            : 
+<span class="lineNum">     250 </span>            :     /** \name Inspector functions
+<span class="lineNum">     251 </span>            :      **********************************************************************/
+<span class="lineNum">     252 </span>            :     ///@{
+<span class="lineNum">     253 </span>            :     /**
+<span class="lineNum">     254 </span>            :      * @return true if the object has been initialized.
+<span class="lineNum">     255 </span>            :      **********************************************************************/
+<span class="lineNum">     256 </span>            :     bool Init() const { return _a &gt; 0; }
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span>            :     /**
+<span class="lineNum">     259 </span>            :      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
+<span class="lineNum">     260 </span>            :      *   the value inherited from the GravityModel object used in the
+<span class="lineNum">     261 </span>            :      *   constructor.
+<span class="lineNum">     262 </span>            :      **********************************************************************/
+<span class="lineNum">     263 </span>            :     Math::real MajorRadius() const
+<span class="lineNum">     264 </span>            :     { return Init() ? _a : Math::NaN(); }
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            :     /**
+<span class="lineNum">     267 </span>            :      * @return \e f the flattening of the ellipsoid.  This is the value
+<span class="lineNum">     268 </span>            :      *   inherited from the GravityModel object used in the constructor.
+<span class="lineNum">     269 </span>            :      **********************************************************************/
+<span class="lineNum">     270 </span>            :     Math::real Flattening() const
+<span class="lineNum">     271 </span>            :     { return Init() ? _f : Math::NaN(); }
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span>            :     /**
+<span class="lineNum">     274 </span>            :      * @return the latitude of the circle (degrees).
+<span class="lineNum">     275 </span>            :      **********************************************************************/
+<span class="lineNum">     276 </span>            :     Math::real Latitude() const
+<span class="lineNum">     277 </span>            :     { return Init() ? _lat : Math::NaN(); }
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span>            :     /**
+<span class="lineNum">     280 </span>            :      * @return the height of the circle (meters).
+<span class="lineNum">     281 </span>            :      **********************************************************************/
+<span class="lineNum">     282 </span>            :     Math::real Height() const
+<span class="lineNum">     283 </span>            :     { return Init() ? _h : Math::NaN(); }
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            :     /**
+<span class="lineNum">     286 </span>            :      * @return \e caps the computational capabilities that this object was
+<span class="lineNum">     287 </span>            :      *   constructed with.
+<span class="lineNum">     288 </span>            :      **********************************************************************/
+<span class="lineNum">     289 </span>            :     unsigned Capabilities() const { return _caps; }
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span>            :     /**
+<span class="lineNum">     292 </span>            :      * @param[in] testcaps a set of bitor'ed GravityModel::mask values.
+<span class="lineNum">     293 </span>            :      * @return true if the GravityCircle object has all these capabilities.
+<span class="lineNum">     294 </span>            :      **********************************************************************/
+<span class="lineNum">     295 </span>            :     bool Capabilities(unsigned testcaps) const {
+<span class="lineNum">     296 </span>            :       return (_caps &amp; testcaps) == testcaps;
+<span class="lineNum">     297 </span>            :     }
+<span class="lineNum">     298 </span>            :     ///@}
+<span class="lineNum">     299 </span>            :   };
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span>            : } // namespace GeographicLib
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span>            : #endif  // GEOGRAPHICLIB_GRAVITYCIRCLE_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

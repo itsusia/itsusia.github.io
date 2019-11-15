@@ -1,0 +1,1006 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/proj_internal.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - proj_internal.h<span style="font-size: 80%;"> (source / <a href="proj_internal.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /******************************************************************************</a>
+<span class="lineNum">       2 </span>            :  * Project:  PROJ.4
+<span class="lineNum">       3 </span>            :  * Purpose:  Internal plumbing for the PROJ.4 library.
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Author:   Thomas Knudsen, &lt;thokn@sdfe.dk&gt;
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  ******************************************************************************
+<span class="lineNum">       8 </span>            :  * Copyright (c) 2016, 2017, Thomas Knudsen / SDFE
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      11 </span>            :  * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      12 </span>            :  * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      13 </span>            :  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      14 </span>            :  * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      15 </span>            :  * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      16 </span>            :  *
+<span class="lineNum">      17 </span>            :  * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      18 </span>            :  * in all copies or substantial portions of the Software.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      21 </span>            :  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      22 </span>            :  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO COORD SHALL
+<span class="lineNum">      23 </span>            :  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      24 </span>            :  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      25 </span>            :  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      26 </span>            :  * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      27 </span>            :  *****************************************************************************/
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #ifndef PROJ_INTERNAL_H
+<span class="lineNum">      30 </span>            : #define PROJ_INTERNAL_H
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #ifndef __cplusplus
+<span class="lineNum">      33 </span>            : #error &quot;proj_internal.h can only be included from a C++ file&quot;
+<span class="lineNum">      34 </span>            : #endif
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : #ifndef ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
+<span class="lineNum">      37 </span>            : #define ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
+<span class="lineNum">      38 </span>            : #endif
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : #ifdef _MSC_VER
+<span class="lineNum">      41 </span>            : #  ifndef _CRT_SECURE_NO_DEPRECATE
+<span class="lineNum">      42 </span>            : #    define _CRT_SECURE_NO_DEPRECATE
+<span class="lineNum">      43 </span>            : #  endif
+<span class="lineNum">      44 </span>            : #  ifndef _CRT_NONSTDC_NO_DEPRECATE
+<span class="lineNum">      45 </span>            : #    define _CRT_NONSTDC_NO_DEPRECATE
+<span class="lineNum">      46 </span>            : #  endif
+<span class="lineNum">      47 </span>            : /* enable predefined math constants M_* for MS Visual Studio workaround */
+<span class="lineNum">      48 </span>            : #  ifndef _USE_MATH_DEFINES
+<span class="lineNum">      49 </span>            : #     define _USE_MATH_DEFINES
+<span class="lineNum">      50 </span>            : #  endif
+<span class="lineNum">      51 </span>            : #endif
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : /* standard inclusions */
+<span class="lineNum">      54 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      55 </span>            : #include &lt;math.h&gt;
+<span class="lineNum">      56 </span>            : #include &lt;stddef.h&gt;
+<span class="lineNum">      57 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      58 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      59 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            : #include &quot;proj/common.hpp&quot;
+<span class="lineNum">      62 </span>            : #include &quot;proj/coordinateoperation.hpp&quot;
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : #include &lt;string&gt;
+<span class="lineNum">      65 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            : #include &quot;proj.h&quot;
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            : #ifdef PROJ_API_H
+<span class="lineNum">      70 </span>            : #error proj_internal.h must be included before proj_api.h
+<span class="lineNum">      71 </span>            : #endif
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            : #ifdef PROJ_RENAME_SYMBOLS
+<span class="lineNum">      74 </span>            : #include &quot;proj_symbol_rename.h&quot;
+<span class="lineNum">      75 </span>            : #endif
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            : #define STATIC_ASSERT(COND) ((void)sizeof(char[(COND) ? 1 : -1]))
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            : #ifndef PJ_TODEG
+<span class="lineNum">      80 </span>            : #define PJ_TODEG(rad)  ((rad)*180.0/M_PI)
+<span class="lineNum">      81 </span>            : #endif
+<span class="lineNum">      82 </span>            : #ifndef PJ_TORAD
+<span class="lineNum">      83 </span>            : #define PJ_TORAD(deg)  ((deg)*M_PI/180.0)
+<span class="lineNum">      84 </span>            : #endif
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            : /* Maximum latitudinal overshoot accepted */
+<span class="lineNum">      87 </span>            : #define PJ_EPS_LAT 1e-12
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            : #define C_NAMESPACE extern &quot;C&quot;
+<span class="lineNum">      90 </span>            : #define C_NAMESPACE_VAR extern &quot;C&quot;
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            : #ifndef NULL
+<span class="lineNum">      93 </span>            : #  define NULL 0
+<span class="lineNum">      94 </span>            : #endif
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            : #ifndef FALSE
+<span class="lineNum">      97 </span>            : #  define FALSE 0
+<span class="lineNum">      98 </span>            : #endif
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            : #ifndef TRUE
+<span class="lineNum">     101 </span>            : #  define TRUE  1
+<span class="lineNum">     102 </span>            : #endif
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            : #ifndef MAX
+<span class="lineNum">     105 </span>            : #  define MIN(a,b)      ((a&lt;b) ? a : b)
+<span class="lineNum">     106 </span>            : #  define MAX(a,b)      ((a&gt;b) ? a : b)
+<span class="lineNum">     107 </span>            : #endif
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            : #ifndef ABS
+<span class="lineNum">     110 </span>            : #  define ABS(x)        ((x&lt;0) ? (-1*(x)) : x)
+<span class="lineNum">     111 </span>            : #endif
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            : #if INT_MAX == 2147483647
+<span class="lineNum">     114 </span>            : typedef int pj_int32;
+<span class="lineNum">     115 </span>            : #elif LONG_MAX == 2147483647
+<span class="lineNum">     116 </span>            : typedef long pj_int32;
+<span class="lineNum">     117 </span>            : #else
+<span class="lineNum">     118 </span>            : #warning It seems no 32-bit integer type is available
+<span class="lineNum">     119 </span>            : #endif
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            : /* maximum path/filename */
+<span class="lineNum">     122 </span>            : #ifndef MAX_PATH_FILENAME
+<span class="lineNum">     123 </span>            : #define MAX_PATH_FILENAME 1024
+<span class="lineNum">     124 </span>            : #endif
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            : /* If we still haven't got M_PI*, we rely on our own defines.
+<span class="lineNum">     127 </span>            :  * For example, this is necessary when compiling with gcc and
+<span class="lineNum">     128 </span>            :  * the -ansi flag.
+<span class="lineNum">     129 </span>            :  */
+<span class="lineNum">     130 </span>            : #ifndef M_PI
+<span class="lineNum">     131 </span>            : #define M_PI            3.14159265358979323846
+<span class="lineNum">     132 </span>            : #define M_PI_2          1.57079632679489661923
+<span class="lineNum">     133 </span>            : #define M_PI_4          0.78539816339744830962
+<span class="lineNum">     134 </span>            : #define M_2_PI          0.63661977236758134308
+<span class="lineNum">     135 </span>            : #endif
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            : /* M_SQRT2 might be missing */
+<span class="lineNum">     138 </span>            : #ifndef M_SQRT2
+<span class="lineNum">     139 </span>            : #define M_SQRT2         1.41421356237309504880
+<span class="lineNum">     140 </span>            : #endif
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            : /* some more useful math constants and aliases */
+<span class="lineNum">     143 </span>            : #define M_FORTPI        M_PI_4                   /* pi/4 */
+<span class="lineNum">     144 </span>            : #define M_HALFPI        M_PI_2                   /* pi/2 */
+<span class="lineNum">     145 </span>            : #define M_PI_HALFPI     4.71238898038468985769   /* 1.5*pi */
+<span class="lineNum">     146 </span>            : #define M_TWOPI         6.28318530717958647693   /* 2*pi */
+<span class="lineNum">     147 </span>            : #define M_TWO_D_PI      M_2_PI                   /* 2/pi */
+<span class="lineNum">     148 </span>            : #define M_TWOPI_HALFPI  7.85398163397448309616   /* 2.5*pi */
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span>            : /* maximum tag id length for +init and default files */
+<span class="lineNum">     152 </span>            : #ifndef ID_TAG_MAX
+<span class="lineNum">     153 </span>            : #define ID_TAG_MAX 50
+<span class="lineNum">     154 </span>            : #endif
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            : /* Use WIN32 as a standard windows 32 bit declaration */
+<span class="lineNum">     157 </span>            : #if defined(_WIN32) &amp;&amp; !defined(WIN32)
+<span class="lineNum">     158 </span>            : #  define WIN32
+<span class="lineNum">     159 </span>            : #endif
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            : #if defined(_WINDOWS) &amp;&amp; !defined(WIN32)
+<span class="lineNum">     162 </span>            : #  define WIN32
+<span class="lineNum">     163 </span>            : #endif
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            : /* directory delimiter for DOS support */
+<span class="lineNum">     166 </span>            : #ifdef WIN32
+<span class="lineNum">     167 </span>            : #define DIR_CHAR '\\'
+<span class="lineNum">     168 </span>            : #else
+<span class="lineNum">     169 </span>            : #define DIR_CHAR '/'
+<span class="lineNum">     170 </span>            : #endif
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            : enum pj_io_units {
+<span class="lineNum">     173 </span>            :     PJ_IO_UNITS_WHATEVER  = 0,  /* Doesn't matter (or depends on pipeline neighbours) */
+<span class="lineNum">     174 </span>            :     PJ_IO_UNITS_CLASSIC   = 1,  /* Scaled meters (right), projected system */
+<span class="lineNum">     175 </span>            :     PJ_IO_UNITS_PROJECTED = 2,  /* Meters, projected system */
+<span class="lineNum">     176 </span>            :     PJ_IO_UNITS_CARTESIAN = 3,  /* Meters, 3D cartesian system */
+<span class="lineNum">     177 </span>            :     PJ_IO_UNITS_RADIANS   = 4   /* Radians */
+<span class="lineNum">     178 </span>            : };
+<span class="lineNum">     179 </span>            : enum pj_io_units pj_left (PJ *P);
+<span class="lineNum">     180 </span>            : enum pj_io_units pj_right (PJ *P);
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span>            : PJ_COORD PROJ_DLL proj_coord_error (void);
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            : void proj_context_errno_set (PJ_CONTEXT *ctx, int err);
+<span class="lineNum">     185 </span>            : void PROJ_DLL proj_context_set (PJ *P, PJ_CONTEXT *ctx);
+<span class="lineNum">     186 </span>            : void proj_context_inherit (PJ *parent, PJ *child);
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span>            : struct projCppContext;
+<span class="lineNum">     189 </span>            : /* not sure why we need to export it, but mingw needs it */
+<span class="lineNum">     190 </span>            : void PROJ_DLL proj_context_delete_cpp_context(struct projCppContext* cppContext);
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            : PJ_COORD pj_fwd4d (PJ_COORD coo, PJ *P);
+<span class="lineNum">     193 </span>            : PJ_COORD pj_inv4d (PJ_COORD coo, PJ *P);
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span>            : PJ_COORD PROJ_DLL pj_approx_2D_trans (PJ *P, PJ_DIRECTION direction, PJ_COORD coo);
+<span class="lineNum">     196 </span>            : PJ_COORD PROJ_DLL pj_approx_3D_trans (PJ *P, PJ_DIRECTION direction, PJ_COORD coo);
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span>            : /* Grid functionality */
+<span class="lineNum">     200 </span>            : int             proj_vgrid_init(PJ *P, const char *grids);
+<span class="lineNum">     201 </span>            : int             proj_hgrid_init(PJ *P, const char *grids);
+<span class="lineNum">     202 </span>            : double          proj_vgrid_value(PJ *P, PJ_LP lp, double vmultiplier);
+<span class="lineNum">     203 </span>            : PJ_LP           proj_hgrid_value(PJ *P, PJ_LP lp);
+<span class="lineNum">     204 </span>            : PJ_LP           proj_hgrid_apply(PJ *P, PJ_LP lp, PJ_DIRECTION direction);
+<span class="lineNum">     205 </span>            : 
+<span class="lineNum">     206 </span>            : void PROJ_DLL proj_log_error (PJ *P, const char *fmt, ...);
+<span class="lineNum">     207 </span>            : void proj_log_debug (PJ *P, const char *fmt, ...);
+<span class="lineNum">     208 </span>            : void proj_log_trace (PJ *P, const char *fmt, ...);
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            : void proj_context_log_debug (PJ_CONTEXT *ctx, const char *fmt, ...);
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            : int pj_ellipsoid (PJ *);
+<span class="lineNum">     213 </span>            : void pj_inherit_ellipsoid_def (const PJ *src, PJ *dst);
+<span class="lineNum">     214 </span>            : int pj_calc_ellipsoid_params (PJ *P, double a, double es);
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            : /* Geographical to geocentric latitude - another of the &quot;simple, but useful&quot; */
+<span class="lineNum">     217 </span>            : PJ_COORD pj_geocentric_latitude (const PJ *P, PJ_DIRECTION direction, PJ_COORD coord);
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span>            : char  PROJ_DLL *pj_chomp (char *c);
+<span class="lineNum">     220 </span>            : char  PROJ_DLL *pj_shrink (char *c);
+<span class="lineNum">     221 </span>            : size_t pj_trim_argc (char *args);
+<span class="lineNum">     222 </span>            : char **pj_trim_argv (size_t argc, char *args);
+<span class="lineNum">     223 </span>            : char  *pj_make_args (size_t argc, char **argv);
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            : /* Lowest level: Minimum support for fileapi */
+<span class="lineNum">     226 </span>            : void proj_fileapi_set (PJ *P, void *fileapi);
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            : typedef struct { double r, i; } COMPLEX;
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            : /* Forward declarations and typedefs for stuff needed inside the PJ object */
+<span class="lineNum">     231 </span>            : struct PJconsts;
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span>            : union  PJ_COORD;
+<span class="lineNum">     234 </span>            : struct geod_geodesic;
+<span class="lineNum">     235 </span>            : struct ARG_list;
+<span class="lineNum">     236 </span>            : struct PJ_REGION_S;
+<span class="lineNum">     237 </span>            : typedef struct PJ_REGION_S  PJ_Region;
+<span class="lineNum">     238 </span>            : typedef struct ARG_list paralist;   /* parameter list */
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            : #ifndef PROJ_H
+<span class="lineNum">     241 </span>            : typedef struct PJconsts PJ;         /* the PJ object herself */
+<span class="lineNum">     242 </span>            : typedef union  PJ_COORD PJ_COORD;
+<span class="lineNum">     243 </span>            : #endif
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span>            : struct PJ_REGION_S {
+<span class="lineNum">     246 </span>            :     double ll_long;        /* lower left corner coordinates (radians) */
+<span class="lineNum">     247 </span>            :     double ll_lat;
+<span class="lineNum">     248 </span>            :     double ur_long;        /* upper right corner coordinates (radians) */
+<span class="lineNum">     249 </span>            :     double ur_lat;
+<span class="lineNum">     250 </span>            : };
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span>            : struct PJ_AREA {
+<span class="lineNum">     253 </span>            :     int     bbox_set;
+<span class="lineNum">     254 </span>            :     double  west_lon_degree;
+<span class="lineNum">     255 </span>            :     double  south_lat_degree;
+<span class="lineNum">     256 </span>            :     double  east_lon_degree;
+<span class="lineNum">     257 </span>            :     double  north_lat_degree;
+<span class="lineNum">     258 </span>            : };
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span>            : struct projCtx_t;
+<span class="lineNum">     261 </span>            : typedef struct projCtx_t projCtx_t;
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span>            : /*****************************************************************************
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span>            :     Some function types that are especially useful when working with PJs
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span>            : ******************************************************************************
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            : PJ_CONSTRUCTOR:
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            :     A function taking a pointer-to-PJ as arg, and returning a pointer-to-PJ.
+<span class="lineNum">     272 </span>            :     Historically called twice: First with a 0 argument, to allocate memory,
+<span class="lineNum">     273 </span>            :     second with the first return value as argument, for actual setup.
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span>            : PJ_DESTRUCTOR:
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span>            :     A function taking a pointer-to-PJ and an integer as args, then first
+<span class="lineNum">     278 </span>            :     handling the deallocation of the PJ, afterwards handing the integer over
+<span class="lineNum">     279 </span>            :     to the error reporting subsystem, and finally returning a null pointer in
+<span class="lineNum">     280 </span>            :     support of the &quot;return free (P)&quot; (aka &quot;get the hell out of here&quot;) idiom.
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span>            : PJ_OPERATOR:
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span>            :     A function taking a PJ_COORD and a pointer-to-PJ as args, applying the
+<span class="lineNum">     285 </span>            :     PJ to the PJ_COORD, and returning the resulting PJ_COORD.
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            : *****************************************************************************/
+<span class="lineNum">     288 </span>            : typedef    PJ       *(* PJ_CONSTRUCTOR) (PJ *);
+<span class="lineNum">     289 </span>            : typedef    PJ       *(* PJ_DESTRUCTOR)  (PJ *, int);
+<span class="lineNum">     290 </span>            : typedef    PJ_COORD  (* PJ_OPERATOR)    (PJ_COORD, PJ *);
+<span class="lineNum">     291 </span>            : /****************************************************************************/
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            : /* datum_type values */
+<span class="lineNum">     295 </span>            : #define PJD_UNKNOWN   0
+<span class="lineNum">     296 </span>            : #define PJD_3PARAM    1
+<span class="lineNum">     297 </span>            : #define PJD_7PARAM    2
+<span class="lineNum">     298 </span>            : #define PJD_GRIDSHIFT 3
+<span class="lineNum">     299 </span>            : #define PJD_WGS84     4   /* WGS84 (or anything considered equivalent) */
+<span class="lineNum">     300 </span>            : 
+<a name="301"><span class="lineNum">     301 </span>            : </a>
+<span class="lineNum">     302 </span>            : /* base projection data structure */
+<span class="lineNum">     303 </span><span class="lineCov">      14684 : struct PJconsts {</span>
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            :     /*************************************************************************************
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            :                          G E N E R A L   P A R A M E T E R   S T R U C T
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            :     **************************************************************************************
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            :         TODO: Need some description here - especially about the thread context...
+<span class="lineNum">     312 </span>            :         This is the struct behind the PJ typedef
+<span class="lineNum">     313 </span>            : 
+<span class="lineNum">     314 </span>            :     **************************************************************************************/
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :     projCtx_t *ctx = nullptr;
+<span class="lineNum">     317 </span>            :     const char *descr = nullptr;   /* From pj_list.h or individual PJ_*.c file */
+<span class="lineNum">     318 </span>            :     paralist *params = nullptr;    /* Parameter list */
+<span class="lineNum">     319 </span>            :     char *def_full = nullptr;      /* Full textual definition (usually 0 - set by proj_pj_info) */
+<span class="lineNum">     320 </span>            :     PJconsts *parent = nullptr;    /* Parent PJ of pipeline steps - nullptr if not a pipeline step */
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            :     /* For debugging / logging purposes */
+<span class="lineNum">     323 </span>            :     char *def_size = nullptr;      /* Shape and size parameters extracted from params */
+<span class="lineNum">     324 </span>            :     char *def_shape = nullptr;
+<span class="lineNum">     325 </span>            :     char *def_spherification = nullptr;
+<span class="lineNum">     326 </span>            :     char *def_ellps = nullptr;
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span>            :     struct geod_geodesic *geod = nullptr;    /* For geodesic computations */
+<span class="lineNum">     329 </span>            :     void *opaque = nullptr;                  /* Projection specific parameters, Defined in PJ_*.c */
+<span class="lineNum">     330 </span>            :     int inverted = 0;                        /* Tell high level API functions to swap inv/fwd */
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            :     /*************************************************************************************
+<span class="lineNum">     334 </span>            : 
+<span class="lineNum">     335 </span>            :                           F U N C T I O N    P O I N T E R S
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span>            :     **************************************************************************************
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span>            :         For projection xxx, these are pointers to functions in the corresponding
+<span class="lineNum">     340 </span>            :         PJ_xxx.c file.
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span>            :         pj_init() delegates the setup of these to pj_projection_specific_setup_xxx(),
+<span class="lineNum">     343 </span>            :         a name which is currently hidden behind the magic curtain of the PROJECTION
+<span class="lineNum">     344 </span>            :         macro.
+<span class="lineNum">     345 </span>            : 
+<span class="lineNum">     346 </span>            :     **************************************************************************************/
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span>            :     PJ_XY  (*fwd)(PJ_LP,    PJ *) = nullptr;
+<span class="lineNum">     350 </span>            :     PJ_LP  (*inv)(PJ_XY,    PJ *) = nullptr;
+<span class="lineNum">     351 </span>            :     PJ_XYZ (*fwd3d)(PJ_LPZ, PJ *) = nullptr;
+<span class="lineNum">     352 </span>            :     PJ_LPZ (*inv3d)(PJ_XYZ, PJ *) = nullptr;
+<span class="lineNum">     353 </span>            :     PJ_OPERATOR fwd4d = nullptr;
+<span class="lineNum">     354 </span>            :     PJ_OPERATOR inv4d = nullptr;
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span>            :     PJ_DESTRUCTOR destructor = nullptr;
+<span class="lineNum">     357 </span>            : 
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span>            :     /*************************************************************************************
+<span class="lineNum">     360 </span>            : 
+<span class="lineNum">     361 </span>            :                           E L L I P S O I D     P A R A M E T E R S
+<span class="lineNum">     362 </span>            : 
+<span class="lineNum">     363 </span>            :     **************************************************************************************
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span>            :         Despite YAGNI, we add a large number of ellipsoidal shape parameters, which
+<span class="lineNum">     366 </span>            :         are not yet set up in pj_init. They are, however, inexpensive to compute,
+<span class="lineNum">     367 </span>            :         compared to the overall time taken for setting up the complex PJ object
+<span class="lineNum">     368 </span>            :         (cf. e.g. https://en.wikipedia.org/wiki/Angular_eccentricity).
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span>            :         But during single point projections it will often be a useful thing to have
+<span class="lineNum">     371 </span>            :         these readily available without having to recompute at every pj_fwd / pj_inv
+<span class="lineNum">     372 </span>            :         call.
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span>            :         With this wide selection, we should be ready for quite a number of geodetic
+<span class="lineNum">     375 </span>            :         algorithms, without having to incur further ABI breakage.
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span>            :     **************************************************************************************/
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span>            :     /* The linear parameters */
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span>            :     double  a = 0.0;                   /* semimajor axis (radius if eccentricity==0) */
+<span class="lineNum">     382 </span>            :     double  b = 0.0;                   /* semiminor axis */
+<span class="lineNum">     383 </span>            :     double  ra = 0.0;                  /* 1/a */
+<span class="lineNum">     384 </span>            :     double  rb = 0.0;                  /* 1/b */
+<span class="lineNum">     385 </span>            : 
+<span class="lineNum">     386 </span>            :     /* The eccentricities */
+<span class="lineNum">     387 </span>            : 
+<span class="lineNum">     388 </span>            :     double  alpha = 0.0;               /* angular eccentricity */
+<span class="lineNum">     389 </span>            :     double  e = 0.0;                   /* first  eccentricity */
+<span class="lineNum">     390 </span>            :     double  es = 0.0;                  /* first  eccentricity squared */
+<span class="lineNum">     391 </span>            :     double  e2 = 0.0;                  /* second eccentricity */
+<span class="lineNum">     392 </span>            :     double  e2s = 0.0;                 /* second eccentricity squared */
+<span class="lineNum">     393 </span>            :     double  e3 = 0.0;                  /* third  eccentricity */
+<span class="lineNum">     394 </span>            :     double  e3s = 0.0;                 /* third  eccentricity squared */
+<span class="lineNum">     395 </span>            :     double  one_es = 0.0;              /* 1 - e^2 */
+<span class="lineNum">     396 </span>            :     double  rone_es = 0.0;             /* 1/one_es */
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span>            :     /* The flattenings */
+<span class="lineNum">     400 </span>            :     double  f = 0.0;                   /* first  flattening */
+<span class="lineNum">     401 </span>            :     double  f2 = 0.0;                  /* second flattening */
+<span class="lineNum">     402 </span>            :     double  n = 0.0;                   /* third  flattening */
+<span class="lineNum">     403 </span>            :     double  rf = 0.0;                  /* 1/f  */
+<span class="lineNum">     404 </span>            :     double  rf2 = 0.0;                 /* 1/f2 */
+<span class="lineNum">     405 </span>            :     double  rn = 0.0;                   /* 1/n  */
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span>            :     /* This one's for GRS80 */
+<span class="lineNum">     408 </span>            :     double  J = 0.0;                   /* &quot;Dynamic form factor&quot; */
+<span class="lineNum">     409 </span>            : 
+<span class="lineNum">     410 </span>            :     double  es_orig = 0.0;    /* es and a before any +proj related adjustment */
+<span class="lineNum">     411 </span>            :     double  a_orig = 0.0;
+<span class="lineNum">     412 </span>            : 
+<span class="lineNum">     413 </span>            : 
+<span class="lineNum">     414 </span>            :     /*************************************************************************************
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span>            :                           C O O R D I N A T E   H A N D L I N G
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span>            :     **************************************************************************************/
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span>            :     int  over = 0;                  /* Over-range flag */
+<span class="lineNum">     421 </span>            :     int  geoc = 0;                  /* Geocentric latitude flag */
+<span class="lineNum">     422 </span>            :     int  is_latlong = 0;            /* proj=latlong ... not really a projection at all */
+<span class="lineNum">     423 </span>            :     int  is_geocent = 0;            /* proj=geocent ... not really a projection at all */
+<span class="lineNum">     424 </span>            :     int  is_pipeline = 0;           /* 1 if PJ represents a pipeline */
+<span class="lineNum">     425 </span>            :     int  need_ellps = 0;            /* 0 for operations that are purely cartesian */
+<span class="lineNum">     426 </span>            :     int  skip_fwd_prepare = 0;
+<span class="lineNum">     427 </span>            :     int  skip_fwd_finalize = 0;
+<span class="lineNum">     428 </span>            :     int  skip_inv_prepare = 0;
+<span class="lineNum">     429 </span>            :     int  skip_inv_finalize = 0;
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span>            :     enum pj_io_units left =  PJ_IO_UNITS_WHATEVER; /* Flags for input/output coordinate types */
+<span class="lineNum">     432 </span>            :     enum pj_io_units right =  PJ_IO_UNITS_WHATEVER;
+<span class="lineNum">     433 </span>            : 
+<span class="lineNum">     434 </span>            :     /* These PJs are used for implementing cs2cs style coordinate handling in the 4D API */
+<span class="lineNum">     435 </span>            :     PJ *axisswap = nullptr;
+<span class="lineNum">     436 </span>            :     PJ *cart = nullptr;
+<span class="lineNum">     437 </span>            :     PJ *cart_wgs84 = nullptr;
+<span class="lineNum">     438 </span>            :     PJ *helmert = nullptr;
+<span class="lineNum">     439 </span>            :     PJ *hgridshift = nullptr;
+<span class="lineNum">     440 </span>            :     PJ *vgridshift = nullptr;
+<span class="lineNum">     441 </span>            : 
+<span class="lineNum">     442 </span>            : 
+<span class="lineNum">     443 </span>            :     /*************************************************************************************
+<span class="lineNum">     444 </span>            : 
+<span class="lineNum">     445 </span>            :                        C A R T O G R A P H I C       O F F S E T S
+<span class="lineNum">     446 </span>            : 
+<span class="lineNum">     447 </span>            :     **************************************************************************************/
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span>            :     double  lam0 = 0.0;    /* central meridian */
+<span class="lineNum">     450 </span>            :     double  phi0 = 0.0;    /* central parallel */
+<span class="lineNum">     451 </span>            :     double  x0 = 0.0;      /* false easting */
+<span class="lineNum">     452 </span>            :     double  y0 = 0.0;      /* false northing  */
+<span class="lineNum">     453 </span>            :     double  z0 = 0.0;      /* height origin */
+<span class="lineNum">     454 </span>            :     double  t0 = 0.0;      /* time origin */
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span>            :     /*************************************************************************************
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span>            :                                     S C A L I N G
+<span class="lineNum">     460 </span>            : 
+<span class="lineNum">     461 </span>            :     **************************************************************************************/
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span>            :     double  k0 = 0.0;                  /* General scaling factor - e.g. the 0.9996 of UTM */
+<span class="lineNum">     464 </span>            :     double  to_meter = 0.0, fr_meter = 0.0;        /* Plane coordinate scaling. Internal unit [m] */
+<span class="lineNum">     465 </span>            :     double  vto_meter = 0.0, vfr_meter = 0.0;      /* Vertical scaling. Internal unit [m] */
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span>            : 
+<span class="lineNum">     468 </span>            :     /*************************************************************************************
+<span class="lineNum">     469 </span>            : 
+<span class="lineNum">     470 </span>            :                   D A T U M S   A N D   H E I G H T   S Y S T E M S
+<span class="lineNum">     471 </span>            : 
+<span class="lineNum">     472 </span>            :     **************************************************************************************
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span>            :         It may be possible, and meaningful, to move the list parts of this up to the
+<span class="lineNum">     475 </span>            :         PJ_CONTEXT level.
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span>            :     **************************************************************************************/
+<span class="lineNum">     478 </span>            : 
+<span class="lineNum">     479 </span>            :     int     datum_type = PJD_UNKNOWN;  /* PJD_UNKNOWN/3PARAM/7PARAM/GRIDSHIFT/WGS84 */
+<span class="lineNum">     480 </span>            :     double  datum_params[7] = {0,0,0,0,0,0,0}; /* Parameters for 3PARAM and 7PARAM */
+<span class="lineNum">     481 </span>            :     struct _pj_gi **gridlist = nullptr;     /* TODO: Description needed */
+<span class="lineNum">     482 </span>            :     int     gridlist_count = 0;
+<span class="lineNum">     483 </span>            : 
+<span class="lineNum">     484 </span>            :     int     has_geoid_vgrids = 0;      /* TODO: Description needed */
+<span class="lineNum">     485 </span>            :     struct _pj_gi **vgridlist_geoid = nullptr;   /* TODO: Description needed */
+<span class="lineNum">     486 </span>            :     int     vgridlist_geoid_count = 0;
+<span class="lineNum">     487 </span>            : 
+<span class="lineNum">     488 </span>            :     double  from_greenwich = 0.0;       /* prime meridian offset (in radians) */
+<span class="lineNum">     489 </span>            :     double  long_wrap_center = 0.0;     /* 0.0 for -180 to 180, actually in radians*/
+<span class="lineNum">     490 </span>            :     int     is_long_wrap_set = 0;
+<span class="lineNum">     491 </span>            :     char    axis[4] = {0,0,0,0};        /* Axis order, pj_transform/pj_adjust_axis */
+<span class="lineNum">     492 </span>            : 
+<span class="lineNum">     493 </span>            :     /* New Datum Shift Grid Catalogs */
+<span class="lineNum">     494 </span>            :     char   *catalog_name = nullptr;
+<span class="lineNum">     495 </span>            :     struct _PJ_GridCatalog *catalog = nullptr;
+<span class="lineNum">     496 </span>            : 
+<span class="lineNum">     497 </span>            :     double  datum_date = 0.0;           /* TODO: Description needed */
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span>            :     struct _pj_gi *last_before_grid = nullptr;    /* TODO: Description needed */
+<span class="lineNum">     500 </span>            :     PJ_Region     last_before_region = {0,0,0,0}; /* TODO: Description needed */
+<span class="lineNum">     501 </span>            :     double        last_before_date = 0.0;         /* TODO: Description needed */
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span>            :     struct _pj_gi *last_after_grid = nullptr;     /* TODO: Description needed */
+<span class="lineNum">     504 </span>            :     PJ_Region     last_after_region = {0,0,0,0};  /* TODO: Description needed */
+<span class="lineNum">     505 </span>            :     double        last_after_date = 0.0;          /* TODO: Description needed */
+<span class="lineNum">     506 </span>            : 
+<span class="lineNum">     507 </span>            :     /*************************************************************************************
+<span class="lineNum">     508 </span>            :      ISO-19111 interface
+<span class="lineNum">     509 </span>            :     **************************************************************************************/
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span>            :     NS_PROJ::common::IdentifiedObjectPtr iso_obj{};
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span>            :     // cached results
+<span class="lineNum">     514 </span>            :     mutable std::string lastWKT{};
+<span class="lineNum">     515 </span>            :     mutable std::string lastPROJString{};
+<span class="lineNum">     516 </span>            :     mutable std::string lastJSONString{};
+<span class="lineNum">     517 </span>            :     mutable bool gridsNeededAsked = false;
+<span class="lineNum">     518 </span>            :     mutable std::vector&lt;NS_PROJ::operation::GridDescription&gt; gridsNeeded{};
+<span class="lineNum">     519 </span>            : 
+<span class="lineNum">     520 </span>            :     /*************************************************************************************
+<span class="lineNum">     521 </span>            :      proj_create_crs_to_crs() alternative coordinate operations
+<span class="lineNum">     522 </span>            :     **************************************************************************************/
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span>            :     struct CoordOperation
+<span class="lineNum">     525 </span>            :     {
+<span class="lineNum">     526 </span>            :         double minxSrc = 0.0;
+<span class="lineNum">     527 </span>            :         double minySrc = 0.0;
+<span class="lineNum">     528 </span>            :         double maxxSrc = 0.0;
+<span class="lineNum">     529 </span>            :         double maxySrc = 0.0;
+<span class="lineNum">     530 </span>            :         double minxDst = 0.0;
+<span class="lineNum">     531 </span>            :         double minyDst = 0.0;
+<span class="lineNum">     532 </span>            :         double maxxDst = 0.0;
+<span class="lineNum">     533 </span>            :         double maxyDst = 0.0;
+<span class="lineNum">     534 </span>            :         PJ* pj = nullptr;
+<span class="lineNum">     535 </span>            :         std::string name{};
+<span class="lineNum">     536 </span>            : 
+<span class="lineNum">     537 </span>            :         CoordOperation(double minxSrcIn, double minySrcIn, double maxxSrcIn, double maxySrcIn,
+<span class="lineNum">     538 </span>            :                        double minxDstIn, double minyDstIn, double maxxDstIn, double maxyDstIn,
+<span class="lineNum">     539 </span><span class="lineCov">         33 :                        PJ* pjIn, const std::string&amp; nameIn):</span>
+<span class="lineNum">     540 </span>            :             minxSrc(minxSrcIn), minySrc(minySrcIn), maxxSrc(maxxSrcIn), maxySrc(maxySrcIn),
+<span class="lineNum">     541 </span>            :             minxDst(minxDstIn), minyDst(minyDstIn), maxxDst(maxxDstIn), maxyDst(maxyDstIn),
+<span class="lineNum">     542 </span><span class="lineCov">         33 :             pj(pjIn), name(nameIn) {}</span>
+<span class="lineNum">     543 </span>            : 
+<a name="544"><span class="lineNum">     544 </span>            :         CoordOperation(const CoordOperation&amp;) = delete;</a>
+<span class="lineNum">     545 </span>            : 
+<span class="lineNum">     546 </span><span class="lineCov">         28 :         CoordOperation(CoordOperation&amp;&amp; other):</span>
+<span class="lineNum">     547 </span><span class="lineCov">        112 :             minxSrc(other.minxSrc), minySrc(other.minySrc), maxxSrc(other.maxxSrc), maxySrc(other.maxySrc),</span>
+<span class="lineNum">     548 </span><span class="lineCov">        112 :             minxDst(other.minxDst), minyDst(other.minyDst), maxxDst(other.maxxDst), maxyDst(other.maxyDst),</span>
+<span class="lineNum">     549 </span><span class="lineCov">        224 :             name(std::move(other.name)) {</span>
+<span class="lineNum">     550 </span><span class="lineCov">         28 :                 pj = other.pj;</span>
+<span class="lineNum">     551 </span><span class="lineCov">         28 :                 other.pj = nullptr;</span>
+<span class="lineNum">     552 </span><span class="lineCov">         28 :             }</span>
+<span class="lineNum">     553 </span>            : 
+<a name="554"><span class="lineNum">     554 </span>            :         CoordOperation&amp; operator=(const CoordOperation&amp;) = delete;</a>
+<span class="lineNum">     555 </span>            : 
+<span class="lineNum">     556 </span><span class="lineCov">         61 :         ~CoordOperation()</span>
+<span class="lineNum">     557 </span><span class="lineCov">         61 :         {</span>
+<span class="lineNum">     558 </span><span class="lineCov">         61 :             proj_destroy(pj);</span>
+<span class="lineNum">     559 </span><span class="lineCov">         61 :         }</span>
+<span class="lineNum">     560 </span>            :     };
+<span class="lineNum">     561 </span>            :     std::vector&lt;CoordOperation&gt; alternativeCoordinateOperations{};
+<span class="lineNum">     562 </span>            :     int iCurCoordOp = -1;
+<span class="lineNum">     563 </span>            : 
+<span class="lineNum">     564 </span>            :     /*************************************************************************************
+<span class="lineNum">     565 </span>            : 
+<span class="lineNum">     566 </span>            :                  E N D   O F    G E N E R A L   P A R A M E T E R   S T R U C T
+<span class="lineNum">     567 </span>            : 
+<span class="lineNum">     568 </span>            :     **************************************************************************************/
+<span class="lineNum">     569 </span>            : 
+<span class="lineNum">     570 </span>            :     PJconsts();
+<span class="lineNum">     571 </span>            :     PJconsts(const PJconsts &amp;) = delete;
+<span class="lineNum">     572 </span>            :     PJconsts &amp;operator=(const PJconsts &amp;) = delete;
+<span class="lineNum">     573 </span>            : };
+<span class="lineNum">     574 </span>            : 
+<span class="lineNum">     575 </span>            : 
+<span class="lineNum">     576 </span>            : 
+<span class="lineNum">     577 </span>            : 
+<span class="lineNum">     578 </span>            : /* Parameter list (a copy of the +proj=... etc. parameters) */
+<span class="lineNum">     579 </span>            : struct ARG_list {
+<span class="lineNum">     580 </span>            :     paralist *next;
+<span class="lineNum">     581 </span>            :     char used;
+<span class="lineNum">     582 </span>            : #if defined(__GNUC__) &amp;&amp; __GNUC__ &gt;= 8
+<span class="lineNum">     583 </span>            :     char param[]; /* variable-length member */
+<span class="lineNum">     584 </span>            :     /* Safer to use [] for gcc 8. See https://github.com/OSGeo/proj.4/pull/1087 */
+<span class="lineNum">     585 </span>            :     /* and https://gcc.gnu.org/bugzilla/show_bug.cgi?id=86914 */
+<span class="lineNum">     586 </span>            : #else
+<span class="lineNum">     587 </span>            :     char param[1]; /* variable-length member */
+<span class="lineNum">     588 </span>            : #endif
+<span class="lineNum">     589 </span>            : };
+<span class="lineNum">     590 </span>            : 
+<span class="lineNum">     591 </span>            : 
+<span class="lineNum">     592 </span>            : typedef union { double  f; int  i; char *s; } PROJVALUE;
+<span class="lineNum">     593 </span>            : 
+<span class="lineNum">     594 </span>            : 
+<span class="lineNum">     595 </span>            : struct PJ_DATUMS {
+<span class="lineNum">     596 </span>            :     const char    *id;           /* datum keyword */
+<span class="lineNum">     597 </span>            :     const char    *defn;         /* ie. &quot;to_wgs84=...&quot; */
+<span class="lineNum">     598 </span>            :     const char    *ellipse_id;   /* ie from ellipse table */
+<span class="lineNum">     599 </span>            :     const char    *comments;     /* EPSG code, etc */
+<span class="lineNum">     600 </span>            : };
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span>            : 
+<span class="lineNum">     603 </span>            : struct DERIVS {
+<span class="lineNum">     604 </span>            :     double x_l, x_p;       /* derivatives of x for lambda-phi */
+<span class="lineNum">     605 </span>            :     double y_l, y_p;       /* derivatives of y for lambda-phi */
+<span class="lineNum">     606 </span>            : };
+<span class="lineNum">     607 </span>            : 
+<span class="lineNum">     608 </span>            : struct FACTORS {
+<span class="lineNum">     609 </span>            :     struct DERIVS der;
+<span class="lineNum">     610 </span>            :     double h, k;           /* meridional, parallel scales */
+<span class="lineNum">     611 </span>            :     double omega, thetap;  /* angular distortion, theta prime */
+<span class="lineNum">     612 </span>            :     double conv;           /* convergence */
+<span class="lineNum">     613 </span>            :     double s;              /* areal scale factor */
+<span class="lineNum">     614 </span>            :     double a, b;           /* max-min scale error */
+<span class="lineNum">     615 </span>            :     int    code;           /* always 0 */
+<span class="lineNum">     616 </span>            : };
+<span class="lineNum">     617 </span>            : 
+<span class="lineNum">     618 </span>            : /* library errors */
+<span class="lineNum">     619 </span>            : #define PJD_ERR_NO_ARGS                  -1
+<span class="lineNum">     620 </span>            : #define PJD_ERR_NO_OPTION_IN_INIT_FILE   -2
+<span class="lineNum">     621 </span>            : #define PJD_ERR_NO_COLON_IN_INIT_STRING  -3
+<span class="lineNum">     622 </span>            : #define PJD_ERR_PROJ_NOT_NAMED           -4
+<span class="lineNum">     623 </span>            : #define PJD_ERR_UNKNOWN_PROJECTION_ID    -5
+<span class="lineNum">     624 </span>            : #define PJD_ERR_INVALID_ECCENTRICITY     -6
+<span class="lineNum">     625 </span>            : #define PJD_ERR_UNKNOWN_UNIT_ID          -7
+<span class="lineNum">     626 </span>            : #define PJD_ERR_INVALID_BOOLEAN_PARAM    -8
+<span class="lineNum">     627 </span>            : #define PJD_ERR_UNKNOWN_ELLP_PARAM       -9
+<span class="lineNum">     628 </span>            : #define PJD_ERR_REV_FLATTENING_IS_ZERO  -10
+<span class="lineNum">     629 </span>            : #define PJD_ERR_REF_RAD_LARGER_THAN_90  -11
+<span class="lineNum">     630 </span>            : #define PJD_ERR_ES_LESS_THAN_ZERO       -12
+<span class="lineNum">     631 </span>            : #define PJD_ERR_MAJOR_AXIS_NOT_GIVEN    -13
+<span class="lineNum">     632 </span>            : #define PJD_ERR_LAT_OR_LON_EXCEED_LIMIT -14
+<span class="lineNum">     633 </span>            : #define PJD_ERR_INVALID_X_OR_Y          -15
+<span class="lineNum">     634 </span>            : #define PJD_ERR_WRONG_FORMAT_DMS_VALUE  -16
+<span class="lineNum">     635 </span>            : #define PJD_ERR_NON_CONV_INV_MERI_DIST  -17
+<span class="lineNum">     636 </span>            : #define PJD_ERR_NON_CON_INV_PHI2        -18
+<span class="lineNum">     637 </span>            : #define PJD_ERR_ACOS_ASIN_ARG_TOO_LARGE -19
+<span class="lineNum">     638 </span>            : #define PJD_ERR_TOLERANCE_CONDITION     -20
+<span class="lineNum">     639 </span>            : #define PJD_ERR_CONIC_LAT_EQUAL         -21
+<span class="lineNum">     640 </span>            : #define PJD_ERR_LAT_LARGER_THAN_90      -22
+<span class="lineNum">     641 </span>            : #define PJD_ERR_LAT1_IS_ZERO            -23
+<span class="lineNum">     642 </span>            : #define PJD_ERR_LAT_TS_LARGER_THAN_90   -24
+<span class="lineNum">     643 </span>            : #define PJD_ERR_CONTROL_POINT_NO_DIST   -25
+<span class="lineNum">     644 </span>            : #define PJD_ERR_NO_ROTATION_PROJ        -26
+<span class="lineNum">     645 </span>            : #define PJD_ERR_W_OR_M_ZERO_OR_LESS     -27
+<span class="lineNum">     646 </span>            : #define PJD_ERR_LSAT_NOT_IN_RANGE       -28
+<span class="lineNum">     647 </span>            : #define PJD_ERR_PATH_NOT_IN_RANGE       -29
+<span class="lineNum">     648 </span>            : #define PJD_ERR_INVALID_H               -30
+<span class="lineNum">     649 </span>            : #define PJD_ERR_K_LESS_THAN_ZERO        -31
+<span class="lineNum">     650 </span>            : #define PJD_ERR_LAT_1_OR_2_ZERO_OR_90   -32
+<span class="lineNum">     651 </span>            : #define PJD_ERR_LAT_0_OR_ALPHA_EQ_90    -33
+<span class="lineNum">     652 </span>            : #define PJD_ERR_ELLIPSOID_USE_REQUIRED  -34
+<span class="lineNum">     653 </span>            : #define PJD_ERR_INVALID_UTM_ZONE        -35
+<span class="lineNum">     654 </span>            : /* -36 no longer used */
+<span class="lineNum">     655 </span>            : #define PJD_ERR_FAILED_TO_FIND_PROJ     -37
+<span class="lineNum">     656 </span>            : #define PJD_ERR_FAILED_TO_LOAD_GRID     -38
+<span class="lineNum">     657 </span>            : #define PJD_ERR_INVALID_M_OR_N          -39
+<span class="lineNum">     658 </span>            : #define PJD_ERR_N_OUT_OF_RANGE          -40
+<span class="lineNum">     659 </span>            : #define PJD_ERR_LAT_1_2_UNSPECIFIED     -41
+<span class="lineNum">     660 </span>            : #define PJD_ERR_ABS_LAT1_EQ_ABS_LAT2    -42
+<span class="lineNum">     661 </span>            : #define PJD_ERR_LAT_0_HALF_PI_FROM_MEAN -43
+<span class="lineNum">     662 </span>            : #define PJD_ERR_UNPARSEABLE_CS_DEF      -44
+<span class="lineNum">     663 </span>            : #define PJD_ERR_GEOCENTRIC              -45
+<span class="lineNum">     664 </span>            : #define PJD_ERR_UNKNOWN_PRIME_MERIDIAN  -46
+<span class="lineNum">     665 </span>            : #define PJD_ERR_AXIS                    -47
+<span class="lineNum">     666 </span>            : #define PJD_ERR_GRID_AREA               -48
+<span class="lineNum">     667 </span>            : #define PJD_ERR_INVALID_SWEEP_AXIS      -49
+<span class="lineNum">     668 </span>            : #define PJD_ERR_MALFORMED_PIPELINE      -50
+<span class="lineNum">     669 </span>            : #define PJD_ERR_UNIT_FACTOR_LESS_THAN_0 -51
+<span class="lineNum">     670 </span>            : #define PJD_ERR_INVALID_SCALE           -52
+<span class="lineNum">     671 </span>            : #define PJD_ERR_NON_CONVERGENT          -53
+<span class="lineNum">     672 </span>            : #define PJD_ERR_MISSING_ARGS            -54
+<span class="lineNum">     673 </span>            : #define PJD_ERR_LAT_0_IS_ZERO           -55
+<span class="lineNum">     674 </span>            : #define PJD_ERR_ELLIPSOIDAL_UNSUPPORTED -56
+<span class="lineNum">     675 </span>            : #define PJD_ERR_TOO_MANY_INITS          -57
+<span class="lineNum">     676 </span>            : #define PJD_ERR_INVALID_ARG             -58
+<span class="lineNum">     677 </span>            : #define PJD_ERR_INCONSISTENT_UNIT       -59
+<span class="lineNum">     678 </span>            : #define PJD_ERR_MUTUALLY_EXCLUSIVE_ARGS -60
+<span class="lineNum">     679 </span>            : #define PJD_ERR_GENERIC_ERROR           -61
+<span class="lineNum">     680 </span>            : /* NOTE: Remember to update src/strerrno.cpp, src/apps/gie.cpp and transient_error in */
+<span class="lineNum">     681 </span>            : /* src/transform.cpp when adding new value */
+<span class="lineNum">     682 </span>            : 
+<span class="lineNum">     683 </span>            : struct projFileAPI_t;
+<span class="lineNum">     684 </span>            : 
+<span class="lineNum">     685 </span>            : struct projCppContext;
+<span class="lineNum">     686 </span>            : 
+<span class="lineNum">     687 </span>            : /* proj thread context */
+<span class="lineNum">     688 </span>            : struct projCtx_t {
+<span class="lineNum">     689 </span>            :     int     last_errno = 0;
+<span class="lineNum">     690 </span>            :     int     debug_level = 0;
+<span class="lineNum">     691 </span>            :     void    (*logger)(void *, int, const char *) = nullptr;
+<span class="lineNum">     692 </span>            :     void    *logger_app_data = nullptr;
+<span class="lineNum">     693 </span>            :     struct projFileAPI_t *fileapi = nullptr;
+<span class="lineNum">     694 </span>            :     struct projCppContext* cpp_context = nullptr; /* internal context for C++ code */
+<span class="lineNum">     695 </span>            :     int     use_proj4_init_rules = -1; /* -1 = unknown, 0 = no, 1 = yes */
+<span class="lineNum">     696 </span>            :     int     epsg_file_exists = -1; /* -1 = unknown, 0 = no, 1 = yes */
+<span class="lineNum">     697 </span>            : 
+<span class="lineNum">     698 </span>            :     std::vector&lt;std::string&gt; search_paths{};
+<span class="lineNum">     699 </span>            :     const char **c_compat_paths = nullptr; // same, but for projinfo usage
+<span class="lineNum">     700 </span>            : 
+<span class="lineNum">     701 </span>            :     const char* (*file_finder_legacy) (const char*) = nullptr; // Only for proj_api compat. To remove once it is removed
+<span class="lineNum">     702 </span>            :     const char* (*file_finder) (PJ_CONTEXT *, const char*, void* user_data) = nullptr;
+<span class="lineNum">     703 </span>            :     void* file_finder_user_data = nullptr;
+<span class="lineNum">     704 </span>            : 
+<span class="lineNum">     705 </span>            :     int projStringParserCreateFromPROJStringRecursionCounter = 0; // to avoid potential infinite recursion in PROJStringParser::createFromPROJString()
+<span class="lineNum">     706 </span>            : 
+<span class="lineNum">     707 </span><span class="lineCov">       1280 :     projCtx_t() = default;</span>
+<span class="lineNum">     708 </span>            :     projCtx_t(const projCtx_t&amp;);
+<span class="lineNum">     709 </span>            :     ~projCtx_t();
+<span class="lineNum">     710 </span>            : 
+<span class="lineNum">     711 </span>            :     projCtx_t&amp; operator= (const projCtx_t&amp;) = delete;
+<span class="lineNum">     712 </span>            : 
+<span class="lineNum">     713 </span>            :     void set_search_paths(const std::vector&lt;std::string&gt;&amp; search_paths_in);
+<span class="lineNum">     714 </span>            : 
+<span class="lineNum">     715 </span>            :     static projCtx_t createDefault();
+<span class="lineNum">     716 </span>            : };
+<span class="lineNum">     717 </span>            : 
+<span class="lineNum">     718 </span>            : /* Generate pj_list external or make list from include file */
+<span class="lineNum">     719 </span>            : #ifndef PJ_DATUMS__
+<span class="lineNum">     720 </span>            : C_NAMESPACE_VAR struct PJ_DATUMS pj_datums[];
+<span class="lineNum">     721 </span>            : #endif
+<span class="lineNum">     722 </span>            : 
+<span class="lineNum">     723 </span>            : 
+<span class="lineNum">     724 </span>            : 
+<span class="lineNum">     725 </span>            : 
+<span class="lineNum">     726 </span>            : 
+<span class="lineNum">     727 </span>            : #ifdef PJ_LIB__
+<span class="lineNum">     728 </span>            : #define PROJ_HEAD(name, desc) static const char des_##name [] = desc
+<span class="lineNum">     729 </span>            : 
+<span class="lineNum">     730 </span>            : #define OPERATION(name, NEED_ELPJ_LPS)                          \
+<span class="lineNum">     731 </span>            :                                                              \
+<span class="lineNum">     732 </span>            : pj_projection_specific_setup_##name (PJ *P);                 \
+<span class="lineNum">     733 </span>            : C_NAMESPACE PJ *pj_##name (PJ *P);                           \
+<span class="lineNum">     734 </span>            :                                                              \
+<span class="lineNum">     735 </span>            : C_NAMESPACE_VAR const char * const pj_s_##name = des_##name; \
+<span class="lineNum">     736 </span>            :                                                              \
+<span class="lineNum">     737 </span>            : C_NAMESPACE PJ *pj_##name (PJ *P) {                          \
+<span class="lineNum">     738 </span>            :     if (P)                                                   \
+<span class="lineNum">     739 </span>            :         return pj_projection_specific_setup_##name (P);      \
+<span class="lineNum">     740 </span>            :     P = pj_new();                                            \
+<span class="lineNum">     741 </span>            :     if (nullptr==P)                                          \
+<span class="lineNum">     742 </span>            :         return nullptr;                                      \
+<span class="lineNum">     743 </span>            :     P-&gt;descr = des_##name;                                   \
+<span class="lineNum">     744 </span>            :     P-&gt;need_ellps = NEED_ELPJ_LPS;                              \
+<span class="lineNum">     745 </span>            :     P-&gt;left  = PJ_IO_UNITS_RADIANS;                          \
+<span class="lineNum">     746 </span>            :     P-&gt;right = PJ_IO_UNITS_CLASSIC;                          \
+<span class="lineNum">     747 </span>            :     return P;                                                \
+<span class="lineNum">     748 </span>            : }                                                            \
+<span class="lineNum">     749 </span>            :                                                              \
+<span class="lineNum">     750 </span>            : PJ *pj_projection_specific_setup_##name (PJ *P)
+<span class="lineNum">     751 </span>            : 
+<span class="lineNum">     752 </span>            : /* In ISO19000 lingo, an operation is either a conversion or a transformation */
+<span class="lineNum">     753 </span>            : #define CONVERSION(name, need_ellps)      OPERATION (name, need_ellps)
+<span class="lineNum">     754 </span>            : #define TRANSFORMATION(name, need_ellps)  OPERATION (name, need_ellps)
+<span class="lineNum">     755 </span>            : 
+<span class="lineNum">     756 </span>            : /* In PROJ.4 a projection is a conversion taking angular input and giving scaled linear output */
+<span class="lineNum">     757 </span>            : #define PROJECTION(name) CONVERSION (name, 1)
+<span class="lineNum">     758 </span>            : 
+<span class="lineNum">     759 </span>            : #endif /* def PJ_LIB__ */
+<span class="lineNum">     760 </span>            : 
+<span class="lineNum">     761 </span>            : 
+<span class="lineNum">     762 </span>            : #define MAX_TAB_ID 80
+<span class="lineNum">     763 </span>            : typedef struct { float lam, phi; } FLP;
+<span class="lineNum">     764 </span>            : typedef struct { pj_int32 lam, phi; } ILP;
+<span class="lineNum">     765 </span>            : 
+<span class="lineNum">     766 </span>            : struct CTABLE {
+<span class="lineNum">     767 </span>            :     char id[MAX_TAB_ID];    /* ascii info */
+<span class="lineNum">     768 </span>            :     PJ_LP ll;               /* lower left corner coordinates */
+<span class="lineNum">     769 </span>            :     PJ_LP del;              /* size of cells */
+<span class="lineNum">     770 </span>            :     ILP lim;                /* limits of conversion matrix */
+<span class="lineNum">     771 </span>            :     FLP *cvs;               /* conversion matrix */
+<span class="lineNum">     772 </span>            : };
+<span class="lineNum">     773 </span>            : 
+<span class="lineNum">     774 </span>            : typedef struct _pj_gi {
+<span class="lineNum">     775 </span>            :     char *gridname;     /* identifying name of grid, eg &quot;conus&quot; or ntv2_0.gsb */
+<span class="lineNum">     776 </span>            :     char *filename;     /* full path to filename */
+<span class="lineNum">     777 </span>            : 
+<span class="lineNum">     778 </span>            :     const char *format; /* format of this grid, ie &quot;ctable&quot;, &quot;ntv1&quot;,
+<span class="lineNum">     779 </span>            :                            &quot;ntv2&quot; or &quot;missing&quot;. */
+<span class="lineNum">     780 </span>            : 
+<span class="lineNum">     781 </span>            :     long   grid_offset;  /* offset in file, for delayed loading */
+<span class="lineNum">     782 </span>            :     int   must_swap;    /* only for NTv2 */
+<span class="lineNum">     783 </span>            : 
+<span class="lineNum">     784 </span>            :     struct CTABLE *ct;
+<span class="lineNum">     785 </span>            : 
+<span class="lineNum">     786 </span>            :     struct _pj_gi *next;
+<span class="lineNum">     787 </span>            :     struct _pj_gi *child;
+<span class="lineNum">     788 </span>            : } PJ_GRIDINFO;
+<span class="lineNum">     789 </span>            : 
+<span class="lineNum">     790 </span>            : typedef struct {
+<span class="lineNum">     791 </span>            :     PJ_Region region;
+<span class="lineNum">     792 </span>            :     int  priority;      /* higher used before lower */
+<span class="lineNum">     793 </span>            :     double date;        /* year.fraction */
+<span class="lineNum">     794 </span>            :     char *definition;   /* usually the gridname */
+<span class="lineNum">     795 </span>            : 
+<span class="lineNum">     796 </span>            :     PJ_GRIDINFO  *gridinfo;
+<span class="lineNum">     797 </span>            :     int available;      /* 0=unknown, 1=true, -1=false */
+<span class="lineNum">     798 </span>            : } PJ_GridCatalogEntry;
+<span class="lineNum">     799 </span>            : 
+<span class="lineNum">     800 </span>            : typedef struct _PJ_GridCatalog {
+<span class="lineNum">     801 </span>            :     char *catalog_name;
+<span class="lineNum">     802 </span>            : 
+<span class="lineNum">     803 </span>            :     PJ_Region region;   /* maximum extent of catalog data */
+<span class="lineNum">     804 </span>            : 
+<span class="lineNum">     805 </span>            :     int entry_count;
+<span class="lineNum">     806 </span>            :     PJ_GridCatalogEntry *entries;
+<span class="lineNum">     807 </span>            : 
+<span class="lineNum">     808 </span>            :     struct _PJ_GridCatalog *next;
+<span class="lineNum">     809 </span>            : } PJ_GridCatalog;
+<span class="lineNum">     810 </span>            : 
+<span class="lineNum">     811 </span>            : /* procedure prototypes */
+<span class="lineNum">     812 </span>            : double PROJ_DLL dmstor(const char *, char **);
+<span class="lineNum">     813 </span>            : double dmstor_ctx(projCtx_t *ctx, const char *, char **);
+<span class="lineNum">     814 </span>            : void   PROJ_DLL set_rtodms(int, int);
+<span class="lineNum">     815 </span>            : char  PROJ_DLL *rtodms(char *, double, int, int);
+<span class="lineNum">     816 </span>            : double PROJ_DLL adjlon(double);
+<span class="lineNum">     817 </span>            : double aacos(projCtx_t *,double);
+<span class="lineNum">     818 </span>            : double aasin(projCtx_t *,double);
+<span class="lineNum">     819 </span>            : double asqrt(double);
+<span class="lineNum">     820 </span>            : double aatan2(double, double);
+<span class="lineNum">     821 </span>            : 
+<span class="lineNum">     822 </span>            : PROJVALUE PROJ_DLL pj_param(projCtx_t *ctx, paralist *, const char *);
+<span class="lineNum">     823 </span>            : paralist PROJ_DLL *pj_param_exists (paralist *list, const char *parameter);
+<span class="lineNum">     824 </span>            : paralist PROJ_DLL *pj_mkparam(const char *);
+<span class="lineNum">     825 </span>            : paralist *pj_mkparam_ws (const char *str, const char **next_str);
+<span class="lineNum">     826 </span>            : 
+<span class="lineNum">     827 </span>            : 
+<span class="lineNum">     828 </span>            : int PROJ_DLL pj_ell_set(projCtx_t *ctx, paralist *, double *, double *);
+<span class="lineNum">     829 </span>            : int pj_datum_set(projCtx_t *,paralist *, PJ *);
+<span class="lineNum">     830 </span>            : int pj_angular_units_set(paralist *, PJ *);
+<span class="lineNum">     831 </span>            : 
+<span class="lineNum">     832 </span>            : paralist *pj_clone_paralist( const paralist* );
+<span class="lineNum">     833 </span>            : paralist *pj_search_initcache( const char *filekey );
+<span class="lineNum">     834 </span>            : void      pj_insert_initcache( const char *filekey, const paralist *list);
+<span class="lineNum">     835 </span>            : paralist *pj_expand_init(projCtx_t *ctx, paralist *init);
+<span class="lineNum">     836 </span>            : 
+<span class="lineNum">     837 </span>            : void     *pj_dealloc_params (projCtx_t *ctx, paralist *start, int errlev);
+<span class="lineNum">     838 </span>            : 
+<span class="lineNum">     839 </span>            : 
+<span class="lineNum">     840 </span>            : double *pj_enfn(double);
+<span class="lineNum">     841 </span>            : double  pj_mlfn(double, double, double, double *);
+<span class="lineNum">     842 </span>            : double  pj_inv_mlfn(projCtx_t *, double, double, double *);
+<span class="lineNum">     843 </span>            : double  pj_qsfn(double, double, double);
+<span class="lineNum">     844 </span>            : double  pj_tsfn(double, double, double);
+<span class="lineNum">     845 </span>            : double  pj_msfn(double, double, double);
+<span class="lineNum">     846 </span>            : double  PROJ_DLL pj_phi2(projCtx_t *, double, double);
+<span class="lineNum">     847 </span>            : double  pj_qsfn_(double, PJ *);
+<span class="lineNum">     848 </span>            : double *pj_authset(double);
+<span class="lineNum">     849 </span>            : double  pj_authlat(double, double *);
+<span class="lineNum">     850 </span>            : 
+<span class="lineNum">     851 </span>            : COMPLEX pj_zpoly1(COMPLEX, const COMPLEX *, int);
+<span class="lineNum">     852 </span>            : COMPLEX pj_zpolyd1(COMPLEX, const COMPLEX *, int, COMPLEX *);
+<span class="lineNum">     853 </span>            : 
+<span class="lineNum">     854 </span>            : int pj_deriv(PJ_LP, double, const PJ *, struct DERIVS *);
+<span class="lineNum">     855 </span>            : int pj_factors(PJ_LP, const PJ *, double, struct FACTORS *);
+<span class="lineNum">     856 </span>            : 
+<span class="lineNum">     857 </span>            : /* nadcon related protos */
+<span class="lineNum">     858 </span>            : PJ_LP             nad_intr(PJ_LP, struct CTABLE *);
+<span class="lineNum">     859 </span>            : PJ_LP             nad_cvt(PJ_LP, int, struct CTABLE *);
+<span class="lineNum">     860 </span>            : struct CTABLE *nad_init(projCtx_t *ctx, char *);
+<span class="lineNum">     861 </span>            : struct CTABLE *nad_ctable_init( projCtx_t *ctx, struct projFileAPI_t* fid );
+<span class="lineNum">     862 </span>            : int            nad_ctable_load( projCtx_t *ctx, struct CTABLE *, struct projFileAPI_t* fid );
+<span class="lineNum">     863 </span>            : struct CTABLE *nad_ctable2_init( projCtx_t *ctx, struct projFileAPI_t* fid );
+<span class="lineNum">     864 </span>            : int            nad_ctable2_load( projCtx_t *ctx, struct CTABLE *, struct projFileAPI_t* fid );
+<span class="lineNum">     865 </span>            : void           nad_free(struct CTABLE *);
+<span class="lineNum">     866 </span>            : 
+<span class="lineNum">     867 </span>            : /* higher level handling of datum grid shift files */
+<span class="lineNum">     868 </span>            : 
+<span class="lineNum">     869 </span>            : int pj_apply_vgridshift( PJ *defn, const char *listname,
+<span class="lineNum">     870 </span>            :                          PJ_GRIDINFO ***gridlist_p,
+<span class="lineNum">     871 </span>            :                          int *gridlist_count_p,
+<span class="lineNum">     872 </span>            :                          int inverse,
+<span class="lineNum">     873 </span>            :                          long point_count, int point_offset,
+<span class="lineNum">     874 </span>            :                          double *x, double *y, double *z );
+<span class="lineNum">     875 </span>            : int pj_apply_gridshift_2( PJ *defn, int inverse,
+<span class="lineNum">     876 </span>            :                           long point_count, int point_offset,
+<span class="lineNum">     877 </span>            :                           double *x, double *y, double *z );
+<span class="lineNum">     878 </span>            : int pj_apply_gridshift_3( projCtx_t *ctx,
+<span class="lineNum">     879 </span>            :                           PJ_GRIDINFO **gridlist, int gridlist_count,
+<span class="lineNum">     880 </span>            :                           int inverse, long point_count, int point_offset,
+<span class="lineNum">     881 </span>            :                           double *x, double *y, double *z );
+<span class="lineNum">     882 </span>            : 
+<span class="lineNum">     883 </span>            : PJ_GRIDINFO **pj_gridlist_from_nadgrids( projCtx_t *, const char *, int * );
+<span class="lineNum">     884 </span>            : 
+<span class="lineNum">     885 </span>            : PJ_GRIDINFO *pj_gridinfo_init( projCtx_t *, const char * );
+<span class="lineNum">     886 </span>            : int          pj_gridinfo_load( projCtx_t *, PJ_GRIDINFO * );
+<span class="lineNum">     887 </span>            : void         pj_gridinfo_free( projCtx_t *, PJ_GRIDINFO * );
+<span class="lineNum">     888 </span>            : 
+<span class="lineNum">     889 </span>            : PJ_GridCatalog *pj_gc_findcatalog( projCtx_t *, const char * );
+<span class="lineNum">     890 </span>            : PJ_GridCatalog *pj_gc_readcatalog( projCtx_t *, const char * );
+<span class="lineNum">     891 </span>            : void pj_gc_unloadall( projCtx_t *);
+<span class="lineNum">     892 </span>            : int pj_gc_apply_gridshift( PJ *defn, int inverse,
+<span class="lineNum">     893 </span>            :                            long point_count, int point_offset,
+<span class="lineNum">     894 </span>            :                            double *x, double *y, double *z );
+<span class="lineNum">     895 </span>            : int pj_gc_apply_gridshift( PJ *defn, int inverse,
+<span class="lineNum">     896 </span>            :                            long point_count, int point_offset,
+<span class="lineNum">     897 </span>            :                            double *x, double *y, double *z );
+<span class="lineNum">     898 </span>            : 
+<span class="lineNum">     899 </span>            : double pj_gc_parsedate( projCtx_t *, const char * );
+<span class="lineNum">     900 </span>            : 
+<span class="lineNum">     901 </span>            : void  *proj_mdist_ini(double);
+<span class="lineNum">     902 </span>            : double proj_mdist(double, double, double, const void *);
+<span class="lineNum">     903 </span>            : double proj_inv_mdist(projCtx_t *ctx, double, const void *);
+<span class="lineNum">     904 </span>            : void  *pj_gauss_ini(double, double, double *,double *);
+<span class="lineNum">     905 </span>            : PJ_LP     pj_gauss(projCtx_t *, PJ_LP, const void *);
+<span class="lineNum">     906 </span>            : PJ_LP     pj_inv_gauss(projCtx_t *, PJ_LP, const void *);
+<span class="lineNum">     907 </span>            : 
+<span class="lineNum">     908 </span>            : struct PJ_DATUMS           PROJ_DLL *pj_get_datums_ref( void );
+<span class="lineNum">     909 </span>            : 
+<span class="lineNum">     910 </span>            : PJ *pj_new(void);
+<span class="lineNum">     911 </span>            : PJ *pj_default_destructor (PJ *P, int errlev);
+<span class="lineNum">     912 </span>            : 
+<span class="lineNum">     913 </span>            : double PROJ_DLL pj_atof( const char* nptr );
+<span class="lineNum">     914 </span>            : double pj_strtod( const char *nptr, char **endptr );
+<span class="lineNum">     915 </span>            : void   pj_freeup_plain (PJ *P);
+<span class="lineNum">     916 </span>            : 
+<span class="lineNum">     917 </span>            : PJ* pj_init_ctx_with_allow_init_epsg( projCtx_t *ctx, int argc, char **argv, int allow_init_epsg );
+<span class="lineNum">     918 </span>            : 
+<span class="lineNum">     919 </span>            : std::string PROJ_DLL pj_add_type_crs_if_needed(const std::string&amp; str);
+<span class="lineNum">     920 </span>            : std::string pj_double_quote_string_param_if_needed(const std::string&amp; str);
+<span class="lineNum">     921 </span>            : 
+<span class="lineNum">     922 </span>            : PJ *pj_create_internal (PJ_CONTEXT *ctx, const char *definition);
+<span class="lineNum">     923 </span>            : PJ *pj_create_argv_internal (PJ_CONTEXT *ctx, int argc, char **argv);
+<span class="lineNum">     924 </span>            : 
+<span class="lineNum">     925 </span>            : void pj_pipeline_assign_context_to_steps( PJ* P, PJ_CONTEXT* ctx );
+<span class="lineNum">     926 </span>            : 
+<span class="lineNum">     927 </span>            : /* classic public API */
+<span class="lineNum">     928 </span>            : #include &quot;proj_api.h&quot;
+<span class="lineNum">     929 </span>            : 
+<span class="lineNum">     930 </span>            : #endif /* ndef PROJ_INTERNAL_H */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

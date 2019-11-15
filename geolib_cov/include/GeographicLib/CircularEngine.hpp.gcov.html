@@ -1,0 +1,271 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/CircularEngine.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - CircularEngine.hpp<span style="font-size: 80%;"> (source / <a href="CircularEngine.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file CircularEngine.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::CircularEngine class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2011-2015) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_CIRCULARENGINE_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_CIRCULARENGINE_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;GeographicLib/SphericalEngine.hpp&gt;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      18 </span>            : // Squelch warnings about dll vs vector
+<span class="lineNum">      19 </span>            : #  pragma warning (push)
+<span class="lineNum">      20 </span>            : #  pragma warning (disable: 4251)
+<span class="lineNum">      21 </span>            : #endif
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : namespace GeographicLib {
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            :   /**
+<span class="lineNum">      26 </span>            :    * \brief Spherical harmonic sums for a circle
+<span class="lineNum">      27 </span>            :    *
+<span class="lineNum">      28 </span>            :    * The class is a companion to SphericalEngine.  If the results of a
+<span class="lineNum">      29 </span>            :    * spherical harmonic sum are needed for several points on a circle of
+<span class="lineNum">      30 </span>            :    * constant latitude \e lat and height \e h, then SphericalEngine::Circle can
+<span class="lineNum">      31 </span>            :    * compute the inner sum, which is independent of longitude \e lon, and
+<span class="lineNum">      32 </span>            :    * produce a CircularEngine object.  CircularEngine::operator()() can
+<span class="lineNum">      33 </span>            :    * then be used to perform the outer sum for particular vales of \e lon.
+<span class="lineNum">      34 </span>            :    * This can lead to substantial improvements in computational speed for high
+<span class="lineNum">      35 </span>            :    * degree sum (approximately by a factor of \e N / 2 where \e N is the
+<span class="lineNum">      36 </span>            :    * maximum degree).
+<span class="lineNum">      37 </span>            :    *
+<span class="lineNum">      38 </span>            :    * CircularEngine is tightly linked to the internals of SphericalEngine.  For
+<span class="lineNum">      39 </span>            :    * that reason, the constructor for this class is private.  Use
+<span class="lineNum">      40 </span>            :    * SphericalHarmonic::Circle, SphericalHarmonic1::Circle, and
+<span class="lineNum">      41 </span>            :    * SphericalHarmonic2::Circle to create instances of this class.
+<span class="lineNum">      42 </span>            :    *
+<span class="lineNum">      43 </span>            :    * CircularEngine stores the coefficients needed to allow the summation over
+<span class="lineNum">      44 </span>            :    * order to be performed in 2 or 6 vectors of length \e M + 1 (depending on
+<span class="lineNum">      45 </span>            :    * whether gradients are to be calculated).  For this reason the constructor
+<span class="lineNum">      46 </span>            :    * may throw a std::bad_alloc exception.
+<span class="lineNum">      47 </span>            :    *
+<span class="lineNum">      48 </span>            :    * Example of use:
+<span class="lineNum">      49 </span>            :    * \include example-CircularEngine.cpp
+<a name="50"><span class="lineNum">      50 </span>            :    **********************************************************************/</a>
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :   class GEOGRAPHICLIB_EXPORT CircularEngine {</span>
+<span class="lineNum">      53 </span>            :   private:
+<span class="lineNum">      54 </span>            :     typedef Math::real real;
+<span class="lineNum">      55 </span>            :     enum normalization {
+<span class="lineNum">      56 </span>            :       FULL = SphericalEngine::FULL,
+<span class="lineNum">      57 </span>            :       SCHMIDT = SphericalEngine::SCHMIDT,
+<span class="lineNum">      58 </span>            :     };
+<span class="lineNum">      59 </span>            :     int _M;
+<span class="lineNum">      60 </span>            :     bool _gradp;
+<span class="lineNum">      61 </span>            :     unsigned _norm;
+<span class="lineNum">      62 </span>            :     real _a, _r, _u, _t;
+<span class="lineNum">      63 </span>            :     std::vector&lt;real&gt; _wc, _ws, _wrc, _wrs, _wtc, _wts;
+<span class="lineNum">      64 </span>            :     real _q, _uq, _uq2;
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :     Math::real Value(bool gradp, real sl, real cl,
+<span class="lineNum">      67 </span>            :                      real&amp; gradx, real&amp; grady, real&amp; gradz) const;
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :     friend class SphericalEngine;
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :     CircularEngine(int M, bool gradp, unsigned norm,</span>
+<span class="lineNum">      71 </span>            :                    real a, real r, real u, real t)
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :       : _M(M)</span>
+<span class="lineNum">      73 </span>            :       , _gradp(gradp)
+<span class="lineNum">      74 </span>            :       , _norm(norm)
+<span class="lineNum">      75 </span>            :       , _a(a)
+<span class="lineNum">      76 </span>            :       , _r(r)
+<span class="lineNum">      77 </span>            :       , _u(u)
+<span class="lineNum">      78 </span>            :       , _t(t)
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :       , _wc(std::vector&lt;real&gt;(_M + 1, 0))</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :       , _ws(std::vector&lt;real&gt;(_M + 1, 0))</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :       , _wrc(std::vector&lt;real&gt;(_gradp ? _M + 1 : 0, 0))</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :       , _wrs(std::vector&lt;real&gt;(_gradp ? _M + 1 : 0, 0))</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :       , _wtc(std::vector&lt;real&gt;(_gradp ? _M + 1 : 0, 0))</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :       , _wts(std::vector&lt;real&gt;(_gradp ? _M + 1 : 0, 0))</span>
+<span class="lineNum">      85 </span>            :       {
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :         _q = _a / _r;</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :         _uq = _u * _q;</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :         _uq2 = Math::sq(_uq);</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :       }</span>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :     void SetCoeff(int m, real wc, real ws)
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :     { _wc[m] = wc; _ws[m] = ws; }</span>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :     void SetCoeff(int m, real wc, real ws,
+<span class="lineNum">      95 </span>            :                   real wrc, real wrs, real wtc, real wts) {
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :       _wc[m] = wc; _ws[m] = ws;</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :       if (_gradp) {</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :         _wrc[m] = wrc; _wrs[m] = wrs;</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :         _wtc[m] = wtc; _wts[m] = wts;</span>
+<span class="lineNum">     100 </span>            :       }
+<span class="lineNum">     101 </span>            :     }
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :   public:
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :     /**
+<span class="lineNum">     106 </span>            :      * A default constructor.  CircularEngine::operator()() on the resulting
+<span class="lineNum">     107 </span>            :      * object returns zero.  The resulting object can be assigned to the result
+<span class="lineNum">     108 </span>            :      * of SphericalHarmonic::Circle.
+<span class="lineNum">     109 </span>            :      **********************************************************************/
+<span class="lineNum">     110 </span>            :     CircularEngine()
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :       : _M(-1)</span>
+<span class="lineNum">     112 </span>            :       , _gradp(true)
+<span class="lineNum">     113 </span>            :       , _u(0)
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :       , _t(1)</span>
+<span class="lineNum">     115 </span>            :       {}
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            :     /**
+<span class="lineNum">     118 </span>            :      * Evaluate the sum for a particular longitude given in terms of its
+<span class="lineNum">     119 </span>            :      * sine and cosine.
+<span class="lineNum">     120 </span>            :      *
+<span class="lineNum">     121 </span>            :      * @param[in] sinlon the sine of the longitude.
+<span class="lineNum">     122 </span>            :      * @param[in] coslon the cosine of the longitude.
+<span class="lineNum">     123 </span>            :      * @return \e V the value of the sum.
+<span class="lineNum">     124 </span>            :      *
+<span class="lineNum">     125 </span>            :      * The arguments must satisfy &lt;i&gt;sinlon&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; +
+<span class="lineNum">     126 </span>            :      * &lt;i&gt;coslon&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; = 1.
+<span class="lineNum">     127 </span>            :      **********************************************************************/
+<span class="lineNum">     128 </span>            :     Math::real operator()(real sinlon, real coslon) const {
+<span class="lineNum">     129 </span>            :       real dummy;
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :       return Value(false, sinlon, coslon, dummy, dummy, dummy);</span>
+<span class="lineNum">     131 </span>            :     }
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            :     /**
+<span class="lineNum">     134 </span>            :      * Evaluate the sum for a particular longitude.
+<span class="lineNum">     135 </span>            :      *
+<span class="lineNum">     136 </span>            :      * @param[in] lon the longitude (degrees).
+<span class="lineNum">     137 </span>            :      * @return \e V the value of the sum.
+<span class="lineNum">     138 </span>            :      **********************************************************************/
+<span class="lineNum">     139 </span>            :     Math::real operator()(real lon) const {
+<span class="lineNum">     140 </span>            :       real sinlon, coslon;
+<span class="lineNum">     141 </span>            :       Math::sincosd(lon, sinlon, coslon);
+<span class="lineNum">     142 </span>            :       return (*this)(sinlon, coslon);
+<span class="lineNum">     143 </span>            :     }
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            :     /**
+<span class="lineNum">     146 </span>            :      * Evaluate the sum and its gradient for a particular longitude given in
+<span class="lineNum">     147 </span>            :      * terms of its sine and cosine.
+<span class="lineNum">     148 </span>            :      *
+<span class="lineNum">     149 </span>            :      * @param[in] sinlon the sine of the longitude.
+<span class="lineNum">     150 </span>            :      * @param[in] coslon the cosine of the longitude.
+<span class="lineNum">     151 </span>            :      * @param[out] gradx \e x component of the gradient.
+<span class="lineNum">     152 </span>            :      * @param[out] grady \e y component of the gradient.
+<span class="lineNum">     153 </span>            :      * @param[out] gradz \e z component of the gradient.
+<span class="lineNum">     154 </span>            :      * @return \e V the value of the sum.
+<span class="lineNum">     155 </span>            :      *
+<span class="lineNum">     156 </span>            :      * The gradients will only be computed if the CircularEngine object was
+<span class="lineNum">     157 </span>            :      * created with this capability (e.g., via \e gradp = true in
+<span class="lineNum">     158 </span>            :      * SphericalHarmonic::Circle).  If not, \e gradx, etc., will not be
+<span class="lineNum">     159 </span>            :      * touched.  The arguments must satisfy &lt;i&gt;sinlon&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; +
+<span class="lineNum">     160 </span>            :      * &lt;i&gt;coslon&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; = 1.
+<span class="lineNum">     161 </span>            :      **********************************************************************/
+<span class="lineNum">     162 </span>            :     Math::real operator()(real sinlon, real coslon,
+<span class="lineNum">     163 </span>            :                           real&amp; gradx, real&amp; grady, real&amp; gradz) const {
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :       return Value(true, sinlon, coslon, gradx, grady, gradz);</span>
+<span class="lineNum">     165 </span>            :     }
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            :     /**
+<span class="lineNum">     168 </span>            :      * Evaluate the sum and its gradient for a particular longitude.
+<span class="lineNum">     169 </span>            :      *
+<span class="lineNum">     170 </span>            :      * @param[in] lon the longitude (degrees).
+<span class="lineNum">     171 </span>            :      * @param[out] gradx \e x component of the gradient.
+<span class="lineNum">     172 </span>            :      * @param[out] grady \e y component of the gradient.
+<span class="lineNum">     173 </span>            :      * @param[out] gradz \e z component of the gradient.
+<span class="lineNum">     174 </span>            :      * @return \e V the value of the sum.
+<span class="lineNum">     175 </span>            :      *
+<span class="lineNum">     176 </span>            :      * The gradients will only be computed if the CircularEngine object was
+<span class="lineNum">     177 </span>            :      * created with this capability (e.g., via \e gradp = true in
+<span class="lineNum">     178 </span>            :      * SphericalHarmonic::Circle).  If not, \e gradx, etc., will not be
+<span class="lineNum">     179 </span>            :      * touched.
+<span class="lineNum">     180 </span>            :      **********************************************************************/
+<span class="lineNum">     181 </span>            :     Math::real operator()(real lon,
+<span class="lineNum">     182 </span>            :                           real&amp; gradx, real&amp; grady, real&amp; gradz) const {
+<span class="lineNum">     183 </span>            :       real sinlon, coslon;
+<span class="lineNum">     184 </span>            :       Math::sincosd(lon, sinlon, coslon);
+<span class="lineNum">     185 </span>            :       return (*this)(sinlon, coslon, gradx, grady, gradz);
+<span class="lineNum">     186 </span>            :     }
+<span class="lineNum">     187 </span>            :   };
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            : } // namespace GeographicLib
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">     192 </span>            : #  pragma warning (pop)
+<span class="lineNum">     193 </span>            : #endif
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span>            : #endif  // GEOGRAPHICLIB_CIRCULARENGINE_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/NormalGravity.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - NormalGravity.hpp<span style="font-size: 80%;"> (source / <a href="NormalGravity.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file NormalGravity.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::NormalGravity class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2011-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_NORMALGRAVITY_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_NORMALGRAVITY_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/Geocentric.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : namespace GeographicLib {
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            :   /**
+<span class="lineNum">      19 </span>            :    * \brief The normal gravity of the earth
+<span class="lineNum">      20 </span>            :    *
+<span class="lineNum">      21 </span>            :    * &quot;Normal&quot; gravity refers to an idealization of the earth which is modeled
+<span class="lineNum">      22 </span>            :    * as an rotating ellipsoid.  The eccentricity of the ellipsoid, the rotation
+<span class="lineNum">      23 </span>            :    * speed, and the distribution of mass within the ellipsoid are such that the
+<span class="lineNum">      24 </span>            :    * ellipsoid is a &quot;level ellipoid&quot;, a surface of constant potential
+<span class="lineNum">      25 </span>            :    * (gravitational plus centrifugal).  The acceleration due to gravity is
+<span class="lineNum">      26 </span>            :    * therefore perpendicular to the surface of the ellipsoid.
+<span class="lineNum">      27 </span>            :    *
+<span class="lineNum">      28 </span>            :    * Because the distribution of mass within the ellipsoid is unspecified, only
+<span class="lineNum">      29 </span>            :    * the potential exterior to the ellipsoid is well defined.  In this class,
+<span class="lineNum">      30 </span>            :    * the mass is assumed to be to concentrated on a &quot;focal disc&quot; of radius,
+<span class="lineNum">      31 </span>            :    * (&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; &amp;minus; &lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;)&lt;sup&gt;1/2&lt;/sup&gt;, where
+<span class="lineNum">      32 </span>            :    * \e a is the equatorial radius of the ellipsoid and \e b is its polar
+<span class="lineNum">      33 </span>            :    * semi-axis.  In the case of an oblate ellipsoid, the mass is concentrated
+<span class="lineNum">      34 </span>            :    * on a &quot;focal rod&quot; of length 2(&lt;i&gt;b&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; &amp;minus;
+<span class="lineNum">      35 </span>            :    * &lt;i&gt;a&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;)&lt;sup&gt;1/2&lt;/sup&gt;.  As a result the potential is well
+<span class="lineNum">      36 </span>            :    * defined everywhere.
+<span class="lineNum">      37 </span>            :    *
+<span class="lineNum">      38 </span>            :    * There is a closed solution to this problem which is implemented here.
+<span class="lineNum">      39 </span>            :    * Series &quot;approximations&quot; are only used to evaluate certain combinations of
+<span class="lineNum">      40 </span>            :    * elementary functions where use of the closed expression results in a loss
+<span class="lineNum">      41 </span>            :    * of accuracy for small arguments due to cancellation of the leading terms.
+<span class="lineNum">      42 </span>            :    * However these series include sufficient terms to give full machine
+<span class="lineNum">      43 </span>            :    * precision.
+<span class="lineNum">      44 </span>            :    *
+<span class="lineNum">      45 </span>            :    * Although the formulation used in this class applies to ellipsoids with
+<span class="lineNum">      46 </span>            :    * arbitrary flattening, in practice, its use should be limited to about
+<span class="lineNum">      47 </span>            :    * &lt;i&gt;b&lt;/i&gt;/\e a &amp;isin; [0.01, 100] or \e f &amp;isin; [&amp;minus;99, 0.99].
+<span class="lineNum">      48 </span>            :    *
+<span class="lineNum">      49 </span>            :    * Definitions:
+<span class="lineNum">      50 </span>            :    * - &lt;i&gt;V&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt;, the gravitational contribution to the normal
+<span class="lineNum">      51 </span>            :    *   potential;
+<span class="lineNum">      52 </span>            :    * - &amp;Phi;, the rotational contribution to the normal potential;
+<span class="lineNum">      53 </span>            :    * - \e U = &lt;i&gt;V&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt; + &amp;Phi;, the total potential;
+<span class="lineNum">      54 </span>            :    * - &lt;b&gt;&amp;Gamma;&lt;/b&gt; = &amp;nabla;&lt;i&gt;V&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt;, the acceleration due to
+<span class="lineNum">      55 </span>            :    *   mass of the earth;
+<span class="lineNum">      56 </span>            :    * - &lt;b&gt;f&lt;/b&gt; = &amp;nabla;&amp;Phi;, the centrifugal acceleration;
+<span class="lineNum">      57 </span>            :    * - &lt;b&gt;&amp;gamma;&lt;/b&gt; = &amp;nabla;\e U = &lt;b&gt;&amp;Gamma;&lt;/b&gt; + &lt;b&gt;f&lt;/b&gt;, the normal
+<span class="lineNum">      58 </span>            :    *   acceleration;
+<span class="lineNum">      59 </span>            :    * - \e X, \e Y, \e Z, geocentric coordinates;
+<span class="lineNum">      60 </span>            :    * - \e x, \e y, \e z, local cartesian coordinates used to denote the east,
+<span class="lineNum">      61 </span>            :    *   north and up directions.
+<span class="lineNum">      62 </span>            :    *
+<span class="lineNum">      63 </span>            :    * References:
+<span class="lineNum">      64 </span>            :    * - C. Somigliana, Teoria generale del campo gravitazionale dell'ellissoide
+<span class="lineNum">      65 </span>            :    *   di rotazione, Mem. Soc. Astron. Ital, &lt;b&gt;4&lt;/b&gt;, 541--599 (1929).
+<span class="lineNum">      66 </span>            :    * - W. A. Heiskanen and H. Moritz, Physical Geodesy (Freeman, San
+<span class="lineNum">      67 </span>            :    *   Francisco, 1967), Secs. 1-19, 2-7, 2-8 (2-9, 2-10), 6-2 (6-3).
+<span class="lineNum">      68 </span>            :    * - B. Hofmann-Wellenhof, H. Moritz, Physical Geodesy (Second edition,
+<span class="lineNum">      69 </span>            :    *   Springer, 2006) https://doi.org/10.1007/978-3-211-33545-1
+<span class="lineNum">      70 </span>            :    * - H. Moritz, Geodetic Reference System 1980, J. Geodesy 54(3), 395-405
+<span class="lineNum">      71 </span>            :    *   (1980) https://doi.org/10.1007/BF02521480
+<span class="lineNum">      72 </span>            :    *
+<span class="lineNum">      73 </span>            :    * For more information on normal gravity see \ref normalgravity.
+<span class="lineNum">      74 </span>            :    *
+<span class="lineNum">      75 </span>            :    * Example of use:
+<span class="lineNum">      76 </span>            :    * \include example-NormalGravity.cpp
+<span class="lineNum">      77 </span>            :    **********************************************************************/
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            :   class GEOGRAPHICLIB_EXPORT NormalGravity {
+<span class="lineNum">      80 </span>            :   private:
+<span class="lineNum">      81 </span>            :     static const int maxit_ = 20;
+<span class="lineNum">      82 </span>            :     typedef Math::real real;
+<span class="lineNum">      83 </span>            :     friend class GravityModel;
+<span class="lineNum">      84 </span>            :     real _a, _GM, _omega, _f, _J2, _omega2, _aomega2;
+<a name="85"><span class="lineNum">      85 </span>            :     real _e2, _ep2, _b, _E, _U0, _gammae, _gammap, _Q0, _k, _fstar;</a>
+<span class="lineNum">      86 </span>            :     Geocentric _earth;
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :     static real atanzz(real x, bool alt) {</span>
+<span class="lineNum">      88 </span>            :       // This routine obeys the identity
+<span class="lineNum">      89 </span>            :       //   atanzz(x, alt) = atanzz(-x/(1+x), !alt)
+<span class="lineNum">      90 </span>            :       //
+<span class="lineNum">      91 </span>            :       // Require x &gt;= -1.  Best to call with alt, s.t. x &gt;= 0; this results in
+<span class="lineNum">      92 </span>            :       // a call to atan, instead of asin, or to asinh, instead of atanh.
+<span class="lineNum">      93 </span>            :       using std::sqrt; using std::abs; using std::atan; using std::asin;
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :       real z = sqrt(abs(x));</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :       return x == 0 ? 1 :</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :         (alt ?</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :          (!(x &lt; 0) ? Math::asinh(z) : asin(z)) / sqrt(abs(x) / (1 + x)) :</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :          (!(x &lt; 0) ? atan(z) : Math::atanh(z)) / z);</span>
+<span class="lineNum">      99 </span>            :     }
+<span class="lineNum">     100 </span>            :     static real atan7series(real x);
+<span class="lineNum">     101 </span>            :     static real atan5series(real x);
+<span class="lineNum">     102 </span>            :     static real Qf(real x, bool alt);
+<span class="lineNum">     103 </span>            :     static real Hf(real x, bool alt);
+<span class="lineNum">     104 </span>            :     static real QH3f(real x, bool alt);
+<span class="lineNum">     105 </span>            :     real Jn(int n) const;
+<span class="lineNum">     106 </span>            :     void Initialize(real a, real GM, real omega, real f_J2, bool geometricp);
+<span class="lineNum">     107 </span>            :   public:
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :     /** \name Setting up the normal gravity
+<span class="lineNum">     110 </span>            :      **********************************************************************/
+<span class="lineNum">     111 </span>            :     ///@{
+<span class="lineNum">     112 </span>            :     /**
+<span class="lineNum">     113 </span>            :      * Constructor for the normal gravity.
+<span class="lineNum">     114 </span>            :      *
+<span class="lineNum">     115 </span>            :      * @param[in] a equatorial radius (meters).
+<span class="lineNum">     116 </span>            :      * @param[in] GM mass constant of the ellipsoid
+<span class="lineNum">     117 </span>            :      *   (meters&lt;sup&gt;3&lt;/sup&gt;/seconds&lt;sup&gt;2&lt;/sup&gt;); this is the product of \e G
+<span class="lineNum">     118 </span>            :      *   the gravitational constant and \e M the mass of the earth (usually
+<span class="lineNum">     119 </span>            :      *   including the mass of the earth's atmosphere).
+<span class="lineNum">     120 </span>            :      * @param[in] omega the angular velocity (rad s&lt;sup&gt;&amp;minus;1&lt;/sup&gt;).
+<span class="lineNum">     121 </span>            :      * @param[in] f_J2 either the flattening of the ellipsoid \e f or the
+<span class="lineNum">     122 </span>            :      *   the dynamical form factor \e J2.
+<span class="lineNum">     123 </span>            :      * @param[out] geometricp if true (the default), then \e f_J2 denotes the
+<span class="lineNum">     124 </span>            :      *   flattening, else it denotes the dynamical form factor \e J2.
+<span class="lineNum">     125 </span>            :      * @exception if \e a is not positive or if the other parameters do not
+<span class="lineNum">     126 </span>            :      *   obey the restrictions given below.
+<span class="lineNum">     127 </span>            :      *
+<span class="lineNum">     128 </span>            :      * The shape of the ellipsoid can be given in one of two ways:
+<span class="lineNum">     129 </span>            :      * - geometrically (\e geomtricp = true), the ellipsoid is defined by the
+<span class="lineNum">     130 </span>            :      *   flattening \e f = (\e a &amp;minus; \e b) / \e a, where \e a and \e b are
+<span class="lineNum">     131 </span>            :      *   the equatorial radius and the polar semi-axis.  The parameters should
+<span class="lineNum">     132 </span>            :      *   obey \e a &amp;gt; 0, \e f &amp;lt; 1.  There are no restrictions on \e GM or
+<span class="lineNum">     133 </span>            :      *   \e omega, in particular, \e GM need not be positive.
+<span class="lineNum">     134 </span>            :      * - physically (\e geometricp = false), the ellipsoid is defined by the
+<span class="lineNum">     135 </span>            :      *   dynamical form factor &lt;i&gt;J&lt;/i&gt;&lt;sub&gt;2&lt;/sub&gt; = (\e C &amp;minus; \e A) /
+<span class="lineNum">     136 </span>            :      *   &lt;i&gt;Ma&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;, where \e A and \e C are the equatorial and
+<span class="lineNum">     137 </span>            :      *   polar moments of inertia and \e M is the mass of the earth.  The
+<span class="lineNum">     138 </span>            :      *   parameters should obey \e a &amp;gt; 0, \e GM &amp;gt; 0 and \e J2 &amp;lt; 1/3
+<span class="lineNum">     139 </span>            :      *   &amp;minus; (&lt;i&gt;omega&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;3&lt;/sup&gt;/&lt;i&gt;GM&lt;/i&gt;)
+<span class="lineNum">     140 </span>            :      *   8/(45&amp;pi;).  There is no restriction on \e omega.
+<span class="lineNum">     141 </span>            :      **********************************************************************/
+<span class="lineNum">     142 </span>            :     NormalGravity(real a, real GM, real omega, real f_J2,
+<span class="lineNum">     143 </span>            :                   bool geometricp = true);
+<span class="lineNum">     144 </span>            :     /**
+<span class="lineNum">     145 </span>            :      * \deprecated Old constructor for the normal gravity.
+<span class="lineNum">     146 </span>            :      *
+<span class="lineNum">     147 </span>            :      * @param[in] a equatorial radius (meters).
+<span class="lineNum">     148 </span>            :      * @param[in] GM mass constant of the ellipsoid
+<span class="lineNum">     149 </span>            :      *   (meters&lt;sup&gt;3&lt;/sup&gt;/seconds&lt;sup&gt;2&lt;/sup&gt;); this is the product of \e G
+<span class="lineNum">     150 </span>            :      *   the gravitational constant and \e M the mass of the earth (usually
+<span class="lineNum">     151 </span>            :      *   including the mass of the earth's atmosphere).
+<span class="lineNum">     152 </span>            :      * @param[in] omega the angular velocity (rad s&lt;sup&gt;&amp;minus;1&lt;/sup&gt;).
+<span class="lineNum">     153 </span>            :      * @param[in] f the flattening of the ellipsoid.
+<span class="lineNum">     154 </span>            :      * @param[in] J2 the dynamical form factor.
+<span class="lineNum">     155 </span>            :      * @exception if \e a is not positive or the other constants are
+<span class="lineNum">     156 </span>            :      *   inconsistent (see below).
+<span class="lineNum">     157 </span>            :      *
+<span class="lineNum">     158 </span>            :      * If \e omega is non-zero, then exactly one of \e f and \e J2 should be
+<span class="lineNum">     159 </span>            :      * positive and this will be used to define the ellipsoid.  The shape of
+<span class="lineNum">     160 </span>            :      * the ellipsoid can be given in one of two ways:
+<span class="lineNum">     161 </span>            :      * - geometrically, the ellipsoid is defined by the flattening \e f = (\e a
+<span class="lineNum">     162 </span>            :      *   &amp;minus; \e b) / \e a, where \e a and \e b are the equatorial radius
+<span class="lineNum">     163 </span>            :      *   and the polar semi-axis.
+<span class="lineNum">     164 </span>            :      * - physically, the ellipsoid is defined by the dynamical form factor
+<span class="lineNum">     165 </span>            :      *   &lt;i&gt;J&lt;/i&gt;&lt;sub&gt;2&lt;/sub&gt; = (\e C &amp;minus; \e A) / &lt;i&gt;Ma&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;,
+<span class="lineNum">     166 </span>            :      *   where \e A and \e C are the equatorial and polar moments of inertia
+<span class="lineNum">     167 </span>            :      *   and \e M is the mass of the earth.
+<span class="lineNum">     168 </span>            :      * .
+<span class="lineNum">     169 </span>            :      * If \e omega, \e f, and \e J2 are all zero, then the ellipsoid becomes a
+<span class="lineNum">     170 </span>            :      * sphere.
+<span class="lineNum">     171 </span>            :      **********************************************************************/
+<span class="lineNum">     172 </span>            :     GEOGRAPHICLIB_DEPRECATED(&quot;Use new NormalGravity constructor&quot;)
+<span class="lineNum">     173 </span>            :     NormalGravity(real a, real GM, real omega, real f, real J2);
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            :     /**
+<span class="lineNum">     176 </span>            :      * A default constructor for the normal gravity.  This sets up an
+<span class="lineNum">     177 </span>            :      * uninitialized object and is used by GravityModel which constructs this
+<span class="lineNum">     178 </span>            :      * object before it has read in the parameters for the reference ellipsoid.
+<span class="lineNum">     179 </span>            :      **********************************************************************/
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :     NormalGravity() : _a(-1) {}</span>
+<span class="lineNum">     181 </span>            :     ///@}
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            :     /** \name Compute the gravity
+<span class="lineNum">     184 </span>            :      **********************************************************************/
+<span class="lineNum">     185 </span>            :     ///@{
+<span class="lineNum">     186 </span>            :     /**
+<span class="lineNum">     187 </span>            :      * Evaluate the gravity on the surface of the ellipsoid.
+<span class="lineNum">     188 </span>            :      *
+<span class="lineNum">     189 </span>            :      * @param[in] lat the geographic latitude (degrees).
+<span class="lineNum">     190 </span>            :      * @return &amp;gamma; the acceleration due to gravity, positive downwards
+<span class="lineNum">     191 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     192 </span>            :      *
+<span class="lineNum">     193 </span>            :      * Due to the axial symmetry of the ellipsoid, the result is independent of
+<span class="lineNum">     194 </span>            :      * the value of the longitude.  This acceleration is perpendicular to the
+<span class="lineNum">     195 </span>            :      * surface of the ellipsoid.  It includes the effects of the earth's
+<span class="lineNum">     196 </span>            :      * rotation.
+<span class="lineNum">     197 </span>            :      **********************************************************************/
+<span class="lineNum">     198 </span>            :     Math::real SurfaceGravity(real lat) const;
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            :     /**
+<span class="lineNum">     201 </span>            :      * Evaluate the gravity at an arbitrary point above (or below) the
+<span class="lineNum">     202 </span>            :      * ellipsoid.
+<span class="lineNum">     203 </span>            :      *
+<span class="lineNum">     204 </span>            :      * @param[in] lat the geographic latitude (degrees).
+<span class="lineNum">     205 </span>            :      * @param[in] h the height above the ellipsoid (meters).
+<span class="lineNum">     206 </span>            :      * @param[out] gammay the northerly component of the acceleration
+<span class="lineNum">     207 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     208 </span>            :      * @param[out] gammaz the upward component of the acceleration
+<span class="lineNum">     209 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;); this is usually negative.
+<span class="lineNum">     210 </span>            :      * @return \e U the corresponding normal potential
+<span class="lineNum">     211 </span>            :      *   (m&lt;sup&gt;2&lt;/sup&gt; s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     212 </span>            :      *
+<span class="lineNum">     213 </span>            :      * Due to the axial symmetry of the ellipsoid, the result is independent of
+<span class="lineNum">     214 </span>            :      * the value of the longitude and the easterly component of the
+<span class="lineNum">     215 </span>            :      * acceleration vanishes, \e gammax = 0.  The function includes the effects
+<span class="lineNum">     216 </span>            :      * of the earth's rotation.  When \e h = 0, this function gives \e gammay =
+<span class="lineNum">     217 </span>            :      * 0 and the returned value matches that of NormalGravity::SurfaceGravity.
+<span class="lineNum">     218 </span>            :      **********************************************************************/
+<span class="lineNum">     219 </span>            :     Math::real Gravity(real lat, real h, real&amp; gammay, real&amp; gammaz)
+<span class="lineNum">     220 </span>            :       const;
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            :     /**
+<span class="lineNum">     223 </span>            :      * Evaluate the components of the acceleration due to gravity and the
+<span class="lineNum">     224 </span>            :      * centrifugal acceleration in geocentric coordinates.
+<span class="lineNum">     225 </span>            :      *
+<span class="lineNum">     226 </span>            :      * @param[in] X geocentric coordinate of point (meters).
+<span class="lineNum">     227 </span>            :      * @param[in] Y geocentric coordinate of point (meters).
+<span class="lineNum">     228 </span>            :      * @param[in] Z geocentric coordinate of point (meters).
+<span class="lineNum">     229 </span>            :      * @param[out] gammaX the \e X component of the acceleration
+<span class="lineNum">     230 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     231 </span>            :      * @param[out] gammaY the \e Y component of the acceleration
+<span class="lineNum">     232 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     233 </span>            :      * @param[out] gammaZ the \e Z component of the acceleration
+<span class="lineNum">     234 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     235 </span>            :      * @return \e U = &lt;i&gt;V&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt; + &amp;Phi; the sum of the
+<span class="lineNum">     236 </span>            :      *   gravitational and centrifugal potentials
+<span class="lineNum">     237 </span>            :      *   (m&lt;sup&gt;2&lt;/sup&gt; s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     238 </span>            :      *
+<span class="lineNum">     239 </span>            :      * The acceleration given by &lt;b&gt;&amp;gamma;&lt;/b&gt; = &amp;nabla;\e U =
+<span class="lineNum">     240 </span>            :      * &amp;nabla;&lt;i&gt;V&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt; + &amp;nabla;&amp;Phi; = &lt;b&gt;&amp;Gamma;&lt;/b&gt; + &lt;b&gt;f&lt;/b&gt;.
+<span class="lineNum">     241 </span>            :      **********************************************************************/
+<span class="lineNum">     242 </span>            :     Math::real U(real X, real Y, real Z,
+<span class="lineNum">     243 </span>            :                  real&amp; gammaX, real&amp; gammaY, real&amp; gammaZ) const;
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span>            :     /**
+<span class="lineNum">     246 </span>            :      * Evaluate the components of the acceleration due to the gravitational
+<span class="lineNum">     247 </span>            :      * force in geocentric coordinates.
+<span class="lineNum">     248 </span>            :      *
+<span class="lineNum">     249 </span>            :      * @param[in] X geocentric coordinate of point (meters).
+<span class="lineNum">     250 </span>            :      * @param[in] Y geocentric coordinate of point (meters).
+<span class="lineNum">     251 </span>            :      * @param[in] Z geocentric coordinate of point (meters).
+<span class="lineNum">     252 </span>            :      * @param[out] GammaX the \e X component of the acceleration due to the
+<span class="lineNum">     253 </span>            :      *   gravitational force (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     254 </span>            :      * @param[out] GammaY the \e Y component of the acceleration due to the
+<span class="lineNum">     255 </span>            :      * @param[out] GammaZ the \e Z component of the acceleration due to the
+<span class="lineNum">     256 </span>            :      *   gravitational force (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     257 </span>            :      * @return &lt;i&gt;V&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt; the gravitational potential
+<span class="lineNum">     258 </span>            :      *   (m&lt;sup&gt;2&lt;/sup&gt; s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     259 </span>            :      *
+<span class="lineNum">     260 </span>            :      * This function excludes the centrifugal acceleration and is appropriate
+<span class="lineNum">     261 </span>            :      * to use for space applications.  In terrestrial applications, the
+<span class="lineNum">     262 </span>            :      * function NormalGravity::U (which includes this effect) should usually be
+<span class="lineNum">     263 </span>            :      * used.
+<span class="lineNum">     264 </span>            :      **********************************************************************/
+<span class="lineNum">     265 </span>            :     Math::real V0(real X, real Y, real Z,
+<span class="lineNum">     266 </span>            :                   real&amp; GammaX, real&amp; GammaY, real&amp; GammaZ) const;
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span>            :     /**
+<span class="lineNum">     269 </span>            :      * Evaluate the centrifugal acceleration in geocentric coordinates.
+<span class="lineNum">     270 </span>            :      *
+<span class="lineNum">     271 </span>            :      * @param[in] X geocentric coordinate of point (meters).
+<span class="lineNum">     272 </span>            :      * @param[in] Y geocentric coordinate of point (meters).
+<span class="lineNum">     273 </span>            :      * @param[out] fX the \e X component of the centrifugal acceleration
+<span class="lineNum">     274 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     275 </span>            :      * @param[out] fY the \e Y component of the centrifugal acceleration
+<span class="lineNum">     276 </span>            :      *   (m s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     277 </span>            :      * @return &amp;Phi; the centrifugal potential (m&lt;sup&gt;2&lt;/sup&gt;
+<span class="lineNum">     278 </span>            :      *   s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     279 </span>            :      *
+<span class="lineNum">     280 </span>            :      * &amp;Phi; is independent of \e Z, thus \e fZ = 0.  This function
+<span class="lineNum">     281 </span>            :      * NormalGravity::U sums the results of NormalGravity::V0 and
+<span class="lineNum">     282 </span>            :      * NormalGravity::Phi.
+<span class="lineNum">     283 </span>            :      **********************************************************************/
+<span class="lineNum">     284 </span>            :     Math::real Phi(real X, real Y, real&amp; fX, real&amp; fY) const;
+<span class="lineNum">     285 </span>            :     ///@}
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            :     /** \name Inspector functions
+<span class="lineNum">     288 </span>            :      **********************************************************************/
+<span class="lineNum">     289 </span>            :     ///@{
+<span class="lineNum">     290 </span>            :     /**
+<span class="lineNum">     291 </span>            :      * @return true if the object has been initialized.
+<span class="lineNum">     292 </span>            :      **********************************************************************/
+<span class="lineNum">     293 </span>            :     bool Init() const { return _a &gt; 0; }
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span>            :     /**
+<span class="lineNum">     296 </span>            :      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
+<span class="lineNum">     297 </span>            :      *   the value used in the constructor.
+<span class="lineNum">     298 </span>            :      **********************************************************************/
+<span class="lineNum">     299 </span>            :     Math::real MajorRadius() const
+<span class="lineNum">     300 </span>            :     { return Init() ? _a : Math::NaN(); }
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            :     /**
+<span class="lineNum">     303 </span>            :      * @return \e GM the mass constant of the ellipsoid
+<span class="lineNum">     304 </span>            :      *   (m&lt;sup&gt;3&lt;/sup&gt; s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).  This is the value used in the
+<span class="lineNum">     305 </span>            :      *   constructor.
+<span class="lineNum">     306 </span>            :      **********************************************************************/
+<span class="lineNum">     307 </span>            :     Math::real MassConstant() const
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :     { return Init() ? _GM : Math::NaN(); }</span>
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            :     /**
+<span class="lineNum">     311 </span>            :      * @return &lt;i&gt;J&lt;/i&gt;&lt;sub&gt;&lt;i&gt;n&lt;/i&gt;&lt;/sub&gt; the dynamical form factors of the
+<span class="lineNum">     312 </span>            :      *   ellipsoid.
+<span class="lineNum">     313 </span>            :      *
+<span class="lineNum">     314 </span>            :      * If \e n = 2 (the default), this is the value of &lt;i&gt;J&lt;/i&gt;&lt;sub&gt;2&lt;/sub&gt;
+<span class="lineNum">     315 </span>            :      * used in the constructor.  Otherwise it is the zonal coefficient of the
+<span class="lineNum">     316 </span>            :      * Legendre harmonic sum of the normal gravitational potential.  Note that
+<span class="lineNum">     317 </span>            :      * &lt;i&gt;J&lt;/i&gt;&lt;sub&gt;&lt;i&gt;n&lt;/i&gt;&lt;/sub&gt; = 0 if \e n is odd.  In most gravity
+<span class="lineNum">     318 </span>            :      * applications, fully normalized Legendre functions are used and the
+<span class="lineNum">     319 </span>            :      * corresponding coefficient is &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;&lt;i&gt;n&lt;/i&gt;0&lt;/sub&gt; =
+<span class="lineNum">     320 </span>            :      * &amp;minus;&lt;i&gt;J&lt;/i&gt;&lt;sub&gt;&lt;i&gt;n&lt;/i&gt;&lt;/sub&gt; / sqrt(2 \e n + 1).
+<span class="lineNum">     321 </span>            :      **********************************************************************/
+<span class="lineNum">     322 </span>            :     Math::real DynamicalFormFactor(int n = 2) const
+<span class="lineNum">     323 </span>            :     { return Init() ? ( n == 2 ? _J2 : Jn(n)) : Math::NaN(); }
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            :     /**
+<span class="lineNum">     326 </span>            :      * @return &amp;omega; the angular velocity of the ellipsoid (rad
+<span class="lineNum">     327 </span>            :      *   s&lt;sup&gt;&amp;minus;1&lt;/sup&gt;).  This is the value used in the constructor.
+<span class="lineNum">     328 </span>            :      **********************************************************************/
+<span class="lineNum">     329 </span>            :     Math::real AngularVelocity() const
+<span class="lineNum">     330 </span>            :     { return Init() ? _omega : Math::NaN(); }
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span>            :     /**
+<span class="lineNum">     333 </span>            :      * @return &lt;i&gt;f&lt;/i&gt; the flattening of the ellipsoid (\e a &amp;minus; \e b)/\e
+<span class="lineNum">     334 </span>            :      *   a.
+<span class="lineNum">     335 </span>            :      **********************************************************************/
+<span class="lineNum">     336 </span>            :     Math::real Flattening() const
+<span class="lineNum">     337 </span>            :     { return Init() ? _f : Math::NaN(); }
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span>            :     /**
+<span class="lineNum">     340 </span>            :      * @return &amp;gamma;&lt;sub&gt;e&lt;/sub&gt; the normal gravity at equator (m
+<span class="lineNum">     341 </span>            :      *   s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     342 </span>            :      **********************************************************************/
+<span class="lineNum">     343 </span>            :     Math::real EquatorialGravity() const
+<span class="lineNum">     344 </span>            :     { return Init() ? _gammae : Math::NaN(); }
+<span class="lineNum">     345 </span>            : 
+<span class="lineNum">     346 </span>            :     /**
+<span class="lineNum">     347 </span>            :      * @return &amp;gamma;&lt;sub&gt;p&lt;/sub&gt; the normal gravity at poles (m
+<span class="lineNum">     348 </span>            :      *   s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     349 </span>            :      **********************************************************************/
+<span class="lineNum">     350 </span>            :     Math::real PolarGravity() const
+<span class="lineNum">     351 </span>            :     { return Init() ? _gammap : Math::NaN(); }
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span>            :     /**
+<span class="lineNum">     354 </span>            :      * @return &lt;i&gt;f*&lt;/i&gt; the gravity flattening (&amp;gamma;&lt;sub&gt;p&lt;/sub&gt; &amp;minus;
+<span class="lineNum">     355 </span>            :      *   &amp;gamma;&lt;sub&gt;e&lt;/sub&gt;) / &amp;gamma;&lt;sub&gt;e&lt;/sub&gt;.
+<span class="lineNum">     356 </span>            :      **********************************************************************/
+<span class="lineNum">     357 </span>            :     Math::real GravityFlattening() const
+<span class="lineNum">     358 </span>            :     { return Init() ? _fstar : Math::NaN(); }
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span>            :     /**
+<span class="lineNum">     361 </span>            :      * @return &lt;i&gt;U&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt; the constant normal potential for the
+<span class="lineNum">     362 </span>            :      *   surface of the ellipsoid (m&lt;sup&gt;2&lt;/sup&gt; s&lt;sup&gt;&amp;minus;2&lt;/sup&gt;).
+<span class="lineNum">     363 </span>            :      **********************************************************************/
+<span class="lineNum">     364 </span>            :     Math::real SurfacePotential() const
+<span class="lineNum">     365 </span>            :     { return Init() ? _U0 : Math::NaN(); }
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span>            :     /**
+<span class="lineNum">     368 </span>            :      * @return the Geocentric object used by this instance.
+<span class="lineNum">     369 </span>            :      **********************************************************************/
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :     const Geocentric&amp; Earth() const { return _earth; }</span>
+<span class="lineNum">     371 </span>            :     ///@}
+<span class="lineNum">     372 </span>            : 
+<span class="lineNum">     373 </span>            :     /**
+<span class="lineNum">     374 </span>            :      * A global instantiation of NormalGravity for the WGS84 ellipsoid.
+<span class="lineNum">     375 </span>            :      **********************************************************************/
+<span class="lineNum">     376 </span>            :     static const NormalGravity&amp; WGS84();
+<span class="lineNum">     377 </span>            : 
+<span class="lineNum">     378 </span>            :     /**
+<span class="lineNum">     379 </span>            :      * A global instantiation of NormalGravity for the GRS80 ellipsoid.
+<span class="lineNum">     380 </span>            :      **********************************************************************/
+<span class="lineNum">     381 </span>            :     static const NormalGravity&amp; GRS80();
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            :     /**
+<span class="lineNum">     384 </span>            :      * Compute the flattening from the dynamical form factor.
+<span class="lineNum">     385 </span>            :      *
+<span class="lineNum">     386 </span>            :      * @param[in] a equatorial radius (meters).
+<span class="lineNum">     387 </span>            :      * @param[in] GM mass constant of the ellipsoid
+<span class="lineNum">     388 </span>            :      *   (meters&lt;sup&gt;3&lt;/sup&gt;/seconds&lt;sup&gt;2&lt;/sup&gt;); this is the product of \e G
+<span class="lineNum">     389 </span>            :      *   the gravitational constant and \e M the mass of the earth (usually
+<span class="lineNum">     390 </span>            :      *   including the mass of the earth's atmosphere).
+<span class="lineNum">     391 </span>            :      * @param[in] omega the angular velocity (rad s&lt;sup&gt;&amp;minus;1&lt;/sup&gt;).
+<span class="lineNum">     392 </span>            :      * @param[in] J2 the dynamical form factor.
+<span class="lineNum">     393 </span>            :      * @return \e f the flattening of the ellipsoid.
+<span class="lineNum">     394 </span>            :      *
+<span class="lineNum">     395 </span>            :      * This routine requires \e a &amp;gt; 0, \e GM &amp;gt; 0, \e J2 &amp;lt; 1/3 &amp;minus;
+<span class="lineNum">     396 </span>            :      * &lt;i&gt;omega&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;i&gt;a&lt;/i&gt;&lt;sup&gt;3&lt;/sup&gt;/&lt;i&gt;GM&lt;/i&gt; 8/(45&amp;pi;).  A
+<span class="lineNum">     397 </span>            :      * NaN is returned if these conditions do not hold.  The restriction to
+<span class="lineNum">     398 </span>            :      * positive \e GM is made because for negative \e GM two solutions are
+<span class="lineNum">     399 </span>            :      * possible.
+<span class="lineNum">     400 </span>            :      **********************************************************************/
+<span class="lineNum">     401 </span>            :     static Math::real J2ToFlattening(real a, real GM, real omega, real J2);
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span>            :     /**
+<span class="lineNum">     404 </span>            :      * Compute the dynamical form factor from the flattening.
+<span class="lineNum">     405 </span>            :      *
+<span class="lineNum">     406 </span>            :      * @param[in] a equatorial radius (meters).
+<span class="lineNum">     407 </span>            :      * @param[in] GM mass constant of the ellipsoid
+<span class="lineNum">     408 </span>            :      *   (meters&lt;sup&gt;3&lt;/sup&gt;/seconds&lt;sup&gt;2&lt;/sup&gt;); this is the product of \e G
+<span class="lineNum">     409 </span>            :      *   the gravitational constant and \e M the mass of the earth (usually
+<span class="lineNum">     410 </span>            :      *   including the mass of the earth's atmosphere).
+<span class="lineNum">     411 </span>            :      * @param[in] omega the angular velocity (rad s&lt;sup&gt;&amp;minus;1&lt;/sup&gt;).
+<span class="lineNum">     412 </span>            :      * @param[in] f the flattening of the ellipsoid.
+<span class="lineNum">     413 </span>            :      * @return \e J2 the dynamical form factor.
+<span class="lineNum">     414 </span>            :      *
+<span class="lineNum">     415 </span>            :      * This routine requires \e a &amp;gt; 0, \e GM &amp;ne; 0, \e f &amp;lt; 1.  The
+<span class="lineNum">     416 </span>            :      * values of these parameters are not checked.
+<span class="lineNum">     417 </span>            :      **********************************************************************/
+<span class="lineNum">     418 </span>            :     static Math::real FlatteningToJ2(real a, real GM, real omega, real f);
+<span class="lineNum">     419 </span>            :   };
+<span class="lineNum">     420 </span>            : 
+<span class="lineNum">     421 </span>            : } // namespace GeographicLib
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span>            : #endif  // GEOGRAPHICLIB_NORMALGRAVITY_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

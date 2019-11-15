@@ -1,0 +1,388 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/AlbersEqualArea.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - AlbersEqualArea.hpp<span style="font-size: 80%;"> (source / <a href="AlbersEqualArea.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryMed">88.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file AlbersEqualArea.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::AlbersEqualArea class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2010-2017) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_ALBERSEQUALAREA_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_ALBERSEQUALAREA_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : namespace GeographicLib {
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            :   /**
+<span class="lineNum">      18 </span>            :    * \brief Albers equal area conic projection
+<span class="lineNum">      19 </span>            :    *
+<span class="lineNum">      20 </span>            :    * Implementation taken from the report,
+<span class="lineNum">      21 </span>            :    * - J. P. Snyder,
+<span class="lineNum">      22 </span>            :    *   &lt;a href=&quot;http://pubs.er.usgs.gov/usgspubs/pp/pp1395&quot;&gt; Map Projections: A
+<span class="lineNum">      23 </span>            :    *   Working Manual&lt;/a&gt;, USGS Professional Paper 1395 (1987),
+<span class="lineNum">      24 </span>            :    *   pp. 101--102.
+<span class="lineNum">      25 </span>            :    *
+<span class="lineNum">      26 </span>            :    * This is a implementation of the equations in Snyder except that divided
+<span class="lineNum">      27 </span>            :    * differences will be [have been] used to transform the expressions into
+<span class="lineNum">      28 </span>            :    * ones which may be evaluated accurately.  [In this implementation, the
+<span class="lineNum">      29 </span>            :    * projection correctly becomes the cylindrical equal area or the azimuthal
+<span class="lineNum">      30 </span>            :    * equal area projection when the standard latitude is the equator or a
+<span class="lineNum">      31 </span>            :    * pole.]
+<span class="lineNum">      32 </span>            :    *
+<span class="lineNum">      33 </span>            :    * The ellipsoid parameters, the standard parallels, and the scale on the
+<span class="lineNum">      34 </span>            :    * standard parallels are set in the constructor.  Internally, the case with
+<span class="lineNum">      35 </span>            :    * two standard parallels is converted into a single standard parallel, the
+<span class="lineNum">      36 </span>            :    * latitude of minimum azimuthal scale, with an azimuthal scale specified on
+<span class="lineNum">      37 </span>            :    * this parallel.  This latitude is also used as the latitude of origin which
+<span class="lineNum">      38 </span>            :    * is returned by AlbersEqualArea::OriginLatitude.  The azimuthal scale on
+<span class="lineNum">      39 </span>            :    * the latitude of origin is given by AlbersEqualArea::CentralScale.  The
+<span class="lineNum">      40 </span>            :    * case with two standard parallels at opposite poles is singular and is
+<span class="lineNum">      41 </span>            :    * disallowed.  The central meridian (which is a trivial shift of the
+<span class="lineNum">      42 </span>            :    * longitude) is specified as the \e lon0 argument of the
+<span class="lineNum">      43 </span>            :    * AlbersEqualArea::Forward and AlbersEqualArea::Reverse functions.
+<span class="lineNum">      44 </span>            :    * AlbersEqualArea::Forward and AlbersEqualArea::Reverse also return the
+<span class="lineNum">      45 </span>            :    * meridian convergence, &amp;gamma;, and azimuthal scale, \e k.  A small square
+<span class="lineNum">      46 </span>            :    * aligned with the cardinal directions is projected to a rectangle with
+<span class="lineNum">      47 </span>            :    * dimensions \e k (in the E-W direction) and 1/\e k (in the N-S direction).
+<span class="lineNum">      48 </span>            :    * The E-W sides of the rectangle are oriented &amp;gamma; degrees
+<span class="lineNum">      49 </span>            :    * counter-clockwise from the \e x axis.  There is no provision in this class
+<span class="lineNum">      50 </span>            :    * for specifying a false easting or false northing or a different latitude
+<span class="lineNum">      51 </span>            :    * of origin.
+<span class="lineNum">      52 </span>            :    *
+<span class="lineNum">      53 </span>            :    * Example of use:
+<span class="lineNum">      54 </span>            :    * \include example-AlbersEqualArea.cpp
+<span class="lineNum">      55 </span>            :    *
+<span class="lineNum">      56 </span>            :    * &lt;a href=&quot;ConicProj.1.html&quot;&gt;ConicProj&lt;/a&gt; is a command-line utility
+<span class="lineNum">      57 </span>            :    * providing access to the functionality of LambertConformalConic and
+<span class="lineNum">      58 </span>            :    * AlbersEqualArea.
+<span class="lineNum">      59 </span>            :    **********************************************************************/
+<span class="lineNum">      60 </span>            :   class GEOGRAPHICLIB_EXPORT AlbersEqualArea {
+<span class="lineNum">      61 </span>            :   private:
+<span class="lineNum">      62 </span>            :     typedef Math::real real;
+<span class="lineNum">      63 </span>            :     real eps_, epsx_, epsx2_, tol_, tol0_;
+<span class="lineNum">      64 </span>            :     real _a, _f, _fm, _e2, _e, _e2m, _qZ, _qx;
+<span class="lineNum">      65 </span>            :     real _sign, _lat0, _k0;
+<span class="lineNum">      66 </span>            :     real _n0, _m02, _nrho0, _k2, _txi0, _scxi0, _sxi0;
+<span class="lineNum">      67 </span>            :     static const int numit_ = 5;   // Newton iterations in Reverse
+<span class="lineNum">      68 </span>            :     static const int numit0_ = 20; // Newton iterations in Init
+<span class="lineNum">      69 </span>            :     static real hyp(real x) { return Math::hypot(real(1), x); }
+<span class="lineNum">      70 </span>            :     // atanh(      e   * x)/      e   if f &gt; 0
+<a name="71"><span class="lineNum">      71 </span>            :     // atan (sqrt(-e2) * x)/sqrt(-e2) if f &lt; 0</a>
+<span class="lineNum">      72 </span>            :     // x                              if f = 0
+<span class="lineNum">      73 </span><span class="lineCov">        186 :     real atanhee(real x) const {</span>
+<span class="lineNum">      74 </span>            :       using std::atan2; using std::abs;
+<span class="lineNum">      75 </span><span class="lineCov">        331 :       return _f &gt; 0 ? Math::atanh(_e * x)/_e :</span>
+<span class="lineNum">      76 </span>            :         // We only invoke atanhee in txif for positive latitude.  Then x is
+<span class="lineNum">      77 </span>            :         // only negative for very prolate ellipsoids (_b/_a &gt;= sqrt(2)) and we
+<span class="lineNum">      78 </span>            :         // still need to return a positive result in this case; hence the need
+<span class="lineNum">      79 </span>            :         // for the call to atan2.
+<span class="lineNum">      80 </span><span class="lineCov">         54 :         (_f &lt; 0 ? (atan2(_e * abs(x), real(x &lt; 0 ? -1 : 1))/_e) : x);</span>
+<span class="lineNum">      81 </span>            :     }
+<span class="lineNum">      82 </span>            :     // return atanh(sqrt(x))/sqrt(x) - 1, accurate for small x
+<span class="lineNum">      83 </span>            :     static real atanhxm1(real x);
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            :     // Divided differences
+<span class="lineNum">      86 </span>            :     // Definition: Df(x,y) = (f(x)-f(y))/(x-y)
+<span class="lineNum">      87 </span>            :     // See:
+<span class="lineNum">      88 </span>            :     //   W. M. Kahan and R. J. Fateman,
+<span class="lineNum">      89 </span>            :     //   Symbolic computation of divided differences,
+<span class="lineNum">      90 </span>            :     //   SIGSAM Bull. 33(3), 7-28 (1999)
+<span class="lineNum">      91 </span>            :     //   https://doi.org/10.1145/334714.334716
+<span class="lineNum">      92 </span>            :     //   http://www.cs.berkeley.edu/~fateman/papers/divdiff.pdf
+<span class="lineNum">      93 </span>            :     //
+<span class="lineNum">      94 </span>            :     // General rules
+<span class="lineNum">      95 </span>            :     // h(x) = f(g(x)): Dh(x,y) = Df(g(x),g(y))*Dg(x,y)
+<span class="lineNum">      96 </span>            :     // h(x) = f(x)*g(x):
+<span class="lineNum">      97 </span>            :     //        Dh(x,y) = Df(x,y)*g(x) + Dg(x,y)*f(y)
+<span class="lineNum">      98 </span>            :     //                = Df(x,y)*g(y) + Dg(x,y)*f(x)
+<span class="lineNum">      99 </span>            :     //                = Df(x,y)*(g(x)+g(y))/2 + Dg(x,y)*(f(x)+f(y))/2
+<span class="lineNum">     100 </span>            :     //
+<span class="lineNum">     101 </span>            :     // sn(x) = x/sqrt(1+x^2): Dsn(x,y) = (x+y)/((sn(x)+sn(y))*(1+x^2)*(1+y^2))
+<span class="lineNum">     102 </span>            :     static real Dsn(real x, real y, real sx, real sy) {
+<span class="lineNum">     103 </span>            :       // sx = x/hyp(x)
+<span class="lineNum">     104 </span><span class="lineCov">          1 :       real t = x * y;</span>
+<span class="lineNum">     105 </span><span class="lineCov">          4 :       return t &gt; 0 ? (x + y) * Math::sq( (sx * sy)/t ) / (sx + sy) :</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :         (x - y != 0 ? (sx - sy) / (x - y) : 1);</span>
+<a name="107"><span class="lineNum">     107 </span>            :     }</a>
+<span class="lineNum">     108 </span>            :     // Datanhee(x,y) = atanhee((x-y)/(1-e^2*x*y))/(x-y)
+<span class="lineNum">     109 </span><span class="lineCov">          1 :     real Datanhee(real x, real y) const {</span>
+<span class="lineNum">     110 </span><span class="lineCov">          1 :       real t = x - y, d = 1 - _e2 * x * y;</span>
+<span class="lineNum">     111 </span><span class="lineCov">          1 :       return t != 0 ? atanhee(t / d) / t : 1 / d;</span>
+<span class="lineNum">     112 </span>            :     }
+<span class="lineNum">     113 </span>            :     // DDatanhee(x,y) = (Datanhee(1,y) - Datanhee(1,x))/(y-x)
+<span class="lineNum">     114 </span>            :     real DDatanhee(real x, real y) const;
+<span class="lineNum">     115 </span>            :     void Init(real sphi1, real cphi1, real sphi2, real cphi2, real k1);
+<span class="lineNum">     116 </span>            :     real txif(real tphi) const;
+<span class="lineNum">     117 </span>            :     real tphif(real txi) const;
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :     friend class Ellipsoid;           // For access to txif, tphif, etc.
+<span class="lineNum">     120 </span>            :   public:
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            :     /**
+<span class="lineNum">     123 </span>            :      * Constructor with a single standard parallel.
+<span class="lineNum">     124 </span>            :      *
+<span class="lineNum">     125 </span>            :      * @param[in] a equatorial radius of ellipsoid (meters).
+<span class="lineNum">     126 </span>            :      * @param[in] f flattening of ellipsoid.  Setting \e f = 0 gives a sphere.
+<span class="lineNum">     127 </span>            :      *   Negative \e f gives a prolate ellipsoid.
+<span class="lineNum">     128 </span>            :      * @param[in] stdlat standard parallel (degrees), the circle of tangency.
+<span class="lineNum">     129 </span>            :      * @param[in] k0 azimuthal scale on the standard parallel.
+<span class="lineNum">     130 </span>            :      * @exception GeographicErr if \e a, (1 &amp;minus; \e f) \e a, or \e k0 is
+<span class="lineNum">     131 </span>            :      *   not positive.
+<span class="lineNum">     132 </span>            :      * @exception GeographicErr if \e stdlat is not in [&amp;minus;90&amp;deg;,
+<span class="lineNum">     133 </span>            :      *   90&amp;deg;].
+<span class="lineNum">     134 </span>            :      **********************************************************************/
+<span class="lineNum">     135 </span>            :     AlbersEqualArea(real a, real f, real stdlat, real k0);
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            :     /**
+<span class="lineNum">     138 </span>            :      * Constructor with two standard parallels.
+<span class="lineNum">     139 </span>            :      *
+<span class="lineNum">     140 </span>            :      * @param[in] a equatorial radius of ellipsoid (meters).
+<span class="lineNum">     141 </span>            :      * @param[in] f flattening of ellipsoid.  Setting \e f = 0 gives a sphere.
+<span class="lineNum">     142 </span>            :      *   Negative \e f gives a prolate ellipsoid.
+<span class="lineNum">     143 </span>            :      * @param[in] stdlat1 first standard parallel (degrees).
+<span class="lineNum">     144 </span>            :      * @param[in] stdlat2 second standard parallel (degrees).
+<span class="lineNum">     145 </span>            :      * @param[in] k1 azimuthal scale on the standard parallels.
+<span class="lineNum">     146 </span>            :      * @exception GeographicErr if \e a, (1 &amp;minus; \e f) \e a, or \e k1 is
+<span class="lineNum">     147 </span>            :      *   not positive.
+<span class="lineNum">     148 </span>            :      * @exception GeographicErr if \e stdlat1 or \e stdlat2 is not in
+<span class="lineNum">     149 </span>            :      *   [&amp;minus;90&amp;deg;, 90&amp;deg;], or if \e stdlat1 and \e stdlat2 are
+<span class="lineNum">     150 </span>            :      *   opposite poles.
+<span class="lineNum">     151 </span>            :      **********************************************************************/
+<span class="lineNum">     152 </span>            :     AlbersEqualArea(real a, real f, real stdlat1, real stdlat2, real k1);
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            :     /**
+<span class="lineNum">     155 </span>            :      * Constructor with two standard parallels specified by sines and cosines.
+<span class="lineNum">     156 </span>            :      *
+<span class="lineNum">     157 </span>            :      * @param[in] a equatorial radius of ellipsoid (meters).
+<span class="lineNum">     158 </span>            :      * @param[in] f flattening of ellipsoid.  Setting \e f = 0 gives a sphere.
+<span class="lineNum">     159 </span>            :      *   Negative \e f gives a prolate ellipsoid.
+<span class="lineNum">     160 </span>            :      * @param[in] sinlat1 sine of first standard parallel.
+<span class="lineNum">     161 </span>            :      * @param[in] coslat1 cosine of first standard parallel.
+<span class="lineNum">     162 </span>            :      * @param[in] sinlat2 sine of second standard parallel.
+<span class="lineNum">     163 </span>            :      * @param[in] coslat2 cosine of second standard parallel.
+<span class="lineNum">     164 </span>            :      * @param[in] k1 azimuthal scale on the standard parallels.
+<span class="lineNum">     165 </span>            :      * @exception GeographicErr if \e a, (1 &amp;minus; \e f) \e a, or \e k1 is
+<span class="lineNum">     166 </span>            :      *   not positive.
+<span class="lineNum">     167 </span>            :      * @exception GeographicErr if \e stdlat1 or \e stdlat2 is not in
+<span class="lineNum">     168 </span>            :      *   [&amp;minus;90&amp;deg;, 90&amp;deg;], or if \e stdlat1 and \e stdlat2 are
+<span class="lineNum">     169 </span>            :      *   opposite poles.
+<span class="lineNum">     170 </span>            :      *
+<span class="lineNum">     171 </span>            :      * This allows parallels close to the poles to be specified accurately.
+<span class="lineNum">     172 </span>            :      * This routine computes the latitude of origin and the azimuthal scale at
+<span class="lineNum">     173 </span>            :      * this latitude.  If \e dlat = abs(\e lat2 &amp;minus; \e lat1) &amp;le; 160&amp;deg;,
+<span class="lineNum">     174 </span>            :      * then the error in the latitude of origin is less than 4.5 &amp;times;
+<span class="lineNum">     175 </span>            :      * 10&lt;sup&gt;&amp;minus;14&lt;/sup&gt;d;.
+<span class="lineNum">     176 </span>            :      **********************************************************************/
+<span class="lineNum">     177 </span>            :     AlbersEqualArea(real a, real f,
+<span class="lineNum">     178 </span>            :                     real sinlat1, real coslat1,
+<span class="lineNum">     179 </span>            :                     real sinlat2, real coslat2,
+<span class="lineNum">     180 </span>            :                     real k1);
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span>            :     /**
+<span class="lineNum">     183 </span>            :      * Set the azimuthal scale for the projection.
+<span class="lineNum">     184 </span>            :      *
+<span class="lineNum">     185 </span>            :      * @param[in] lat (degrees).
+<span class="lineNum">     186 </span>            :      * @param[in] k azimuthal scale at latitude \e lat (default 1).
+<span class="lineNum">     187 </span>            :      * @exception GeographicErr \e k is not positive.
+<span class="lineNum">     188 </span>            :      * @exception GeographicErr if \e lat is not in (&amp;minus;90&amp;deg;,
+<span class="lineNum">     189 </span>            :      *   90&amp;deg;).
+<span class="lineNum">     190 </span>            :      *
+<span class="lineNum">     191 </span>            :      * This allows a &quot;latitude of conformality&quot; to be specified.
+<span class="lineNum">     192 </span>            :      **********************************************************************/
+<span class="lineNum">     193 </span>            :     void SetScale(real lat, real k = real(1));
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span>            :     /**
+<span class="lineNum">     196 </span>            :      * Forward projection, from geographic to Lambert conformal conic.
+<span class="lineNum">     197 </span>            :      *
+<span class="lineNum">     198 </span>            :      * @param[in] lon0 central meridian longitude (degrees).
+<span class="lineNum">     199 </span>            :      * @param[in] lat latitude of point (degrees).
+<span class="lineNum">     200 </span>            :      * @param[in] lon longitude of point (degrees).
+<span class="lineNum">     201 </span>            :      * @param[out] x easting of point (meters).
+<span class="lineNum">     202 </span>            :      * @param[out] y northing of point (meters).
+<span class="lineNum">     203 </span>            :      * @param[out] gamma meridian convergence at point (degrees).
+<span class="lineNum">     204 </span>            :      * @param[out] k azimuthal scale of projection at point; the radial
+<span class="lineNum">     205 </span>            :      *   scale is the 1/\e k.
+<span class="lineNum">     206 </span>            :      *
+<span class="lineNum">     207 </span>            :      * The latitude origin is given by AlbersEqualArea::LatitudeOrigin().  No
+<span class="lineNum">     208 </span>            :      * false easting or northing is added and \e lat should be in the range
+<span class="lineNum">     209 </span>            :      * [&amp;minus;90&amp;deg;, 90&amp;deg;].  The values of \e x and \e y returned for
+<span class="lineNum">     210 </span>            :      * points which project to infinity (i.e., one or both of the poles) will
+<span class="lineNum">     211 </span>            :      * be large but finite.
+<span class="lineNum">     212 </span>            :      **********************************************************************/
+<span class="lineNum">     213 </span>            :     void Forward(real lon0, real lat, real lon,
+<span class="lineNum">     214 </span>            :                  real&amp; x, real&amp; y, real&amp; gamma, real&amp; k) const;
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            :     /**
+<span class="lineNum">     217 </span>            :      * Reverse projection, from Lambert conformal conic to geographic.
+<span class="lineNum">     218 </span>            :      *
+<span class="lineNum">     219 </span>            :      * @param[in] lon0 central meridian longitude (degrees).
+<span class="lineNum">     220 </span>            :      * @param[in] x easting of point (meters).
+<span class="lineNum">     221 </span>            :      * @param[in] y northing of point (meters).
+<span class="lineNum">     222 </span>            :      * @param[out] lat latitude of point (degrees).
+<span class="lineNum">     223 </span>            :      * @param[out] lon longitude of point (degrees).
+<span class="lineNum">     224 </span>            :      * @param[out] gamma meridian convergence at point (degrees).
+<span class="lineNum">     225 </span>            :      * @param[out] k azimuthal scale of projection at point; the radial
+<span class="lineNum">     226 </span>            :      *   scale is the 1/\e k.
+<span class="lineNum">     227 </span>            :      *
+<span class="lineNum">     228 </span>            :      * The latitude origin is given by AlbersEqualArea::LatitudeOrigin().  No
+<span class="lineNum">     229 </span>            :      * false easting or northing is added.  The value of \e lon returned is in
+<span class="lineNum">     230 </span>            :      * the range [&amp;minus;180&amp;deg;, 180&amp;deg;].  The value of \e lat returned is
+<span class="lineNum">     231 </span>            :      * in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].  If the input point is outside
+<span class="lineNum">     232 </span>            :      * the legal projected space the nearest pole is returned.
+<span class="lineNum">     233 </span>            :      **********************************************************************/
+<span class="lineNum">     234 </span>            :     void Reverse(real lon0, real x, real y,
+<span class="lineNum">     235 </span>            :                  real&amp; lat, real&amp; lon, real&amp; gamma, real&amp; k) const;
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            :     /**
+<span class="lineNum">     238 </span>            :      * AlbersEqualArea::Forward without returning the convergence and
+<span class="lineNum">     239 </span>            :      * scale.
+<span class="lineNum">     240 </span>            :      **********************************************************************/
+<span class="lineNum">     241 </span>            :     void Forward(real lon0, real lat, real lon,
+<span class="lineNum">     242 </span>            :                  real&amp; x, real&amp; y) const {
+<span class="lineNum">     243 </span>            :       real gamma, k;
+<span class="lineNum">     244 </span>            :       Forward(lon0, lat, lon, x, y, gamma, k);
+<span class="lineNum">     245 </span>            :     }
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span>            :     /**
+<span class="lineNum">     248 </span>            :      * AlbersEqualArea::Reverse without returning the convergence and
+<span class="lineNum">     249 </span>            :      * scale.
+<span class="lineNum">     250 </span>            :      **********************************************************************/
+<span class="lineNum">     251 </span>            :     void Reverse(real lon0, real x, real y,
+<span class="lineNum">     252 </span>            :                  real&amp; lat, real&amp; lon) const {
+<span class="lineNum">     253 </span>            :       real gamma, k;
+<span class="lineNum">     254 </span>            :       Reverse(lon0, x, y, lat, lon, gamma, k);
+<span class="lineNum">     255 </span>            :     }
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            :     /** \name Inspector functions
+<span class="lineNum">     258 </span>            :      **********************************************************************/
+<span class="lineNum">     259 </span>            :     ///@{
+<span class="lineNum">     260 </span>            :     /**
+<span class="lineNum">     261 </span>            :      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
+<span class="lineNum">     262 </span>            :      *   the value used in the constructor.
+<span class="lineNum">     263 </span>            :      **********************************************************************/
+<span class="lineNum">     264 </span>            :     Math::real MajorRadius() const { return _a; }
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            :     /**
+<span class="lineNum">     267 </span>            :      * @return \e f the flattening of the ellipsoid.  This is the value used in
+<span class="lineNum">     268 </span>            :      *   the constructor.
+<span class="lineNum">     269 </span>            :      **********************************************************************/
+<span class="lineNum">     270 </span>            :     Math::real Flattening() const { return _f; }
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span>            :     /**
+<span class="lineNum">     273 </span>            :      * @return latitude of the origin for the projection (degrees).
+<span class="lineNum">     274 </span>            :      *
+<span class="lineNum">     275 </span>            :      * This is the latitude of minimum azimuthal scale and equals the \e stdlat
+<span class="lineNum">     276 </span>            :      * in the 1-parallel constructor and lies between \e stdlat1 and \e stdlat2
+<span class="lineNum">     277 </span>            :      * in the 2-parallel constructors.
+<span class="lineNum">     278 </span>            :      **********************************************************************/
+<span class="lineNum">     279 </span>            :     Math::real OriginLatitude() const { return _lat0; }
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span>            :     /**
+<span class="lineNum">     282 </span>            :      * @return central scale for the projection.  This is the azimuthal scale
+<span class="lineNum">     283 </span>            :      *   on the latitude of origin.
+<span class="lineNum">     284 </span>            :      **********************************************************************/
+<span class="lineNum">     285 </span>            :     Math::real CentralScale() const { return _k0; }
+<span class="lineNum">     286 </span>            :     ///@}
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span>            :     /**
+<span class="lineNum">     289 </span>            :      * A global instantiation of AlbersEqualArea with the WGS84 ellipsoid, \e
+<span class="lineNum">     290 </span>            :      * stdlat = 0, and \e k0 = 1.  This degenerates to the cylindrical equal
+<span class="lineNum">     291 </span>            :      * area projection.
+<span class="lineNum">     292 </span>            :      **********************************************************************/
+<span class="lineNum">     293 </span>            :     static const AlbersEqualArea&amp; CylindricalEqualArea();
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span>            :     /**
+<span class="lineNum">     296 </span>            :      * A global instantiation of AlbersEqualArea with the WGS84 ellipsoid, \e
+<span class="lineNum">     297 </span>            :      * stdlat = 90&amp;deg;, and \e k0 = 1.  This degenerates to the
+<span class="lineNum">     298 </span>            :      * Lambert azimuthal equal area projection.
+<span class="lineNum">     299 </span>            :      **********************************************************************/
+<span class="lineNum">     300 </span>            :     static const AlbersEqualArea&amp; AzimuthalEqualAreaNorth();
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            :     /**
+<span class="lineNum">     303 </span>            :      * A global instantiation of AlbersEqualArea with the WGS84 ellipsoid, \e
+<span class="lineNum">     304 </span>            :      * stdlat = &amp;minus;90&amp;deg;, and \e k0 = 1.  This degenerates to the
+<span class="lineNum">     305 </span>            :      * Lambert azimuthal equal area projection.
+<span class="lineNum">     306 </span>            :      **********************************************************************/
+<span class="lineNum">     307 </span>            :     static const AlbersEqualArea&amp; AzimuthalEqualAreaSouth();
+<span class="lineNum">     308 </span>            :   };
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            : } // namespace GeographicLib
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span>            : #endif  // GEOGRAPHICLIB_ALBERSEQUALAREA_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

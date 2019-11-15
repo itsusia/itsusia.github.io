@@ -1,0 +1,1298 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/apps/projinfo.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/apps</a> - projinfo.cpp<span style="font-size: 80%;"> (source / <a href="projinfo.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">313</td>
+            <td class="headerCovTableEntry">545</td>
+            <td class="headerCovTableEntryLo">57.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryLo">66.7 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /******************************************************************************</a>
+<span class="lineNum">       2 </span>            :  *
+<span class="lineNum">       3 </span>            :  * Project:  PROJ
+<span class="lineNum">       4 </span>            :  * Purpose:  projinfo utility
+<span class="lineNum">       5 </span>            :  * Author:   Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  ******************************************************************************
+<span class="lineNum">       8 </span>            :  * Copyright (c) 2018, Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      11 </span>            :  * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      12 </span>            :  * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      13 </span>            :  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      14 </span>            :  * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      15 </span>            :  * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      16 </span>            :  *
+<span class="lineNum">      17 </span>            :  * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      18 </span>            :  * in all copies or substantial portions of the Software.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      21 </span>            :  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      22 </span>            :  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      23 </span>            :  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      24 </span>            :  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      25 </span>            :  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      26 </span>            :  * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      27 </span>            :  ****************************************************************************/
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : //! @cond Doxygen_Suppress
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #define FROM_PROJ_CPP
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #include &lt;cstdlib&gt;
+<span class="lineNum">      34 </span>            : #include &lt;fstream&gt; // std::ifstream
+<span class="lineNum">      35 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">      36 </span>            : #include &lt;utility&gt;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : #include &quot;proj.h&quot;
+<span class="lineNum">      39 </span>            : #include &quot;proj_internal.h&quot;
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : #include &lt;proj/common.hpp&gt;
+<span class="lineNum">      42 </span>            : #include &lt;proj/coordinateoperation.hpp&gt;
+<span class="lineNum">      43 </span>            : #include &lt;proj/crs.hpp&gt;
+<span class="lineNum">      44 </span>            : #include &lt;proj/io.hpp&gt;
+<span class="lineNum">      45 </span>            : #include &lt;proj/metadata.hpp&gt;
+<span class="lineNum">      46 </span>            : #include &lt;proj/util.hpp&gt;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : #include &quot;proj/internal/internal.hpp&quot; // for split
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : using namespace NS_PROJ::common;
+<span class="lineNum">      51 </span>            : using namespace NS_PROJ::crs;
+<span class="lineNum">      52 </span>            : using namespace NS_PROJ::io;
+<span class="lineNum">      53 </span>            : using namespace NS_PROJ::metadata;
+<span class="lineNum">      54 </span>            : using namespace NS_PROJ::operation;
+<span class="lineNum">      55 </span>            : using namespace NS_PROJ::util;
+<span class="lineNum">      56 </span>            : using namespace NS_PROJ::internal;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            : namespace { // anonymous namespace
+<span class="lineNum">      61 </span>            : struct OutputOptions {
+<span class="lineNum">      62 </span>            :     bool quiet = false;
+<span class="lineNum">      63 </span>            :     bool PROJ5 = false;
+<span class="lineNum">      64 </span>            :     bool WKT2_2019 = false;
+<span class="lineNum">      65 </span>            :     bool WKT2_2019_SIMPLIFIED = false;
+<span class="lineNum">      66 </span>            :     bool WKT2_2015 = false;
+<span class="lineNum">      67 </span>            :     bool WKT2_2015_SIMPLIFIED = false;
+<span class="lineNum">      68 </span>            :     bool WKT1_GDAL = false;
+<span class="lineNum">      69 </span>            :     bool WKT1_ESRI = false;
+<span class="lineNum">      70 </span>            :     bool PROJJSON = false;
+<span class="lineNum">      71 </span>            :     bool c_ify = false;
+<span class="lineNum">      72 </span>            :     bool singleLine = false;
+<span class="lineNum">      73 </span>            :     bool strict = true;
+<span class="lineNum">      74 </span>            : };
+<span class="lineNum">      75 </span>            : } // anonymous namespace
+<span class="lineNum">      76 </span>            : 
+<a name="77"><span class="lineNum">      77 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 : static void usage() {</span>
+<span class="lineNum">      80 </span>            :     std::cerr
+<span class="lineNum">      81 </span>            :         &lt;&lt; &quot;usage: projinfo [-o formats] [-k crs|operation|ellipsoid] &quot;
+<span class="lineNum">      82 </span>            :            &quot;[--summary] [-q]&quot;
+<span class="lineNum">      83 </span>            :         &lt;&lt; std::endl
+<span class="lineNum">      84 </span>            :         &lt;&lt; &quot;                ([--area name_or_code] | &quot;
+<span class="lineNum">      85 </span>            :            &quot;[--bbox west_long,south_lat,east_long,north_lat]) &quot;
+<span class="lineNum">      86 </span>            :         &lt;&lt; std::endl
+<span class="lineNum">      87 </span>            :         &lt;&lt; &quot;                [--spatial-test contains|intersects]&quot; &lt;&lt; std::endl
+<span class="lineNum">      88 </span>            :         &lt;&lt; &quot;                [--crs-extent-use none|both|intersection|smallest]&quot;
+<span class="lineNum">      89 </span>            :         &lt;&lt; std::endl
+<span class="lineNum">      90 </span>            :         &lt;&lt; &quot;                [--grid-check none|discard_missing|sort] &quot;
+<span class="lineNum">      91 </span>            :            &quot;[--show-superseded]&quot;
+<span class="lineNum">      92 </span>            :         &lt;&lt; std::endl
+<span class="lineNum">      93 </span>            :         &lt;&lt; &quot;                [--pivot-crs always|if_no_direct_transformation|&quot;
+<span class="lineNum">      94 </span>            :         &lt;&lt; &quot;never|{auth:code[,auth:code]*}]&quot; &lt;&lt; std::endl
+<span class="lineNum">      95 </span>            :         &lt;&lt; &quot;                [--boundcrs-to-wgs84]&quot; &lt;&lt; std::endl
+<span class="lineNum">      96 </span>            :         &lt;&lt; &quot;                [--main-db-path path] [--aux-db-path path]*&quot;
+<span class="lineNum">      97 </span>            :         &lt;&lt; std::endl
+<span class="lineNum">      98 </span>            :         &lt;&lt; &quot;                [--identify] [--3d]&quot; &lt;&lt; std::endl
+<span class="lineNum">      99 </span>            :         &lt;&lt; &quot;                [--c-ify] [--single-line]&quot; &lt;&lt; std::endl
+<span class="lineNum">     100 </span>            :         &lt;&lt; &quot;                {object_definition} | (-s {srs_def} -t {srs_def})&quot;
+<span class="lineNum">     101 </span>            :         &lt;&lt; std::endl;
+<span class="lineNum">     102 </span>            :     std::cerr &lt;&lt; std::endl;
+<span class="lineNum">     103 </span>            :     std::cerr &lt;&lt; &quot;-o: formats is a comma separated combination of: &quot;
+<span class="lineNum">     104 </span>            :                  &quot;all,default,PROJ,WKT_ALL,WKT2:2015,WKT2:2019,WKT1:GDAL,&quot;
+<span class="lineNum">     105 </span>            :                  &quot;WKT1:ESRI,PROJJSON&quot;
+<span class="lineNum">     106 </span>            :               &lt;&lt; std::endl;
+<span class="lineNum">     107 </span>            :     std::cerr &lt;&lt; &quot;    Except 'all' and 'default', other format can be preceded &quot;
+<span class="lineNum">     108 </span>            :                  &quot;by '-' to disable them&quot;
+<span class="lineNum">     109 </span>            :               &lt;&lt; std::endl;
+<span class="lineNum">     110 </span>            :     std::cerr &lt;&lt; std::endl;
+<span class="lineNum">     111 </span>            :     std::cerr &lt;&lt; &quot;{object_definition} might be a PROJ string, a WKT string, &quot;
+<span class="lineNum">     112 </span>            :                  &quot; a AUTHORITY:CODE, or urn:ogc:def:OBJECT_TYPE:AUTHORITY::CODE&quot;
+<span class="lineNum">     113 </span>            :               &lt;&lt; std::endl;
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :     std::exit(1);</span>
+<span class="lineNum">     115 </span>            : }
+<span class="lineNum">     116 </span>            : 
+<a name="117"><span class="lineNum">     117 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 : static std::string un_c_ify_string(const std::string &amp;str) {</span>
+<span class="lineNum">     120 </span>            :     std::string out(str);
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :     out = out.substr(1, out.size() - 2);</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :     out = replaceAll(out, &quot;\\\&quot;&quot;, &quot;{ESCAPED_DOUBLE_QUOTE}&quot;);</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :     out = replaceAll(out, &quot;\\n\&quot;&quot;, &quot;&quot;);</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :     out = replaceAll(out, &quot;\&quot;&quot;, &quot;&quot;);</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :     out = replaceAll(out, &quot;{ESCAPED_DOUBLE_QUOTE}&quot;, &quot;\&quot;&quot;);</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :     return out;</span>
+<span class="lineNum">     127 </span>            : }
+<span class="lineNum">     128 </span>            : 
+<a name="129"><span class="lineNum">     129 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 : static std::string c_ify_string(const std::string &amp;str) {</span>
+<span class="lineNum">     132 </span>            :     std::string out(str);
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :     out = replaceAll(out, &quot;\&quot;&quot;, &quot;{DOUBLE_QUOTE}&quot;);</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :     out = replaceAll(out, &quot;\n&quot;, &quot;\\n\&quot;\n\&quot;&quot;);</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :     out = replaceAll(out, &quot;{DOUBLE_QUOTE}&quot;, &quot;\\\&quot;&quot;);</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :     return &quot;\&quot;&quot; + out + &quot;\&quot;&quot;;</span>
+<span class="lineNum">     137 </span>            : }
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span><span class="lineCov">         37 : static BaseObjectNNPtr buildObject(</span>
+<span class="lineNum">     142 </span>            :     DatabaseContextPtr dbContext, const std::string &amp;user_string,
+<span class="lineNum">     143 </span>            :     const std::string &amp;kind, const std::string &amp;context,
+<span class="lineNum">     144 </span>            :     bool buildBoundCRSToWGS84,
+<span class="lineNum">     145 </span>            :     CoordinateOperationContext::IntermediateCRSUse allowUseIntermediateCRS,
+<span class="lineNum">     146 </span>            :     bool promoteTo3D, bool quiet) {
+<span class="lineNum">     147 </span><span class="lineCov">         37 :     BaseObjectPtr obj;</span>
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            :     std::string l_user_string(user_string);
+<span class="lineNum">     150 </span><span class="lineCov">         74 :     if (!user_string.empty() &amp;&amp; user_string[0] == '@') {</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :         std::ifstream fs;</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :         auto filename = user_string.substr(1);</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :         fs.open(filename, std::fstream::in | std::fstream::binary);</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :         if (!fs.is_open()) {</span>
+<span class="lineNum">     155 </span>            :             std::cerr &lt;&lt; context &lt;&lt; &quot;: cannot open &quot; &lt;&lt; filename &lt;&lt; std::endl;
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :             std::exit(1);</span>
+<span class="lineNum">     157 </span>            :         }
+<span class="lineNum">     158 </span>            :         l_user_string.clear();
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :         while (!fs.eof()) {</span>
+<span class="lineNum">     160 </span>            :             char buffer[256];
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :             fs.read(buffer, sizeof(buffer));</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :             l_user_string.append(buffer, static_cast&lt;size_t&gt;(fs.gcount()));</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :             if (l_user_string.size() &gt; 100 * 1000) {</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :                 fs.close();</span>
+<span class="lineNum">     165 </span>            :                 std::cerr &lt;&lt; context &lt;&lt; &quot;: too big file&quot; &lt;&lt; std::endl;
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :                 std::exit(1);</span>
+<span class="lineNum">     167 </span>            :             }
+<span class="lineNum">     168 </span>            :         }
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :         fs.close();</span>
+<span class="lineNum">     170 </span>            :     }
+<span class="lineNum">     171 </span><span class="lineCov">         74 :     if (!l_user_string.empty() &amp;&amp; l_user_string.back() == '\n') {</span>
+<span class="lineNum">     172 </span>            :         l_user_string.resize(l_user_string.size() - 1);
+<span class="lineNum">     173 </span>            :     }
+<span class="lineNum">     174 </span><span class="lineCov">         74 :     if (!l_user_string.empty() &amp;&amp; l_user_string.back() == '\r') {</span>
+<span class="lineNum">     175 </span>            :         l_user_string.resize(l_user_string.size() - 1);
+<span class="lineNum">     176 </span>            :     }
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span>            :     try {
+<span class="lineNum">     179 </span><span class="lineCov">         74 :         auto tokens = split(l_user_string, ':');</span>
+<span class="lineNum">     180 </span><span class="lineCov">         37 :         if (kind == &quot;operation&quot; &amp;&amp; tokens.size() == 2) {</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :             auto urn = &quot;urn:ogc:def:coordinateOperation:&quot; + tokens[0] + &quot;::&quot; +</span>
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :                        tokens[1];</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :             obj = createFromUserInput(urn, dbContext).as_nullable();</span>
+<span class="lineNum">     184 </span><span class="lineCov">         37 :         } else if (kind == &quot;ellipsoid&quot; &amp;&amp; tokens.size() == 2) {</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :             auto urn = &quot;urn:ogc:def:ellipsoid:&quot; + tokens[0] + &quot;::&quot; + tokens[1];</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :             obj = createFromUserInput(urn, dbContext).as_nullable();</span>
+<span class="lineNum">     187 </span>            :         } else {
+<span class="lineNum">     188 </span>            :             // Convenience to be able to use C escaped strings...
+<span class="lineNum">     189 </span><span class="lineCov">         74 :             if (l_user_string.size() &gt; 2 &amp;&amp; l_user_string[0] == '&quot;' &amp;&amp;</span>
+<span class="lineNum">     190 </span><span class="lineCov">         37 :                 l_user_string.back() == '&quot;' &amp;&amp;</span>
+<span class="lineNum">     191 </span>            :                 l_user_string.find(&quot;\\\&quot;&quot;) != std::string::npos) {
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :                 l_user_string = un_c_ify_string(l_user_string);</span>
+<span class="lineNum">     193 </span>            :             }
+<span class="lineNum">     194 </span><span class="lineCov">         74 :             WKTParser wktParser;</span>
+<span class="lineNum">     195 </span><span class="lineCov">         37 :             if (wktParser.guessDialect(l_user_string) !=</span>
+<span class="lineNum">     196 </span>            :                 WKTParser::WKTGuessedDialect::NOT_WKT) {
+<span class="lineNum">     197 </span><span class="lineCov">          1 :                 wktParser.setStrict(false);</span>
+<span class="lineNum">     198 </span><span class="lineCov">          1 :                 wktParser.attachDatabaseContext(dbContext);</span>
+<span class="lineNum">     199 </span><span class="lineCov">          2 :                 obj = wktParser.createFromWKT(l_user_string).as_nullable();</span>
+<span class="lineNum">     200 </span><span class="lineCov">          1 :                 if (!quiet) {</span>
+<span class="lineNum">     201 </span><span class="lineCov">          1 :                     auto warnings = wktParser.warningList();</span>
+<span class="lineNum">     202 </span><span class="lineCov">          1 :                     if (!warnings.empty()) {</span>
+<span class="lineNum">     203 </span><span class="lineCov">          3 :                         for (const auto &amp;str : warnings) {</span>
+<span class="lineNum">     204 </span>            :                             std::cerr &lt;&lt; &quot;Warning: &quot; &lt;&lt; str &lt;&lt; std::endl;
+<span class="lineNum">     205 </span>            :                         }
+<span class="lineNum">     206 </span>            :                     }
+<span class="lineNum">     207 </span>            :                 }
+<span class="lineNum">     208 </span>            :             } else {
+<span class="lineNum">     209 </span>            :                 obj =
+<span class="lineNum">     210 </span><span class="lineCov">         72 :                     createFromUserInput(l_user_string, dbContext).as_nullable();</span>
+<span class="lineNum">     211 </span>            :             }
+<span class="lineNum">     212 </span>            :         }
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :     } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :         std::cerr &lt;&lt; context &lt;&lt; &quot;: parsing of user string failed: &quot; &lt;&lt; e.what()</span>
+<span class="lineNum">     215 </span>            :                   &lt;&lt; std::endl;
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :         std::exit(1);</span>
+<span class="lineNum">     217 </span>            :     }
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineCov">         37 :     if (buildBoundCRSToWGS84) {</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :         auto crs = std::dynamic_pointer_cast&lt;CRS&gt;(obj);</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :         if (crs) {</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :             obj = crs-&gt;createBoundCRSToWGS84IfPossible(dbContext,</span>
+<span class="lineNum">     223 </span>            :                                                        allowUseIntermediateCRS)
+<span class="lineNum">     224 </span>            :                       .as_nullable();
+<span class="lineNum">     225 </span>            :         }
+<span class="lineNum">     226 </span>            :     }
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">         37 :     if (promoteTo3D) {</span>
+<span class="lineNum">     229 </span><span class="lineCov">          3 :         auto crs = std::dynamic_pointer_cast&lt;CRS&gt;(obj);</span>
+<span class="lineNum">     230 </span><span class="lineCov">          3 :         if (crs) {</span>
+<span class="lineNum">     231 </span><span class="lineCov">          9 :             obj = crs-&gt;promoteTo3D(std::string(), dbContext).as_nullable();</span>
+<span class="lineNum">     232 </span>            :         }
+<span class="lineNum">     233 </span>            :     }
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">         74 :     return NN_NO_CHECK(obj);</span>
+<span class="lineNum">     236 </span>            : }
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span><span class="lineCov">         27 : static void outputObject(</span>
+<span class="lineNum">     241 </span>            :     DatabaseContextPtr dbContext, BaseObjectNNPtr obj,
+<span class="lineNum">     242 </span>            :     CoordinateOperationContext::IntermediateCRSUse allowUseIntermediateCRS,
+<span class="lineNum">     243 </span>            :     const OutputOptions &amp;outputOpt) {
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineCov">         27 :     auto identified = dynamic_cast&lt;const IdentifiedObject *&gt;(obj.get());</span>
+<span class="lineNum">     246 </span><span class="lineCov">         27 :     if (!outputOpt.quiet &amp;&amp; identified &amp;&amp; identified-&gt;isDeprecated()) {</span>
+<span class="lineNum">     247 </span>            :         std::cout &lt;&lt; &quot;Warning: object is deprecated&quot; &lt;&lt; std::endl;
+<span class="lineNum">     248 </span><span class="lineCov">          1 :         auto crs = dynamic_cast&lt;const CRS *&gt;(obj.get());</span>
+<span class="lineNum">     249 </span><span class="lineCov">          1 :         if (crs &amp;&amp; dbContext) {</span>
+<span class="lineNum">     250 </span>            :             try {
+<span class="lineNum">     251 </span><span class="lineCov">          2 :                 auto list = crs-&gt;getNonDeprecated(NN_NO_CHECK(dbContext));</span>
+<span class="lineNum">     252 </span><span class="lineCov">          1 :                 if (!list.empty()) {</span>
+<span class="lineNum">     253 </span>            :                     std::cout &lt;&lt; &quot;Alternative non-deprecated CRS:&quot; &lt;&lt; std::endl;
+<span class="lineNum">     254 </span>            :                 }
+<span class="lineNum">     255 </span><span class="lineCov">          1 :                 for (const auto &amp;altCRS : list) {</span>
+<span class="lineNum">     256 </span><span class="lineCov">          1 :                     const auto &amp;ids = altCRS-&gt;identifiers();</span>
+<span class="lineNum">     257 </span><span class="lineCov">          1 :                     if (!ids.empty()) {</span>
+<span class="lineNum">     258 </span><span class="lineCov">          2 :                         std::cout &lt;&lt; &quot;  &quot; &lt;&lt; *(ids[0]-&gt;codeSpace()) &lt;&lt; &quot;:&quot;</span>
+<span class="lineNum">     259 </span><span class="lineCov">          2 :                                   &lt;&lt; ids[0]-&gt;code() &lt;&lt; std::endl;</span>
+<span class="lineNum">     260 </span>            :                     }
+<span class="lineNum">     261 </span>            :                 }
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :             } catch (const std::exception &amp;) {</span>
+<span class="lineNum">     263 </span>            :             }
+<span class="lineNum">     264 </span>            :         }
+<span class="lineNum">     265 </span>            :         std::cout &lt;&lt; std::endl;
+<span class="lineNum">     266 </span>            :     }
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span>            :     auto projStringExportable =
+<span class="lineNum">     269 </span><span class="lineCov">         27 :         nn_dynamic_pointer_cast&lt;IPROJStringExportable&gt;(obj);</span>
+<span class="lineNum">     270 </span>            :     bool alreadyOutputed = false;
+<span class="lineNum">     271 </span><span class="lineCov">         27 :     if (projStringExportable) {</span>
+<span class="lineNum">     272 </span><span class="lineCov">         27 :         if (outputOpt.PROJ5) {</span>
+<span class="lineNum">     273 </span>            :             try {
+<span class="lineNum">     274 </span>            :                 if (alreadyOutputed) {
+<span class="lineNum">     275 </span>            :                     std::cout &lt;&lt; std::endl;
+<span class="lineNum">     276 </span>            :                 }
+<span class="lineNum">     277 </span><span class="lineCov">         24 :                 auto crs = nn_dynamic_pointer_cast&lt;CRS&gt;(obj);</span>
+<span class="lineNum">     278 </span><span class="lineCov">         24 :                 if (!outputOpt.quiet) {</span>
+<span class="lineNum">     279 </span><span class="lineCov">         23 :                     if (crs) {</span>
+<span class="lineNum">     280 </span>            :                         std::cout &lt;&lt; &quot;PROJ.4 string:&quot; &lt;&lt; std::endl;
+<span class="lineNum">     281 </span>            :                     } else {
+<span class="lineNum">     282 </span>            :                         std::cout &lt;&lt; &quot;PROJ string:&quot; &lt;&lt; std::endl;
+<span class="lineNum">     283 </span>            :                     }
+<span class="lineNum">     284 </span>            :                 }
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span><span class="lineCov">         24 :                 std::shared_ptr&lt;IPROJStringExportable&gt; objToExport;</span>
+<span class="lineNum">     287 </span><span class="lineCov">         24 :                 if (crs) {</span>
+<span class="lineNum">     288 </span>            :                     objToExport =
+<span class="lineNum">     289 </span><span class="lineCov">         12 :                         nn_dynamic_pointer_cast&lt;IPROJStringExportable&gt;(</span>
+<span class="lineNum">     290 </span><span class="lineCov">         12 :                             crs-&gt;createBoundCRSToWGS84IfPossible(</span>
+<span class="lineNum">     291 </span>            :                                 dbContext, allowUseIntermediateCRS));
+<span class="lineNum">     292 </span>            :                 }
+<span class="lineNum">     293 </span><span class="lineCov">         24 :                 if (!objToExport) {</span>
+<span class="lineNum">     294 </span>            :                     objToExport = projStringExportable;
+<span class="lineNum">     295 </span>            :                 }
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span><span class="lineCov">         48 :                 std::cout &lt;&lt; objToExport-&gt;exportToPROJString(</span>
+<span class="lineNum">     298 </span><span class="lineCov">         72 :                                  PROJStringFormatter::create(</span>
+<span class="lineNum">     299 </span>            :                                      PROJStringFormatter::Convention::PROJ_5,
+<span class="lineNum">     300 </span>            :                                      dbContext)
+<span class="lineNum">     301 </span>            :                                      .get())
+<span class="lineNum">     302 </span>            :                           &lt;&lt; std::endl;
+<span class="lineNum">     303 </span><span class="lineCov">          4 :             } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     304 </span><span class="lineCov">          2 :                 std::cerr &lt;&lt; &quot;Error when exporting to PROJ string: &quot; &lt;&lt; e.what()</span>
+<span class="lineNum">     305 </span>            :                           &lt;&lt; std::endl;
+<span class="lineNum">     306 </span>            :             }
+<span class="lineNum">     307 </span>            :             alreadyOutputed = true;
+<span class="lineNum">     308 </span>            :         }
+<span class="lineNum">     309 </span>            :     }
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span><span class="lineCov">         27 :     auto wktExportable = nn_dynamic_pointer_cast&lt;IWKTExportable&gt;(obj);</span>
+<span class="lineNum">     312 </span><span class="lineCov">         27 :     if (wktExportable) {</span>
+<span class="lineNum">     313 </span><span class="lineCov">         27 :         if (outputOpt.WKT2_2015) {</span>
+<span class="lineNum">     314 </span>            :             try {
+<span class="lineNum">     315 </span><span class="lineCov">          2 :                 if (alreadyOutputed) {</span>
+<span class="lineNum">     316 </span>            :                     std::cout &lt;&lt; std::endl;
+<span class="lineNum">     317 </span>            :                 }
+<span class="lineNum">     318 </span><span class="lineCov">          2 :                 if (!outputOpt.quiet) {</span>
+<span class="lineNum">     319 </span>            :                     std::cout &lt;&lt; &quot;WKT2:2015 string:&quot; &lt;&lt; std::endl;
+<span class="lineNum">     320 </span>            :                 }
+<span class="lineNum">     321 </span>            :                 auto formatter =
+<span class="lineNum">     322 </span><span class="lineCov">          4 :                     WKTFormatter::create(WKTFormatter::Convention::WKT2_2015);</span>
+<span class="lineNum">     323 </span><span class="lineCov">          2 :                 if (outputOpt.singleLine) {</span>
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :                     formatter-&gt;setMultiLine(false);</span>
+<span class="lineNum">     325 </span>            :                 }
+<span class="lineNum">     326 </span><span class="lineCov">          2 :                 formatter-&gt;setStrict(outputOpt.strict);</span>
+<span class="lineNum">     327 </span><span class="lineCov">          2 :                 auto wkt = wktExportable-&gt;exportToWKT(formatter.get());</span>
+<span class="lineNum">     328 </span><span class="lineCov">          2 :                 if (outputOpt.c_ify) {</span>
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :                     wkt = c_ify_string(wkt);</span>
+<span class="lineNum">     330 </span>            :                 }
+<span class="lineNum">     331 </span>            :                 std::cout &lt;&lt; wkt &lt;&lt; std::endl;
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :             } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :                 std::cerr &lt;&lt; &quot;Error when exporting to WKT2:2015: &quot; &lt;&lt; e.what()</span>
+<span class="lineNum">     334 </span>            :                           &lt;&lt; std::endl;
+<span class="lineNum">     335 </span>            :             }
+<span class="lineNum">     336 </span>            :             alreadyOutputed = true;
+<span class="lineNum">     337 </span>            :         }
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span><span class="lineCov">         27 :         if (outputOpt.WKT2_2015_SIMPLIFIED) {</span>
+<span class="lineNum">     340 </span>            :             try {
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :                 if (alreadyOutputed) {</span>
+<span class="lineNum">     342 </span>            :                     std::cout &lt;&lt; std::endl;
+<span class="lineNum">     343 </span>            :                 }
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :                 if (!outputOpt.quiet) {</span>
+<span class="lineNum">     345 </span>            :                     std::cout &lt;&lt; &quot;WKT2:2015_SIMPLIFIED string:&quot; &lt;&lt; std::endl;
+<span class="lineNum">     346 </span>            :                 }
+<span class="lineNum">     347 </span>            :                 auto formatter = WKTFormatter::create(
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :                     WKTFormatter::Convention::WKT2_2015_SIMPLIFIED);</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :                 if (outputOpt.singleLine) {</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :                     formatter-&gt;setMultiLine(false);</span>
+<span class="lineNum">     351 </span>            :                 }
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :                 formatter-&gt;setStrict(outputOpt.strict);</span>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :                 auto wkt = wktExportable-&gt;exportToWKT(formatter.get());</span>
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :                 if (outputOpt.c_ify) {</span>
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :                     wkt = c_ify_string(wkt);</span>
+<span class="lineNum">     356 </span>            :                 }
+<span class="lineNum">     357 </span>            :                 std::cout &lt;&lt; wkt &lt;&lt; std::endl;
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :             } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     359 </span>            :                 std::cerr &lt;&lt; &quot;Error when exporting to WKT2:2015_SIMPLIFIED: &quot;
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :                           &lt;&lt; e.what() &lt;&lt; std::endl;</span>
+<span class="lineNum">     361 </span>            :             }
+<span class="lineNum">     362 </span>            :             alreadyOutputed = true;
+<span class="lineNum">     363 </span>            :         }
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span><span class="lineCov">         27 :         if (outputOpt.WKT2_2019) {</span>
+<span class="lineNum">     366 </span>            :             try {
+<span class="lineNum">     367 </span><span class="lineCov">         19 :                 if (alreadyOutputed) {</span>
+<span class="lineNum">     368 </span>            :                     std::cout &lt;&lt; std::endl;
+<span class="lineNum">     369 </span>            :                 }
+<span class="lineNum">     370 </span><span class="lineCov">         19 :                 if (!outputOpt.quiet) {</span>
+<span class="lineNum">     371 </span>            :                     std::cout &lt;&lt; &quot;WKT2:2019 string:&quot; &lt;&lt; std::endl;
+<span class="lineNum">     372 </span>            :                 }
+<span class="lineNum">     373 </span>            :                 auto formatter =
+<span class="lineNum">     374 </span><span class="lineCov">         38 :                     WKTFormatter::create(WKTFormatter::Convention::WKT2_2019);</span>
+<span class="lineNum">     375 </span><span class="lineCov">         19 :                 if (outputOpt.singleLine) {</span>
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :                     formatter-&gt;setMultiLine(false);</span>
+<span class="lineNum">     377 </span>            :                 }
+<span class="lineNum">     378 </span><span class="lineCov">         19 :                 formatter-&gt;setStrict(outputOpt.strict);</span>
+<span class="lineNum">     379 </span><span class="lineCov">         19 :                 auto wkt = wktExportable-&gt;exportToWKT(formatter.get());</span>
+<span class="lineNum">     380 </span><span class="lineCov">         19 :                 if (outputOpt.c_ify) {</span>
+<span class="lineNum">     381 </span><span class="lineNoCov">          0 :                     wkt = c_ify_string(wkt);</span>
+<span class="lineNum">     382 </span>            :                 }
+<span class="lineNum">     383 </span>            :                 std::cout &lt;&lt; wkt &lt;&lt; std::endl;
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :             } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :                 std::cerr &lt;&lt; &quot;Error when exporting to WKT2:2019: &quot; &lt;&lt; e.what()</span>
+<span class="lineNum">     386 </span>            :                           &lt;&lt; std::endl;
+<span class="lineNum">     387 </span>            :             }
+<span class="lineNum">     388 </span>            :             alreadyOutputed = true;
+<span class="lineNum">     389 </span>            :         }
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span><span class="lineCov">         27 :         if (outputOpt.WKT2_2019_SIMPLIFIED) {</span>
+<span class="lineNum">     392 </span>            :             try {
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :                 if (alreadyOutputed) {</span>
+<span class="lineNum">     394 </span>            :                     std::cout &lt;&lt; std::endl;
+<span class="lineNum">     395 </span>            :                 }
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :                 if (!outputOpt.quiet) {</span>
+<span class="lineNum">     397 </span>            :                     std::cout &lt;&lt; &quot;WKT2:2019_SIMPLIFIED string:&quot; &lt;&lt; std::endl;
+<span class="lineNum">     398 </span>            :                 }
+<span class="lineNum">     399 </span>            :                 auto formatter = WKTFormatter::create(
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :                     WKTFormatter::Convention::WKT2_2019_SIMPLIFIED);</span>
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :                 if (outputOpt.singleLine) {</span>
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :                     formatter-&gt;setMultiLine(false);</span>
+<span class="lineNum">     403 </span>            :                 }
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :                 formatter-&gt;setStrict(outputOpt.strict);</span>
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :                 auto wkt = wktExportable-&gt;exportToWKT(formatter.get());</span>
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :                 if (outputOpt.c_ify) {</span>
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :                     wkt = c_ify_string(wkt);</span>
+<span class="lineNum">     408 </span>            :                 }
+<span class="lineNum">     409 </span>            :                 std::cout &lt;&lt; wkt &lt;&lt; std::endl;
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :             } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     411 </span>            :                 std::cerr &lt;&lt; &quot;Error when exporting to WKT2:2019_SIMPLIFIED: &quot;
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :                           &lt;&lt; e.what() &lt;&lt; std::endl;</span>
+<span class="lineNum">     413 </span>            :             }
+<span class="lineNum">     414 </span>            :             alreadyOutputed = true;
+<span class="lineNum">     415 </span>            :         }
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span><span class="lineCov">         54 :         if (outputOpt.WKT1_GDAL &amp;&amp; !nn_dynamic_pointer_cast&lt;Conversion&gt;(obj)) {</span>
+<span class="lineNum">     418 </span>            :             try {
+<span class="lineNum">     419 </span><span class="lineCov">          2 :                 if (alreadyOutputed) {</span>
+<span class="lineNum">     420 </span>            :                     std::cout &lt;&lt; std::endl;
+<span class="lineNum">     421 </span>            :                 }
+<span class="lineNum">     422 </span><span class="lineCov">          2 :                 if (!outputOpt.quiet) {</span>
+<span class="lineNum">     423 </span>            :                     std::cout &lt;&lt; &quot;WKT1:GDAL string:&quot; &lt;&lt; std::endl;
+<span class="lineNum">     424 </span>            :                 }
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span><span class="lineCov">          2 :                 auto crs = nn_dynamic_pointer_cast&lt;CRS&gt;(obj);</span>
+<span class="lineNum">     427 </span><span class="lineCov">          2 :                 std::shared_ptr&lt;IWKTExportable&gt; objToExport;</span>
+<span class="lineNum">     428 </span><span class="lineCov">          2 :                 if (crs) {</span>
+<span class="lineNum">     429 </span><span class="lineCov">          4 :                     objToExport = nn_dynamic_pointer_cast&lt;IWKTExportable&gt;(</span>
+<span class="lineNum">     430 </span><span class="lineCov">          4 :                         crs-&gt;createBoundCRSToWGS84IfPossible(</span>
+<span class="lineNum">     431 </span>            :                             dbContext, allowUseIntermediateCRS));
+<span class="lineNum">     432 </span>            :                 }
+<span class="lineNum">     433 </span><span class="lineCov">          2 :                 if (!objToExport) {</span>
+<span class="lineNum">     434 </span>            :                     objToExport = wktExportable;
+<span class="lineNum">     435 </span>            :                 }
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            :                 auto formatter =
+<span class="lineNum">     438 </span><span class="lineCov">          4 :                     WKTFormatter::create(WKTFormatter::Convention::WKT1_GDAL);</span>
+<span class="lineNum">     439 </span><span class="lineCov">          2 :                 if (outputOpt.singleLine) {</span>
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :                     formatter-&gt;setMultiLine(false);</span>
+<span class="lineNum">     441 </span>            :                 }
+<span class="lineNum">     442 </span><span class="lineCov">          2 :                 formatter-&gt;setStrict(outputOpt.strict);</span>
+<span class="lineNum">     443 </span><span class="lineCov">          2 :                 auto wkt = objToExport-&gt;exportToWKT(formatter.get());</span>
+<span class="lineNum">     444 </span><span class="lineCov">          2 :                 if (outputOpt.c_ify) {</span>
+<span class="lineNum">     445 </span><span class="lineNoCov">          0 :                     wkt = c_ify_string(wkt);</span>
+<span class="lineNum">     446 </span>            :                 }
+<span class="lineNum">     447 </span>            :                 std::cout &lt;&lt; wkt &lt;&lt; std::endl;
+<span class="lineNum">     448 </span>            :                 std::cout &lt;&lt; std::endl;
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :             } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 :                 std::cerr &lt;&lt; &quot;Error when exporting to WKT1:GDAL: &quot; &lt;&lt; e.what()</span>
+<span class="lineNum">     451 </span>            :                           &lt;&lt; std::endl;
+<span class="lineNum">     452 </span>            :             }
+<span class="lineNum">     453 </span>            :             alreadyOutputed = true;
+<span class="lineNum">     454 </span>            :         }
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span><span class="lineCov">         54 :         if (outputOpt.WKT1_ESRI &amp;&amp; !nn_dynamic_pointer_cast&lt;Conversion&gt;(obj)) {</span>
+<span class="lineNum">     457 </span>            :             try {
+<span class="lineNum">     458 </span><span class="lineCov">          1 :                 if (alreadyOutputed) {</span>
+<span class="lineNum">     459 </span>            :                     std::cout &lt;&lt; std::endl;
+<span class="lineNum">     460 </span>            :                 }
+<span class="lineNum">     461 </span><span class="lineCov">          1 :                 if (!outputOpt.quiet) {</span>
+<span class="lineNum">     462 </span>            :                     std::cout &lt;&lt; &quot;WKT1:ESRI string:&quot; &lt;&lt; std::endl;
+<span class="lineNum">     463 </span>            :                 }
+<span class="lineNum">     464 </span>            : 
+<span class="lineNum">     465 </span>            :                 auto formatter = WKTFormatter::create(
+<span class="lineNum">     466 </span><span class="lineCov">          2 :                     WKTFormatter::Convention::WKT1_ESRI, dbContext);</span>
+<span class="lineNum">     467 </span><span class="lineCov">          1 :                 formatter-&gt;setStrict(outputOpt.strict);</span>
+<span class="lineNum">     468 </span><span class="lineCov">          1 :                 auto wkt = wktExportable-&gt;exportToWKT(formatter.get());</span>
+<span class="lineNum">     469 </span><span class="lineCov">          1 :                 if (outputOpt.c_ify) {</span>
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :                     wkt = c_ify_string(wkt);</span>
+<span class="lineNum">     471 </span>            :                 }
+<span class="lineNum">     472 </span>            :                 std::cout &lt;&lt; wkt &lt;&lt; std::endl;
+<span class="lineNum">     473 </span>            :                 std::cout &lt;&lt; std::endl;
+<span class="lineNum">     474 </span><span class="lineNoCov">          0 :             } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     475 </span><span class="lineNoCov">          0 :                 std::cerr &lt;&lt; &quot;Error when exporting to WKT1:ESRI: &quot; &lt;&lt; e.what()</span>
+<span class="lineNum">     476 </span>            :                           &lt;&lt; std::endl;
+<span class="lineNum">     477 </span>            :             }
+<span class="lineNum">     478 </span>            :             alreadyOutputed = true;
+<span class="lineNum">     479 </span>            :         }
+<span class="lineNum">     480 </span>            :     }
+<span class="lineNum">     481 </span>            : 
+<span class="lineNum">     482 </span><span class="lineCov">         27 :     auto JSONExportable = nn_dynamic_pointer_cast&lt;IJSONExportable&gt;(obj);</span>
+<span class="lineNum">     483 </span><span class="lineCov">         27 :     if (JSONExportable) {</span>
+<span class="lineNum">     484 </span><span class="lineCov">         27 :         if (outputOpt.PROJJSON) {</span>
+<span class="lineNum">     485 </span>            :             try {
+<span class="lineNum">     486 </span><span class="lineCov">          1 :                 if (alreadyOutputed) {</span>
+<span class="lineNum">     487 </span>            :                     std::cout &lt;&lt; std::endl;
+<span class="lineNum">     488 </span>            :                 }
+<span class="lineNum">     489 </span><span class="lineCov">          1 :                 if (!outputOpt.quiet) {</span>
+<span class="lineNum">     490 </span>            :                     std::cout &lt;&lt; &quot;PROJJSON:&quot; &lt;&lt; std::endl;
+<span class="lineNum">     491 </span>            :                 }
+<span class="lineNum">     492 </span><span class="lineCov">          2 :                 auto formatter(JSONFormatter::create(dbContext));</span>
+<span class="lineNum">     493 </span><span class="lineCov">          1 :                 if (outputOpt.singleLine) {</span>
+<span class="lineNum">     494 </span><span class="lineNoCov">          0 :                     formatter-&gt;setMultiLine(false);</span>
+<span class="lineNum">     495 </span>            :                 }
+<span class="lineNum">     496 </span><span class="lineCov">          1 :                 auto jsonString(JSONExportable-&gt;exportToJSON(formatter.get()));</span>
+<span class="lineNum">     497 </span><span class="lineCov">          1 :                 if (outputOpt.c_ify) {</span>
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :                     jsonString = c_ify_string(jsonString);</span>
+<span class="lineNum">     499 </span>            :                 }
+<span class="lineNum">     500 </span>            :                 std::cout &lt;&lt; jsonString &lt;&lt; std::endl;
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :             } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :                 std::cerr &lt;&lt; &quot;Error when exporting to PROJJSON: &quot; &lt;&lt; e.what()</span>
+<span class="lineNum">     503 </span>            :                           &lt;&lt; std::endl;
+<span class="lineNum">     504 </span>            :             }
+<span class="lineNum">     505 </span>            :             // alreadyOutputed = true;
+<span class="lineNum">     506 </span>            :         }
+<span class="lineNum">     507 </span>            :     }
+<span class="lineNum">     508 </span>            : 
+<span class="lineNum">     509 </span><span class="lineCov">         27 :     auto op = dynamic_cast&lt;CoordinateOperation *&gt;(obj.get());</span>
+<span class="lineNum">     510 </span><span class="lineCov">         27 :     if (op &amp;&amp; dbContext &amp;&amp; getenv(&quot;PROJINFO_NO_GRID_CHECK&quot;) == nullptr) {</span>
+<span class="lineNum">     511 </span>            :         try {
+<span class="lineNum">     512 </span><span class="lineNoCov">          0 :             auto setGrids = op-&gt;gridsNeeded(dbContext);</span>
+<span class="lineNum">     513 </span>            :             bool firstWarning = true;
+<span class="lineNum">     514 </span><span class="lineNoCov">          0 :             for (const auto &amp;grid : setGrids) {</span>
+<span class="lineNum">     515 </span><span class="lineNoCov">          0 :                 if (!grid.available) {</span>
+<span class="lineNum">     516 </span><span class="lineNoCov">          0 :                     if (firstWarning) {</span>
+<span class="lineNum">     517 </span>            :                         std::cout &lt;&lt; std::endl;
+<span class="lineNum">     518 </span>            :                         firstWarning = false;
+<span class="lineNum">     519 </span>            :                     }
+<span class="lineNum">     520 </span>            :                     std::cout &lt;&lt; &quot;Grid &quot; &lt;&lt; grid.shortName
+<span class="lineNum">     521 </span><span class="lineNoCov">          0 :                               &lt;&lt; &quot; needed but not found on the system.&quot;;</span>
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :                     if (!grid.packageName.empty()) {</span>
+<span class="lineNum">     523 </span>            :                         std::cout &lt;&lt; &quot; Can be obtained from the &quot;
+<span class="lineNum">     524 </span><span class="lineNoCov">          0 :                                   &lt;&lt; grid.packageName &lt;&lt; &quot; package&quot;;</span>
+<span class="lineNum">     525 </span><span class="lineNoCov">          0 :                         if (!grid.url.empty()) {</span>
+<span class="lineNum">     526 </span>            :                             std::cout &lt;&lt; &quot; at &quot; &lt;&lt; grid.url;
+<span class="lineNum">     527 </span>            :                         }
+<span class="lineNum">     528 </span><span class="lineNoCov">          0 :                     } else if (!grid.url.empty()) {</span>
+<span class="lineNum">     529 </span>            :                         std::cout &lt;&lt; &quot; Can be obtained at &quot; &lt;&lt; grid.url;
+<span class="lineNum">     530 </span>            :                     }
+<span class="lineNum">     531 </span>            :                     std::cout &lt;&lt; std::endl;
+<span class="lineNum">     532 </span>            :                 }
+<span class="lineNum">     533 </span>            :             }
+<span class="lineNum">     534 </span><span class="lineNoCov">          0 :         } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     535 </span><span class="lineNoCov">          0 :             std::cerr &lt;&lt; &quot;Error in gridsNeeded(): &quot; &lt;&lt; e.what() &lt;&lt; std::endl;</span>
+<span class="lineNum">     536 </span>            :         }
+<span class="lineNum">     537 </span>            :     }
+<span class="lineNum">     538 </span><span class="lineCov">         27 : }</span>
+<span class="lineNum">     539 </span>            : 
+<span class="lineNum">     540 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span><span class="lineCov">         38 : static void outputOperationSummary(const CoordinateOperationNNPtr &amp;op,</span>
+<span class="lineNum">     543 </span>            :                                    const DatabaseContextPtr &amp;dbContext) {
+<span class="lineNum">     544 </span><span class="lineCov">         76 :     auto ids = op-&gt;identifiers();</span>
+<span class="lineNum">     545 </span><span class="lineCov">         38 :     if (!ids.empty()) {</span>
+<span class="lineNum">     546 </span><span class="lineCov">         78 :         std::cout &lt;&lt; *(ids[0]-&gt;codeSpace()) &lt;&lt; &quot;:&quot; &lt;&lt; ids[0]-&gt;code();</span>
+<span class="lineNum">     547 </span>            :     } else {
+<span class="lineNum">     548 </span><span class="lineCov">         12 :         std::cout &lt;&lt; &quot;unknown id&quot;;</span>
+<span class="lineNum">     549 </span>            :     }
+<span class="lineNum">     550 </span>            : 
+<span class="lineNum">     551 </span><span class="lineCov">         38 :     std::cout &lt;&lt; &quot;, &quot;;</span>
+<span class="lineNum">     552 </span>            : 
+<span class="lineNum">     553 </span><span class="lineCov">         38 :     auto name = op-&gt;nameStr();</span>
+<span class="lineNum">     554 </span><span class="lineCov">         38 :     if (!name.empty()) {</span>
+<span class="lineNum">     555 </span>            :         std::cout &lt;&lt; name;
+<span class="lineNum">     556 </span>            :     } else {
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;unknown name&quot;;</span>
+<span class="lineNum">     558 </span>            :     }
+<span class="lineNum">     559 </span>            : 
+<span class="lineNum">     560 </span><span class="lineCov">         38 :     std::cout &lt;&lt; &quot;, &quot;;</span>
+<span class="lineNum">     561 </span>            : 
+<span class="lineNum">     562 </span><span class="lineCov">         76 :     auto accuracies = op-&gt;coordinateOperationAccuracies();</span>
+<span class="lineNum">     563 </span><span class="lineCov">         38 :     if (!accuracies.empty()) {</span>
+<span class="lineNum">     564 </span><span class="lineCov">         60 :         std::cout &lt;&lt; accuracies[0]-&gt;value() &lt;&lt; &quot; m&quot;;</span>
+<span class="lineNum">     565 </span>            :     } else {
+<span class="lineNum">     566 </span><span class="lineCov">         16 :         if (std::dynamic_pointer_cast&lt;Conversion&gt;(op.as_nullable())) {</span>
+<span class="lineNum">     567 </span><span class="lineCov">          1 :             std::cout &lt;&lt; &quot;0 m&quot;;</span>
+<span class="lineNum">     568 </span>            :         } else {
+<span class="lineNum">     569 </span><span class="lineCov">          7 :             std::cout &lt;&lt; &quot;unknown accuracy&quot;;</span>
+<span class="lineNum">     570 </span>            :         }
+<span class="lineNum">     571 </span>            :     }
+<span class="lineNum">     572 </span>            : 
+<span class="lineNum">     573 </span><span class="lineCov">         38 :     std::cout &lt;&lt; &quot;, &quot;;</span>
+<span class="lineNum">     574 </span>            : 
+<span class="lineNum">     575 </span><span class="lineCov">         76 :     auto domains = op-&gt;domains();</span>
+<span class="lineNum">     576 </span><span class="lineCov">        114 :     if (!domains.empty() &amp;&amp; domains[0]-&gt;domainOfValidity() &amp;&amp;</span>
+<span class="lineNum">     577 </span><span class="lineCov">         38 :         domains[0]-&gt;domainOfValidity()-&gt;description().has_value()) {</span>
+<span class="lineNum">     578 </span>            :         std::cout &lt;&lt; *(domains[0]-&gt;domainOfValidity()-&gt;description());
+<span class="lineNum">     579 </span>            :     } else {
+<span class="lineNum">     580 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;unknown domain of validity&quot;;</span>
+<span class="lineNum">     581 </span>            :     }
+<span class="lineNum">     582 </span>            : 
+<span class="lineNum">     583 </span><span class="lineCov">         38 :     if (op-&gt;hasBallparkTransformation()) {</span>
+<span class="lineNum">     584 </span><span class="lineCov">          6 :         std::cout &lt;&lt; &quot;, has ballpark transformation&quot;;</span>
+<span class="lineNum">     585 </span>            :     }
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span><span class="lineCov">         38 :     if (dbContext &amp;&amp; getenv(&quot;PROJINFO_NO_GRID_CHECK&quot;) == nullptr) {</span>
+<span class="lineNum">     588 </span>            :         try {
+<span class="lineNum">     589 </span><span class="lineNoCov">          0 :             auto setGrids = op-&gt;gridsNeeded(dbContext);</span>
+<span class="lineNum">     590 </span><span class="lineNoCov">          0 :             for (const auto &amp;grid : setGrids) {</span>
+<span class="lineNum">     591 </span><span class="lineNoCov">          0 :                 if (!grid.available) {</span>
+<span class="lineNum">     592 </span><span class="lineNoCov">          0 :                     std::cout &lt;&lt; &quot;, at least one grid missing&quot;;</span>
+<span class="lineNum">     593 </span>            :                     break;
+<span class="lineNum">     594 </span>            :                 }
+<span class="lineNum">     595 </span>            :             }
+<span class="lineNum">     596 </span><span class="lineNoCov">          0 :         } catch (const std::exception &amp;) {</span>
+<span class="lineNum">     597 </span>            :         }
+<span class="lineNum">     598 </span>            :     }
+<span class="lineNum">     599 </span>            :     std::cout &lt;&lt; std::endl;
+<span class="lineNum">     600 </span><span class="lineCov">         38 : }</span>
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     603 </span>            : 
+<span class="lineNum">     604 </span><span class="lineCov">         14 : static void outputOperations(</span>
+<span class="lineNum">     605 </span>            :     DatabaseContextPtr dbContext, const std::string &amp;sourceCRSStr,
+<span class="lineNum">     606 </span>            :     const std::string &amp;targetCRSStr, const ExtentPtr &amp;bboxFilter,
+<span class="lineNum">     607 </span>            :     CoordinateOperationContext::SpatialCriterion spatialCriterion,
+<span class="lineNum">     608 </span>            :     bool spatialCriterionExplicitlySpecified,
+<span class="lineNum">     609 </span>            :     CoordinateOperationContext::SourceTargetCRSExtentUse crsExtentUse,
+<span class="lineNum">     610 </span>            :     CoordinateOperationContext::GridAvailabilityUse gridAvailabilityUse,
+<span class="lineNum">     611 </span>            :     CoordinateOperationContext::IntermediateCRSUse allowUseIntermediateCRS,
+<span class="lineNum">     612 </span>            :     const std::vector&lt;std::pair&lt;std::string, std::string&gt;&gt; &amp;pivots,
+<span class="lineNum">     613 </span>            :     const std::string &amp;authority, bool usePROJGridAlternatives,
+<span class="lineNum">     614 </span>            :     bool showSuperseded, bool promoteTo3D, const OutputOptions &amp;outputOpt,
+<span class="lineNum">     615 </span>            :     bool summary) {
+<span class="lineNum">     616 </span>            :     auto sourceObj =
+<span class="lineNum">     617 </span>            :         buildObject(dbContext, sourceCRSStr, &quot;crs&quot;, &quot;source CRS&quot;, false,
+<span class="lineNum">     618 </span>            :                     CoordinateOperationContext::IntermediateCRSUse::NEVER,
+<span class="lineNum">     619 </span><span class="lineCov">         83 :                     promoteTo3D, outputOpt.quiet);</span>
+<span class="lineNum">     620 </span><span class="lineCov">         14 :     auto sourceCRS = nn_dynamic_pointer_cast&lt;CRS&gt;(sourceObj);</span>
+<span class="lineNum">     621 </span><span class="lineCov">         14 :     if (!sourceCRS) {</span>
+<span class="lineNum">     622 </span>            :         std::cerr &lt;&lt; &quot;source CRS string is not a CRS&quot; &lt;&lt; std::endl;
+<span class="lineNum">     623 </span><span class="lineNoCov">          0 :         std::exit(1);</span>
+<span class="lineNum">     624 </span>            :     }
+<span class="lineNum">     625 </span>            :     auto nnSourceCRS = NN_NO_CHECK(sourceCRS);
+<span class="lineNum">     626 </span>            : 
+<span class="lineNum">     627 </span>            :     auto targetObj =
+<span class="lineNum">     628 </span>            :         buildObject(dbContext, targetCRSStr, &quot;crs&quot;, &quot;target CRS&quot;, false,
+<span class="lineNum">     629 </span>            :                     CoordinateOperationContext::IntermediateCRSUse::NEVER,
+<span class="lineNum">     630 </span><span class="lineCov">         83 :                     promoteTo3D, outputOpt.quiet);</span>
+<span class="lineNum">     631 </span><span class="lineCov">         14 :     auto targetCRS = nn_dynamic_pointer_cast&lt;CRS&gt;(targetObj);</span>
+<span class="lineNum">     632 </span><span class="lineCov">         14 :     if (!targetCRS) {</span>
+<span class="lineNum">     633 </span>            :         std::cerr &lt;&lt; &quot;target CRS string is not a CRS&quot; &lt;&lt; std::endl;
+<span class="lineNum">     634 </span><span class="lineNoCov">          0 :         std::exit(1);</span>
+<span class="lineNum">     635 </span>            :     }
+<span class="lineNum">     636 </span>            :     auto nnTargetCRS = NN_NO_CHECK(targetCRS);
+<span class="lineNum">     637 </span>            : 
+<span class="lineNum">     638 </span><span class="lineCov">         13 :     std::vector&lt;CoordinateOperationNNPtr&gt; list;</span>
+<span class="lineNum">     639 </span>            :     size_t spatialCriterionPartialIntersectionResultCount = 0;
+<span class="lineNum">     640 </span>            :     try {
+<span class="lineNum">     641 </span>            :         auto authFactory =
+<span class="lineNum">     642 </span>            :             dbContext
+<span class="lineNum">     643 </span><span class="lineCov">         42 :                 ? AuthorityFactory::create(NN_NO_CHECK(dbContext), authority)</span>
+<span class="lineNum">     644 </span>            :                       .as_nullable()
+<span class="lineNum">     645 </span><span class="lineCov">         14 :                 : nullptr;</span>
+<span class="lineNum">     646 </span>            :         auto ctxt =
+<span class="lineNum">     647 </span><span class="lineCov">         14 :             CoordinateOperationContext::create(authFactory, bboxFilter, 0);</span>
+<span class="lineNum">     648 </span><span class="lineCov">         14 :         ctxt-&gt;setSpatialCriterion(spatialCriterion);</span>
+<span class="lineNum">     649 </span><span class="lineCov">         14 :         ctxt-&gt;setSourceAndTargetCRSExtentUse(crsExtentUse);</span>
+<span class="lineNum">     650 </span><span class="lineCov">         14 :         ctxt-&gt;setGridAvailabilityUse(gridAvailabilityUse);</span>
+<span class="lineNum">     651 </span><span class="lineCov">         14 :         ctxt-&gt;setAllowUseIntermediateCRS(allowUseIntermediateCRS);</span>
+<span class="lineNum">     652 </span><span class="lineCov">         14 :         ctxt-&gt;setIntermediateCRS(pivots);</span>
+<span class="lineNum">     653 </span><span class="lineCov">         14 :         ctxt-&gt;setUsePROJAlternativeGridNames(usePROJGridAlternatives);</span>
+<span class="lineNum">     654 </span><span class="lineCov">         14 :         ctxt-&gt;setDiscardSuperseded(!showSuperseded);</span>
+<span class="lineNum">     655 </span><span class="lineCov">         56 :         list = CoordinateOperationFactory::create()-&gt;createOperations(</span>
+<span class="lineNum">     656 </span>            :             nnSourceCRS, nnTargetCRS, ctxt);
+<span class="lineNum">     657 </span><span class="lineCov">         28 :         if (!spatialCriterionExplicitlySpecified &amp;&amp;</span>
+<span class="lineNum">     658 </span><span class="lineCov">         14 :             spatialCriterion == CoordinateOperationContext::SpatialCriterion::</span>
+<span class="lineNum">     659 </span>            :                                     STRICT_CONTAINMENT) {
+<span class="lineNum">     660 </span>            :             try {
+<span class="lineNum">     661 </span><span class="lineCov">         10 :                 ctxt-&gt;setSpatialCriterion(</span>
+<span class="lineNum">     662 </span>            :                     CoordinateOperationContext::SpatialCriterion::
+<span class="lineNum">     663 </span>            :                         PARTIAL_INTERSECTION);
+<span class="lineNum">     664 </span><span class="lineCov">         10 :                 spatialCriterionPartialIntersectionResultCount =</span>
+<span class="lineNum">     665 </span><span class="lineCov">         20 :                     CoordinateOperationFactory::create()</span>
+<span class="lineNum">     666 </span><span class="lineCov">         20 :                         -&gt;createOperations(nnSourceCRS, nnTargetCRS, ctxt)</span>
+<span class="lineNum">     667 </span>            :                         .size();
+<span class="lineNum">     668 </span><span class="lineNoCov">          0 :             } catch (const std::exception &amp;) {</span>
+<span class="lineNum">     669 </span>            :             }
+<span class="lineNum">     670 </span>            :         }
+<span class="lineNum">     671 </span><span class="lineNoCov">          0 :     } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     672 </span><span class="lineNoCov">          0 :         std::cerr &lt;&lt; &quot;createOperations() failed with: &quot; &lt;&lt; e.what()</span>
+<span class="lineNum">     673 </span>            :                   &lt;&lt; std::endl;
+<span class="lineNum">     674 </span><span class="lineNoCov">          0 :         std::exit(1);</span>
+<span class="lineNum">     675 </span>            :     }
+<span class="lineNum">     676 </span><span class="lineCov">         15 :     if (outputOpt.quiet &amp;&amp; !list.empty()) {</span>
+<span class="lineNum">     677 </span><span class="lineCov">          2 :         outputObject(dbContext, list[0], allowUseIntermediateCRS, outputOpt);</span>
+<span class="lineNum">     678 </span><span class="lineCov">          1 :         return;</span>
+<span class="lineNum">     679 </span>            :     }
+<span class="lineNum">     680 </span><span class="lineCov">         13 :     std::cout &lt;&lt; &quot;Candidate operations found: &quot; &lt;&lt; list.size() &lt;&lt; std::endl;</span>
+<span class="lineNum">     681 </span><span class="lineCov">         26 :     if (spatialCriterionPartialIntersectionResultCount &gt; list.size()) {</span>
+<span class="lineNum">     682 </span>            :         std::cout &lt;&lt; &quot;Note: using '--spatial-test intersects' would bring &quot;
+<span class="lineNum">     683 </span>            :                      &quot;more results (&quot;
+<span class="lineNum">     684 </span>            :                   &lt;&lt; spatialCriterionPartialIntersectionResultCount &lt;&lt; &quot;)&quot;
+<span class="lineNum">     685 </span>            :                   &lt;&lt; std::endl;
+<span class="lineNum">     686 </span>            :     }
+<span class="lineNum">     687 </span><span class="lineCov">         13 :     if (summary) {</span>
+<span class="lineNum">     688 </span><span class="lineCov">         28 :         for (const auto &amp;op : list) {</span>
+<span class="lineNum">     689 </span><span class="lineCov">         21 :             outputOperationSummary(op, dbContext);</span>
+<span class="lineNum">     690 </span>            :         }
+<span class="lineNum">     691 </span>            :     } else {
+<span class="lineNum">     692 </span>            :         bool first = true;
+<span class="lineNum">     693 </span><span class="lineCov">         63 :         for (size_t i = 0; i &lt; list.size(); ++i) {</span>
+<span class="lineNum">     694 </span>            :             const auto &amp;op = list[i];
+<span class="lineNum">     695 </span><span class="lineCov">         17 :             if (!first) {</span>
+<span class="lineNum">     696 </span>            :                 std::cout &lt;&lt; std::endl;
+<span class="lineNum">     697 </span>            :             }
+<span class="lineNum">     698 </span>            :             first = false;
+<span class="lineNum">     699 </span>            :             std::cout &lt;&lt; &quot;-------------------------------------&quot; &lt;&lt; std::endl;
+<span class="lineNum">     700 </span>            :             std::cout &lt;&lt; &quot;Operation n&quot;
+<span class="lineNum">     701 </span>            :                          &quot;\xC2\xB0&quot;
+<span class="lineNum">     702 </span><span class="lineCov">         17 :                       &lt;&lt; (i + 1) &lt;&lt; &quot;:&quot; &lt;&lt; std::endl</span>
+<span class="lineNum">     703 </span>            :                       &lt;&lt; std::endl;
+<span class="lineNum">     704 </span><span class="lineCov">         17 :             outputOperationSummary(op, dbContext);</span>
+<span class="lineNum">     705 </span>            :             std::cout &lt;&lt; std::endl;
+<span class="lineNum">     706 </span><span class="lineCov">         34 :             outputObject(dbContext, op, allowUseIntermediateCRS, outputOpt);</span>
+<span class="lineNum">     707 </span>            :         }
+<span class="lineNum">     708 </span>            :     }
+<span class="lineNum">     709 </span>            : }
+<span class="lineNum">     710 </span>            : 
+<span class="lineNum">     711 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     712 </span>            : 
+<span class="lineNum">     713 </span><span class="lineCov">         26 : int main(int argc, char **argv) {</span>
+<span class="lineNum">     714 </span>            : 
+<span class="lineNum">     715 </span><span class="lineCov">         26 :     if (argc == 1) {</span>
+<span class="lineNum">     716 </span><span class="lineNoCov">          0 :         std::cerr &lt;&lt; pj_get_release() &lt;&lt; std::endl;</span>
+<span class="lineNum">     717 </span><span class="lineNoCov">          0 :         usage();</span>
+<span class="lineNum">     718 </span>            :     }
+<span class="lineNum">     719 </span>            : 
+<span class="lineNum">     720 </span>            :     std::string user_string;
+<span class="lineNum">     721 </span>            :     bool user_string_specified = false;
+<span class="lineNum">     722 </span>            :     std::string sourceCRSStr;
+<span class="lineNum">     723 </span>            :     std::string targetCRSStr;
+<span class="lineNum">     724 </span>            :     bool outputSwithSpecified = false;
+<span class="lineNum">     725 </span><span class="lineCov">         26 :     OutputOptions outputOpt;</span>
+<span class="lineNum">     726 </span>            :     std::string objectKind;
+<span class="lineNum">     727 </span>            :     bool summary = false;
+<span class="lineNum">     728 </span>            :     ExtentPtr bboxFilter = nullptr;
+<span class="lineNum">     729 </span>            :     std::string area;
+<span class="lineNum">     730 </span>            :     bool spatialCriterionExplicitlySpecified = false;
+<span class="lineNum">     731 </span>            :     CoordinateOperationContext::SpatialCriterion spatialCriterion =
+<span class="lineNum">     732 </span>            :         CoordinateOperationContext::SpatialCriterion::STRICT_CONTAINMENT;
+<span class="lineNum">     733 </span>            :     CoordinateOperationContext::SourceTargetCRSExtentUse crsExtentUse =
+<span class="lineNum">     734 </span>            :         CoordinateOperationContext::SourceTargetCRSExtentUse::SMALLEST;
+<span class="lineNum">     735 </span>            :     bool buildBoundCRSToWGS84 = false;
+<span class="lineNum">     736 </span>            :     CoordinateOperationContext::GridAvailabilityUse gridAvailabilityUse =
+<span class="lineNum">     737 </span>            :         CoordinateOperationContext::GridAvailabilityUse::USE_FOR_SORTING;
+<span class="lineNum">     738 </span>            :     CoordinateOperationContext::IntermediateCRSUse allowUseIntermediateCRS =
+<span class="lineNum">     739 </span>            :         CoordinateOperationContext::IntermediateCRSUse::
+<span class="lineNum">     740 </span>            :             IF_NO_DIRECT_TRANSFORMATION;
+<span class="lineNum">     741 </span><span class="lineCov">         23 :     std::vector&lt;std::pair&lt;std::string, std::string&gt;&gt; pivots;</span>
+<span class="lineNum">     742 </span>            :     bool usePROJGridAlternatives = true;
+<span class="lineNum">     743 </span>            :     std::string mainDBPath;
+<span class="lineNum">     744 </span><span class="lineCov">         23 :     std::vector&lt;std::string&gt; auxDBPath;</span>
+<span class="lineNum">     745 </span>            :     bool guessDialect = false;
+<span class="lineNum">     746 </span>            :     std::string authority;
+<span class="lineNum">     747 </span>            :     bool identify = false;
+<span class="lineNum">     748 </span>            :     bool showSuperseded = false;
+<span class="lineNum">     749 </span>            :     bool promoteTo3D = false;
+<span class="lineNum">     750 </span>            : 
+<span class="lineNum">     751 </span><span class="lineCov">        178 :     for (int i = 1; i &lt; argc; i++) {</span>
+<span class="lineNum">     752 </span><span class="lineCov">         76 :         std::string arg(argv[i]);</span>
+<span class="lineNum">     753 </span><span class="lineCov">         76 :         if (arg == &quot;-o&quot; &amp;&amp; i + 1 &lt; argc) {</span>
+<span class="lineNum">     754 </span>            :             outputSwithSpecified = true;
+<span class="lineNum">     755 </span>            :             i++;
+<span class="lineNum">     756 </span><span class="lineCov">         32 :             auto formats(split(argv[i], ','));</span>
+<span class="lineNum">     757 </span><span class="lineCov">         16 :             for (auto format : formats) {</span>
+<span class="lineNum">     758 </span><span class="lineCov">          8 :                 if (ci_equal(format, &quot;all&quot;)) {</span>
+<span class="lineNum">     759 </span><span class="lineCov">          1 :                     outputOpt.PROJ5 = true;</span>
+<span class="lineNum">     760 </span><span class="lineCov">          1 :                     outputOpt.WKT2_2019 = true;</span>
+<span class="lineNum">     761 </span><span class="lineCov">          1 :                     outputOpt.WKT2_2015 = true;</span>
+<span class="lineNum">     762 </span><span class="lineCov">          1 :                     outputOpt.WKT1_GDAL = true;</span>
+<span class="lineNum">     763 </span><span class="lineCov">          1 :                     outputOpt.WKT1_ESRI = true;</span>
+<span class="lineNum">     764 </span><span class="lineCov">          1 :                     outputOpt.PROJJSON = true;</span>
+<span class="lineNum">     765 </span><span class="lineCov">          7 :                 } else if (ci_equal(format, &quot;default&quot;)) {</span>
+<span class="lineNum">     766 </span><span class="lineNoCov">          0 :                     outputOpt.PROJ5 = true;</span>
+<span class="lineNum">     767 </span><span class="lineNoCov">          0 :                     outputOpt.WKT2_2019 = true;</span>
+<span class="lineNum">     768 </span><span class="lineNoCov">          0 :                     outputOpt.WKT2_2015 = false;</span>
+<span class="lineNum">     769 </span><span class="lineNoCov">          0 :                     outputOpt.WKT1_GDAL = false;</span>
+<span class="lineNum">     770 </span><span class="lineCov">          7 :                 } else if (ci_equal(format, &quot;PROJ&quot;)) {</span>
+<span class="lineNum">     771 </span><span class="lineCov">          4 :                     outputOpt.PROJ5 = true;</span>
+<span class="lineNum">     772 </span><span class="lineCov">          3 :                 } else if (ci_equal(format, &quot;-PROJ&quot;)) {</span>
+<span class="lineNum">     773 </span><span class="lineNoCov">          0 :                     outputOpt.PROJ5 = false;</span>
+<span class="lineNum">     774 </span><span class="lineCov">          6 :                 } else if (ci_equal(format, &quot;WKT_ALL&quot;) ||</span>
+<span class="lineNum">     775 </span><span class="lineCov">          3 :                            ci_equal(format, &quot;WKT-ALL&quot;)) {</span>
+<span class="lineNum">     776 </span><span class="lineNoCov">          0 :                     outputOpt.WKT2_2019 = true;</span>
+<span class="lineNum">     777 </span><span class="lineNoCov">          0 :                     outputOpt.WKT2_2015 = true;</span>
+<span class="lineNum">     778 </span><span class="lineNoCov">          0 :                     outputOpt.WKT1_GDAL = true;</span>
+<span class="lineNum">     779 </span><span class="lineCov">          6 :                 } else if (ci_equal(format, &quot;-WKT_ALL&quot;) ||</span>
+<span class="lineNum">     780 </span><span class="lineCov">          3 :                            ci_equal(format, &quot;-WKT-ALL&quot;)) {</span>
+<span class="lineNum">     781 </span><span class="lineNoCov">          0 :                     outputOpt.WKT2_2019 = false;</span>
+<span class="lineNum">     782 </span><span class="lineNoCov">          0 :                     outputOpt.WKT2_2015 = false;</span>
+<span class="lineNum">     783 </span><span class="lineNoCov">          0 :                     outputOpt.WKT1_GDAL = false;</span>
+<span class="lineNum">     784 </span><span class="lineCov">          5 :                 } else if (ci_equal(format, &quot;WKT2_2019&quot;) ||</span>
+<span class="lineNum">     785 </span><span class="lineCov">          4 :                            ci_equal(format, &quot;WKT2-2019&quot;) ||</span>
+<span class="lineNum">     786 </span><span class="lineCov">          4 :                            ci_equal(format, &quot;WKT2:2019&quot;) ||</span>
+<span class="lineNum">     787 </span>            :                            /* legacy: undocumented */
+<span class="lineNum">     788 </span><span class="lineCov">          4 :                            ci_equal(format, &quot;WKT2_2018&quot;) ||</span>
+<span class="lineNum">     789 </span><span class="lineCov">          7 :                            ci_equal(format, &quot;WKT2-2018&quot;) ||</span>
+<span class="lineNum">     790 </span><span class="lineCov">          2 :                            ci_equal(format, &quot;WKT2:2018&quot;)) {</span>
+<span class="lineNum">     791 </span><span class="lineCov">          1 :                     outputOpt.WKT2_2019 = true;</span>
+<span class="lineNum">     792 </span><span class="lineCov">          4 :                 } else if (ci_equal(format, &quot;WKT2_2019_SIMPLIFIED&quot;) ||</span>
+<span class="lineNum">     793 </span><span class="lineCov">          4 :                            ci_equal(format, &quot;WKT2-2019_SIMPLIFIED&quot;) ||</span>
+<span class="lineNum">     794 </span><span class="lineCov">          4 :                            ci_equal(format, &quot;WKT2:2019_SIMPLIFIED&quot;) ||</span>
+<span class="lineNum">     795 </span>            :                            /* legacy: undocumented */
+<span class="lineNum">     796 </span><span class="lineCov">          4 :                            ci_equal(format, &quot;WKT2_2018_SIMPLIFIED&quot;) ||</span>
+<span class="lineNum">     797 </span><span class="lineCov">          6 :                            ci_equal(format, &quot;WKT2-2018_SIMPLIFIED&quot;) ||</span>
+<span class="lineNum">     798 </span><span class="lineCov">          2 :                            ci_equal(format, &quot;WKT2:2018_SIMPLIFIED&quot;)) {</span>
+<span class="lineNum">     799 </span><span class="lineNoCov">          0 :                     outputOpt.WKT2_2019_SIMPLIFIED = true;</span>
+<span class="lineNum">     800 </span><span class="lineCov">          4 :                 } else if (ci_equal(format, &quot;-WKT2_2019&quot;) ||</span>
+<span class="lineNum">     801 </span><span class="lineCov">          4 :                            ci_equal(format, &quot;-WKT2-2019&quot;) ||</span>
+<span class="lineNum">     802 </span><span class="lineCov">          4 :                            ci_equal(format, &quot;-WKT2:2019&quot;) ||</span>
+<span class="lineNum">     803 </span>            :                            /* legacy: undocumented */
+<span class="lineNum">     804 </span><span class="lineCov">          4 :                            ci_equal(format, &quot;-WKT2_2018&quot;) ||</span>
+<span class="lineNum">     805 </span><span class="lineCov">          6 :                            ci_equal(format, &quot;-WKT2-2018&quot;) ||</span>
+<span class="lineNum">     806 </span><span class="lineCov">          2 :                            ci_equal(format, &quot;-WKT2:2018&quot;)) {</span>
+<span class="lineNum">     807 </span><span class="lineNoCov">          0 :                     outputOpt.WKT2_2019 = false;</span>
+<span class="lineNum">     808 </span><span class="lineCov">          3 :                 } else if (ci_equal(format, &quot;WKT2_2015&quot;) ||</span>
+<span class="lineNum">     809 </span><span class="lineCov">          4 :                            ci_equal(format, &quot;WKT2-2015&quot;) ||</span>
+<span class="lineNum">     810 </span><span class="lineCov">          1 :                            ci_equal(format, &quot;WKT2:2015&quot;)) {</span>
+<span class="lineNum">     811 </span><span class="lineCov">          1 :                     outputOpt.WKT2_2015 = true;</span>
+<span class="lineNum">     812 </span><span class="lineCov">          2 :                 } else if (ci_equal(format, &quot;WKT2_2015_SIMPLIFIED&quot;) ||</span>
+<span class="lineNum">     813 </span><span class="lineCov">          3 :                            ci_equal(format, &quot;WKT2-2015_SIMPLIFIED&quot;) ||</span>
+<span class="lineNum">     814 </span><span class="lineCov">          1 :                            ci_equal(format, &quot;WKT2:2015_SIMPLIFIED&quot;)) {</span>
+<span class="lineNum">     815 </span><span class="lineNoCov">          0 :                     outputOpt.WKT2_2015_SIMPLIFIED = true;</span>
+<span class="lineNum">     816 </span><span class="lineCov">          2 :                 } else if (ci_equal(format, &quot;-WKT2_2015&quot;) ||</span>
+<span class="lineNum">     817 </span><span class="lineCov">          3 :                            ci_equal(format, &quot;-WKT2-2015&quot;) ||</span>
+<span class="lineNum">     818 </span><span class="lineCov">          1 :                            ci_equal(format, &quot;-WKT2:2015&quot;)) {</span>
+<span class="lineNum">     819 </span><span class="lineNoCov">          0 :                     outputOpt.WKT2_2015 = false;</span>
+<span class="lineNum">     820 </span><span class="lineCov">          1 :                 } else if (ci_equal(format, &quot;WKT1_GDAL&quot;) ||</span>
+<span class="lineNum">     821 </span><span class="lineCov">          1 :                            ci_equal(format, &quot;WKT1-GDAL&quot;) ||</span>
+<span class="lineNum">     822 </span><span class="lineNoCov">          0 :                            ci_equal(format, &quot;WKT1:GDAL&quot;)) {</span>
+<span class="lineNum">     823 </span><span class="lineCov">          1 :                     outputOpt.WKT1_GDAL = true;</span>
+<span class="lineNum">     824 </span><span class="lineNoCov">          0 :                 } else if (ci_equal(format, &quot;-WKT1_GDAL&quot;) ||</span>
+<span class="lineNum">     825 </span><span class="lineNoCov">          0 :                            ci_equal(format, &quot;-WKT1-GDAL&quot;) ||</span>
+<span class="lineNum">     826 </span><span class="lineNoCov">          0 :                            ci_equal(format, &quot;-WKT1:GDAL&quot;)) {</span>
+<span class="lineNum">     827 </span><span class="lineNoCov">          0 :                     outputOpt.WKT1_GDAL = false;</span>
+<span class="lineNum">     828 </span><span class="lineNoCov">          0 :                 } else if (ci_equal(format, &quot;WKT1_ESRI&quot;) ||</span>
+<span class="lineNum">     829 </span><span class="lineNoCov">          0 :                            ci_equal(format, &quot;WKT1-ESRI&quot;) ||</span>
+<span class="lineNum">     830 </span><span class="lineNoCov">          0 :                            ci_equal(format, &quot;WKT1:ESRI&quot;)) {</span>
+<span class="lineNum">     831 </span><span class="lineNoCov">          0 :                     outputOpt.WKT1_ESRI = true;</span>
+<span class="lineNum">     832 </span><span class="lineNoCov">          0 :                 } else if (ci_equal(format, &quot;-WKT1_ESRI&quot;) ||</span>
+<span class="lineNum">     833 </span><span class="lineNoCov">          0 :                            ci_equal(format, &quot;-WKT1-ESRI&quot;) ||</span>
+<span class="lineNum">     834 </span><span class="lineNoCov">          0 :                            ci_equal(format, &quot;-WKT1:ESRI&quot;)) {</span>
+<span class="lineNum">     835 </span><span class="lineNoCov">          0 :                     outputOpt.WKT1_ESRI = false;</span>
+<span class="lineNum">     836 </span><span class="lineNoCov">          0 :                 } else if (ci_equal(format, &quot;PROJJSON&quot;)) {</span>
+<span class="lineNum">     837 </span><span class="lineNoCov">          0 :                     outputOpt.PROJJSON = true;</span>
+<span class="lineNum">     838 </span><span class="lineNoCov">          0 :                 } else if (ci_equal(format, &quot;-PROJJSON&quot;)) {</span>
+<span class="lineNum">     839 </span><span class="lineNoCov">          0 :                     outputOpt.PROJJSON = false;</span>
+<span class="lineNum">     840 </span>            :                 } else {
+<span class="lineNum">     841 </span>            :                     std::cerr &lt;&lt; &quot;Unrecognized value for option -o: &quot; &lt;&lt; format
+<span class="lineNum">     842 </span>            :                               &lt;&lt; std::endl;
+<span class="lineNum">     843 </span><span class="lineNoCov">          0 :                     usage();</span>
+<span class="lineNum">     844 </span>            :                 }
+<span class="lineNum">     845 </span>            :             }
+<span class="lineNum">     846 </span><span class="lineCov">         69 :         } else if (arg == &quot;--bbox&quot; &amp;&amp; i + 1 &lt; argc) {</span>
+<span class="lineNum">     847 </span>            :             i++;
+<span class="lineNum">     848 </span><span class="lineCov">          1 :             auto bboxStr(argv[i]);</span>
+<span class="lineNum">     849 </span><span class="lineCov">          3 :             auto bbox(split(bboxStr, ','));</span>
+<span class="lineNum">     850 </span><span class="lineCov">          2 :             if (bbox.size() != 4) {</span>
+<span class="lineNum">     851 </span>            :                 std::cerr &lt;&lt; &quot;Incorrect number of values for option --bbox: &quot;
+<span class="lineNum">     852 </span><span class="lineNoCov">          0 :                           &lt;&lt; bboxStr &lt;&lt; std::endl;</span>
+<span class="lineNum">     853 </span><span class="lineNoCov">          0 :                 usage();</span>
+<span class="lineNum">     854 </span>            :             }
+<span class="lineNum">     855 </span>            :             try {
+<span class="lineNum">     856 </span><span class="lineCov">          6 :                 bboxFilter = Extent::createFromBBOX(</span>
+<span class="lineNum">     857 </span><span class="lineCov">          2 :                                  c_locale_stod(bbox[0]), c_locale_stod(bbox[1]),</span>
+<span class="lineNum">     858 </span><span class="lineCov">          1 :                                  c_locale_stod(bbox[2]), c_locale_stod(bbox[3]))</span>
+<span class="lineNum">     859 </span>            :                                  .as_nullable();
+<span class="lineNum">     860 </span><span class="lineNoCov">          0 :             } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     861 </span>            :                 std::cerr &lt;&lt; &quot;Invalid value for option --bbox: &quot; &lt;&lt; bboxStr
+<span class="lineNum">     862 </span><span class="lineNoCov">          0 :                           &lt;&lt; &quot;, &quot; &lt;&lt; e.what() &lt;&lt; std::endl;</span>
+<span class="lineNum">     863 </span><span class="lineNoCov">          0 :                 usage();</span>
+<span class="lineNum">     864 </span>            :             }
+<span class="lineNum">     865 </span><span class="lineCov">         72 :         } else if (arg == &quot;--area&quot; &amp;&amp; i + 1 &lt; argc) {</span>
+<span class="lineNum">     866 </span>            :             i++;
+<span class="lineNum">     867 </span><span class="lineCov">          5 :             area = argv[i];</span>
+<span class="lineNum">     868 </span><span class="lineCov">         62 :         } else if (arg == &quot;-k&quot; &amp;&amp; i + 1 &lt; argc) {</span>
+<span class="lineNum">     869 </span>            :             i++;
+<span class="lineNum">     870 </span><span class="lineNoCov">          0 :             std::string kind(argv[i]);</span>
+<span class="lineNum">     871 </span><span class="lineNoCov">          0 :             if (ci_equal(kind, &quot;crs&quot;) || ci_equal(kind, &quot;srs&quot;)) {</span>
+<span class="lineNum">     872 </span>            :                 objectKind = &quot;crs&quot;;
+<span class="lineNum">     873 </span><span class="lineNoCov">          0 :             } else if (ci_equal(kind, &quot;operation&quot;)) {</span>
+<span class="lineNum">     874 </span>            :                 objectKind = &quot;operation&quot;;
+<span class="lineNum">     875 </span><span class="lineNoCov">          0 :             } else if (ci_equal(kind, &quot;ellipsoid&quot;)) {</span>
+<span class="lineNum">     876 </span>            :                 objectKind = &quot;ellipsoid&quot;;
+<span class="lineNum">     877 </span>            :             } else {
+<span class="lineNum">     878 </span>            :                 std::cerr &lt;&lt; &quot;Unrecognized value for option -k: &quot; &lt;&lt; kind
+<span class="lineNum">     879 </span>            :                           &lt;&lt; std::endl;
+<span class="lineNum">     880 </span><span class="lineNoCov">          0 :                 usage();</span>
+<span class="lineNum">     881 </span>            :             }
+<span class="lineNum">     882 </span><span class="lineCov">        107 :         } else if ((arg == &quot;-s&quot; || arg == &quot;--ssource-crs&quot;) &amp;&amp; i + 1 &lt; argc) {</span>
+<span class="lineNum">     883 </span>            :             i++;
+<span class="lineNum">     884 </span><span class="lineCov">         17 :             sourceCRSStr = argv[i];</span>
+<span class="lineNum">     885 </span><span class="lineCov">         73 :         } else if ((arg == &quot;-t&quot; || arg == &quot;--target-crs&quot;) &amp;&amp; i + 1 &lt; argc) {</span>
+<span class="lineNum">     886 </span>            :             i++;
+<span class="lineNum">     887 </span><span class="lineCov">         17 :             targetCRSStr = argv[i];</span>
+<span class="lineNum">     888 </span><span class="lineCov">         55 :         } else if (arg == &quot;-q&quot; || arg == &quot;--quiet&quot;) {</span>
+<span class="lineNum">     889 </span><span class="lineCov">          1 :             outputOpt.quiet = true;</span>
+<span class="lineNum">     890 </span><span class="lineCov">         27 :         } else if (arg == &quot;--c-ify&quot;) {</span>
+<span class="lineNum">     891 </span><span class="lineNoCov">          0 :             outputOpt.c_ify = true;</span>
+<span class="lineNum">     892 </span><span class="lineCov">         27 :         } else if (arg == &quot;--single-line&quot;) {</span>
+<span class="lineNum">     893 </span><span class="lineNoCov">          0 :             outputOpt.singleLine = true;</span>
+<span class="lineNum">     894 </span><span class="lineCov">         27 :         } else if (arg == &quot;--summary&quot;) {</span>
+<span class="lineNum">     895 </span>            :             summary = true;
+<span class="lineNum">     896 </span><span class="lineCov">         17 :         } else if (ci_equal(arg, &quot;--boundcrs-to-wgs84&quot;)) {</span>
+<span class="lineNum">     897 </span>            :             buildBoundCRSToWGS84 = true;
+<span class="lineNum">     898 </span>            : 
+<span class="lineNum">     899 </span>            :             // undocumented: only for debugging purposes
+<span class="lineNum">     900 </span><span class="lineCov">         17 :         } else if (ci_equal(arg, &quot;--no-proj-grid-alternatives&quot;)) {</span>
+<span class="lineNum">     901 </span>            :             usePROJGridAlternatives = false;
+<span class="lineNum">     902 </span>            : 
+<span class="lineNum">     903 </span><span class="lineCov">         17 :         } else if (arg == &quot;--spatial-test&quot; &amp;&amp; i + 1 &lt; argc) {</span>
+<span class="lineNum">     904 </span>            :             i++;
+<span class="lineNum">     905 </span><span class="lineCov">          4 :             std::string value(argv[i]);</span>
+<span class="lineNum">     906 </span>            :             spatialCriterionExplicitlySpecified = true;
+<span class="lineNum">     907 </span><span class="lineCov">          4 :             if (ci_equal(value, &quot;contains&quot;)) {</span>
+<span class="lineNum">     908 </span>            :                 spatialCriterion = CoordinateOperationContext::
+<span class="lineNum">     909 </span>            :                     SpatialCriterion::STRICT_CONTAINMENT;
+<span class="lineNum">     910 </span><span class="lineCov">          4 :             } else if (ci_equal(value, &quot;intersects&quot;)) {</span>
+<span class="lineNum">     911 </span>            :                 spatialCriterion = CoordinateOperationContext::
+<span class="lineNum">     912 </span>            :                     SpatialCriterion::PARTIAL_INTERSECTION;
+<span class="lineNum">     913 </span>            :             } else {
+<span class="lineNum">     914 </span>            :                 std::cerr &lt;&lt; &quot;Unrecognized value for option --spatial-test: &quot;
+<span class="lineNum">     915 </span>            :                           &lt;&lt; value &lt;&lt; std::endl;
+<span class="lineNum">     916 </span><span class="lineNoCov">          0 :                 usage();</span>
+<span class="lineNum">     917 </span>            :             }
+<span class="lineNum">     918 </span><span class="lineCov">         13 :         } else if (arg == &quot;--crs-extent-use&quot; &amp;&amp; i + 1 &lt; argc) {</span>
+<span class="lineNum">     919 </span>            :             i++;
+<span class="lineNum">     920 </span><span class="lineNoCov">          0 :             std::string value(argv[i]);</span>
+<span class="lineNum">     921 </span><span class="lineNoCov">          0 :             if (ci_equal(value, &quot;NONE&quot;)) {</span>
+<span class="lineNum">     922 </span>            :                 crsExtentUse =
+<span class="lineNum">     923 </span>            :                     CoordinateOperationContext::SourceTargetCRSExtentUse::NONE;
+<span class="lineNum">     924 </span><span class="lineNoCov">          0 :             } else if (ci_equal(value, &quot;BOTH&quot;)) {</span>
+<span class="lineNum">     925 </span>            :                 crsExtentUse =
+<span class="lineNum">     926 </span>            :                     CoordinateOperationContext::SourceTargetCRSExtentUse::BOTH;
+<span class="lineNum">     927 </span><span class="lineNoCov">          0 :             } else if (ci_equal(value, &quot;INTERSECTION&quot;)) {</span>
+<span class="lineNum">     928 </span>            :                 crsExtentUse = CoordinateOperationContext::
+<span class="lineNum">     929 </span>            :                     SourceTargetCRSExtentUse::INTERSECTION;
+<span class="lineNum">     930 </span><span class="lineNoCov">          0 :             } else if (ci_equal(value, &quot;SMALLEST&quot;)) {</span>
+<span class="lineNum">     931 </span>            :                 crsExtentUse = CoordinateOperationContext::
+<span class="lineNum">     932 </span>            :                     SourceTargetCRSExtentUse::SMALLEST;
+<span class="lineNum">     933 </span>            :             } else {
+<span class="lineNum">     934 </span>            :                 std::cerr &lt;&lt; &quot;Unrecognized value for option --crs-extent-use: &quot;
+<span class="lineNum">     935 </span>            :                           &lt;&lt; value &lt;&lt; std::endl;
+<span class="lineNum">     936 </span><span class="lineNoCov">          0 :                 usage();</span>
+<span class="lineNum">     937 </span>            :             }
+<span class="lineNum">     938 </span><span class="lineCov">         15 :         } else if (arg == &quot;--grid-check&quot; &amp;&amp; i + 1 &lt; argc) {</span>
+<span class="lineNum">     939 </span>            :             i++;
+<span class="lineNum">     940 </span><span class="lineCov">          2 :             std::string value(argv[i]);</span>
+<span class="lineNum">     941 </span><span class="lineCov">          2 :             if (ci_equal(value, &quot;none&quot;)) {</span>
+<span class="lineNum">     942 </span>            :                 gridAvailabilityUse = CoordinateOperationContext::
+<span class="lineNum">     943 </span>            :                     GridAvailabilityUse::IGNORE_GRID_AVAILABILITY;
+<span class="lineNum">     944 </span><span class="lineNoCov">          0 :             } else if (ci_equal(value, &quot;discard_missing&quot;)) {</span>
+<span class="lineNum">     945 </span>            :                 gridAvailabilityUse = CoordinateOperationContext::
+<span class="lineNum">     946 </span>            :                     GridAvailabilityUse::DISCARD_OPERATION_IF_MISSING_GRID;
+<span class="lineNum">     947 </span><span class="lineNoCov">          0 :             } else if (ci_equal(value, &quot;sort&quot;)) {</span>
+<span class="lineNum">     948 </span>            :                 gridAvailabilityUse = CoordinateOperationContext::
+<span class="lineNum">     949 </span>            :                     GridAvailabilityUse::USE_FOR_SORTING;
+<span class="lineNum">     950 </span>            :             } else {
+<span class="lineNum">     951 </span>            :                 std::cerr &lt;&lt; &quot;Unrecognized value for option --grid-check: &quot;
+<span class="lineNum">     952 </span>            :                           &lt;&lt; value &lt;&lt; std::endl;
+<span class="lineNum">     953 </span><span class="lineNoCov">          0 :                 usage();</span>
+<span class="lineNum">     954 </span>            :             }
+<span class="lineNum">     955 </span><span class="lineCov">         11 :         } else if (arg == &quot;--pivot-crs&quot; &amp;&amp; i + 1 &lt; argc) {</span>
+<span class="lineNum">     956 </span>            :             i++;
+<span class="lineNum">     957 </span><span class="lineNoCov">          0 :             auto value(argv[i]);</span>
+<span class="lineNum">     958 </span><span class="lineNoCov">          0 :             if (ci_equal(std::string(value), &quot;always&quot;)) {</span>
+<span class="lineNum">     959 </span>            :                 allowUseIntermediateCRS =
+<span class="lineNum">     960 </span>            :                     CoordinateOperationContext::IntermediateCRSUse::ALWAYS;
+<span class="lineNum">     961 </span><span class="lineNoCov">          0 :             } else if (ci_equal(std::string(value),</span>
+<span class="lineNum">     962 </span>            :                                 &quot;if_no_direct_transformation&quot;)) {
+<span class="lineNum">     963 </span>            :                 allowUseIntermediateCRS = CoordinateOperationContext::
+<span class="lineNum">     964 </span>            :                     IntermediateCRSUse::IF_NO_DIRECT_TRANSFORMATION;
+<span class="lineNum">     965 </span><span class="lineNoCov">          0 :             } else if (ci_equal(std::string(value), &quot;never&quot;)) {</span>
+<span class="lineNum">     966 </span>            :                 allowUseIntermediateCRS =
+<span class="lineNum">     967 </span>            :                     CoordinateOperationContext::IntermediateCRSUse::NEVER;
+<span class="lineNum">     968 </span>            :             } else {
+<span class="lineNum">     969 </span><span class="lineNoCov">          0 :                 auto splitValue(split(value, ','));</span>
+<span class="lineNum">     970 </span><span class="lineNoCov">          0 :                 for (const auto &amp;v : splitValue) {</span>
+<span class="lineNum">     971 </span><span class="lineNoCov">          0 :                     auto auth_code = split(v, ':');</span>
+<span class="lineNum">     972 </span><span class="lineNoCov">          0 :                     if (auth_code.size() != 2) {</span>
+<span class="lineNum">     973 </span>            :                         std::cerr
+<span class="lineNum">     974 </span>            :                             &lt;&lt; &quot;Unrecognized value for option --grid-check: &quot;
+<span class="lineNum">     975 </span><span class="lineNoCov">          0 :                             &lt;&lt; value &lt;&lt; std::endl;</span>
+<span class="lineNum">     976 </span><span class="lineNoCov">          0 :                         usage();</span>
+<span class="lineNum">     977 </span>            :                     }
+<span class="lineNum">     978 </span><span class="lineNoCov">          0 :                     pivots.emplace_back(</span>
+<span class="lineNum">     979 </span><span class="lineNoCov">          0 :                         std::make_pair(auth_code[0], auth_code[1]));</span>
+<span class="lineNum">     980 </span>            :                 }
+<span class="lineNum">     981 </span>            :             }
+<span class="lineNum">     982 </span><span class="lineCov">         11 :         } else if (arg == &quot;--main-db-path&quot; &amp;&amp; i + 1 &lt; argc) {</span>
+<span class="lineNum">     983 </span>            :             i++;
+<span class="lineNum">     984 </span><span class="lineNoCov">          0 :             mainDBPath = argv[i];</span>
+<span class="lineNum">     985 </span><span class="lineCov">         11 :         } else if (arg == &quot;--aux-db-path&quot; &amp;&amp; i + 1 &lt; argc) {</span>
+<span class="lineNum">     986 </span>            :             i++;
+<span class="lineNum">     987 </span><span class="lineNoCov">          0 :             auxDBPath.push_back(argv[i]);</span>
+<span class="lineNum">     988 </span><span class="lineCov">         11 :         } else if (arg == &quot;--guess-dialect&quot;) {</span>
+<span class="lineNum">     989 </span>            :             guessDialect = true;
+<span class="lineNum">     990 </span><span class="lineCov">         11 :         } else if (arg == &quot;--authority&quot; &amp;&amp; i + 1 &lt; argc) {</span>
+<span class="lineNum">     991 </span>            :             i++;
+<span class="lineNum">     992 </span><span class="lineNoCov">          0 :             authority = argv[i];</span>
+<span class="lineNum">     993 </span><span class="lineCov">         11 :         } else if (arg == &quot;--identify&quot;) {</span>
+<span class="lineNum">     994 </span>            :             identify = true;
+<span class="lineNum">     995 </span><span class="lineCov">         11 :         } else if (arg == &quot;--show-superseded&quot;) {</span>
+<span class="lineNum">     996 </span>            :             showSuperseded = true;
+<span class="lineNum">     997 </span><span class="lineCov">         11 :         } else if (arg == &quot;--lax&quot;) {</span>
+<span class="lineNum">     998 </span><span class="lineNoCov">          0 :             outputOpt.strict = false;</span>
+<span class="lineNum">     999 </span><span class="lineCov">         11 :         } else if (ci_equal(arg, &quot;--3d&quot;)) {</span>
+<span class="lineNum">    1000 </span>            :             promoteTo3D = true;
+<span class="lineNum">    1001 </span><span class="lineCov">         18 :         } else if (arg == &quot;-?&quot; || arg == &quot;--help&quot;) {</span>
+<span class="lineNum">    1002 </span><span class="lineNoCov">          0 :             usage();</span>
+<span class="lineNum">    1003 </span><span class="lineCov">          9 :         } else if (arg[0] == '-') {</span>
+<span class="lineNum">    1004 </span>            :             std::cerr &lt;&lt; &quot;Unrecognized option: &quot; &lt;&lt; arg &lt;&lt; std::endl;
+<span class="lineNum">    1005 </span><span class="lineNoCov">          0 :             usage();</span>
+<span class="lineNum">    1006 </span>            :         } else {
+<span class="lineNum">    1007 </span><span class="lineCov">          9 :             if (!user_string_specified) {</span>
+<span class="lineNum">    1008 </span>            :                 user_string_specified = true;
+<span class="lineNum">    1009 </span>            :                 user_string = arg;
+<span class="lineNum">    1010 </span>            :             } else {
+<span class="lineNum">    1011 </span>            :                 std::cerr &lt;&lt; &quot;Too many parameters: &quot; &lt;&lt; arg &lt;&lt; std::endl;
+<span class="lineNum">    1012 </span><span class="lineNoCov">          0 :                 usage();</span>
+<span class="lineNum">    1013 </span>            :             }
+<span class="lineNum">    1014 </span>            :         }
+<span class="lineNum">    1015 </span>            :     }
+<span class="lineNum">    1016 </span>            : 
+<span class="lineNum">    1017 </span><span class="lineCov">         27 :     if (bboxFilter &amp;&amp; !area.empty()) {</span>
+<span class="lineNum">    1018 </span>            :         std::cerr &lt;&lt; &quot;ERROR: --bbox and --area are exclusive&quot; &lt;&lt; std::endl;
+<span class="lineNum">    1019 </span><span class="lineNoCov">          0 :         std::exit(1);</span>
+<span class="lineNum">    1020 </span>            :     }
+<span class="lineNum">    1021 </span>            : 
+<span class="lineNum">    1022 </span><span class="lineCov">         26 :     DatabaseContextPtr dbContext;</span>
+<span class="lineNum">    1023 </span>            :     try {
+<span class="lineNum">    1024 </span>            :         dbContext =
+<span class="lineNum">    1025 </span><span class="lineCov">         52 :             DatabaseContext::create(mainDBPath, auxDBPath).as_nullable();</span>
+<span class="lineNum">    1026 </span><span class="lineNoCov">          0 :     } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">    1027 </span><span class="lineNoCov">          0 :         if (!mainDBPath.empty() || !auxDBPath.empty() || !area.empty()) {</span>
+<span class="lineNum">    1028 </span>            :             std::cerr &lt;&lt; &quot;ERROR: Cannot create database connection: &quot;
+<span class="lineNum">    1029 </span><span class="lineNoCov">          0 :                       &lt;&lt; e.what() &lt;&lt; std::endl;</span>
+<span class="lineNum">    1030 </span><span class="lineNoCov">          0 :             std::exit(1);</span>
+<span class="lineNum">    1031 </span>            :         }
+<span class="lineNum">    1032 </span><span class="lineNoCov">          0 :         std::cerr &lt;&lt; &quot;WARNING: Cannot create database connection: &quot; &lt;&lt; e.what()</span>
+<span class="lineNum">    1033 </span>            :                   &lt;&lt; std::endl;
+<span class="lineNum">    1034 </span>            :     }
+<span class="lineNum">    1035 </span>            : 
+<span class="lineNum">    1036 </span><span class="lineCov">         43 :     if (!sourceCRSStr.empty() &amp;&amp; targetCRSStr.empty()) {</span>
+<span class="lineNum">    1037 </span>            :         std::cerr &lt;&lt; &quot;Source CRS specified, but missing target CRS&quot;
+<span class="lineNum">    1038 </span>            :                   &lt;&lt; std::endl;
+<span class="lineNum">    1039 </span><span class="lineNoCov">          0 :         usage();</span>
+<span class="lineNum">    1040 </span><span class="lineCov">         35 :     } else if (sourceCRSStr.empty() &amp;&amp; !targetCRSStr.empty()) {</span>
+<span class="lineNum">    1041 </span>            :         std::cerr &lt;&lt; &quot;Target CRS specified, but missing source CRS&quot;
+<span class="lineNum">    1042 </span>            :                   &lt;&lt; std::endl;
+<span class="lineNum">    1043 </span><span class="lineNoCov">          0 :         usage();</span>
+<span class="lineNum">    1044 </span><span class="lineCov">         43 :     } else if (!sourceCRSStr.empty() &amp;&amp; !targetCRSStr.empty()) {</span>
+<span class="lineNum">    1045 </span><span class="lineCov">         17 :         if (user_string_specified) {</span>
+<span class="lineNum">    1046 </span>            :             std::cerr &lt;&lt; &quot;Unused extra value&quot; &lt;&lt; std::endl;
+<span class="lineNum">    1047 </span><span class="lineNoCov">          0 :             usage();</span>
+<span class="lineNum">    1048 </span>            :         }
+<span class="lineNum">    1049 </span><span class="lineCov">          9 :     } else if (!user_string_specified) {</span>
+<span class="lineNum">    1050 </span>            :         std::cerr &lt;&lt; &quot;Missing user string&quot; &lt;&lt; std::endl;
+<span class="lineNum">    1051 </span><span class="lineNoCov">          0 :         usage();</span>
+<span class="lineNum">    1052 </span>            :     }
+<span class="lineNum">    1053 </span>            : 
+<span class="lineNum">    1054 </span><span class="lineCov">         26 :     if (!outputSwithSpecified) {</span>
+<span class="lineNum">    1055 </span><span class="lineCov">         18 :         outputOpt.PROJ5 = true;</span>
+<span class="lineNum">    1056 </span><span class="lineCov">         18 :         outputOpt.WKT2_2019 = true;</span>
+<span class="lineNum">    1057 </span>            :     }
+<span class="lineNum">    1058 </span>            : 
+<span class="lineNum">    1059 </span><span class="lineCov">         27 :     if (outputOpt.quiet &amp;&amp;</span>
+<span class="lineNum">    1060 </span><span class="lineCov">          2 :         (outputOpt.PROJ5 + outputOpt.WKT2_2019 + outputOpt.WKT2_2015 +</span>
+<span class="lineNum">    1061 </span><span class="lineCov">          2 :          outputOpt.WKT1_GDAL + outputOpt.PROJJSON) != 1) {</span>
+<span class="lineNum">    1062 </span>            :         std::cerr &lt;&lt; &quot;-q can only be used with a single output format&quot;
+<span class="lineNum">    1063 </span>            :                   &lt;&lt; std::endl;
+<span class="lineNum">    1064 </span><span class="lineNoCov">          0 :         usage();</span>
+<span class="lineNum">    1065 </span>            :     }
+<span class="lineNum">    1066 </span>            : 
+<span class="lineNum">    1067 </span><span class="lineCov">         26 :     if (!user_string.empty()) {</span>
+<span class="lineNum">    1068 </span>            :         try {
+<span class="lineNum">    1069 </span>            :             auto obj(buildObject(dbContext, user_string, objectKind,
+<span class="lineNum">    1070 </span>            :                                  &quot;input string&quot;, buildBoundCRSToWGS84,
+<span class="lineNum">    1071 </span>            :                                  allowUseIntermediateCRS, promoteTo3D,
+<span class="lineNum">    1072 </span><span class="lineCov">         45 :                                  outputOpt.quiet));</span>
+<span class="lineNum">    1073 </span><span class="lineCov">          9 :             if (guessDialect) {</span>
+<span class="lineNum">    1074 </span><span class="lineNoCov">          0 :                 auto dialect = WKTParser().guessDialect(user_string);</span>
+<span class="lineNum">    1075 </span><span class="lineNoCov">          0 :                 std::cout &lt;&lt; &quot;Guessed WKT dialect: &quot;;</span>
+<span class="lineNum">    1076 </span><span class="lineNoCov">          0 :                 if (dialect == WKTParser::WKTGuessedDialect::WKT2_2019) {</span>
+<span class="lineNum">    1077 </span><span class="lineNoCov">          0 :                     std::cout &lt;&lt; &quot;WKT2_2019&quot;;</span>
+<span class="lineNum">    1078 </span><span class="lineNoCov">          0 :                 } else if (dialect == WKTParser::WKTGuessedDialect::WKT2_2015) {</span>
+<span class="lineNum">    1079 </span><span class="lineNoCov">          0 :                     std::cout &lt;&lt; &quot;WKT2_2015&quot;;</span>
+<span class="lineNum">    1080 </span><span class="lineNoCov">          0 :                 } else if (dialect == WKTParser::WKTGuessedDialect::WKT1_GDAL) {</span>
+<span class="lineNum">    1081 </span><span class="lineNoCov">          0 :                     std::cout &lt;&lt; &quot;WKT1_GDAL&quot;;</span>
+<span class="lineNum">    1082 </span><span class="lineNoCov">          0 :                 } else if (dialect == WKTParser::WKTGuessedDialect::WKT1_ESRI) {</span>
+<span class="lineNum">    1083 </span><span class="lineNoCov">          0 :                     std::cout &lt;&lt; &quot;WKT1_ESRI&quot;;</span>
+<span class="lineNum">    1084 </span>            :                 } else {
+<span class="lineNum">    1085 </span><span class="lineNoCov">          0 :                     std::cout &lt;&lt; &quot;Not WKT / unknown&quot;;</span>
+<span class="lineNum">    1086 </span>            :                 }
+<span class="lineNum">    1087 </span>            :                 std::cout &lt;&lt; std::endl;
+<span class="lineNum">    1088 </span>            :             }
+<span class="lineNum">    1089 </span><span class="lineCov">         18 :             outputObject(dbContext, obj, allowUseIntermediateCRS, outputOpt);</span>
+<span class="lineNum">    1090 </span><span class="lineCov">          9 :             if (identify) {</span>
+<span class="lineNum">    1091 </span><span class="lineNoCov">          0 :                 auto crs = dynamic_cast&lt;CRS *&gt;(obj.get());</span>
+<span class="lineNum">    1092 </span><span class="lineNoCov">          0 :                 if (crs) {</span>
+<span class="lineNum">    1093 </span>            :                     try {
+<span class="lineNum">    1094 </span>            :                         auto res = crs-&gt;identify(
+<span class="lineNum">    1095 </span>            :                             dbContext
+<span class="lineNum">    1096 </span><span class="lineNoCov">          0 :                                 ? AuthorityFactory::create(</span>
+<span class="lineNum">    1097 </span><span class="lineNoCov">          0 :                                       NN_NO_CHECK(dbContext), authority)</span>
+<span class="lineNum">    1098 </span>            :                                       .as_nullable()
+<span class="lineNum">    1099 </span><span class="lineNoCov">          0 :                                 : nullptr);</span>
+<span class="lineNum">    1100 </span>            :                         std::cout &lt;&lt; std::endl;
+<span class="lineNum">    1101 </span>            :                         std::cout
+<span class="lineNum">    1102 </span>            :                             &lt;&lt; &quot;Identification match count: &quot; &lt;&lt; res.size()
+<span class="lineNum">    1103 </span>            :                             &lt;&lt; std::endl;
+<span class="lineNum">    1104 </span><span class="lineNoCov">          0 :                         for (const auto &amp;pair : res) {</span>
+<span class="lineNum">    1105 </span>            :                             const auto &amp;identifiedCRS = pair.first;
+<span class="lineNum">    1106 </span><span class="lineNoCov">          0 :                             const auto &amp;ids = identifiedCRS-&gt;identifiers();</span>
+<span class="lineNum">    1107 </span><span class="lineNoCov">          0 :                             if (!ids.empty()) {</span>
+<span class="lineNum">    1108 </span><span class="lineNoCov">          0 :                                 std::cout &lt;&lt; *ids[0]-&gt;codeSpace() &lt;&lt; &quot;:&quot;</span>
+<span class="lineNum">    1109 </span><span class="lineNoCov">          0 :                                           &lt;&lt; ids[0]-&gt;code() &lt;&lt; &quot;: &quot;</span>
+<span class="lineNum">    1110 </span><span class="lineNoCov">          0 :                                           &lt;&lt; pair.second &lt;&lt; &quot; %&quot; &lt;&lt; std::endl;</span>
+<span class="lineNum">    1111 </span>            :                             } else {
+<span class="lineNum">    1112 </span><span class="lineNoCov">          0 :                                 auto boundCRS = dynamic_cast&lt;BoundCRS *&gt;(</span>
+<span class="lineNum">    1113 </span>            :                                     identifiedCRS.get());
+<span class="lineNum">    1114 </span><span class="lineNoCov">          0 :                                 if (boundCRS &amp;&amp;</span>
+<span class="lineNum">    1115 </span><span class="lineNoCov">          0 :                                     !boundCRS-&gt;baseCRS()</span>
+<span class="lineNum">    1116 </span><span class="lineNoCov">          0 :                                          -&gt;identifiers()</span>
+<span class="lineNum">    1117 </span>            :                                          .empty()) {
+<span class="lineNum">    1118 </span>            :                                     const auto &amp;idsBase =
+<span class="lineNum">    1119 </span>            :                                         boundCRS-&gt;baseCRS()-&gt;identifiers();
+<span class="lineNum">    1120 </span>            :                                     std::cout &lt;&lt; &quot;BoundCRS of &quot;
+<span class="lineNum">    1121 </span><span class="lineNoCov">          0 :                                               &lt;&lt; *idsBase[0]-&gt;codeSpace() &lt;&lt; &quot;:&quot;</span>
+<span class="lineNum">    1122 </span><span class="lineNoCov">          0 :                                               &lt;&lt; idsBase[0]-&gt;code() &lt;&lt; &quot;: &quot;</span>
+<span class="lineNum">    1123 </span><span class="lineNoCov">          0 :                                               &lt;&lt; pair.second &lt;&lt; &quot; %&quot;</span>
+<span class="lineNum">    1124 </span>            :                                               &lt;&lt; std::endl;
+<span class="lineNum">    1125 </span>            :                                 } else {
+<span class="lineNum">    1126 </span>            :                                     std::cout
+<span class="lineNum">    1127 </span><span class="lineNoCov">          0 :                                         &lt;&lt; &quot;un-identifier CRS: &quot; &lt;&lt; pair.second</span>
+<span class="lineNum">    1128 </span><span class="lineNoCov">          0 :                                         &lt;&lt; &quot; %&quot; &lt;&lt; std::endl;</span>
+<span class="lineNum">    1129 </span>            :                                 }
+<span class="lineNum">    1130 </span>            :                             }
+<span class="lineNum">    1131 </span>            :                         }
+<span class="lineNum">    1132 </span><span class="lineNoCov">          0 :                     } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">    1133 </span><span class="lineNoCov">          0 :                         std::cerr &lt;&lt; &quot;Identification failed: &quot; &lt;&lt; e.what()</span>
+<span class="lineNum">    1134 </span>            :                                   &lt;&lt; std::endl;
+<span class="lineNum">    1135 </span>            :                     }
+<span class="lineNum">    1136 </span>            :                 }
+<span class="lineNum">    1137 </span>            :             }
+<span class="lineNum">    1138 </span><span class="lineNoCov">          0 :         } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">    1139 </span><span class="lineNoCov">          0 :             std::cerr &lt;&lt; &quot;buildObject failed: &quot; &lt;&lt; e.what() &lt;&lt; std::endl;</span>
+<span class="lineNum">    1140 </span><span class="lineNoCov">          0 :             std::exit(1);</span>
+<span class="lineNum">    1141 </span>            :         }
+<span class="lineNum">    1142 </span>            :     } else {
+<span class="lineNum">    1143 </span>            : 
+<span class="lineNum">    1144 </span><span class="lineCov">         17 :         if (!area.empty()) {</span>
+<span class="lineNum">    1145 </span>            :             assert(dbContext);
+<span class="lineNum">    1146 </span>            :             try {
+<span class="lineNum">    1147 </span><span class="lineCov">          8 :                 if (area.find(' ') == std::string::npos &amp;&amp;</span>
+<span class="lineNum">    1148 </span><span class="lineCov">          3 :                     area.find(':') != std::string::npos) {</span>
+<span class="lineNum">    1149 </span><span class="lineCov">          4 :                     auto tokens = split(area, ':');</span>
+<span class="lineNum">    1150 </span><span class="lineCov">          4 :                     if (tokens.size() == 2) {</span>
+<span class="lineNum">    1151 </span>            :                         const std::string &amp;areaAuth = tokens[0];
+<span class="lineNum">    1152 </span>            :                         const std::string &amp;areaCode = tokens[1];
+<span class="lineNum">    1153 </span><span class="lineCov">          4 :                         bboxFilter = AuthorityFactory::create(</span>
+<span class="lineNum">    1154 </span><span class="lineCov">          2 :                                          NN_NO_CHECK(dbContext), areaAuth)</span>
+<span class="lineNum">    1155 </span><span class="lineCov">          3 :                                          -&gt;createExtent(areaCode)</span>
+<span class="lineNum">    1156 </span>            :                                          .as_nullable();
+<span class="lineNum">    1157 </span>            :                     }
+<span class="lineNum">    1158 </span>            :                 }
+<span class="lineNum">    1159 </span><span class="lineCov">          4 :                 if (!bboxFilter) {</span>
+<span class="lineNum">    1160 </span>            :                     auto authFactory = AuthorityFactory::create(
+<span class="lineNum">    1161 </span><span class="lineCov">         10 :                         NN_NO_CHECK(dbContext), std::string());</span>
+<span class="lineNum">    1162 </span><span class="lineCov">          3 :                     auto res = authFactory-&gt;listAreaOfUseFromName(area, false);</span>
+<span class="lineNum">    1163 </span><span class="lineCov">          3 :                     if (res.size() == 1) {</span>
+<span class="lineNum">    1164 </span>            :                         bboxFilter =
+<span class="lineNum">    1165 </span><span class="lineCov">          4 :                             AuthorityFactory::create(NN_NO_CHECK(dbContext),</span>
+<span class="lineNum">    1166 </span>            :                                                      res.front().first)
+<span class="lineNum">    1167 </span><span class="lineCov">          2 :                                 -&gt;createExtent(res.front().second)</span>
+<span class="lineNum">    1168 </span>            :                                 .as_nullable();
+<span class="lineNum">    1169 </span>            :                     } else {
+<span class="lineNum">    1170 </span><span class="lineCov">          4 :                         res = authFactory-&gt;listAreaOfUseFromName(area, true);</span>
+<span class="lineNum">    1171 </span><span class="lineCov">          2 :                         if (res.size() == 1) {</span>
+<span class="lineNum">    1172 </span>            :                             bboxFilter =
+<span class="lineNum">    1173 </span><span class="lineNoCov">          0 :                                 AuthorityFactory::create(NN_NO_CHECK(dbContext),</span>
+<span class="lineNum">    1174 </span>            :                                                          res.front().first)
+<span class="lineNum">    1175 </span><span class="lineNoCov">          0 :                                     -&gt;createExtent(res.front().second)</span>
+<span class="lineNum">    1176 </span>            :                                     .as_nullable();
+<span class="lineNum">    1177 </span><span class="lineCov">          2 :                         } else if (res.empty()) {</span>
+<span class="lineNum">    1178 </span>            :                             std::cerr &lt;&lt; &quot;No area of use matching provided name&quot;
+<span class="lineNum">    1179 </span>            :                                       &lt;&lt; std::endl;
+<span class="lineNum">    1180 </span><span class="lineCov">          1 :                             std::exit(1);</span>
+<span class="lineNum">    1181 </span>            :                         } else {
+<span class="lineNum">    1182 </span>            :                             std::cerr &lt;&lt; &quot;Several candidates area of use &quot;
+<span class="lineNum">    1183 </span>            :                                          &quot;matching provided name :&quot;
+<span class="lineNum">    1184 </span>            :                                       &lt;&lt; std::endl;
+<span class="lineNum">    1185 </span><span class="lineCov">          1 :                             for (const auto &amp;candidate : res) {</span>
+<span class="lineNum">    1186 </span>            :                                 auto obj =
+<span class="lineNum">    1187 </span><span class="lineCov">         24 :                                     AuthorityFactory::create(</span>
+<span class="lineNum">    1188 </span><span class="lineCov">          8 :                                         NN_NO_CHECK(dbContext), candidate.first)</span>
+<span class="lineNum">    1189 </span><span class="lineCov">          8 :                                         -&gt;createExtent(candidate.second);</span>
+<span class="lineNum">    1190 </span>            :                                 std::cerr &lt;&lt; &quot;  &quot; &lt;&lt; candidate.first &lt;&lt; &quot;:&quot;
+<span class="lineNum">    1191 </span>            :                                           &lt;&lt; candidate.second &lt;&lt; &quot; : &quot;
+<span class="lineNum">    1192 </span><span class="lineCov">          8 :                                           &lt;&lt; *obj-&gt;description() &lt;&lt; std::endl;</span>
+<span class="lineNum">    1193 </span>            :                             }
+<span class="lineNum">    1194 </span><span class="lineCov">          1 :                             std::exit(1);</span>
+<span class="lineNum">    1195 </span>            :                         }
+<span class="lineNum">    1196 </span>            :                     }
+<span class="lineNum">    1197 </span>            :                 }
+<span class="lineNum">    1198 </span><span class="lineCov">          1 :             } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">    1199 </span><span class="lineCov">          1 :                 std::cerr &lt;&lt; &quot;Area of use retrieval failed: &quot; &lt;&lt; e.what()</span>
+<span class="lineNum">    1200 </span>            :                           &lt;&lt; std::endl;
+<span class="lineNum">    1201 </span><span class="lineCov">          1 :                 std::exit(1);</span>
+<span class="lineNum">    1202 </span>            :             }
+<span class="lineNum">    1203 </span>            :         }
+<span class="lineNum">    1204 </span>            : 
+<span class="lineNum">    1205 </span>            :         try {
+<span class="lineNum">    1206 </span><span class="lineCov">         42 :             outputOperations(dbContext, sourceCRSStr, targetCRSStr, bboxFilter,</span>
+<span class="lineNum">    1207 </span>            :                              spatialCriterion,
+<span class="lineNum">    1208 </span>            :                              spatialCriterionExplicitlySpecified, crsExtentUse,
+<span class="lineNum">    1209 </span>            :                              gridAvailabilityUse, allowUseIntermediateCRS,
+<span class="lineNum">    1210 </span>            :                              pivots, authority, usePROJGridAlternatives,
+<span class="lineNum">    1211 </span>            :                              showSuperseded, promoteTo3D, outputOpt, summary);
+<span class="lineNum">    1212 </span><span class="lineNoCov">          0 :         } catch (const std::exception &amp;e) {</span>
+<span class="lineNum">    1213 </span><span class="lineNoCov">          0 :             std::cerr &lt;&lt; &quot;outputOperations() failed with: &quot; &lt;&lt; e.what()</span>
+<span class="lineNum">    1214 </span>            :                       &lt;&lt; std::endl;
+<span class="lineNum">    1215 </span><span class="lineNoCov">          0 :             std::exit(1);</span>
+<span class="lineNum">    1216 </span>            :         }
+<span class="lineNum">    1217 </span>            :     }
+<a name="1218"><span class="lineNum">    1218 </span>            : </a>
+<span class="lineNum">    1219 </span>            :     return 0;
+<span class="lineNum">    1220 </span><span class="lineCov">         52 : }</span>
+<span class="lineNum">    1221 </span>            : 
+<span class="lineNum">    1222 </span>            : //! @endcond
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

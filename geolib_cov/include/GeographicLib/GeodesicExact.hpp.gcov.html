@@ -1,0 +1,939 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/GeodesicExact.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - GeodesicExact.hpp<span style="font-size: 80%;"> (source / <a href="GeodesicExact.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file GeodesicExact.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::GeodesicExact class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2012-2016) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_GEODESICEXACT_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_GEODESICEXACT_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/EllipticFunction.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : #if !defined(GEOGRAPHICLIB_GEODESICEXACT_ORDER)
+<span class="lineNum">      17 </span>            : /**
+<span class="lineNum">      18 </span>            :  * The order of the expansions used by GeodesicExact.
+<span class="lineNum">      19 </span>            :  **********************************************************************/
+<span class="lineNum">      20 </span>            : #  define GEOGRAPHICLIB_GEODESICEXACT_ORDER 30
+<span class="lineNum">      21 </span>            : #endif
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : namespace GeographicLib {
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            :   class GeodesicLineExact;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            :   /**
+<span class="lineNum">      28 </span>            :    * \brief Exact geodesic calculations
+<span class="lineNum">      29 </span>            :    *
+<span class="lineNum">      30 </span>            :    * The equations for geodesics on an ellipsoid can be expressed in terms of
+<span class="lineNum">      31 </span>            :    * incomplete elliptic integrals.  The Geodesic class expands these integrals
+<span class="lineNum">      32 </span>            :    * in a series in the flattening \e f and this provides an accurate solution
+<span class="lineNum">      33 </span>            :    * for \e f &amp;isin; [-0.01, 0.01].  The GeodesicExact class computes the
+<span class="lineNum">      34 </span>            :    * ellitpic integrals directly and so provides a solution which is valid for
+<span class="lineNum">      35 </span>            :    * all \e f.  However, in practice, its use should be limited to about
+<span class="lineNum">      36 </span>            :    * &lt;i&gt;b&lt;/i&gt;/\e a &amp;isin; [0.01, 100] or \e f &amp;isin; [&amp;minus;99, 0.99].
+<span class="lineNum">      37 </span>            :    *
+<span class="lineNum">      38 </span>            :    * For the WGS84 ellipsoid, these classes are 2--3 times \e slower than the
+<span class="lineNum">      39 </span>            :    * series solution and 2--3 times \e less \e accurate (because it's less easy
+<span class="lineNum">      40 </span>            :    * to control round-off errors with the elliptic integral formulation); i.e.,
+<span class="lineNum">      41 </span>            :    * the error is about 40 nm (40 nanometers) instead of 15 nm.  However the
+<span class="lineNum">      42 </span>            :    * error in the series solution scales as &lt;i&gt;f&lt;/i&gt;&lt;sup&gt;7&lt;/sup&gt; while the
+<span class="lineNum">      43 </span>            :    * error in the elliptic integral solution depends weakly on \e f.  If the
+<span class="lineNum">      44 </span>            :    * quarter meridian distance is 10000 km and the ratio &lt;i&gt;b&lt;/i&gt;/\e a = 1
+<span class="lineNum">      45 </span>            :    * &amp;minus; \e f is varied then the approximate maximum error (expressed as a
+<span class="lineNum">      46 </span>            :    * distance) is &lt;pre&gt;
+<span class="lineNum">      47 </span>            :    *       1 - f  error (nm)
+<span class="lineNum">      48 </span>            :    *       1/128     387
+<span class="lineNum">      49 </span>            :    *       1/64      345
+<span class="lineNum">      50 </span>            :    *       1/32      269
+<span class="lineNum">      51 </span>            :    *       1/16      210
+<span class="lineNum">      52 </span>            :    *       1/8       115
+<span class="lineNum">      53 </span>            :    *       1/4        69
+<span class="lineNum">      54 </span>            :    *       1/2        36
+<span class="lineNum">      55 </span>            :    *         1        15
+<span class="lineNum">      56 </span>            :    *         2        25
+<span class="lineNum">      57 </span>            :    *         4        96
+<span class="lineNum">      58 </span>            :    *         8       318
+<span class="lineNum">      59 </span>            :    *        16       985
+<span class="lineNum">      60 </span>            :    *        32      2352
+<span class="lineNum">      61 </span>            :    *        64      6008
+<span class="lineNum">      62 </span>            :    *       128     19024
+<span class="lineNum">      63 </span>            :    * &lt;/pre&gt;
+<span class="lineNum">      64 </span>            :    *
+<span class="lineNum">      65 </span>            :    * The computation of the area in these classes is via a 30th order series.
+<span class="lineNum">      66 </span>            :    * This gives accurate results for &lt;i&gt;b&lt;/i&gt;/\e a &amp;isin; [1/2, 2]; the
+<span class="lineNum">      67 </span>            :    * accuracy is about 8 decimal digits for &lt;i&gt;b&lt;/i&gt;/\e a &amp;isin; [1/4, 4].
+<span class="lineNum">      68 </span>            :    *
+<span class="lineNum">      69 </span>            :    * See \ref geodellip for the formulation.  See the documentation on the
+<span class="lineNum">      70 </span>            :    * Geodesic class for additional information on the geodesic problems.
+<span class="lineNum">      71 </span>            :    *
+<span class="lineNum">      72 </span>            :    * Example of use:
+<span class="lineNum">      73 </span>            :    * \include example-GeodesicExact.cpp
+<span class="lineNum">      74 </span>            :    *
+<span class="lineNum">      75 </span>            :    * &lt;a href=&quot;GeodSolve.1.html&quot;&gt;GeodSolve&lt;/a&gt; is a command-line utility
+<span class="lineNum">      76 </span>            :    * providing access to the functionality of GeodesicExact and
+<span class="lineNum">      77 </span>            :    * GeodesicLineExact (via the -E option).
+<span class="lineNum">      78 </span>            :    **********************************************************************/
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :   class GEOGRAPHICLIB_EXPORT GeodesicExact {
+<span class="lineNum">      81 </span>            :   private:
+<span class="lineNum">      82 </span>            :     typedef Math::real real;
+<span class="lineNum">      83 </span>            :     friend class GeodesicLineExact;
+<span class="lineNum">      84 </span>            :     static const int nC4_ = GEOGRAPHICLIB_GEODESICEXACT_ORDER;
+<span class="lineNum">      85 </span>            :     static const int nC4x_ = (nC4_ * (nC4_ + 1)) / 2;
+<span class="lineNum">      86 </span>            :     static const unsigned maxit1_ = 20;
+<span class="lineNum">      87 </span>            :     unsigned maxit2_;
+<span class="lineNum">      88 </span>            :     real tiny_, tol0_, tol1_, tol2_, tolb_, xthresh_;
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            :     enum captype {
+<span class="lineNum">      91 </span>            :       CAP_NONE = 0U,
+<span class="lineNum">      92 </span>            :       CAP_E    = 1U&lt;&lt;0,
+<span class="lineNum">      93 </span>            :       // Skip 1U&lt;&lt;1 for compatibility with Geodesic (not required)
+<span class="lineNum">      94 </span>            :       CAP_D    = 1U&lt;&lt;2,
+<span class="lineNum">      95 </span>            :       CAP_H    = 1U&lt;&lt;3,
+<span class="lineNum">      96 </span>            :       CAP_C4   = 1U&lt;&lt;4,
+<span class="lineNum">      97 </span>            :       CAP_ALL  = 0x1FU,
+<span class="lineNum">      98 </span>            :       CAP_MASK = CAP_ALL,
+<span class="lineNum">      99 </span>            :       OUT_ALL  = 0x7F80U,
+<span class="lineNum">     100 </span>            :       OUT_MASK = 0xFF80U,       // Includes LONG_UNROLL
+<span class="lineNum">     101 </span>            :     };
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :     static real CosSeries(real sinx, real cosx, const real c[], int n);
+<span class="lineNum">     104 </span>            :     static real Astroid(real x, real y);
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            :     real _a, _f, _f1, _e2, _ep2, _n, _b, _c2, _etol2;
+<span class="lineNum">     107 </span>            :     real _C4x[nC4x_];
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :     void Lengths(const EllipticFunction&amp; E,
+<span class="lineNum">     110 </span>            :                  real sig12,
+<span class="lineNum">     111 </span>            :                  real ssig1, real csig1, real dn1,
+<span class="lineNum">     112 </span>            :                  real ssig2, real csig2, real dn2,
+<span class="lineNum">     113 </span>            :                  real cbet1, real cbet2, unsigned outmask,
+<span class="lineNum">     114 </span>            :                  real&amp; s12s, real&amp; m12a, real&amp; m0,
+<span class="lineNum">     115 </span>            :                  real&amp; M12, real&amp; M21) const;
+<span class="lineNum">     116 </span>            :     real InverseStart(EllipticFunction&amp; E,
+<span class="lineNum">     117 </span>            :                       real sbet1, real cbet1, real dn1,
+<span class="lineNum">     118 </span>            :                       real sbet2, real cbet2, real dn2,
+<span class="lineNum">     119 </span>            :                       real lam12, real slam12, real clam12,
+<span class="lineNum">     120 </span>            :                       real&amp; salp1, real&amp; calp1,
+<span class="lineNum">     121 </span>            :                       real&amp; salp2, real&amp; calp2, real&amp; dnm) const;
+<span class="lineNum">     122 </span>            :     real Lambda12(real sbet1, real cbet1, real dn1,
+<span class="lineNum">     123 </span>            :                   real sbet2, real cbet2, real dn2,
+<span class="lineNum">     124 </span>            :                   real salp1, real calp1, real slam120, real clam120,
+<span class="lineNum">     125 </span>            :                   real&amp; salp2, real&amp; calp2, real&amp; sig12,
+<span class="lineNum">     126 </span>            :                   real&amp; ssig1, real&amp; csig1, real&amp; ssig2, real&amp; csig2,
+<span class="lineNum">     127 </span>            :                   EllipticFunction&amp; E,
+<span class="lineNum">     128 </span>            :                   real&amp; domg12, bool diffp, real&amp; dlam12) const;
+<span class="lineNum">     129 </span>            :     real GenInverse(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     130 </span>            :                     unsigned outmask, real&amp; s12,
+<span class="lineNum">     131 </span>            :                     real&amp; salp1, real&amp; calp1, real&amp; salp2, real&amp; calp2,
+<span class="lineNum">     132 </span>            :                     real&amp; m12, real&amp; M12, real&amp; M21, real&amp; S12) const;
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :     // These are Maxima generated functions to provide series approximations to
+<span class="lineNum">     135 </span>            :     // the integrals for the area.
+<span class="lineNum">     136 </span>            :     void C4coeff();
+<span class="lineNum">     137 </span>            :     void C4f(real k2, real c[]) const;
+<span class="lineNum">     138 </span>            :     // Large coefficients are split so that lo contains the low 52 bits and hi
+<span class="lineNum">     139 </span>            :     // the rest.  This choice avoids double rounding with doubles and higher
+<span class="lineNum">     140 </span>            :     // precision types.  float coefficients will suffer double rounding;
+<span class="lineNum">     141 </span>            :     // however the accuracy is already lousy for floats.
+<span class="lineNum">     142 </span>            :     static Math::real reale(long long hi, long long lo) {
+<span class="lineNum">     143 </span>            :       using std::ldexp;
+<span class="lineNum">     144 </span>            :       return ldexp(real(hi), 52) + lo;
+<span class="lineNum">     145 </span>            :     }
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            :   public:
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            :     /**
+<span class="lineNum">     150 </span>            :      * Bit masks for what calculations to do.  These masks do double duty.
+<span class="lineNum">     151 </span>            :      * They signify to the GeodesicLineExact::GeodesicLineExact constructor and
+<span class="lineNum">     152 </span>            :      * to GeodesicExact::Line what capabilities should be included in the
+<span class="lineNum">     153 </span>            :      * GeodesicLineExact object.  They also specify which results to return in
+<span class="lineNum">     154 </span>            :      * the general routines GeodesicExact::GenDirect and
+<span class="lineNum">     155 </span>            :      * GeodesicExact::GenInverse routines.  GeodesicLineExact::mask is a
+<span class="lineNum">     156 </span>            :      * duplication of this enum.
+<span class="lineNum">     157 </span>            :      **********************************************************************/
+<span class="lineNum">     158 </span>            :     enum mask {
+<span class="lineNum">     159 </span>            :       /**
+<span class="lineNum">     160 </span>            :        * No capabilities, no output.
+<span class="lineNum">     161 </span>            :        * @hideinitializer
+<span class="lineNum">     162 </span>            :        **********************************************************************/
+<span class="lineNum">     163 </span>            :       NONE          = 0U,
+<span class="lineNum">     164 </span>            :       /**
+<span class="lineNum">     165 </span>            :        * Calculate latitude \e lat2.  (It's not necessary to include this as a
+<span class="lineNum">     166 </span>            :        * capability to GeodesicLineExact because this is included by default.)
+<span class="lineNum">     167 </span>            :        * @hideinitializer
+<span class="lineNum">     168 </span>            :        **********************************************************************/
+<span class="lineNum">     169 </span>            :       LATITUDE      = 1U&lt;&lt;7  | CAP_NONE,
+<span class="lineNum">     170 </span>            :       /**
+<span class="lineNum">     171 </span>            :        * Calculate longitude \e lon2.
+<span class="lineNum">     172 </span>            :        * @hideinitializer
+<span class="lineNum">     173 </span>            :        **********************************************************************/
+<span class="lineNum">     174 </span>            :       LONGITUDE     = 1U&lt;&lt;8  | CAP_H,
+<span class="lineNum">     175 </span>            :       /**
+<span class="lineNum">     176 </span>            :        * Calculate azimuths \e azi1 and \e azi2.  (It's not necessary to
+<span class="lineNum">     177 </span>            :        * include this as a capability to GeodesicLineExact because this is
+<span class="lineNum">     178 </span>            :        * included by default.)
+<span class="lineNum">     179 </span>            :        * @hideinitializer
+<span class="lineNum">     180 </span>            :        **********************************************************************/
+<span class="lineNum">     181 </span>            :       AZIMUTH       = 1U&lt;&lt;9  | CAP_NONE,
+<span class="lineNum">     182 </span>            :       /**
+<span class="lineNum">     183 </span>            :        * Calculate distance \e s12.
+<span class="lineNum">     184 </span>            :        * @hideinitializer
+<span class="lineNum">     185 </span>            :        **********************************************************************/
+<span class="lineNum">     186 </span>            :       DISTANCE      = 1U&lt;&lt;10 | CAP_E,
+<span class="lineNum">     187 </span>            :       /**
+<span class="lineNum">     188 </span>            :        * Allow distance \e s12 to be used as input in the direct geodesic
+<span class="lineNum">     189 </span>            :        * problem.
+<span class="lineNum">     190 </span>            :        * @hideinitializer
+<span class="lineNum">     191 </span>            :        **********************************************************************/
+<span class="lineNum">     192 </span>            :       DISTANCE_IN   = 1U&lt;&lt;11 | CAP_E,
+<span class="lineNum">     193 </span>            :       /**
+<span class="lineNum">     194 </span>            :        * Calculate reduced length \e m12.
+<span class="lineNum">     195 </span>            :        * @hideinitializer
+<span class="lineNum">     196 </span>            :        **********************************************************************/
+<span class="lineNum">     197 </span>            :       REDUCEDLENGTH = 1U&lt;&lt;12 | CAP_D,
+<span class="lineNum">     198 </span>            :       /**
+<span class="lineNum">     199 </span>            :        * Calculate geodesic scales \e M12 and \e M21.
+<span class="lineNum">     200 </span>            :        * @hideinitializer
+<span class="lineNum">     201 </span>            :        **********************************************************************/
+<span class="lineNum">     202 </span>            :       GEODESICSCALE = 1U&lt;&lt;13 | CAP_D,
+<span class="lineNum">     203 </span>            :       /**
+<span class="lineNum">     204 </span>            :        * Calculate area \e S12.
+<span class="lineNum">     205 </span>            :        * @hideinitializer
+<span class="lineNum">     206 </span>            :        **********************************************************************/
+<span class="lineNum">     207 </span>            :       AREA          = 1U&lt;&lt;14 | CAP_C4,
+<span class="lineNum">     208 </span>            :       /**
+<span class="lineNum">     209 </span>            :        * Unroll \e lon2 in the direct calculation.
+<span class="lineNum">     210 </span>            :        * @hideinitializer
+<span class="lineNum">     211 </span>            :        **********************************************************************/
+<span class="lineNum">     212 </span>            :       LONG_UNROLL   = 1U&lt;&lt;15,
+<span class="lineNum">     213 </span>            :       /**
+<span class="lineNum">     214 </span>            :        * All capabilities, calculate everything.  (LONG_UNROLL is not
+<span class="lineNum">     215 </span>            :        * included in this mask.)
+<span class="lineNum">     216 </span>            :        * @hideinitializer
+<span class="lineNum">     217 </span>            :        **********************************************************************/
+<span class="lineNum">     218 </span>            :       ALL           = OUT_ALL| CAP_ALL,
+<span class="lineNum">     219 </span>            :     };
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span>            :     /** \name Constructor
+<span class="lineNum">     222 </span>            :      **********************************************************************/
+<span class="lineNum">     223 </span>            :     ///@{
+<span class="lineNum">     224 </span>            :     /**
+<span class="lineNum">     225 </span>            :      * Constructor for a ellipsoid with
+<span class="lineNum">     226 </span>            :      *
+<span class="lineNum">     227 </span>            :      * @param[in] a equatorial radius (meters).
+<span class="lineNum">     228 </span>            :      * @param[in] f flattening of ellipsoid.  Setting \e f = 0 gives a sphere.
+<span class="lineNum">     229 </span>            :      *   Negative \e f gives a prolate ellipsoid.
+<span class="lineNum">     230 </span>            :      * @exception GeographicErr if \e a or (1 &amp;minus; \e f) \e a is not
+<span class="lineNum">     231 </span>            :      *   positive.
+<span class="lineNum">     232 </span>            :      **********************************************************************/
+<span class="lineNum">     233 </span>            :     GeodesicExact(real a, real f);
+<span class="lineNum">     234 </span>            :     ///@}
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span>            :     /** \name Direct geodesic problem specified in terms of distance.
+<span class="lineNum">     237 </span>            :      **********************************************************************/
+<span class="lineNum">     238 </span>            :     ///@{
+<span class="lineNum">     239 </span>            :     /**
+<span class="lineNum">     240 </span>            :      * Perform the direct geodesic calculation where the length of the geodesic
+<span class="lineNum">     241 </span>            :      * is specified in terms of distance.
+<span class="lineNum">     242 </span>            :      *
+<span class="lineNum">     243 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     244 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     245 </span>            :      * @param[in] azi1 azimuth at point 1 (degrees).
+<span class="lineNum">     246 </span>            :      * @param[in] s12 distance between point 1 and point 2 (meters); it can be
+<span class="lineNum">     247 </span>            :      *   signed.
+<span class="lineNum">     248 </span>            :      * @param[out] lat2 latitude of point 2 (degrees).
+<span class="lineNum">     249 </span>            :      * @param[out] lon2 longitude of point 2 (degrees).
+<span class="lineNum">     250 </span>            :      * @param[out] azi2 (forward) azimuth at point 2 (degrees).
+<span class="lineNum">     251 </span>            :      * @param[out] m12 reduced length of geodesic (meters).
+<span class="lineNum">     252 </span>            :      * @param[out] M12 geodesic scale of point 2 relative to point 1
+<span class="lineNum">     253 </span>            :      *   (dimensionless).
+<span class="lineNum">     254 </span>            :      * @param[out] M21 geodesic scale of point 1 relative to point 2
+<span class="lineNum">     255 </span>            :      *   (dimensionless).
+<span class="lineNum">     256 </span>            :      * @param[out] S12 area under the geodesic (meters&lt;sup&gt;2&lt;/sup&gt;).
+<span class="lineNum">     257 </span>            :      * @return \e a12 arc length of between point 1 and point 2 (degrees).
+<span class="lineNum">     258 </span>            :      *
+<span class="lineNum">     259 </span>            :      * \e lat1 should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].  The values of
+<span class="lineNum">     260 </span>            :      * \e lon2 and \e azi2 returned are in the range [&amp;minus;180&amp;deg;,
+<span class="lineNum">     261 </span>            :      * 180&amp;deg;].
+<span class="lineNum">     262 </span>            :      *
+<span class="lineNum">     263 </span>            :      * If either point is at a pole, the azimuth is defined by keeping the
+<span class="lineNum">     264 </span>            :      * longitude fixed, writing \e lat = &amp;plusmn;(90&amp;deg; &amp;minus; &amp;epsilon;),
+<span class="lineNum">     265 </span>            :      * and taking the limit &amp;epsilon; &amp;rarr; 0+.  An arc length greater that
+<span class="lineNum">     266 </span>            :      * 180&amp;deg; signifies a geodesic which is not a shortest path.  (For a
+<span class="lineNum">     267 </span>            :      * prolate ellipsoid, an additional condition is necessary for a shortest
+<span class="lineNum">     268 </span>            :      * path: the longitudinal extent must not exceed of 180&amp;deg;.)
+<span class="lineNum">     269 </span>            :      *
+<span class="lineNum">     270 </span>            :      * The following functions are overloaded versions of GeodesicExact::Direct
+<span class="lineNum">     271 </span>            :      * which omit some of the output parameters.  Note, however, that the arc
+<span class="lineNum">     272 </span>            :      * length is always computed and returned as the function value.
+<span class="lineNum">     273 </span>            :      **********************************************************************/
+<span class="lineNum">     274 </span>            :     Math::real Direct(real lat1, real lon1, real azi1, real s12,
+<span class="lineNum">     275 </span>            :                       real&amp; lat2, real&amp; lon2, real&amp; azi2,
+<span class="lineNum">     276 </span>            :                       real&amp; m12, real&amp; M12, real&amp; M21, real&amp; S12)
+<span class="lineNum">     277 </span>            :       const {
+<span class="lineNum">     278 </span>            :       real t;
+<span class="lineNum">     279 </span>            :       return GenDirect(lat1, lon1, azi1, false, s12,
+<span class="lineNum">     280 </span>            :                        LATITUDE | LONGITUDE | AZIMUTH |
+<span class="lineNum">     281 </span>            :                        REDUCEDLENGTH | GEODESICSCALE | AREA,
+<span class="lineNum">     282 </span>            :                        lat2, lon2, azi2, t, m12, M12, M21, S12);
+<span class="lineNum">     283 </span>            :     }
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            :     /**
+<span class="lineNum">     286 </span>            :      * See the documentation for GeodesicExact::Direct.
+<span class="lineNum">     287 </span>            :      **********************************************************************/
+<span class="lineNum">     288 </span>            :     Math::real Direct(real lat1, real lon1, real azi1, real s12,
+<span class="lineNum">     289 </span>            :                       real&amp; lat2, real&amp; lon2)
+<span class="lineNum">     290 </span>            :       const {
+<span class="lineNum">     291 </span>            :       real t;
+<span class="lineNum">     292 </span>            :       return GenDirect(lat1, lon1, azi1, false, s12,
+<span class="lineNum">     293 </span>            :                        LATITUDE | LONGITUDE,
+<span class="lineNum">     294 </span>            :                        lat2, lon2, t, t, t, t, t, t);
+<span class="lineNum">     295 </span>            :     }
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            :     /**
+<span class="lineNum">     298 </span>            :      * See the documentation for GeodesicExact::Direct.
+<span class="lineNum">     299 </span>            :      **********************************************************************/
+<span class="lineNum">     300 </span>            :     Math::real Direct(real lat1, real lon1, real azi1, real s12,
+<span class="lineNum">     301 </span>            :                       real&amp; lat2, real&amp; lon2, real&amp; azi2)
+<span class="lineNum">     302 </span>            :       const {
+<span class="lineNum">     303 </span>            :       real t;
+<span class="lineNum">     304 </span>            :       return GenDirect(lat1, lon1, azi1, false, s12,
+<span class="lineNum">     305 </span>            :                        LATITUDE | LONGITUDE | AZIMUTH,
+<span class="lineNum">     306 </span>            :                        lat2, lon2, azi2, t, t, t, t, t);
+<span class="lineNum">     307 </span>            :     }
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            :     /**
+<span class="lineNum">     310 </span>            :      * See the documentation for GeodesicExact::Direct.
+<span class="lineNum">     311 </span>            :      **********************************************************************/
+<span class="lineNum">     312 </span>            :     Math::real Direct(real lat1, real lon1, real azi1, real s12,
+<span class="lineNum">     313 </span>            :                       real&amp; lat2, real&amp; lon2, real&amp; azi2, real&amp; m12)
+<span class="lineNum">     314 </span>            :       const {
+<span class="lineNum">     315 </span>            :       real t;
+<span class="lineNum">     316 </span>            :       return GenDirect(lat1, lon1, azi1, false, s12,
+<span class="lineNum">     317 </span>            :                        LATITUDE | LONGITUDE | AZIMUTH | REDUCEDLENGTH,
+<span class="lineNum">     318 </span>            :                        lat2, lon2, azi2, t, m12, t, t, t);
+<span class="lineNum">     319 </span>            :     }
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span>            :     /**
+<span class="lineNum">     322 </span>            :      * See the documentation for GeodesicExact::Direct.
+<span class="lineNum">     323 </span>            :      **********************************************************************/
+<span class="lineNum">     324 </span>            :     Math::real Direct(real lat1, real lon1, real azi1, real s12,
+<span class="lineNum">     325 </span>            :                       real&amp; lat2, real&amp; lon2, real&amp; azi2,
+<span class="lineNum">     326 </span>            :                       real&amp; M12, real&amp; M21)
+<span class="lineNum">     327 </span>            :       const {
+<span class="lineNum">     328 </span>            :       real t;
+<span class="lineNum">     329 </span>            :       return GenDirect(lat1, lon1, azi1, false, s12,
+<span class="lineNum">     330 </span>            :                        LATITUDE | LONGITUDE | AZIMUTH | GEODESICSCALE,
+<span class="lineNum">     331 </span>            :                        lat2, lon2, azi2, t, t, M12, M21, t);
+<span class="lineNum">     332 </span>            :     }
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span>            :     /**
+<span class="lineNum">     335 </span>            :      * See the documentation for GeodesicExact::Direct.
+<span class="lineNum">     336 </span>            :      **********************************************************************/
+<span class="lineNum">     337 </span>            :     Math::real Direct(real lat1, real lon1, real azi1, real s12,
+<span class="lineNum">     338 </span>            :                       real&amp; lat2, real&amp; lon2, real&amp; azi2,
+<span class="lineNum">     339 </span>            :                       real&amp; m12, real&amp; M12, real&amp; M21)
+<span class="lineNum">     340 </span>            :       const {
+<span class="lineNum">     341 </span>            :       real t;
+<span class="lineNum">     342 </span>            :       return GenDirect(lat1, lon1, azi1, false, s12,
+<span class="lineNum">     343 </span>            :                        LATITUDE | LONGITUDE | AZIMUTH |
+<span class="lineNum">     344 </span>            :                        REDUCEDLENGTH | GEODESICSCALE,
+<span class="lineNum">     345 </span>            :                        lat2, lon2, azi2, t, m12, M12, M21, t);
+<span class="lineNum">     346 </span>            :     }
+<span class="lineNum">     347 </span>            :     ///@}
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span>            :     /** \name Direct geodesic problem specified in terms of arc length.
+<span class="lineNum">     350 </span>            :      **********************************************************************/
+<span class="lineNum">     351 </span>            :     ///@{
+<span class="lineNum">     352 </span>            :     /**
+<span class="lineNum">     353 </span>            :      * Perform the direct geodesic calculation where the length of the geodesic
+<span class="lineNum">     354 </span>            :      * is specified in terms of arc length.
+<span class="lineNum">     355 </span>            :      *
+<span class="lineNum">     356 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     357 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     358 </span>            :      * @param[in] azi1 azimuth at point 1 (degrees).
+<span class="lineNum">     359 </span>            :      * @param[in] a12 arc length between point 1 and point 2 (degrees); it can
+<span class="lineNum">     360 </span>            :      *   be signed.
+<span class="lineNum">     361 </span>            :      * @param[out] lat2 latitude of point 2 (degrees).
+<span class="lineNum">     362 </span>            :      * @param[out] lon2 longitude of point 2 (degrees).
+<span class="lineNum">     363 </span>            :      * @param[out] azi2 (forward) azimuth at point 2 (degrees).
+<span class="lineNum">     364 </span>            :      * @param[out] s12 distance between point 1 and point 2 (meters).
+<span class="lineNum">     365 </span>            :      * @param[out] m12 reduced length of geodesic (meters).
+<span class="lineNum">     366 </span>            :      * @param[out] M12 geodesic scale of point 2 relative to point 1
+<span class="lineNum">     367 </span>            :      *   (dimensionless).
+<span class="lineNum">     368 </span>            :      * @param[out] M21 geodesic scale of point 1 relative to point 2
+<span class="lineNum">     369 </span>            :      *   (dimensionless).
+<span class="lineNum">     370 </span>            :      * @param[out] S12 area under the geodesic (meters&lt;sup&gt;2&lt;/sup&gt;).
+<span class="lineNum">     371 </span>            :      *
+<span class="lineNum">     372 </span>            :      * \e lat1 should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].  The values of
+<span class="lineNum">     373 </span>            :      * \e lon2 and \e azi2 returned are in the range [&amp;minus;180&amp;deg;,
+<span class="lineNum">     374 </span>            :      * 180&amp;deg;].
+<span class="lineNum">     375 </span>            :      *
+<span class="lineNum">     376 </span>            :      * If either point is at a pole, the azimuth is defined by keeping the
+<span class="lineNum">     377 </span>            :      * longitude fixed, writing \e lat = &amp;plusmn;(90&amp;deg; &amp;minus; &amp;epsilon;),
+<span class="lineNum">     378 </span>            :      * and taking the limit &amp;epsilon; &amp;rarr; 0+.  An arc length greater that
+<span class="lineNum">     379 </span>            :      * 180&amp;deg; signifies a geodesic which is not a shortest path.  (For a
+<span class="lineNum">     380 </span>            :      * prolate ellipsoid, an additional condition is necessary for a shortest
+<span class="lineNum">     381 </span>            :      * path: the longitudinal extent must not exceed of 180&amp;deg;.)
+<span class="lineNum">     382 </span>            :      *
+<span class="lineNum">     383 </span>            :      * The following functions are overloaded versions of GeodesicExact::Direct
+<span class="lineNum">     384 </span>            :      * which omit some of the output parameters.
+<span class="lineNum">     385 </span>            :      **********************************************************************/
+<span class="lineNum">     386 </span>            :     void ArcDirect(real lat1, real lon1, real azi1, real a12,
+<span class="lineNum">     387 </span>            :                    real&amp; lat2, real&amp; lon2, real&amp; azi2, real&amp; s12,
+<span class="lineNum">     388 </span>            :                    real&amp; m12, real&amp; M12, real&amp; M21, real&amp; S12)
+<span class="lineNum">     389 </span>            :       const {
+<span class="lineNum">     390 </span>            :       GenDirect(lat1, lon1, azi1, true, a12,
+<span class="lineNum">     391 </span>            :                 LATITUDE | LONGITUDE | AZIMUTH | DISTANCE |
+<span class="lineNum">     392 </span>            :                 REDUCEDLENGTH | GEODESICSCALE | AREA,
+<span class="lineNum">     393 </span>            :                 lat2, lon2, azi2, s12, m12, M12, M21, S12);
+<span class="lineNum">     394 </span>            :     }
+<span class="lineNum">     395 </span>            : 
+<span class="lineNum">     396 </span>            :     /**
+<span class="lineNum">     397 </span>            :      * See the documentation for GeodesicExact::ArcDirect.
+<span class="lineNum">     398 </span>            :      **********************************************************************/
+<span class="lineNum">     399 </span>            :     void ArcDirect(real lat1, real lon1, real azi1, real a12,
+<span class="lineNum">     400 </span>            :                    real&amp; lat2, real&amp; lon2) const {
+<span class="lineNum">     401 </span>            :       real t;
+<span class="lineNum">     402 </span>            :       GenDirect(lat1, lon1, azi1, true, a12,
+<span class="lineNum">     403 </span>            :                 LATITUDE | LONGITUDE,
+<span class="lineNum">     404 </span>            :                 lat2, lon2, t, t, t, t, t, t);
+<span class="lineNum">     405 </span>            :     }
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span>            :     /**
+<span class="lineNum">     408 </span>            :      * See the documentation for GeodesicExact::ArcDirect.
+<span class="lineNum">     409 </span>            :      **********************************************************************/
+<span class="lineNum">     410 </span>            :     void ArcDirect(real lat1, real lon1, real azi1, real a12,
+<span class="lineNum">     411 </span>            :                    real&amp; lat2, real&amp; lon2, real&amp; azi2) const {
+<span class="lineNum">     412 </span>            :       real t;
+<span class="lineNum">     413 </span>            :       GenDirect(lat1, lon1, azi1, true, a12,
+<span class="lineNum">     414 </span>            :                 LATITUDE | LONGITUDE | AZIMUTH,
+<span class="lineNum">     415 </span>            :                 lat2, lon2, azi2, t, t, t, t, t);
+<span class="lineNum">     416 </span>            :     }
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span>            :     /**
+<span class="lineNum">     419 </span>            :      * See the documentation for GeodesicExact::ArcDirect.
+<span class="lineNum">     420 </span>            :      **********************************************************************/
+<span class="lineNum">     421 </span>            :     void ArcDirect(real lat1, real lon1, real azi1, real a12,
+<span class="lineNum">     422 </span>            :                    real&amp; lat2, real&amp; lon2, real&amp; azi2, real&amp; s12)
+<span class="lineNum">     423 </span>            :       const {
+<span class="lineNum">     424 </span>            :       real t;
+<span class="lineNum">     425 </span>            :       GenDirect(lat1, lon1, azi1, true, a12,
+<span class="lineNum">     426 </span>            :                 LATITUDE | LONGITUDE | AZIMUTH | DISTANCE,
+<span class="lineNum">     427 </span>            :                 lat2, lon2, azi2, s12, t, t, t, t);
+<span class="lineNum">     428 </span>            :     }
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span>            :     /**
+<span class="lineNum">     431 </span>            :      * See the documentation for GeodesicExact::ArcDirect.
+<span class="lineNum">     432 </span>            :      **********************************************************************/
+<span class="lineNum">     433 </span>            :     void ArcDirect(real lat1, real lon1, real azi1, real a12,
+<span class="lineNum">     434 </span>            :                    real&amp; lat2, real&amp; lon2, real&amp; azi2,
+<span class="lineNum">     435 </span>            :                    real&amp; s12, real&amp; m12) const {
+<span class="lineNum">     436 </span>            :       real t;
+<span class="lineNum">     437 </span>            :       GenDirect(lat1, lon1, azi1, true, a12,
+<span class="lineNum">     438 </span>            :                 LATITUDE | LONGITUDE | AZIMUTH | DISTANCE |
+<span class="lineNum">     439 </span>            :                 REDUCEDLENGTH,
+<span class="lineNum">     440 </span>            :                 lat2, lon2, azi2, s12, m12, t, t, t);
+<span class="lineNum">     441 </span>            :     }
+<span class="lineNum">     442 </span>            : 
+<span class="lineNum">     443 </span>            :     /**
+<span class="lineNum">     444 </span>            :      * See the documentation for GeodesicExact::ArcDirect.
+<span class="lineNum">     445 </span>            :      **********************************************************************/
+<span class="lineNum">     446 </span>            :     void ArcDirect(real lat1, real lon1, real azi1, real a12,
+<span class="lineNum">     447 </span>            :                    real&amp; lat2, real&amp; lon2, real&amp; azi2, real&amp; s12,
+<span class="lineNum">     448 </span>            :                    real&amp; M12, real&amp; M21) const {
+<span class="lineNum">     449 </span>            :       real t;
+<span class="lineNum">     450 </span>            :       GenDirect(lat1, lon1, azi1, true, a12,
+<span class="lineNum">     451 </span>            :                 LATITUDE | LONGITUDE | AZIMUTH | DISTANCE |
+<span class="lineNum">     452 </span>            :                 GEODESICSCALE,
+<span class="lineNum">     453 </span>            :                 lat2, lon2, azi2, s12, t, M12, M21, t);
+<span class="lineNum">     454 </span>            :     }
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            :     /**
+<span class="lineNum">     457 </span>            :      * See the documentation for GeodesicExact::ArcDirect.
+<span class="lineNum">     458 </span>            :      **********************************************************************/
+<span class="lineNum">     459 </span>            :     void ArcDirect(real lat1, real lon1, real azi1, real a12,
+<span class="lineNum">     460 </span>            :                    real&amp; lat2, real&amp; lon2, real&amp; azi2, real&amp; s12,
+<span class="lineNum">     461 </span>            :                    real&amp; m12, real&amp; M12, real&amp; M21) const {
+<span class="lineNum">     462 </span>            :       real t;
+<span class="lineNum">     463 </span>            :       GenDirect(lat1, lon1, azi1, true, a12,
+<span class="lineNum">     464 </span>            :                 LATITUDE | LONGITUDE | AZIMUTH | DISTANCE |
+<span class="lineNum">     465 </span>            :                 REDUCEDLENGTH | GEODESICSCALE,
+<span class="lineNum">     466 </span>            :                 lat2, lon2, azi2, s12, m12, M12, M21, t);
+<span class="lineNum">     467 </span>            :     }
+<span class="lineNum">     468 </span>            :     ///@}
+<span class="lineNum">     469 </span>            : 
+<span class="lineNum">     470 </span>            :     /** \name General version of the direct geodesic solution.
+<span class="lineNum">     471 </span>            :      **********************************************************************/
+<span class="lineNum">     472 </span>            :     ///@{
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span>            :     /**
+<span class="lineNum">     475 </span>            :      * The general direct geodesic calculation.  GeodesicExact::Direct and
+<span class="lineNum">     476 </span>            :      * GeodesicExact::ArcDirect are defined in terms of this function.
+<span class="lineNum">     477 </span>            :      *
+<span class="lineNum">     478 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     479 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     480 </span>            :      * @param[in] azi1 azimuth at point 1 (degrees).
+<span class="lineNum">     481 </span>            :      * @param[in] arcmode boolean flag determining the meaning of the second
+<span class="lineNum">     482 </span>            :      *   parameter.
+<span class="lineNum">     483 </span>            :      * @param[in] s12_a12 if \e arcmode is false, this is the distance between
+<span class="lineNum">     484 </span>            :      *   point 1 and point 2 (meters); otherwise it is the arc length between
+<span class="lineNum">     485 </span>            :      *   point 1 and point 2 (degrees); it can be signed.
+<span class="lineNum">     486 </span>            :      * @param[in] outmask a bitor'ed combination of GeodesicExact::mask values
+<span class="lineNum">     487 </span>            :      *   specifying which of the following parameters should be set.
+<span class="lineNum">     488 </span>            :      * @param[out] lat2 latitude of point 2 (degrees).
+<span class="lineNum">     489 </span>            :      * @param[out] lon2 longitude of point 2 (degrees).
+<span class="lineNum">     490 </span>            :      * @param[out] azi2 (forward) azimuth at point 2 (degrees).
+<span class="lineNum">     491 </span>            :      * @param[out] s12 distance between point 1 and point 2 (meters).
+<span class="lineNum">     492 </span>            :      * @param[out] m12 reduced length of geodesic (meters).
+<span class="lineNum">     493 </span>            :      * @param[out] M12 geodesic scale of point 2 relative to point 1
+<span class="lineNum">     494 </span>            :      *   (dimensionless).
+<span class="lineNum">     495 </span>            :      * @param[out] M21 geodesic scale of point 1 relative to point 2
+<span class="lineNum">     496 </span>            :      *   (dimensionless).
+<span class="lineNum">     497 </span>            :      * @param[out] S12 area under the geodesic (meters&lt;sup&gt;2&lt;/sup&gt;).
+<span class="lineNum">     498 </span>            :      * @return \e a12 arc length of between point 1 and point 2 (degrees).
+<span class="lineNum">     499 </span>            :      *
+<span class="lineNum">     500 </span>            :      * The GeodesicExact::mask values possible for \e outmask are
+<span class="lineNum">     501 </span>            :      * - \e outmask |= GeodesicExact::LATITUDE for the latitude \e lat2;
+<span class="lineNum">     502 </span>            :      * - \e outmask |= GeodesicExact::LONGITUDE for the latitude \e lon2;
+<span class="lineNum">     503 </span>            :      * - \e outmask |= GeodesicExact::AZIMUTH for the latitude \e azi2;
+<span class="lineNum">     504 </span>            :      * - \e outmask |= GeodesicExact::DISTANCE for the distance \e s12;
+<span class="lineNum">     505 </span>            :      * - \e outmask |= GeodesicExact::REDUCEDLENGTH for the reduced length \e
+<span class="lineNum">     506 </span>            :      *   m12;
+<span class="lineNum">     507 </span>            :      * - \e outmask |= GeodesicExact::GEODESICSCALE for the geodesic scales \e
+<span class="lineNum">     508 </span>            :      *   M12 and \e M21;
+<span class="lineNum">     509 </span>            :      * - \e outmask |= GeodesicExact::AREA for the area \e S12;
+<span class="lineNum">     510 </span>            :      * - \e outmask |= GeodesicExact::ALL for all of the above;
+<span class="lineNum">     511 </span>            :      * - \e outmask |= GeodesicExact::LONG_UNROLL to unroll \e lon2 instead of
+<span class="lineNum">     512 </span>            :      *   wrapping it into the range [&amp;minus;180&amp;deg;, 180&amp;deg;].
+<span class="lineNum">     513 </span>            :      * .
+<span class="lineNum">     514 </span>            :      * The function value \e a12 is always computed and returned and this
+<span class="lineNum">     515 </span>            :      * equals \e s12_a12 is \e arcmode is true.  If \e outmask includes
+<span class="lineNum">     516 </span>            :      * GeodesicExact::DISTANCE and \e arcmode is false, then \e s12 = \e
+<span class="lineNum">     517 </span>            :      * s12_a12.  It is not necessary to include GeodesicExact::DISTANCE_IN in
+<span class="lineNum">     518 </span>            :      * \e outmask; this is automatically included is \e arcmode is false.
+<span class="lineNum">     519 </span>            :      *
+<span class="lineNum">     520 </span>            :      * With the GeodesicExact::LONG_UNROLL bit set, the quantity \e lon2
+<span class="lineNum">     521 </span>            :      * &amp;minus; \e lon1 indicates how many times and in what sense the geodesic
+<span class="lineNum">     522 </span>            :      * encircles the ellipsoid.
+<span class="lineNum">     523 </span>            :      **********************************************************************/
+<span class="lineNum">     524 </span>            :     Math::real GenDirect(real lat1, real lon1, real azi1,
+<span class="lineNum">     525 </span>            :                          bool arcmode, real s12_a12, unsigned outmask,
+<span class="lineNum">     526 </span>            :                          real&amp; lat2, real&amp; lon2, real&amp; azi2,
+<span class="lineNum">     527 </span>            :                          real&amp; s12, real&amp; m12, real&amp; M12, real&amp; M21,
+<span class="lineNum">     528 </span>            :                          real&amp; S12) const;
+<span class="lineNum">     529 </span>            :     ///@}
+<span class="lineNum">     530 </span>            : 
+<span class="lineNum">     531 </span>            :     /** \name Inverse geodesic problem.
+<span class="lineNum">     532 </span>            :      **********************************************************************/
+<span class="lineNum">     533 </span>            :     ///@{
+<span class="lineNum">     534 </span>            :     /**
+<span class="lineNum">     535 </span>            :      * Perform the inverse geodesic calculation.
+<span class="lineNum">     536 </span>            :      *
+<span class="lineNum">     537 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     538 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     539 </span>            :      * @param[in] lat2 latitude of point 2 (degrees).
+<span class="lineNum">     540 </span>            :      * @param[in] lon2 longitude of point 2 (degrees).
+<span class="lineNum">     541 </span>            :      * @param[out] s12 distance between point 1 and point 2 (meters).
+<span class="lineNum">     542 </span>            :      * @param[out] azi1 azimuth at point 1 (degrees).
+<span class="lineNum">     543 </span>            :      * @param[out] azi2 (forward) azimuth at point 2 (degrees).
+<span class="lineNum">     544 </span>            :      * @param[out] m12 reduced length of geodesic (meters).
+<span class="lineNum">     545 </span>            :      * @param[out] M12 geodesic scale of point 2 relative to point 1
+<span class="lineNum">     546 </span>            :      *   (dimensionless).
+<span class="lineNum">     547 </span>            :      * @param[out] M21 geodesic scale of point 1 relative to point 2
+<span class="lineNum">     548 </span>            :      *   (dimensionless).
+<span class="lineNum">     549 </span>            :      * @param[out] S12 area under the geodesic (meters&lt;sup&gt;2&lt;/sup&gt;).
+<span class="lineNum">     550 </span>            :      * @return \e a12 arc length of between point 1 and point 2 (degrees).
+<span class="lineNum">     551 </span>            :      *
+<span class="lineNum">     552 </span>            :      * \e lat1 and \e lat2 should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     553 </span>            :      * The values of \e azi1 and \e azi2 returned are in the range
+<span class="lineNum">     554 </span>            :      * [&amp;minus;180&amp;deg;, 180&amp;deg;].
+<span class="lineNum">     555 </span>            :      *
+<span class="lineNum">     556 </span>            :      * If either point is at a pole, the azimuth is defined by keeping the
+<span class="lineNum">     557 </span>            :      * longitude fixed, writing \e lat = &amp;plusmn;(90&amp;deg; &amp;minus; &amp;epsilon;),
+<span class="lineNum">     558 </span>            :      * and taking the limit &amp;epsilon; &amp;rarr; 0+.
+<span class="lineNum">     559 </span>            :      *
+<span class="lineNum">     560 </span>            :      * The following functions are overloaded versions of
+<span class="lineNum">     561 </span>            :      * GeodesicExact::Inverse which omit some of the output parameters.  Note,
+<span class="lineNum">     562 </span>            :      * however, that the arc length is always computed and returned as the
+<span class="lineNum">     563 </span>            :      * function value.
+<span class="lineNum">     564 </span>            :      **********************************************************************/
+<span class="lineNum">     565 </span>            :     Math::real Inverse(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     566 </span>            :                        real&amp; s12, real&amp; azi1, real&amp; azi2, real&amp; m12,
+<span class="lineNum">     567 </span>            :                        real&amp; M12, real&amp; M21, real&amp; S12) const {
+<span class="lineNum">     568 </span>            :       return GenInverse(lat1, lon1, lat2, lon2,
+<span class="lineNum">     569 </span>            :                         DISTANCE | AZIMUTH |
+<span class="lineNum">     570 </span>            :                         REDUCEDLENGTH | GEODESICSCALE | AREA,
+<span class="lineNum">     571 </span>            :                         s12, azi1, azi2, m12, M12, M21, S12);
+<span class="lineNum">     572 </span>            :     }
+<span class="lineNum">     573 </span>            : 
+<span class="lineNum">     574 </span>            :     /**
+<span class="lineNum">     575 </span>            :      * See the documentation for GeodesicExact::Inverse.
+<span class="lineNum">     576 </span>            :      **********************************************************************/
+<span class="lineNum">     577 </span>            :     Math::real Inverse(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     578 </span>            :                        real&amp; s12) const {
+<span class="lineNum">     579 </span>            :       real t;
+<span class="lineNum">     580 </span>            :       return GenInverse(lat1, lon1, lat2, lon2,
+<span class="lineNum">     581 </span>            :                         DISTANCE,
+<span class="lineNum">     582 </span>            :                         s12, t, t, t, t, t, t);
+<span class="lineNum">     583 </span>            :     }
+<span class="lineNum">     584 </span>            : 
+<span class="lineNum">     585 </span>            :     /**
+<span class="lineNum">     586 </span>            :      * See the documentation for GeodesicExact::Inverse.
+<span class="lineNum">     587 </span>            :      **********************************************************************/
+<span class="lineNum">     588 </span>            :     Math::real Inverse(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     589 </span>            :                        real&amp; azi1, real&amp; azi2) const {
+<span class="lineNum">     590 </span>            :       real t;
+<span class="lineNum">     591 </span>            :       return GenInverse(lat1, lon1, lat2, lon2,
+<span class="lineNum">     592 </span>            :                         AZIMUTH,
+<span class="lineNum">     593 </span>            :                         t, azi1, azi2, t, t, t, t);
+<span class="lineNum">     594 </span>            :     }
+<span class="lineNum">     595 </span>            : 
+<span class="lineNum">     596 </span>            :     /**
+<span class="lineNum">     597 </span>            :      * See the documentation for GeodesicExact::Inverse.
+<span class="lineNum">     598 </span>            :      **********************************************************************/
+<span class="lineNum">     599 </span>            :     Math::real Inverse(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     600 </span>            :                        real&amp; s12, real&amp; azi1, real&amp; azi2)
+<span class="lineNum">     601 </span>            :       const {
+<span class="lineNum">     602 </span>            :       real t;
+<span class="lineNum">     603 </span>            :       return GenInverse(lat1, lon1, lat2, lon2,
+<span class="lineNum">     604 </span>            :                         DISTANCE | AZIMUTH,
+<span class="lineNum">     605 </span>            :                         s12, azi1, azi2, t, t, t, t);
+<span class="lineNum">     606 </span>            :     }
+<span class="lineNum">     607 </span>            : 
+<span class="lineNum">     608 </span>            :     /**
+<span class="lineNum">     609 </span>            :      * See the documentation for GeodesicExact::Inverse.
+<span class="lineNum">     610 </span>            :      **********************************************************************/
+<span class="lineNum">     611 </span>            :     Math::real Inverse(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     612 </span>            :                        real&amp; s12, real&amp; azi1, real&amp; azi2, real&amp; m12)
+<span class="lineNum">     613 </span>            :       const {
+<span class="lineNum">     614 </span>            :       real t;
+<span class="lineNum">     615 </span>            :       return GenInverse(lat1, lon1, lat2, lon2,
+<span class="lineNum">     616 </span>            :                         DISTANCE | AZIMUTH | REDUCEDLENGTH,
+<span class="lineNum">     617 </span>            :                         s12, azi1, azi2, m12, t, t, t);
+<span class="lineNum">     618 </span>            :     }
+<span class="lineNum">     619 </span>            : 
+<span class="lineNum">     620 </span>            :     /**
+<span class="lineNum">     621 </span>            :      * See the documentation for GeodesicExact::Inverse.
+<span class="lineNum">     622 </span>            :      **********************************************************************/
+<span class="lineNum">     623 </span>            :     Math::real Inverse(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     624 </span>            :                        real&amp; s12, real&amp; azi1, real&amp; azi2,
+<span class="lineNum">     625 </span>            :                        real&amp; M12, real&amp; M21) const {
+<span class="lineNum">     626 </span>            :       real t;
+<span class="lineNum">     627 </span>            :       return GenInverse(lat1, lon1, lat2, lon2,
+<span class="lineNum">     628 </span>            :                         DISTANCE | AZIMUTH | GEODESICSCALE,
+<span class="lineNum">     629 </span>            :                         s12, azi1, azi2, t, M12, M21, t);
+<span class="lineNum">     630 </span>            :     }
+<span class="lineNum">     631 </span>            : 
+<span class="lineNum">     632 </span>            :     /**
+<span class="lineNum">     633 </span>            :      * See the documentation for GeodesicExact::Inverse.
+<span class="lineNum">     634 </span>            :      **********************************************************************/
+<span class="lineNum">     635 </span>            :     Math::real Inverse(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     636 </span>            :                        real&amp; s12, real&amp; azi1, real&amp; azi2, real&amp; m12,
+<span class="lineNum">     637 </span>            :                        real&amp; M12, real&amp; M21) const {
+<span class="lineNum">     638 </span>            :       real t;
+<span class="lineNum">     639 </span>            :       return GenInverse(lat1, lon1, lat2, lon2,
+<span class="lineNum">     640 </span>            :                         DISTANCE | AZIMUTH |
+<span class="lineNum">     641 </span>            :                         REDUCEDLENGTH | GEODESICSCALE,
+<span class="lineNum">     642 </span>            :                         s12, azi1, azi2, m12, M12, M21, t);
+<span class="lineNum">     643 </span>            :     }
+<span class="lineNum">     644 </span>            :     ///@}
+<span class="lineNum">     645 </span>            : 
+<span class="lineNum">     646 </span>            :     /** \name General version of inverse geodesic solution.
+<span class="lineNum">     647 </span>            :      **********************************************************************/
+<span class="lineNum">     648 </span>            :     ///@{
+<span class="lineNum">     649 </span>            :     /**
+<span class="lineNum">     650 </span>            :      * The general inverse geodesic calculation.  GeodesicExact::Inverse is
+<span class="lineNum">     651 </span>            :      * defined in terms of this function.
+<span class="lineNum">     652 </span>            :      *
+<span class="lineNum">     653 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     654 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     655 </span>            :      * @param[in] lat2 latitude of point 2 (degrees).
+<span class="lineNum">     656 </span>            :      * @param[in] lon2 longitude of point 2 (degrees).
+<span class="lineNum">     657 </span>            :      * @param[in] outmask a bitor'ed combination of GeodesicExact::mask values
+<span class="lineNum">     658 </span>            :      *   specifying which of the following parameters should be set.
+<span class="lineNum">     659 </span>            :      * @param[out] s12 distance between point 1 and point 2 (meters).
+<span class="lineNum">     660 </span>            :      * @param[out] azi1 azimuth at point 1 (degrees).
+<span class="lineNum">     661 </span>            :      * @param[out] azi2 (forward) azimuth at point 2 (degrees).
+<span class="lineNum">     662 </span>            :      * @param[out] m12 reduced length of geodesic (meters).
+<span class="lineNum">     663 </span>            :      * @param[out] M12 geodesic scale of point 2 relative to point 1
+<span class="lineNum">     664 </span>            :      *   (dimensionless).
+<span class="lineNum">     665 </span>            :      * @param[out] M21 geodesic scale of point 1 relative to point 2
+<span class="lineNum">     666 </span>            :      *   (dimensionless).
+<span class="lineNum">     667 </span>            :      * @param[out] S12 area under the geodesic (meters&lt;sup&gt;2&lt;/sup&gt;).
+<span class="lineNum">     668 </span>            :      * @return \e a12 arc length of between point 1 and point 2 (degrees).
+<span class="lineNum">     669 </span>            :      *
+<span class="lineNum">     670 </span>            :      * The GeodesicExact::mask values possible for \e outmask are
+<span class="lineNum">     671 </span>            :      * - \e outmask |= GeodesicExact::DISTANCE for the distance \e s12;
+<span class="lineNum">     672 </span>            :      * - \e outmask |= GeodesicExact::AZIMUTH for the latitude \e azi2;
+<span class="lineNum">     673 </span>            :      * - \e outmask |= GeodesicExact::REDUCEDLENGTH for the reduced length \e
+<span class="lineNum">     674 </span>            :      *   m12;
+<span class="lineNum">     675 </span>            :      * - \e outmask |= GeodesicExact::GEODESICSCALE for the geodesic scales \e
+<span class="lineNum">     676 </span>            :      *   M12 and \e M21;
+<span class="lineNum">     677 </span>            :      * - \e outmask |= GeodesicExact::AREA for the area \e S12;
+<span class="lineNum">     678 </span>            :      * - \e outmask |= GeodesicExact::ALL for all of the above.
+<span class="lineNum">     679 </span>            :      * .
+<span class="lineNum">     680 </span>            :      * The arc length is always computed and returned as the function value.
+<span class="lineNum">     681 </span>            :      **********************************************************************/
+<span class="lineNum">     682 </span>            :     Math::real GenInverse(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     683 </span>            :                           unsigned outmask,
+<span class="lineNum">     684 </span>            :                           real&amp; s12, real&amp; azi1, real&amp; azi2,
+<span class="lineNum">     685 </span>            :                           real&amp; m12, real&amp; M12, real&amp; M21, real&amp; S12) const;
+<span class="lineNum">     686 </span>            :     ///@}
+<span class="lineNum">     687 </span>            : 
+<span class="lineNum">     688 </span>            :     /** \name Interface to GeodesicLineExact.
+<span class="lineNum">     689 </span>            :      **********************************************************************/
+<span class="lineNum">     690 </span>            :     ///@{
+<span class="lineNum">     691 </span>            : 
+<span class="lineNum">     692 </span>            :     /**
+<span class="lineNum">     693 </span>            :      * Set up to compute several points on a single geodesic.
+<span class="lineNum">     694 </span>            :      *
+<span class="lineNum">     695 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     696 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     697 </span>            :      * @param[in] azi1 azimuth at point 1 (degrees).
+<span class="lineNum">     698 </span>            :      * @param[in] caps bitor'ed combination of GeodesicExact::mask values
+<span class="lineNum">     699 </span>            :      *   specifying the capabilities the GeodesicLineExact object should
+<span class="lineNum">     700 </span>            :      *   possess, i.e., which quantities can be returned in calls to
+<span class="lineNum">     701 </span>            :      *   GeodesicLineExact::Position.
+<span class="lineNum">     702 </span>            :      * @return a GeodesicLineExact object.
+<span class="lineNum">     703 </span>            :      *
+<span class="lineNum">     704 </span>            :      * \e lat1 should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     705 </span>            :      *
+<span class="lineNum">     706 </span>            :      * The GeodesicExact::mask values are
+<span class="lineNum">     707 </span>            :      * - \e caps |= GeodesicExact::LATITUDE for the latitude \e lat2; this is
+<span class="lineNum">     708 </span>            :      *   added automatically;
+<span class="lineNum">     709 </span>            :      * - \e caps |= GeodesicExact::LONGITUDE for the latitude \e lon2;
+<span class="lineNum">     710 </span>            :      * - \e caps |= GeodesicExact::AZIMUTH for the azimuth \e azi2; this is
+<span class="lineNum">     711 </span>            :      *   added automatically;
+<span class="lineNum">     712 </span>            :      * - \e caps |= GeodesicExact::DISTANCE for the distance \e s12;
+<span class="lineNum">     713 </span>            :      * - \e caps |= GeodesicExact::REDUCEDLENGTH for the reduced length \e m12;
+<span class="lineNum">     714 </span>            :      * - \e caps |= GeodesicExact::GEODESICSCALE for the geodesic scales \e M12
+<span class="lineNum">     715 </span>            :      *   and \e M21;
+<span class="lineNum">     716 </span>            :      * - \e caps |= GeodesicExact::AREA for the area \e S12;
+<span class="lineNum">     717 </span>            :      * - \e caps |= GeodesicExact::DISTANCE_IN permits the length of the
+<span class="lineNum">     718 </span>            :      *   geodesic to be given in terms of \e s12; without this capability the
+<span class="lineNum">     719 </span>            :      *   length can only be specified in terms of arc length;
+<span class="lineNum">     720 </span>            :      * - \e caps |= GeodesicExact::ALL for all of the above.
+<span class="lineNum">     721 </span>            :      * .
+<span class="lineNum">     722 </span>            :      * The default value of \e caps is GeodesicExact::ALL which turns on all
+<span class="lineNum">     723 </span>            :      * the capabilities.
+<span class="lineNum">     724 </span>            :      *
+<span class="lineNum">     725 </span>            :      * If the point is at a pole, the azimuth is defined by keeping \e lon1
+<span class="lineNum">     726 </span>            :      * fixed, writing \e lat1 = &amp;plusmn;(90 &amp;minus; &amp;epsilon;), and taking the
+<span class="lineNum">     727 </span>            :      * limit &amp;epsilon; &amp;rarr; 0+.
+<span class="lineNum">     728 </span>            :      **********************************************************************/
+<span class="lineNum">     729 </span>            :     GeodesicLineExact Line(real lat1, real lon1, real azi1,
+<span class="lineNum">     730 </span>            :                            unsigned caps = ALL) const;
+<span class="lineNum">     731 </span>            : 
+<span class="lineNum">     732 </span>            :     /**
+<span class="lineNum">     733 </span>            :      * Define a GeodesicLineExact in terms of the inverse geodesic problem.
+<span class="lineNum">     734 </span>            :      *
+<span class="lineNum">     735 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     736 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     737 </span>            :      * @param[in] lat2 latitude of point 2 (degrees).
+<span class="lineNum">     738 </span>            :      * @param[in] lon2 longitude of point 2 (degrees).
+<span class="lineNum">     739 </span>            :      * @param[in] caps bitor'ed combination of GeodesicExact::mask values
+<span class="lineNum">     740 </span>            :      *   specifying the capabilities the GeodesicLineExact object should
+<span class="lineNum">     741 </span>            :      *   possess, i.e., which quantities can be returned in calls to
+<span class="lineNum">     742 </span>            :      *   GeodesicLineExact::Position.
+<span class="lineNum">     743 </span>            :      * @return a GeodesicLineExact object.
+<span class="lineNum">     744 </span>            :      *
+<span class="lineNum">     745 </span>            :      * This function sets point 3 of the GeodesicLineExact to correspond to
+<span class="lineNum">     746 </span>            :      * point 2 of the inverse geodesic problem.
+<span class="lineNum">     747 </span>            :      *
+<span class="lineNum">     748 </span>            :      * \e lat1 and \e lat2 should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     749 </span>            :      **********************************************************************/
+<span class="lineNum">     750 </span>            :     GeodesicLineExact InverseLine(real lat1, real lon1, real lat2, real lon2,
+<span class="lineNum">     751 </span>            :                                   unsigned caps = ALL) const;
+<span class="lineNum">     752 </span>            : 
+<span class="lineNum">     753 </span>            :     /**
+<span class="lineNum">     754 </span>            :      * Define a GeodesicLineExact in terms of the direct geodesic problem
+<span class="lineNum">     755 </span>            :      * specified in terms of distance.
+<span class="lineNum">     756 </span>            :      *
+<span class="lineNum">     757 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     758 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     759 </span>            :      * @param[in] azi1 azimuth at point 1 (degrees).
+<span class="lineNum">     760 </span>            :      * @param[in] s12 distance between point 1 and point 2 (meters); it can be
+<span class="lineNum">     761 </span>            :      *   negative.
+<span class="lineNum">     762 </span>            :      * @param[in] caps bitor'ed combination of GeodesicExact::mask values
+<span class="lineNum">     763 </span>            :      *   specifying the capabilities the GeodesicLineExact object should
+<span class="lineNum">     764 </span>            :      *   possess, i.e., which quantities can be returned in calls to
+<span class="lineNum">     765 </span>            :      *   GeodesicLineExact::Position.
+<span class="lineNum">     766 </span>            :      * @return a GeodesicLineExact object.
+<span class="lineNum">     767 </span>            :      *
+<span class="lineNum">     768 </span>            :      * This function sets point 3 of the GeodesicLineExact to correspond to
+<span class="lineNum">     769 </span>            :      * point 2 of the direct geodesic problem.
+<span class="lineNum">     770 </span>            :      *
+<span class="lineNum">     771 </span>            :      * \e lat1 should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     772 </span>            :      **********************************************************************/
+<span class="lineNum">     773 </span>            :     GeodesicLineExact DirectLine(real lat1, real lon1, real azi1, real s12,
+<span class="lineNum">     774 </span>            :                                  unsigned caps = ALL) const;
+<span class="lineNum">     775 </span>            : 
+<span class="lineNum">     776 </span>            :     /**
+<span class="lineNum">     777 </span>            :      * Define a GeodesicLineExact in terms of the direct geodesic problem
+<span class="lineNum">     778 </span>            :      * specified in terms of arc length.
+<span class="lineNum">     779 </span>            :      *
+<span class="lineNum">     780 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     781 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     782 </span>            :      * @param[in] azi1 azimuth at point 1 (degrees).
+<span class="lineNum">     783 </span>            :      * @param[in] a12 arc length between point 1 and point 2 (degrees); it can
+<span class="lineNum">     784 </span>            :      *   be negative.
+<span class="lineNum">     785 </span>            :      * @param[in] caps bitor'ed combination of GeodesicExact::mask values
+<span class="lineNum">     786 </span>            :      *   specifying the capabilities the GeodesicLineExact object should
+<span class="lineNum">     787 </span>            :      *   possess, i.e., which quantities can be returned in calls to
+<span class="lineNum">     788 </span>            :      *   GeodesicLineExact::Position.
+<span class="lineNum">     789 </span>            :      * @return a GeodesicLineExact object.
+<span class="lineNum">     790 </span>            :      *
+<span class="lineNum">     791 </span>            :      * This function sets point 3 of the GeodesicLineExact to correspond to
+<span class="lineNum">     792 </span>            :      * point 2 of the direct geodesic problem.
+<span class="lineNum">     793 </span>            :      *
+<span class="lineNum">     794 </span>            :      * \e lat1 should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     795 </span>            :      **********************************************************************/
+<span class="lineNum">     796 </span>            :     GeodesicLineExact ArcDirectLine(real lat1, real lon1, real azi1, real a12,
+<span class="lineNum">     797 </span>            :                                     unsigned caps = ALL) const;
+<span class="lineNum">     798 </span>            : 
+<span class="lineNum">     799 </span>            :     /**
+<span class="lineNum">     800 </span>            :      * Define a GeodesicLineExact in terms of the direct geodesic problem
+<span class="lineNum">     801 </span>            :      * specified in terms of either distance or arc length.
+<span class="lineNum">     802 </span>            :      *
+<span class="lineNum">     803 </span>            :      * @param[in] lat1 latitude of point 1 (degrees).
+<span class="lineNum">     804 </span>            :      * @param[in] lon1 longitude of point 1 (degrees).
+<span class="lineNum">     805 </span>            :      * @param[in] azi1 azimuth at point 1 (degrees).
+<span class="lineNum">     806 </span>            :      * @param[in] arcmode boolean flag determining the meaning of the \e
+<span class="lineNum">     807 </span>            :      *   s12_a12.
+<span class="lineNum">     808 </span>            :      * @param[in] s12_a12 if \e arcmode is false, this is the distance between
+<span class="lineNum">     809 </span>            :      *   point 1 and point 2 (meters); otherwise it is the arc length between
+<span class="lineNum">     810 </span>            :      *   point 1 and point 2 (degrees); it can be negative.
+<span class="lineNum">     811 </span>            :      * @param[in] caps bitor'ed combination of GeodesicExact::mask values
+<span class="lineNum">     812 </span>            :      *   specifying the capabilities the GeodesicLineExact object should
+<span class="lineNum">     813 </span>            :      *   possess, i.e., which quantities can be returned in calls to
+<span class="lineNum">     814 </span>            :      *   GeodesicLineExact::Position.
+<span class="lineNum">     815 </span>            :      * @return a GeodesicLineExact object.
+<span class="lineNum">     816 </span>            :      *
+<span class="lineNum">     817 </span>            :      * This function sets point 3 of the GeodesicLineExact to correspond to
+<span class="lineNum">     818 </span>            :      * point 2 of the direct geodesic problem.
+<span class="lineNum">     819 </span>            :      *
+<span class="lineNum">     820 </span>            :      * \e lat1 should be in the range [&amp;minus;90&amp;deg;, 90&amp;deg;].
+<span class="lineNum">     821 </span>            :      **********************************************************************/
+<span class="lineNum">     822 </span>            :     GeodesicLineExact GenDirectLine(real lat1, real lon1, real azi1,
+<span class="lineNum">     823 </span>            :                                     bool arcmode, real s12_a12,
+<span class="lineNum">     824 </span>            :                                     unsigned caps = ALL) const;
+<span class="lineNum">     825 </span>            :     ///@}
+<span class="lineNum">     826 </span>            : 
+<span class="lineNum">     827 </span>            :     /** \name Inspector functions.
+<span class="lineNum">     828 </span>            :      **********************************************************************/
+<span class="lineNum">     829 </span>            :     ///@{
+<span class="lineNum">     830 </span>            : 
+<span class="lineNum">     831 </span>            :     /**
+<span class="lineNum">     832 </span>            :      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
+<span class="lineNum">     833 </span>            :      *   the value used in the constructor.
+<span class="lineNum">     834 </span>            :      **********************************************************************/
+<span class="lineNum">     835 </span>            :     Math::real MajorRadius() const { return _a; }
+<span class="lineNum">     836 </span>            : 
+<span class="lineNum">     837 </span>            :     /**
+<span class="lineNum">     838 </span>            :      * @return \e f the  flattening of the ellipsoid.  This is the
+<span class="lineNum">     839 </span>            :      *   value used in the constructor.
+<span class="lineNum">     840 </span>            :      **********************************************************************/
+<span class="lineNum">     841 </span>            :     Math::real Flattening() const { return _f; }
+<span class="lineNum">     842 </span>            : 
+<span class="lineNum">     843 </span>            :     /**
+<span class="lineNum">     844 </span>            :      * @return total area of ellipsoid in meters&lt;sup&gt;2&lt;/sup&gt;.  The area of a
+<span class="lineNum">     845 </span>            :      *   polygon encircling a pole can be found by adding
+<span class="lineNum">     846 </span>            :      *   GeodesicExact::EllipsoidArea()/2 to the sum of \e S12 for each side of
+<span class="lineNum">     847 </span>            :      *   the polygon.
+<span class="lineNum">     848 </span>            :      **********************************************************************/
+<span class="lineNum">     849 </span>            :     Math::real EllipsoidArea() const
+<span class="lineNum">     850 </span><span class="lineCov">         15 :     { return 4 * Math::pi() * _c2; }</span>
+<span class="lineNum">     851 </span>            :     ///@}
+<span class="lineNum">     852 </span>            : 
+<span class="lineNum">     853 </span>            :     /**
+<span class="lineNum">     854 </span>            :      * A global instantiation of GeodesicExact with the parameters for the
+<span class="lineNum">     855 </span>            :      * WGS84 ellipsoid.
+<span class="lineNum">     856 </span>            :      **********************************************************************/
+<span class="lineNum">     857 </span>            :     static const GeodesicExact&amp; WGS84();
+<span class="lineNum">     858 </span>            : 
+<span class="lineNum">     859 </span>            :   };
+<span class="lineNum">     860 </span>            : 
+<span class="lineNum">     861 </span>            : } // namespace GeographicLib
+<span class="lineNum">     862 </span>            : 
+<span class="lineNum">     863 </span>            : #endif  // GEOGRAPHICLIB_GEODESICEXACT_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,541 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/proj/metadata.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/proj</a> - metadata.hpp<span style="font-size: 80%;"> (source / <a href="metadata.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">21</td>
+            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntryHi">91.3 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /******************************************************************************</a>
+<span class="lineNum">       2 </span>            :  *
+<span class="lineNum">       3 </span>            :  * Project:  PROJ
+<span class="lineNum">       4 </span>            :  * Purpose:  ISO19111:2019 implementation
+<span class="lineNum">       5 </span>            :  * Author:   Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  ******************************************************************************
+<span class="lineNum">       8 </span>            :  * Copyright (c) 2018, Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      11 </span>            :  * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      12 </span>            :  * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      13 </span>            :  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      14 </span>            :  * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      15 </span>            :  * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      16 </span>            :  *
+<span class="lineNum">      17 </span>            :  * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      18 </span>            :  * in all copies or substantial portions of the Software.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      21 </span>            :  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      22 </span>            :  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      23 </span>            :  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      24 </span>            :  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      25 </span>            :  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      26 </span>            :  * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      27 </span>            :  ****************************************************************************/
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #ifndef METADATA_HH_INCLUDED
+<span class="lineNum">      30 </span>            : #define METADATA_HH_INCLUDED
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #include &lt;memory&gt;
+<span class="lineNum">      33 </span>            : #include &lt;string&gt;
+<span class="lineNum">      34 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : #include &quot;io.hpp&quot;
+<span class="lineNum">      37 </span>            : #include &quot;util.hpp&quot;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : NS_PROJ_START
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : namespace common {
+<span class="lineNum">      42 </span>            : class UnitOfMeasure;
+<span class="lineNum">      43 </span>            : using UnitOfMeasurePtr = std::shared_ptr&lt;UnitOfMeasure&gt;;
+<span class="lineNum">      44 </span>            : using UnitOfMeasureNNPtr = util::nn&lt;UnitOfMeasurePtr&gt;;
+<span class="lineNum">      45 </span>            : class IdentifiedObject;
+<span class="lineNum">      46 </span>            : } // namespace common
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : /** osgeo.proj.metadata namespace
+<span class="lineNum">      49 </span>            :  *
+<span class="lineNum">      50 </span>            :  * \brief Common classes from \ref ISO_19115 standard
+<span class="lineNum">      51 </span>            :  */
+<span class="lineNum">      52 </span>            : namespace metadata {
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            : /** \brief Standardized resource reference.
+<span class="lineNum">      57 </span>            :  *
+<span class="lineNum">      58 </span>            :  * A citation contains a title.
+<span class="lineNum">      59 </span>            :  *
+<span class="lineNum">      60 </span>            :  * \remark Simplified version of [Citation]
+<span class="lineNum">      61 </span>            :  * (http://www.geoapi.org/3.0/javadoc/org/opengis/metadata/citation/Citation.html)
+<a name="62"><span class="lineNum">      62 </span>            :  * from \ref GeoAPI</a>
+<span class="lineNum">      63 </span>            :  */
+<span class="lineNum">      64 </span><span class="lineCov">    1130616 : class PROJ_GCC_DLL Citation : public util::BaseObject {</span>
+<span class="lineNum">      65 </span>            :   public:
+<span class="lineNum">      66 </span>            :     PROJ_DLL explicit Citation(const std::string &amp;titleIn);
+<span class="lineNum">      67 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">      68 </span>            :     PROJ_DLL Citation();
+<span class="lineNum">      69 </span>            :     PROJ_DLL Citation(const Citation &amp;other);
+<span class="lineNum">      70 </span>            :     PROJ_DLL ~Citation();
+<span class="lineNum">      71 </span>            :     //! @endcond
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :     PROJ_DLL const util::optional&lt;std::string&gt; &amp;title() PROJ_PURE_DECL;
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :   protected:
+<span class="lineNum">      76 </span>            :     PROJ_FRIEND_OPTIONAL(Citation);
+<span class="lineNum">      77 </span>            :     PROJ_INTERNAL Citation &amp;operator=(const Citation &amp;other);
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            :   private:
+<span class="lineNum">      80 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">      81 </span>            : };
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            : class GeographicExtent;
+<span class="lineNum">      86 </span>            : /** Shared pointer of GeographicExtent. */
+<span class="lineNum">      87 </span>            : using GeographicExtentPtr = std::shared_ptr&lt;GeographicExtent&gt;;
+<span class="lineNum">      88 </span>            : /** Non-null shared pointer of GeographicExtent. */
+<span class="lineNum">      89 </span>            : using GeographicExtentNNPtr = util::nn&lt;GeographicExtentPtr&gt;;
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            : /** \brief Base interface for geographic area of the dataset.
+<span class="lineNum">      92 </span>            :  *
+<span class="lineNum">      93 </span>            :  * \remark Simplified version of [GeographicExtent]
+<span class="lineNum">      94 </span>            :  * (http://www.geoapi.org/3.0/javadoc/org/opengis/metadata/extent/GeographicExtent.html)
+<a name="95"><span class="lineNum">      95 </span>            :  * from \ref GeoAPI</a>
+<span class="lineNum">      96 </span>            :  */
+<span class="lineNum">      97 </span><span class="lineCov">     318758 : class PROJ_GCC_DLL GeographicExtent : public util::BaseObject,</span>
+<span class="lineNum">      98 </span>            :                                       public util::IComparable {
+<span class="lineNum">      99 </span>            :   public:
+<span class="lineNum">     100 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     101 </span>            :     PROJ_DLL ~GeographicExtent() override;
+<span class="lineNum">     102 </span>            :     //! @endcond
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            :     // GeoAPI has a getInclusion() method. We assume that it is included for our
+<span class="lineNum">     105 </span>            :     // use
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     108 </span>            :     PROJ_INTERNAL bool _isEquivalentTo(
+<span class="lineNum">     109 </span>            :         const util::IComparable *other,
+<span class="lineNum">     110 </span>            :         util::IComparable::Criterion criterion =
+<span class="lineNum">     111 </span>            :             util::IComparable::Criterion::STRICT) const override = 0;
+<span class="lineNum">     112 </span>            :     //! @endcond
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :     /** \brief Returns whether this extent contains the other one. */
+<span class="lineNum">     115 </span>            :     PROJ_DLL virtual bool
+<span class="lineNum">     116 </span>            :     contains(const GeographicExtentNNPtr &amp;other) const = 0;
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span>            :     /** \brief Returns whether this extent intersects the other one. */
+<span class="lineNum">     119 </span>            :     PROJ_DLL virtual bool
+<span class="lineNum">     120 </span>            :     intersects(const GeographicExtentNNPtr &amp;other) const = 0;
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            :     /** \brief Returns the intersection of this extent with another one. */
+<span class="lineNum">     123 </span>            :     PROJ_DLL virtual GeographicExtentPtr
+<span class="lineNum">     124 </span>            :     intersection(const GeographicExtentNNPtr &amp;other) const = 0;
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            :   protected:
+<span class="lineNum">     127 </span>            :     PROJ_INTERNAL GeographicExtent();
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            :   private:
+<span class="lineNum">     130 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     131 </span>            : };
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            : class GeographicBoundingBox;
+<span class="lineNum">     136 </span>            : /** Shared pointer of GeographicBoundingBox. */
+<span class="lineNum">     137 </span>            : using GeographicBoundingBoxPtr = std::shared_ptr&lt;GeographicBoundingBox&gt;;
+<span class="lineNum">     138 </span>            : /** Non-null shared pointer of GeographicBoundingBox. */
+<span class="lineNum">     139 </span>            : using GeographicBoundingBoxNNPtr = util::nn&lt;GeographicBoundingBoxPtr&gt;;
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            : /** \brief Geographic position of the dataset.
+<span class="lineNum">     142 </span>            :  *
+<span class="lineNum">     143 </span>            :  * This is only an approximate so specifying the co-ordinate reference system is
+<span class="lineNum">     144 </span>            :  * unnecessary.
+<span class="lineNum">     145 </span>            :  *
+<span class="lineNum">     146 </span>            :  * \remark Implements [GeographicBoundingBox]
+<span class="lineNum">     147 </span>            :  * (http://www.geoapi.org/3.0/javadoc/org/opengis/metadata/extent/GeographicBoundingBox.html)
+<a name="148"><span class="lineNum">     148 </span>            :  * from \ref GeoAPI</a>
+<span class="lineNum">     149 </span>            :  */
+<span class="lineNum">     150 </span><span class="lineCov">     478137 : class PROJ_GCC_DLL GeographicBoundingBox : public GeographicExtent {</span>
+<span class="lineNum">     151 </span>            :   public:
+<span class="lineNum">     152 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     153 </span>            :     PROJ_DLL ~GeographicBoundingBox() override;
+<span class="lineNum">     154 </span>            :     //! @endcond
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            :     PROJ_DLL double westBoundLongitude() PROJ_PURE_DECL;
+<span class="lineNum">     157 </span>            :     PROJ_DLL double southBoundLatitude() PROJ_PURE_DECL;
+<span class="lineNum">     158 </span>            :     PROJ_DLL double eastBoundLongitude() PROJ_PURE_DECL;
+<span class="lineNum">     159 </span>            :     PROJ_DLL double northBoundLatitude() PROJ_PURE_DECL;
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            :     PROJ_DLL static GeographicBoundingBoxNNPtr
+<span class="lineNum">     162 </span>            :     create(double west, double south, double east, double north);
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     165 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     166 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     167 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     168 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     169 </span>            :     //! @endcond
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     172 </span>            :     contains(const GeographicExtentNNPtr &amp;other) const override;
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     175 </span>            :     intersects(const GeographicExtentNNPtr &amp;other) const override;
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            :     PROJ_INTERNAL GeographicExtentPtr
+<span class="lineNum">     178 </span>            :     intersection(const GeographicExtentNNPtr &amp;other) const override;
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            :   protected:
+<span class="lineNum">     181 </span>            :     PROJ_INTERNAL GeographicBoundingBox(double west, double south, double east,
+<span class="lineNum">     182 </span>            :                                         double north);
+<span class="lineNum">     183 </span><span class="lineCov">     318774 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span>            :   private:
+<span class="lineNum">     186 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     187 </span>            : };
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span>            : class TemporalExtent;
+<span class="lineNum">     192 </span>            : /** Shared pointer of TemporalExtent. */
+<span class="lineNum">     193 </span>            : using TemporalExtentPtr = std::shared_ptr&lt;TemporalExtent&gt;;
+<span class="lineNum">     194 </span>            : /** Non-null shared pointer of TemporalExtent. */
+<span class="lineNum">     195 </span>            : using TemporalExtentNNPtr = util::nn&lt;TemporalExtentPtr&gt;;
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span>            : /** \brief Time period covered by the content of the dataset.
+<span class="lineNum">     198 </span>            :  *
+<span class="lineNum">     199 </span>            :  * \remark Simplified version of [TemporalExtent]
+<span class="lineNum">     200 </span>            :  * (http://www.geoapi.org/3.0/javadoc/org/opengis/metadata/extent/TemporalExtent.html)
+<a name="201"><span class="lineNum">     201 </span>            :  * from \ref GeoAPI</a>
+<span class="lineNum">     202 </span>            :  */
+<span class="lineNum">     203 </span><span class="lineCov">          2 : class PROJ_GCC_DLL TemporalExtent : public util::BaseObject,</span>
+<span class="lineNum">     204 </span>            :                                     public util::IComparable {
+<span class="lineNum">     205 </span>            :   public:
+<span class="lineNum">     206 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     207 </span>            :     PROJ_DLL ~TemporalExtent() override;
+<span class="lineNum">     208 </span>            :     //! @endcond
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            :     PROJ_DLL const std::string &amp;start() PROJ_PURE_DECL;
+<span class="lineNum">     211 </span>            :     PROJ_DLL const std::string &amp;stop() PROJ_PURE_DECL;
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span>            :     PROJ_DLL static TemporalExtentNNPtr create(const std::string &amp;start,
+<span class="lineNum">     214 </span>            :                                                const std::string &amp;stop);
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     217 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     218 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     219 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     220 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     221 </span>            :     //! @endcond
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            :     PROJ_DLL bool contains(const TemporalExtentNNPtr &amp;other) const;
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :     PROJ_DLL bool intersects(const TemporalExtentNNPtr &amp;other) const;
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span>            :   protected:
+<span class="lineNum">     228 </span>            :     PROJ_INTERNAL TemporalExtent(const std::string &amp;start,
+<span class="lineNum">     229 </span>            :                                  const std::string &amp;stop);
+<span class="lineNum">     230 </span><span class="lineCov">          2 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            :   private:
+<span class="lineNum">     233 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     234 </span>            : };
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            : class VerticalExtent;
+<span class="lineNum">     239 </span>            : /** Shared pointer of VerticalExtent. */
+<span class="lineNum">     240 </span>            : using VerticalExtentPtr = std::shared_ptr&lt;VerticalExtent&gt;;
+<span class="lineNum">     241 </span>            : /** Non-null shared pointer of VerticalExtent. */
+<span class="lineNum">     242 </span>            : using VerticalExtentNNPtr = util::nn&lt;VerticalExtentPtr&gt;;
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            : /** \brief Vertical domain of dataset.
+<span class="lineNum">     245 </span>            :  *
+<span class="lineNum">     246 </span>            :  * \remark Simplified version of [VerticalExtent]
+<span class="lineNum">     247 </span>            :  * (http://www.geoapi.org/3.0/javadoc/org/opengis/metadata/extent/VerticalExtent.html)
+<a name="248"><span class="lineNum">     248 </span>            :  * from \ref GeoAPI</a>
+<span class="lineNum">     249 </span>            :  */
+<span class="lineNum">     250 </span><span class="lineCov">          3 : class PROJ_GCC_DLL VerticalExtent : public util::BaseObject,</span>
+<span class="lineNum">     251 </span>            :                                     public util::IComparable {
+<span class="lineNum">     252 </span>            :   public:
+<span class="lineNum">     253 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     254 </span>            :     PROJ_DLL ~VerticalExtent() override;
+<span class="lineNum">     255 </span>            :     //! @endcond
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            :     PROJ_DLL double minimumValue() PROJ_PURE_DECL;
+<span class="lineNum">     258 </span>            :     PROJ_DLL double maximumValue() PROJ_PURE_DECL;
+<span class="lineNum">     259 </span>            :     PROJ_DLL common::UnitOfMeasureNNPtr &amp;unit() PROJ_PURE_DECL;
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span>            :     PROJ_DLL static VerticalExtentNNPtr
+<span class="lineNum">     262 </span>            :     create(double minimumValue, double maximumValue,
+<span class="lineNum">     263 </span>            :            const common::UnitOfMeasureNNPtr &amp;unitIn);
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     266 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     267 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     268 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     269 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     270 </span>            :     //! @endcond
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span>            :     PROJ_DLL bool contains(const VerticalExtentNNPtr &amp;other) const;
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            :     PROJ_DLL bool intersects(const VerticalExtentNNPtr &amp;other) const;
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span>            :   protected:
+<span class="lineNum">     277 </span>            :     PROJ_INTERNAL VerticalExtent(double minimumValue, double maximumValue,
+<span class="lineNum">     278 </span>            :                                  const common::UnitOfMeasureNNPtr &amp;unitIn);
+<span class="lineNum">     279 </span><span class="lineCov">          2 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span>            :   private:
+<span class="lineNum">     282 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     283 </span>            : };
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            : class Extent;
+<span class="lineNum">     288 </span>            : /** Shared pointer of Extent. */
+<span class="lineNum">     289 </span>            : using ExtentPtr = std::shared_ptr&lt;Extent&gt;;
+<span class="lineNum">     290 </span>            : /** Non-null shared pointer of Extent. */
+<span class="lineNum">     291 </span>            : using ExtentNNPtr = util::nn&lt;ExtentPtr&gt;;
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span>            : /** \brief Information about spatial, vertical, and temporal extent.
+<span class="lineNum">     294 </span>            :  *
+<span class="lineNum">     295 </span>            :  * \remark Simplified version of [Extent]
+<span class="lineNum">     296 </span>            :  * (http://www.geoapi.org/3.0/javadoc/org/opengis/metadata/extent/Extent.html)
+<a name="297"><span class="lineNum">     297 </span>            :  * from \ref GeoAPI</a>
+<span class="lineNum">     298 </span>            :  */
+<span class="lineNum">     299 </span><span class="lineCov">      16008 : class PROJ_GCC_DLL Extent : public util::BaseObject, public util::IComparable {</span>
+<span class="lineNum">     300 </span>            :   public:
+<span class="lineNum">     301 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     302 </span>            :     PROJ_DLL Extent(const Extent &amp;other);
+<span class="lineNum">     303 </span>            :     PROJ_DLL ~Extent() override;
+<span class="lineNum">     304 </span>            :     //! @endcond
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span>            :     PROJ_DLL const util::optional&lt;std::string&gt; &amp;description() PROJ_PURE_DECL;
+<span class="lineNum">     307 </span>            :     PROJ_DLL const std::vector&lt;GeographicExtentNNPtr&gt; &amp;
+<span class="lineNum">     308 </span>            :     geographicElements() PROJ_PURE_DECL;
+<span class="lineNum">     309 </span>            :     PROJ_DLL const std::vector&lt;TemporalExtentNNPtr&gt; &amp;
+<span class="lineNum">     310 </span>            :     temporalElements() PROJ_PURE_DECL;
+<span class="lineNum">     311 </span>            :     PROJ_DLL const std::vector&lt;VerticalExtentNNPtr&gt; &amp;
+<span class="lineNum">     312 </span>            :     verticalElements() PROJ_PURE_DECL;
+<span class="lineNum">     313 </span>            : 
+<span class="lineNum">     314 </span>            :     PROJ_DLL static ExtentNNPtr
+<span class="lineNum">     315 </span>            :     create(const util::optional&lt;std::string&gt; &amp;descriptionIn,
+<span class="lineNum">     316 </span>            :            const std::vector&lt;GeographicExtentNNPtr&gt; &amp;geographicElementsIn,
+<span class="lineNum">     317 </span>            :            const std::vector&lt;VerticalExtentNNPtr&gt; &amp;verticalElementsIn,
+<span class="lineNum">     318 </span>            :            const std::vector&lt;TemporalExtentNNPtr&gt; &amp;temporalElementsIn);
+<span class="lineNum">     319 </span>            : 
+<span class="lineNum">     320 </span>            :     PROJ_DLL static ExtentNNPtr
+<span class="lineNum">     321 </span>            :     createFromBBOX(double west, double south, double east, double north,
+<span class="lineNum">     322 </span>            :                    const util::optional&lt;std::string&gt; &amp;descriptionIn =
+<span class="lineNum">     323 </span>            :                        util::optional&lt;std::string&gt;());
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     326 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     327 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     328 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     329 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     330 </span>            :     //! @endcond
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span>            :     PROJ_DLL bool contains(const ExtentNNPtr &amp;other) const;
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span>            :     PROJ_DLL bool intersects(const ExtentNNPtr &amp;other) const;
+<span class="lineNum">     335 </span>            : 
+<span class="lineNum">     336 </span>            :     PROJ_DLL ExtentPtr intersection(const ExtentNNPtr &amp;other) const;
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            :     PROJ_DLL static const ExtentNNPtr WORLD;
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span>            :   protected:
+<span class="lineNum">     341 </span>            :     PROJ_INTERNAL Extent();
+<span class="lineNum">     342 </span><span class="lineCov">      16024 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            :   private:
+<span class="lineNum">     345 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     346 </span>            :     Extent &amp;operator=(const Extent &amp;other) = delete;
+<span class="lineNum">     347 </span>            : };
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span>            : class Identifier;
+<span class="lineNum">     352 </span>            : /** Shared pointer of Identifier. */
+<span class="lineNum">     353 </span>            : using IdentifierPtr = std::shared_ptr&lt;Identifier&gt;;
+<span class="lineNum">     354 </span>            : /** Non-null shared pointer of Identifier. */
+<span class="lineNum">     355 </span>            : using IdentifierNNPtr = util::nn&lt;IdentifierPtr&gt;;
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span>            : /** \brief Value uniquely identifying an object within a namespace.
+<span class="lineNum">     358 </span>            :  *
+<span class="lineNum">     359 </span>            :  * \remark Implements Identifier as described in \ref ISO_19111_2019 but which
+<a name="360"><span class="lineNum">     360 </span>            :  * originates from \ref ISO_19115</a>
+<span class="lineNum">     361 </span>            :  */
+<span class="lineNum">     362 </span><span class="lineCov">    1050896 : class PROJ_GCC_DLL Identifier : public util::BaseObject,</span>
+<span class="lineNum">     363 </span>            :                                 public io::IWKTExportable,
+<span class="lineNum">     364 </span>            :                                 public io::IJSONExportable {
+<span class="lineNum">     365 </span>            :   public:
+<span class="lineNum">     366 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     367 </span>            :     PROJ_DLL Identifier(const Identifier &amp;other);
+<span class="lineNum">     368 </span>            :     PROJ_DLL ~Identifier() override;
+<span class="lineNum">     369 </span>            :     //! @endcond
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span>            :     PROJ_DLL static IdentifierNNPtr
+<span class="lineNum">     372 </span>            :     create(const std::string &amp;codeIn = std::string(),
+<span class="lineNum">     373 </span>            :            const util::PropertyMap &amp;properties =
+<span class="lineNum">     374 </span>            :                util::PropertyMap()); // throw(InvalidValueTypeException)
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            :     PROJ_DLL static const std::string AUTHORITY_KEY;
+<span class="lineNum">     377 </span>            :     PROJ_DLL static const std::string CODE_KEY;
+<span class="lineNum">     378 </span>            :     PROJ_DLL static const std::string CODESPACE_KEY;
+<span class="lineNum">     379 </span>            :     PROJ_DLL static const std::string VERSION_KEY;
+<span class="lineNum">     380 </span>            :     PROJ_DLL static const std::string DESCRIPTION_KEY;
+<span class="lineNum">     381 </span>            :     PROJ_DLL static const std::string URI_KEY;
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            :     PROJ_DLL static const std::string EPSG;
+<span class="lineNum">     384 </span>            :     PROJ_DLL static const std::string OGC;
+<span class="lineNum">     385 </span>            : 
+<span class="lineNum">     386 </span>            :     PROJ_DLL const util::optional&lt;Citation&gt; &amp;authority() PROJ_PURE_DECL;
+<span class="lineNum">     387 </span>            :     PROJ_DLL const std::string &amp;code() PROJ_PURE_DECL;
+<span class="lineNum">     388 </span>            :     PROJ_DLL const util::optional&lt;std::string&gt; &amp;codeSpace() PROJ_PURE_DECL;
+<span class="lineNum">     389 </span>            :     PROJ_DLL const util::optional&lt;std::string&gt; &amp;version() PROJ_PURE_DECL;
+<span class="lineNum">     390 </span>            :     PROJ_DLL const util::optional&lt;std::string&gt; &amp;description() PROJ_PURE_DECL;
+<span class="lineNum">     391 </span>            :     PROJ_DLL const util::optional&lt;std::string&gt; &amp;uri() PROJ_PURE_DECL;
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span>            :     PROJ_DLL static bool isEquivalentName(const char *a,
+<span class="lineNum">     394 </span>            :                                           const char *b) noexcept;
+<span class="lineNum">     395 </span>            : 
+<span class="lineNum">     396 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     397 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     398 </span>            :         PROJ_INTERNAL static std::string
+<span class="lineNum">     399 </span>            :         canonicalizeName(const std::string &amp;str);
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">     402 </span>            :         const override; // throw(io::FormattingException)
+<span class="lineNum">     403 </span>            : 
+<span class="lineNum">     404 </span>            :     PROJ_INTERNAL void _exportToJSON(io::JSONFormatter *formatter)
+<span class="lineNum">     405 </span>            :         const override; // throw(io::FormattingException)
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span>            :     //! @endcond
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span>            :   protected:
+<span class="lineNum">     410 </span>            :     PROJ_INTERNAL explicit Identifier(const std::string &amp;codeIn,
+<span class="lineNum">     411 </span>            :                                       const util::PropertyMap &amp;properties);
+<span class="lineNum">     412 </span>            :     PROJ_INTERNAL explicit Identifier();
+<span class="lineNum">     413 </span>            : 
+<span class="lineNum">     414 </span>            :     PROJ_FRIEND_OPTIONAL(Identifier);
+<span class="lineNum">     415 </span><span class="lineCov">    1050984 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     416 </span>            :     Identifier &amp;operator=(const Identifier &amp;other) = delete;
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span>            :     PROJ_FRIEND(common::IdentifiedObject);
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span>            :     PROJ_INTERNAL static IdentifierNNPtr
+<span class="lineNum">     421 </span>            :     createFromDescription(const std::string &amp;descriptionIn);
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span>            :   private:
+<span class="lineNum">     424 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     425 </span>            : };
+<span class="lineNum">     426 </span>            : 
+<span class="lineNum">     427 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span>            : class PositionalAccuracy;
+<span class="lineNum">     430 </span>            : /** Shared pointer of PositionalAccuracy. */
+<span class="lineNum">     431 </span>            : using PositionalAccuracyPtr = std::shared_ptr&lt;PositionalAccuracy&gt;;
+<span class="lineNum">     432 </span>            : /** Non-null shared pointer of PositionalAccuracy. */
+<span class="lineNum">     433 </span>            : using PositionalAccuracyNNPtr = util::nn&lt;PositionalAccuracyPtr&gt;;
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span>            : /** \brief Accuracy of the position of features.
+<span class="lineNum">     436 </span>            :  *
+<span class="lineNum">     437 </span>            :  * \remark Simplified version of [PositionalAccuracy]
+<span class="lineNum">     438 </span>            :  * (http://www.geoapi.org/3.0/javadoc/org/opengis/metadata/quality/PositionalAccuracy.html)
+<a name="439"><span class="lineNum">     439 </span>            :  * from \ref GeoAPI, which originates from \ref ISO_19115</a>
+<span class="lineNum">     440 </span>            :  */
+<span class="lineNum">     441 </span><span class="lineCov">      72594 : class PROJ_GCC_DLL PositionalAccuracy : public util::BaseObject {</span>
+<span class="lineNum">     442 </span>            :   public:
+<span class="lineNum">     443 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     444 </span>            :     PROJ_DLL ~PositionalAccuracy() override;
+<span class="lineNum">     445 </span>            :     //! @endcond
+<span class="lineNum">     446 </span>            : 
+<span class="lineNum">     447 </span>            :     PROJ_DLL const std::string &amp;value() PROJ_PURE_DECL;
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span>            :     PROJ_DLL static PositionalAccuracyNNPtr create(const std::string &amp;valueIn);
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span>            :   protected:
+<span class="lineNum">     452 </span>            :     PROJ_INTERNAL explicit PositionalAccuracy(const std::string &amp;valueIn);
+<span class="lineNum">     453 </span><span class="lineCov">      48396 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span>            :   private:
+<span class="lineNum">     456 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     457 </span>            :     PositionalAccuracy(const PositionalAccuracy &amp;other) = delete;
+<span class="lineNum">     458 </span>            :     PositionalAccuracy &amp;operator=(const PositionalAccuracy &amp;other) = delete;
+<span class="lineNum">     459 </span>            : };
+<span class="lineNum">     460 </span>            : 
+<span class="lineNum">     461 </span>            : } // namespace metadata
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span>            : NS_PROJ_END
+<span class="lineNum">     464 </span>            : 
+<span class="lineNum">     465 </span>            : #endif //  METADATA_HH_INCLUDED
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

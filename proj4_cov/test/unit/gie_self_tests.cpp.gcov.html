@@ -1,0 +1,876 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - test/unit/gie_self_tests.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">test/unit</a> - gie_self_tests.cpp<span style="font-size: 80%;"> (source / <a href="gie_self_tests.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">359</td>
+            <td class="headerCovTableEntry">359</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">28</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntryLo">71.8 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /******************************************************************************</a>
+<span class="lineNum">       2 </span>            :  *
+<span class="lineNum">       3 </span>            :  * Project:  PROJ
+<span class="lineNum">       4 </span>            :  * Purpose:  Test
+<span class="lineNum">       5 </span>            :  * Author:   Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  ******************************************************************************
+<span class="lineNum">       8 </span>            :  * Copyright (c) 2017, Thomas Knudsen
+<span class="lineNum">       9 </span>            :  * Copyright (c) 2017, SDFE
+<span class="lineNum">      10 </span>            :  *
+<span class="lineNum">      11 </span>            :  * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      12 </span>            :  * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      13 </span>            :  * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      14 </span>            :  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      15 </span>            :  * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      16 </span>            :  * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      17 </span>            :  *
+<span class="lineNum">      18 </span>            :  * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      19 </span>            :  * in all copies or substantial portions of the Software.
+<span class="lineNum">      20 </span>            :  *
+<span class="lineNum">      21 </span>            :  * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      22 </span>            :  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      23 </span>            :  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      24 </span>            :  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      25 </span>            :  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      26 </span>            :  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      27 </span>            :  * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      28 </span>            :  ****************************************************************************/
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #include &quot;gtest_include.h&quot;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : // PROJ include order is sensitive
+<span class="lineNum">      33 </span>            : // clang-format off
+<span class="lineNum">      34 </span>            : #include &quot;proj.h&quot;
+<span class="lineNum">      35 </span>            : #include &quot;proj_internal.h&quot;
+<span class="lineNum">      36 </span>            : // clang-format on
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      39 </span>            : #include &lt;string&gt;
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : namespace {
+<span class="lineNum">      42 </span>            : 
+<a name="43"><span class="lineNum">      43 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineCov">          8 : TEST(gie, cart_selftest) {</span>
+<span class="lineNum">      46 </span>            :     PJ_CONTEXT *ctx;
+<span class="lineNum">      47 </span>            :     PJ *P;
+<span class="lineNum">      48 </span>            :     PJ_COORD a, b, obs[2];
+<span class="lineNum">      49 </span>            :     PJ_COORD coord[2];
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :     int err;
+<span class="lineNum">      52 </span>            :     size_t n, sz;
+<span class="lineNum">      53 </span>            :     double dist, h, t;
+<span class="lineNum">      54 </span><span class="lineCov">          1 :     const char *const args[3] = {&quot;proj=utm&quot;, &quot;zone=32&quot;, &quot;ellps=GRS80&quot;};</span>
+<span class="lineNum">      55 </span><span class="lineCov">          1 :     char arg[50] = {&quot;+proj=utm; +zone=32; +ellps=GRS80&quot;};</span>
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :     /* An utm projection on the GRS80 ellipsoid */
+<span class="lineNum">      58 </span><span class="lineCov">          1 :     P = proj_create(PJ_DEFAULT_CTX, arg);</span>
+<span class="lineNum">      59 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :     /* Clean up */
+<span class="lineNum">      62 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            :     /* Same projection, now using argc/argv style initialization */
+<span class="lineNum">      65 </span><span class="lineCov">          1 :     P = proj_create_argv(PJ_DEFAULT_CTX, 3, const_cast&lt;char **&gt;(args));</span>
+<span class="lineNum">      66 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            :     /* zero initialize everything, then set (longitude, latitude) to (12, 55) */
+<span class="lineNum">      69 </span><span class="lineCov">          1 :     a = proj_coord(0, 0, 0, 0);</span>
+<span class="lineNum">      70 </span>            :     /* a.lp: The coordinate part of a, interpreted as a classic LP pair */
+<span class="lineNum">      71 </span><span class="lineCov">          1 :     a.lp.lam = proj_torad(12);</span>
+<span class="lineNum">      72 </span><span class="lineCov">          1 :     a.lp.phi = proj_torad(55);</span>
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :     /* Forward projection */
+<span class="lineNum">      75 </span><span class="lineCov">          1 :     b = proj_trans(P, PJ_FWD, a);</span>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :     /* Inverse projection */
+<span class="lineNum">      78 </span><span class="lineCov">          1 :     a = proj_trans(P, PJ_INV, b);</span>
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :     /* Null projection */
+<span class="lineNum">      81 </span><span class="lineCov">          1 :     a = proj_trans(P, PJ_IDENT, a);</span>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :     /* Forward again, to get two linear items for comparison */
+<span class="lineNum">      84 </span><span class="lineCov">          1 :     a = proj_trans(P, PJ_FWD, a);</span>
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineCov">          1 :     dist = proj_xy_dist(a, b);</span>
+<span class="lineNum">      87 </span><span class="lineCov">          2 :     ASSERT_LE(dist, 2e-9);</span>
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :     /* Clear any previous error */
+<span class="lineNum">      90 </span><span class="lineCov">          1 :     proj_errno_reset(P);</span>
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :     /* Invalid projection */
+<span class="lineNum">      93 </span><span class="lineCov">          1 :     a = proj_trans(P, static_cast&lt;PJ_DIRECTION&gt;(42), a);</span>
+<span class="lineNum">      94 </span><span class="lineCov">          3 :     ASSERT_EQ(a.lpz.lam, HUGE_VAL);</span>
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span><span class="lineCov">          1 :     err = proj_errno(P);</span>
+<span class="lineNum">      97 </span><span class="lineCov">          2 :     ASSERT_NE(err, 0);</span>
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            :     /* Clear error again */
+<span class="lineNum">     100 </span><span class="lineCov">          1 :     proj_errno_reset(P);</span>
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :     /* Clean up */
+<span class="lineNum">     103 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :     /* Now do some 3D transformations */
+<span class="lineNum">     106 </span><span class="lineCov">          1 :     P = proj_create(PJ_DEFAULT_CTX, &quot;+proj=cart +ellps=GRS80&quot;);</span>
+<span class="lineNum">     107 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :     /* zero initialize everything, then set (longitude, latitude, height) to
+<span class="lineNum">     110 </span>            :      * (12, 55, 100) */
+<span class="lineNum">     111 </span><span class="lineCov">          1 :     a = b = proj_coord(0, 0, 0, 0);</span>
+<span class="lineNum">     112 </span><span class="lineCov">          1 :     a.lpz.lam = proj_torad(12);</span>
+<span class="lineNum">     113 </span><span class="lineCov">          1 :     a.lpz.phi = proj_torad(55);</span>
+<span class="lineNum">     114 </span><span class="lineCov">          1 :     a.lpz.z = 100;</span>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :     /* Forward projection: 3D-Cartesian-to-Ellipsoidal */
+<span class="lineNum">     117 </span><span class="lineCov">          1 :     b = proj_trans(P, PJ_FWD, a);</span>
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :     /* Check roundtrip precision for 10000 iterations each way */
+<span class="lineNum">     120 </span><span class="lineCov">          1 :     dist = proj_roundtrip(P, PJ_FWD, 10000, &amp;a);</span>
+<span class="lineNum">     121 </span><span class="lineCov">          1 :     dist += proj_roundtrip(P, PJ_INV, 10000, &amp;b);</span>
+<span class="lineNum">     122 </span><span class="lineCov">          2 :     ASSERT_LE(dist, 4e-9);</span>
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            :     /* Test at the North Pole */
+<span class="lineNum">     125 </span><span class="lineCov">          1 :     a = b = proj_coord(0, 0, 0, 0);</span>
+<span class="lineNum">     126 </span><span class="lineCov">          1 :     a.lpz.lam = proj_torad(0);</span>
+<span class="lineNum">     127 </span><span class="lineCov">          1 :     a.lpz.phi = proj_torad(90);</span>
+<span class="lineNum">     128 </span><span class="lineCov">          1 :     a.lpz.z = 100;</span>
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            :     /* Forward projection: Ellipsoidal-to-3D-Cartesian */
+<span class="lineNum">     131 </span><span class="lineCov">          1 :     dist = proj_roundtrip(P, PJ_FWD, 1, &amp;a);</span>
+<span class="lineNum">     132 </span><span class="lineCov">          2 :     ASSERT_LE(dist, 1e-9);</span>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :     /* Test at the South Pole */
+<span class="lineNum">     135 </span><span class="lineCov">          1 :     a = b = proj_coord(0, 0, 0, 0);</span>
+<span class="lineNum">     136 </span><span class="lineCov">          1 :     a.lpz.lam = proj_torad(0);</span>
+<span class="lineNum">     137 </span><span class="lineCov">          1 :     a.lpz.phi = proj_torad(-90);</span>
+<span class="lineNum">     138 </span><span class="lineCov">          1 :     a.lpz.z = 100;</span>
+<span class="lineNum">     139 </span><span class="lineCov">          1 :     b = a;</span>
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :     /* Forward projection: Ellipsoidal-to-3D-Cartesian */
+<span class="lineNum">     142 </span><span class="lineCov">          1 :     dist = proj_roundtrip(P, PJ_FWD, 1, &amp;a);</span>
+<span class="lineNum">     143 </span><span class="lineCov">          2 :     ASSERT_LE(dist, 4e-9);</span>
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            :     /* Inverse projection: 3D-Cartesian-to-Ellipsoidal */
+<span class="lineNum">     146 </span><span class="lineCov">          1 :     b = proj_trans(P, PJ_INV, b);</span>
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            :     /* Move p to another context */
+<span class="lineNum">     149 </span><span class="lineCov">          1 :     ctx = proj_context_create();</span>
+<span class="lineNum">     150 </span><span class="lineCov">          2 :     ASSERT_NE(ctx, pj_get_default_ctx());</span>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span><span class="lineCov">          1 :     proj_context_set(P, ctx);</span>
+<span class="lineNum">     153 </span><span class="lineCov">          3 :     ASSERT_EQ(ctx, P-&gt;ctx);</span>
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span><span class="lineCov">          1 :     b = proj_trans(P, PJ_FWD, b);</span>
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            :     /* Move it back to the default context */
+<span class="lineNum">     158 </span><span class="lineCov">          1 :     proj_context_set(P, 0);</span>
+<span class="lineNum">     159 </span><span class="lineCov">          3 :     ASSERT_EQ(pj_get_default_ctx(), P-&gt;ctx);</span>
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span><span class="lineCov">          1 :     proj_context_destroy(ctx);</span>
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            :     /* We go on with the work - now back on the default context */
+<span class="lineNum">     164 </span><span class="lineCov">          1 :     b = proj_trans(P, PJ_INV, b);</span>
+<span class="lineNum">     165 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            :     /* Testing proj_trans_generic () */
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :     /* An utm projection on the GRS80 ellipsoid */
+<span class="lineNum">     170 </span><span class="lineCov">          1 :     P = proj_create(PJ_DEFAULT_CTX, &quot;+proj=utm +zone=32 +ellps=GRS80&quot;);</span>
+<span class="lineNum">     171 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span><span class="lineCov">          1 :     obs[0] = proj_coord(proj_torad(12), proj_torad(55), 45, 0);</span>
+<span class="lineNum">     174 </span><span class="lineCov">          1 :     obs[1] = proj_coord(proj_torad(12), proj_torad(56), 50, 0);</span>
+<span class="lineNum">     175 </span>            :     sz = sizeof(PJ_COORD);
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            :     /* Forward projection */
+<span class="lineNum">     178 </span><span class="lineCov">          1 :     a = proj_trans(P, PJ_FWD, obs[0]);</span>
+<span class="lineNum">     179 </span><span class="lineCov">          1 :     b = proj_trans(P, PJ_FWD, obs[1]);</span>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineCov">          1 :     n = proj_trans_generic(P, PJ_FWD, &amp;(obs[0].lpz.lam), sz, 2,</span>
+<span class="lineNum">     182 </span>            :                            &amp;(obs[0].lpz.phi), sz, 2, &amp;(obs[0].lpz.z), sz, 2, 0,
+<span class="lineNum">     183 </span>            :                            sz, 0);
+<span class="lineNum">     184 </span><span class="lineCov">          3 :     ASSERT_EQ(n, 2U);</span>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineCov">          2 :     ASSERT_EQ(a.lpz.lam, obs[0].lpz.lam);</span>
+<span class="lineNum">     187 </span><span class="lineCov">          2 :     ASSERT_EQ(a.lpz.phi, obs[0].lpz.phi);</span>
+<span class="lineNum">     188 </span><span class="lineCov">          2 :     ASSERT_EQ(a.lpz.z, obs[0].lpz.z);</span>
+<span class="lineNum">     189 </span><span class="lineCov">          2 :     ASSERT_EQ(b.lpz.lam, obs[1].lpz.lam);</span>
+<span class="lineNum">     190 </span><span class="lineCov">          2 :     ASSERT_EQ(b.lpz.phi, obs[1].lpz.phi);</span>
+<span class="lineNum">     191 </span><span class="lineCov">          2 :     ASSERT_EQ(b.lpz.z, obs[1].lpz.z);</span>
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span>            :     /* now test the case of constant z */
+<span class="lineNum">     194 </span><span class="lineCov">          1 :     obs[0] = proj_coord(proj_torad(12), proj_torad(55), 45, 0);</span>
+<span class="lineNum">     195 </span><span class="lineCov">          1 :     obs[1] = proj_coord(proj_torad(12), proj_torad(56), 50, 0);</span>
+<span class="lineNum">     196 </span><span class="lineCov">          1 :     h = 27;</span>
+<span class="lineNum">     197 </span><span class="lineCov">          1 :     t = 33;</span>
+<span class="lineNum">     198 </span><span class="lineCov">          1 :     n = proj_trans_generic(P, PJ_FWD, &amp;(obs[0].lpz.lam), sz, 2,</span>
+<span class="lineNum">     199 </span>            :                            &amp;(obs[0].lpz.phi), sz, 2, &amp;h, 0, 1, &amp;t, 0, 1);
+<span class="lineNum">     200 </span><span class="lineCov">          3 :     ASSERT_EQ(n, 2U);</span>
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span><span class="lineCov">          2 :     ASSERT_EQ(a.lpz.lam, obs[0].lpz.lam);</span>
+<span class="lineNum">     203 </span><span class="lineCov">          2 :     ASSERT_EQ(a.lpz.phi, obs[0].lpz.phi);</span>
+<span class="lineNum">     204 </span><span class="lineCov">          3 :     ASSERT_EQ(45, obs[0].lpz.z);</span>
+<span class="lineNum">     205 </span><span class="lineCov">          2 :     ASSERT_EQ(b.lpz.lam, obs[1].lpz.lam);</span>
+<span class="lineNum">     206 </span><span class="lineCov">          2 :     ASSERT_EQ(b.lpz.phi, obs[1].lpz.phi);</span>
+<span class="lineNum">     207 </span><span class="lineCov">          3 :     ASSERT_EQ(50, obs[1].lpz.z);</span>
+<span class="lineNum">     208 </span><span class="lineCov">          2 :     ASSERT_NE(50, h);</span>
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            :     /* test proj_trans_array () */
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span><span class="lineCov">          1 :     coord[0] = proj_coord(proj_torad(12), proj_torad(55), 45, 0);</span>
+<span class="lineNum">     213 </span><span class="lineCov">          1 :     coord[1] = proj_coord(proj_torad(12), proj_torad(56), 50, 0);</span>
+<span class="lineNum">     214 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_trans_array(P, PJ_FWD, 2, coord));</span>
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span><span class="lineCov">          2 :     ASSERT_EQ(a.lpz.lam, coord[0].lpz.lam);</span>
+<span class="lineNum">     217 </span><span class="lineCov">          2 :     ASSERT_EQ(a.lpz.phi, coord[0].lpz.phi);</span>
+<span class="lineNum">     218 </span><span class="lineCov">          2 :     ASSERT_EQ(a.lpz.z, coord[0].lpz.z);</span>
+<span class="lineNum">     219 </span><span class="lineCov">          2 :     ASSERT_EQ(b.lpz.lam, coord[1].lpz.lam);</span>
+<span class="lineNum">     220 </span><span class="lineCov">          2 :     ASSERT_EQ(b.lpz.phi, coord[1].lpz.phi);</span>
+<span class="lineNum">     221 </span><span class="lineCov">          2 :     ASSERT_EQ(b.lpz.z, coord[1].lpz.z);</span>
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            :     /* Clean up  after proj_trans_* tests */
+<span class="lineNum">     224 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     225 </span>            : }
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     228 </span>            : 
+<a name="229"><span class="lineNum">     229 </span><span class="lineCov">          6 : class gieTest : public ::testing::Test {</span></a>
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span><span class="lineCov">          2 :     static void DummyLogFunction(void *, int, const char *) {}</span>
+<a name="232"><span class="lineNum">     232 </span>            : </a>
+<span class="lineNum">     233 </span>            :   protected:
+<span class="lineNum">     234 </span><span class="lineCov">          3 :     void SetUp() override {</span>
+<span class="lineNum">     235 </span><span class="lineCov">          3 :         m_ctxt = proj_context_create();</span>
+<span class="lineNum">     236 </span><span class="lineCov">          3 :         proj_log_func(m_ctxt, nullptr, DummyLogFunction);</span>
+<a name="237"><span class="lineNum">     237 </span><span class="lineCov">          3 :     }</span></a>
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span><span class="lineCov">          3 :     void TearDown() override { proj_context_destroy(m_ctxt); }</span>
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            :     PJ_CONTEXT *m_ctxt = nullptr;
+<span class="lineNum">     242 </span>            : };
+<span class="lineNum">     243 </span>            : 
+<a name="244"><span class="lineNum">     244 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span><span class="lineCov">         10 : TEST_F(gieTest, proj_create_crs_to_crs) {</span>
+<span class="lineNum">     247 </span>            :     /* test proj_create_crs_to_crs() */
+<span class="lineNum">     248 </span>            :     auto P = proj_create_crs_to_crs(PJ_DEFAULT_CTX, &quot;epsg:25832&quot;, &quot;epsg:25833&quot;,
+<span class="lineNum">     249 </span><span class="lineCov">          1 :                                     NULL);</span>
+<span class="lineNum">     250 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     251 </span>            :     PJ_COORD a, b;
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            :     a.xy.x = 700000.0;
+<span class="lineNum">     254 </span>            :     a.xy.y = 6000000.0;
+<span class="lineNum">     255 </span>            :     b.xy.x = 307788.8761171057;
+<span class="lineNum">     256 </span>            :     b.xy.y = 5999669.3036037628;
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span><span class="lineCov">          1 :     a = proj_trans(P, PJ_FWD, a);</span>
+<span class="lineNum">     259 </span><span class="lineCov">          2 :     EXPECT_NEAR(a.xy.x, b.xy.x, 1e-8);</span>
+<span class="lineNum">     260 </span><span class="lineCov">          2 :     EXPECT_NEAR(a.xy.y, b.xy.y, 1e-8);</span>
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span><span class="lineCov">          1 :     auto src = proj_get_source_crs(PJ_DEFAULT_CTX, P);</span>
+<span class="lineNum">     263 </span><span class="lineCov">          3 :     ASSERT_TRUE(src != nullptr);</span>
+<span class="lineNum">     264 </span><span class="lineCov">          4 :     EXPECT_EQ(proj_get_name(src), std::string(&quot;ETRS89 / UTM zone 32N&quot;));</span>
+<span class="lineNum">     265 </span><span class="lineCov">          1 :     proj_destroy(src);</span>
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            :     /* we can also allow PROJ strings as a usable PJ */
+<span class="lineNum">     270 </span><span class="lineCov">          1 :     P = proj_create_crs_to_crs(PJ_DEFAULT_CTX, &quot;proj=utm +zone=32 +datum=WGS84&quot;,</span>
+<span class="lineNum">     271 </span>            :                                &quot;proj=utm +zone=33 +datum=WGS84&quot;, NULL);
+<span class="lineNum">     272 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     273 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span><span class="lineCov">          2 :     EXPECT_TRUE(proj_create_crs_to_crs(m_ctxt, &quot;invalid&quot;, &quot;EPSG:25833&quot;, NULL) ==</span>
+<span class="lineNum">     276 </span><span class="lineCov">          1 :                 nullptr);</span>
+<span class="lineNum">     277 </span><span class="lineCov">          2 :     EXPECT_TRUE(proj_create_crs_to_crs(m_ctxt, &quot;EPSG:25832&quot;, &quot;invalid&quot;, NULL) ==</span>
+<span class="lineNum">     278 </span><span class="lineCov">          1 :                 nullptr);</span>
+<span class="lineNum">     279 </span>            : }
+<span class="lineNum">     280 </span>            : 
+<a name="281"><span class="lineNum">     281 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span><span class="lineCov">         10 : TEST_F(gieTest, proj_create_crs_to_crs_EPSG_4326) {</span>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            :     auto P =
+<span class="lineNum">     286 </span><span class="lineCov">          1 :         proj_create_crs_to_crs(PJ_DEFAULT_CTX, &quot;EPSG:4326&quot;, &quot;EPSG:32631&quot;, NULL);</span>
+<span class="lineNum">     287 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     288 </span>            :     PJ_COORD a, b;
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span>            :     // Lat, long degrees
+<span class="lineNum">     291 </span>            :     a.xy.x = 0.0;
+<span class="lineNum">     292 </span>            :     a.xy.y = 3.0;
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            :     b.xy.x = 500000.0;
+<span class="lineNum">     295 </span>            :     b.xy.y = 0.0;
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span><span class="lineCov">          1 :     a = proj_trans(P, PJ_FWD, a);</span>
+<span class="lineNum">     298 </span><span class="lineCov">          2 :     EXPECT_NEAR(a.xy.x, b.xy.x, 1e-9);</span>
+<span class="lineNum">     299 </span><span class="lineCov">          2 :     EXPECT_NEAR(a.xy.y, b.xy.y, 1e-9);</span>
+<span class="lineNum">     300 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     301 </span>            : }
+<span class="lineNum">     302 </span>            : 
+<a name="303"><span class="lineNum">     303 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span><span class="lineCov">         10 : TEST_F(gieTest, proj_create_crs_to_crs_proj_longlat) {</span>
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            :     auto P = proj_create_crs_to_crs(
+<span class="lineNum">     308 </span><span class="lineCov">          1 :         PJ_DEFAULT_CTX, &quot;+proj=longlat +datum=WGS84&quot;, &quot;EPSG:32631&quot;, NULL);</span>
+<span class="lineNum">     309 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     310 </span>            :     PJ_COORD a, b;
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span>            :     // Long, lat degrees
+<span class="lineNum">     313 </span>            :     a.xy.x = 3.0;
+<span class="lineNum">     314 </span>            :     a.xy.y = 0;
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :     b.xy.x = 500000.0;
+<span class="lineNum">     317 </span>            :     b.xy.y = 0.0;
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span><span class="lineCov">          1 :     a = proj_trans(P, PJ_FWD, a);</span>
+<span class="lineNum">     320 </span><span class="lineCov">          2 :     EXPECT_NEAR(a.xy.x, b.xy.x, 1e-9);</span>
+<span class="lineNum">     321 </span><span class="lineCov">          2 :     EXPECT_NEAR(a.xy.y, b.xy.y, 1e-9);</span>
+<span class="lineNum">     322 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     323 </span>            : }
+<span class="lineNum">     324 </span>            : 
+<a name="325"><span class="lineNum">     325 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span><span class="lineCov">          8 : TEST(gie, info_functions) {</span>
+<span class="lineNum">     328 </span>            :     PJ_INFO info;
+<span class="lineNum">     329 </span>            :     PJ_PROJ_INFO pj_info;
+<span class="lineNum">     330 </span>            :     PJ_GRID_INFO grid_info;
+<span class="lineNum">     331 </span>            :     PJ_INIT_INFO init_info;
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            :     PJ_FACTORS factors;
+<span class="lineNum">     334 </span>            : 
+<span class="lineNum">     335 </span>            :     const PJ_OPERATIONS *oper_list;
+<span class="lineNum">     336 </span>            :     const PJ_ELLPS *ellps_list;
+<span class="lineNum">     337 </span>            :     const PJ_UNITS *unit_list;
+<span class="lineNum">     338 </span>            :     const PJ_PRIME_MERIDIANS *pm_list;
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span>            :     char buf[40];
+<span class="lineNum">     341 </span>            :     PJ *P;
+<span class="lineNum">     342 </span><span class="lineCov">          1 :     char arg[50] = {&quot;+proj=utm; +zone=32; +ellps=GRS80&quot;};</span>
+<span class="lineNum">     343 </span>            :     PJ_COORD a;
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            :     /* ********************************************************************** */
+<span class="lineNum">     346 </span>            :     /*                          Test info functions                           */
+<span class="lineNum">     347 </span>            :     /* ********************************************************************** */
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span>            :     /* proj_info()                                                            */
+<span class="lineNum">     350 </span>            :     /* this one is difficult to test, since the output changes with the setup */
+<span class="lineNum">     351 </span><span class="lineCov">          1 :     info = proj_info();</span>
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span><span class="lineCov">          1 :     if (info.version[0] != '\0') {</span>
+<span class="lineNum">     354 </span>            :         char tmpstr[64];
+<span class="lineNum">     355 </span><span class="lineCov">          1 :         sprintf(tmpstr, &quot;%d.%d.%d&quot;, info.major, info.minor, info.patch);</span>
+<span class="lineNum">     356 </span><span class="lineCov">          4 :         ASSERT_EQ(std::string(info.version), std::string(tmpstr));</span>
+<span class="lineNum">     357 </span>            :     }
+<span class="lineNum">     358 </span><span class="lineCov">          3 :     ASSERT_NE(std::string(info.release), &quot;&quot;);</span>
+<span class="lineNum">     359 </span><span class="lineCov">          1 :     if (getenv(&quot;HOME&quot;) || getenv(&quot;PROJ_LIB&quot;)) {</span>
+<span class="lineNum">     360 </span><span class="lineCov">          4 :         ASSERT_NE(std::string(info.searchpath), std::string());</span>
+<span class="lineNum">     361 </span>            :     }
+<span class="lineNum">     362 </span>            : 
+<span class="lineNum">     363 </span>            :     /* proj_pj_info() */
+<span class="lineNum">     364 </span>            :     {
+<span class="lineNum">     365 </span><span class="lineCov">          1 :         P = proj_create(PJ_DEFAULT_CTX,</span>
+<span class="lineNum">     366 </span>            :                         &quot;+proj=august&quot;); /* august has no inverse */
+<span class="lineNum">     367 </span><span class="lineCov">          1 :         auto has_inverse = proj_pj_info(P).has_inverse;</span>
+<span class="lineNum">     368 </span><span class="lineCov">          1 :         proj_destroy(P);</span>
+<span class="lineNum">     369 </span><span class="lineCov">          3 :         ASSERT_FALSE(has_inverse);</span>
+<span class="lineNum">     370 </span>            :     }
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span><span class="lineCov">          1 :     P = proj_create(PJ_DEFAULT_CTX, arg);</span>
+<span class="lineNum">     373 </span><span class="lineCov">          1 :     pj_info = proj_pj_info(P);</span>
+<span class="lineNum">     374 </span><span class="lineCov">          2 :     ASSERT_TRUE(pj_info.has_inverse);</span>
+<span class="lineNum">     375 </span><span class="lineCov">          1 :     pj_shrink(arg);</span>
+<span class="lineNum">     376 </span><span class="lineCov">          3 :     ASSERT_EQ(std::string(pj_info.definition), arg);</span>
+<span class="lineNum">     377 </span><span class="lineCov">          3 :     ASSERT_EQ(std::string(pj_info.id), &quot;utm&quot;);</span>
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span>            :     /* proj_grid_info() */
+<span class="lineNum">     382 </span><span class="lineCov">          1 :     grid_info = proj_grid_info(&quot;null&quot;);</span>
+<span class="lineNum">     383 </span><span class="lineCov">          3 :     ASSERT_NE(std::string(grid_info.filename), &quot;&quot;);</span>
+<span class="lineNum">     384 </span><span class="lineCov">          3 :     ASSERT_EQ(std::string(grid_info.gridname), &quot;null&quot;);</span>
+<span class="lineNum">     385 </span>            : 
+<span class="lineNum">     386 </span><span class="lineCov">          1 :     grid_info = proj_grid_info(&quot;nonexistinggrid&quot;);</span>
+<span class="lineNum">     387 </span><span class="lineCov">          3 :     ASSERT_EQ(std::string(grid_info.filename), &quot;&quot;);</span>
+<span class="lineNum">     388 </span>            : 
+<span class="lineNum">     389 </span>            :     /* proj_init_info() */
+<span class="lineNum">     390 </span><span class="lineCov">          1 :     init_info = proj_init_info(&quot;unknowninit&quot;);</span>
+<span class="lineNum">     391 </span><span class="lineCov">          3 :     ASSERT_EQ(std::string(init_info.filename), &quot;&quot;);</span>
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span><span class="lineCov">          1 :     init_info = proj_init_info(&quot;epsg&quot;);</span>
+<span class="lineNum">     394 </span>            :     /* Need to allow for &quot;Unknown&quot; until all commonly distributed EPSG-files
+<span class="lineNum">     395 </span>            :      * comes with a metadata section */
+<span class="lineNum">     396 </span><span class="lineCov">          5 :     ASSERT_TRUE(std::string(init_info.origin) == &quot;EPSG&quot; ||</span>
+<span class="lineNum">     397 </span>            :                 std::string(init_info.origin) == &quot;Unknown&quot;)
+<span class="lineNum">     398 </span><span class="lineCov">          1 :         &lt;&lt; std::string(init_info.origin);</span>
+<span class="lineNum">     399 </span><span class="lineCov">          3 :     ASSERT_EQ(std::string(init_info.name), &quot;epsg&quot;);</span>
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            :     /* test proj_rtodms() and proj_dmstor() */
+<span class="lineNum">     402 </span><span class="lineCov">          3 :     ASSERT_EQ(std::string(&quot;180dN&quot;), proj_rtodms(buf, M_PI, 'N', 'S'));</span>
+<span class="lineNum">     403 </span>            : 
+<span class="lineNum">     404 </span><span class="lineCov">          3 :     ASSERT_EQ(proj_dmstor(&amp;buf[0], NULL), M_PI);</span>
+<span class="lineNum">     405 </span>            : 
+<span class="lineNum">     406 </span><span class="lineCov">          2 :     ASSERT_EQ(std::string(&quot;114d35'29.612\&quot;S&quot;),</span>
+<span class="lineNum">     407 </span><span class="lineCov">          1 :               proj_rtodms(buf, -2.0, 'N', 'S'));</span>
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span>            :     /* we can't expect perfect numerical accuracy so testing with a tolerance */
+<span class="lineNum">     410 </span><span class="lineCov">          2 :     ASSERT_NEAR(-2.0, proj_dmstor(&amp;buf[0], NULL), 1e-7);</span>
+<span class="lineNum">     411 </span>            : 
+<span class="lineNum">     412 </span>            :     /* test proj_derivatives_retrieve() and proj_factors_retrieve() */
+<span class="lineNum">     413 </span><span class="lineCov">          1 :     P = proj_create(PJ_DEFAULT_CTX, &quot;+proj=merc +ellps=WGS84&quot;);</span>
+<span class="lineNum">     414 </span><span class="lineCov">          1 :     a = proj_coord(0, 0, 0, 0);</span>
+<span class="lineNum">     415 </span><span class="lineCov">          1 :     a.lp.lam = proj_torad(12);</span>
+<span class="lineNum">     416 </span><span class="lineCov">          1 :     a.lp.phi = proj_torad(55);</span>
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span><span class="lineCov">          1 :     factors = proj_factors(P, a);</span>
+<span class="lineNum">     419 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_errno(P)); /* factors not created correctly */</span>
+<span class="lineNum">     420 </span>            : 
+<span class="lineNum">     421 </span>            :     /* check a few key characteristics of the Mercator projection */
+<span class="lineNum">     422 </span><span class="lineCov">          1 :     EXPECT_NEAR(factors.angular_distortion, 0.0, 1e-7)</span>
+<span class="lineNum">     423 </span><span class="lineCov">          1 :         &lt;&lt; factors.angular_distortion; /* angular distortion should be 0 */</span>
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span>            :     /* Meridian/parallel angle should be 90 deg */
+<span class="lineNum">     426 </span><span class="lineCov">          1 :     EXPECT_NEAR(factors.meridian_parallel_angle, M_PI_2, 1e-7)</span>
+<span class="lineNum">     427 </span><span class="lineCov">          1 :         &lt;&lt; factors.meridian_parallel_angle;</span>
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span><span class="lineCov">          2 :     EXPECT_EQ(factors.meridian_convergence,</span>
+<span class="lineNum">     430 </span><span class="lineCov">          1 :               0.0); /* meridian convergence should be 0 */</span>
+<span class="lineNum">     431 </span>            : 
+<span class="lineNum">     432 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     433 </span>            : 
+<span class="lineNum">     434 </span>            :     /* Check that proj_list_* functions work by looping through them */
+<span class="lineNum">     435 </span><span class="lineCov">          1 :     size_t n = 0;</span>
+<span class="lineNum">     436 </span><span class="lineCov">        166 :     for (oper_list = proj_list_operations(); oper_list-&gt;id; ++oper_list)</span>
+<span class="lineNum">     437 </span><span class="lineCov">        165 :         n++;</span>
+<span class="lineNum">     438 </span><span class="lineCov">          2 :     ASSERT_NE(n, 0U);</span>
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span><span class="lineCov">          1 :     n = 0;</span>
+<span class="lineNum">     441 </span><span class="lineCov">         47 :     for (ellps_list = proj_list_ellps(); ellps_list-&gt;id; ++ellps_list)</span>
+<span class="lineNum">     442 </span><span class="lineCov">         46 :         n++;</span>
+<span class="lineNum">     443 </span><span class="lineCov">          2 :     ASSERT_NE(n, 0U);</span>
+<span class="lineNum">     444 </span>            : 
+<span class="lineNum">     445 </span><span class="lineCov">          1 :     n = 0;</span>
+<span class="lineNum">     446 </span><span class="lineCov">         22 :     for (unit_list = proj_list_units(); unit_list-&gt;id; ++unit_list)</span>
+<span class="lineNum">     447 </span><span class="lineCov">         21 :         n++;</span>
+<span class="lineNum">     448 </span><span class="lineCov">          2 :     ASSERT_NE(n, 0U);</span>
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span><span class="lineCov">          1 :     n = 0;</span>
+<span class="lineNum">     451 </span><span class="lineCov">         15 :     for (pm_list = proj_list_prime_meridians(); pm_list-&gt;id; ++pm_list)</span>
+<span class="lineNum">     452 </span><span class="lineCov">         14 :         n++;</span>
+<span class="lineNum">     453 </span><span class="lineCov">          2 :     ASSERT_NE(n, 0U);</span>
+<span class="lineNum">     454 </span>            : }
+<span class="lineNum">     455 </span>            : 
+<a name="456"><span class="lineNum">     456 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     457 </span>            : 
+<span class="lineNum">     458 </span><span class="lineCov">          8 : TEST(gie, io_predicates) {</span>
+<span class="lineNum">     459 </span>            :     /* check io-predicates */
+<span class="lineNum">     460 </span>            : 
+<span class="lineNum">     461 </span>            :     /* angular in on fwd, linear out */
+<span class="lineNum">     462 </span><span class="lineCov">          1 :     auto P = proj_create(PJ_DEFAULT_CTX, &quot;+proj=cart +ellps=GRS80&quot;);</span>
+<span class="lineNum">     463 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     464 </span><span class="lineCov">          3 :     ASSERT_TRUE(proj_angular_input(P, PJ_FWD));</span>
+<span class="lineNum">     465 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_angular_input(P, PJ_INV));</span>
+<span class="lineNum">     466 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_angular_output(P, PJ_FWD));</span>
+<span class="lineNum">     467 </span><span class="lineCov">          3 :     ASSERT_TRUE(proj_angular_output(P, PJ_INV));</span>
+<span class="lineNum">     468 </span><span class="lineCov">          1 :     P-&gt;inverted = 1;</span>
+<span class="lineNum">     469 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_angular_input(P, PJ_FWD));</span>
+<span class="lineNum">     470 </span><span class="lineCov">          3 :     ASSERT_TRUE(proj_angular_input(P, PJ_INV));</span>
+<span class="lineNum">     471 </span><span class="lineCov">          3 :     ASSERT_TRUE(proj_angular_output(P, PJ_FWD));</span>
+<span class="lineNum">     472 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_angular_output(P, PJ_INV));</span>
+<span class="lineNum">     473 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     474 </span>            : 
+<span class="lineNum">     475 </span>            :     /* angular in and out */
+<span class="lineNum">     476 </span><span class="lineCov">          1 :     P = proj_create(PJ_DEFAULT_CTX,</span>
+<span class="lineNum">     477 </span>            :                     &quot;+proj=molodensky +a=6378160 +rf=298.25 &quot;
+<span class="lineNum">     478 </span>            :                     &quot;+da=-23 +df=-8.120449e-8 +dx=-134 +dy=-48 +dz=149 &quot;
+<span class="lineNum">     479 </span>            :                     &quot;+abridged &quot;);
+<span class="lineNum">     480 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     481 </span><span class="lineCov">          3 :     ASSERT_TRUE(proj_angular_input(P, PJ_FWD));</span>
+<span class="lineNum">     482 </span><span class="lineCov">          3 :     ASSERT_TRUE(proj_angular_input(P, PJ_INV));</span>
+<span class="lineNum">     483 </span><span class="lineCov">          3 :     ASSERT_TRUE(proj_angular_output(P, PJ_FWD));</span>
+<span class="lineNum">     484 </span><span class="lineCov">          3 :     ASSERT_TRUE(proj_angular_output(P, PJ_INV));</span>
+<span class="lineNum">     485 </span><span class="lineCov">          1 :     P-&gt;inverted = 1;</span>
+<span class="lineNum">     486 </span><span class="lineCov">          3 :     ASSERT_TRUE(proj_angular_input(P, PJ_FWD));</span>
+<span class="lineNum">     487 </span><span class="lineCov">          3 :     ASSERT_TRUE(proj_angular_input(P, PJ_INV));</span>
+<span class="lineNum">     488 </span><span class="lineCov">          3 :     ASSERT_TRUE(proj_angular_output(P, PJ_FWD));</span>
+<span class="lineNum">     489 </span><span class="lineCov">          3 :     ASSERT_TRUE(proj_angular_output(P, PJ_INV));</span>
+<span class="lineNum">     490 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     491 </span>            : 
+<span class="lineNum">     492 </span>            :     /* linear in and out */
+<span class="lineNum">     493 </span><span class="lineCov">          1 :     P = proj_create(PJ_DEFAULT_CTX,</span>
+<span class="lineNum">     494 </span>            :                     &quot; +proj=helmert&quot;
+<span class="lineNum">     495 </span>            :                     &quot; +x=0.0127 +y=0.0065 +z=-0.0209 +s=0.00195&quot;
+<span class="lineNum">     496 </span>            :                     &quot; +rx=-0.00039 +ry=0.00080 +rz=-0.00114&quot;
+<span class="lineNum">     497 </span>            :                     &quot; +dx=-0.0029 +dy=-0.0002 +dz=-0.0006 +ds=0.00001&quot;
+<span class="lineNum">     498 </span>            :                     &quot; +drx=-0.00011 +dry=-0.00019 +drz=0.00007&quot;
+<span class="lineNum">     499 </span>            :                     &quot; +t_epoch=1988.0 +convention=coordinate_frame&quot;);
+<span class="lineNum">     500 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     501 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_angular_input(P, PJ_FWD));</span>
+<span class="lineNum">     502 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_angular_input(P, PJ_INV));</span>
+<span class="lineNum">     503 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_angular_output(P, PJ_FWD));</span>
+<span class="lineNum">     504 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_angular_output(P, PJ_INV));</span>
+<span class="lineNum">     505 </span><span class="lineCov">          1 :     P-&gt;inverted = 1;</span>
+<span class="lineNum">     506 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_angular_input(P, PJ_FWD));</span>
+<span class="lineNum">     507 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_angular_input(P, PJ_INV));</span>
+<span class="lineNum">     508 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_angular_output(P, PJ_FWD));</span>
+<span class="lineNum">     509 </span><span class="lineCov">          3 :     ASSERT_FALSE(proj_angular_output(P, PJ_INV));</span>
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span>            :     /* pj_init_ctx should default to GRS80 */
+<span class="lineNum">     512 </span><span class="lineCov">          3 :     ASSERT_EQ(P-&gt;a, 6378137.0);</span>
+<span class="lineNum">     513 </span><span class="lineCov">          3 :     ASSERT_EQ(P-&gt;f, 1.0 / 298.257222101);</span>
+<span class="lineNum">     514 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     515 </span>            : 
+<span class="lineNum">     516 </span>            :     /* Test that pj_fwd* and pj_inv* returns NaNs when receiving NaN input */
+<span class="lineNum">     517 </span><span class="lineCov">          1 :     P = proj_create(PJ_DEFAULT_CTX, &quot;+proj=merc +ellps=WGS84&quot;);</span>
+<span class="lineNum">     518 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     519 </span><span class="lineCov">          1 :     auto a = proj_coord(NAN, NAN, NAN, NAN);</span>
+<span class="lineNum">     520 </span><span class="lineCov">          1 :     a = proj_trans(P, PJ_FWD, a);</span>
+<span class="lineNum">     521 </span><span class="lineCov">          1 :     ASSERT_TRUE((std::isnan(a.v[0]) &amp;&amp; std::isnan(a.v[1]) &amp;&amp;</span>
+<span class="lineNum">     522 </span><span class="lineCov">          1 :                  std::isnan(a.v[2]) &amp;&amp; std::isnan(a.v[3])));</span>
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span><span class="lineCov">          1 :     a = proj_coord(NAN, NAN, NAN, NAN);</span>
+<span class="lineNum">     525 </span><span class="lineCov">          1 :     a = proj_trans(P, PJ_INV, a);</span>
+<span class="lineNum">     526 </span><span class="lineCov">          1 :     ASSERT_TRUE((std::isnan(a.v[0]) &amp;&amp; std::isnan(a.v[1]) &amp;&amp;</span>
+<span class="lineNum">     527 </span><span class="lineCov">          1 :                  std::isnan(a.v[2]) &amp;&amp; std::isnan(a.v[3])));</span>
+<span class="lineNum">     528 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     529 </span>            : }
+<span class="lineNum">     530 </span>            : 
+<span class="lineNum">     531 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     532 </span>            : 
+<span class="lineNum">     533 </span><span class="lineCov">          5 : static void test_time(const char *args, double tol, double t_in, double t_exp) {</span>
+<span class="lineNum">     534 </span>            :     PJ_COORD in, out;
+<span class="lineNum">     535 </span><span class="lineCov">          5 :     PJ *P = proj_create(PJ_DEFAULT_CTX, args);</span>
+<span class="lineNum">     536 </span>            : 
+<span class="lineNum">     537 </span><span class="lineCov">         15 :     ASSERT_TRUE(P != 0);</span>
+<span class="lineNum">     538 </span>            : 
+<span class="lineNum">     539 </span><span class="lineCov">          5 :     in = proj_coord(0.0, 0.0, 0.0, t_in);</span>
+<span class="lineNum">     540 </span>            : 
+<span class="lineNum">     541 </span><span class="lineCov">          5 :     out = proj_trans(P, PJ_FWD, in);</span>
+<span class="lineNum">     542 </span><span class="lineCov">         10 :     EXPECT_NEAR(out.xyzt.t, t_exp, tol);</span>
+<span class="lineNum">     543 </span>            : 
+<span class="lineNum">     544 </span><span class="lineCov">          5 :     out = proj_trans(P, PJ_INV, out);</span>
+<span class="lineNum">     545 </span><span class="lineCov">         10 :     EXPECT_NEAR(out.xyzt.t, t_in, tol);</span>
+<span class="lineNum">     546 </span>            : 
+<span class="lineNum">     547 </span><span class="lineCov">          5 :     pj_free(P);</span>
+<span class="lineNum">     548 </span>            : 
+<span class="lineNum">     549 </span><span class="lineCov">          5 :     proj_log_level(NULL, PJ_LOG_NONE);</span>
+<span class="lineNum">     550 </span>            : }
+<span class="lineNum">     551 </span>            : 
+<a name="552"><span class="lineNum">     552 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     553 </span>            : 
+<span class="lineNum">     554 </span><span class="lineCov">          8 : TEST(gie, unitconvert_selftest) {</span>
+<span class="lineNum">     555 </span>            : 
+<span class="lineNum">     556 </span><span class="lineCov">          1 :     char args1[] = &quot;+proj=unitconvert +t_in=decimalyear +t_out=decimalyear&quot;;</span>
+<span class="lineNum">     557 </span>            :     double in1 = 2004.25;
+<span class="lineNum">     558 </span>            : 
+<span class="lineNum">     559 </span><span class="lineCov">          1 :     char args2[] = &quot;+proj=unitconvert +t_in=gps_week +t_out=gps_week&quot;;</span>
+<span class="lineNum">     560 </span>            :     double in2 = 1782.0;
+<span class="lineNum">     561 </span>            : 
+<span class="lineNum">     562 </span><span class="lineCov">          1 :     char args3[] = &quot;+proj=unitconvert +t_in=mjd +t_out=mjd&quot;;</span>
+<span class="lineNum">     563 </span>            :     double in3 = 57390.0;
+<span class="lineNum">     564 </span>            : 
+<span class="lineNum">     565 </span><span class="lineCov">          1 :     char args4[] = &quot;+proj=unitconvert +t_in=gps_week +t_out=decimalyear&quot;;</span>
+<span class="lineNum">     566 </span>            :     double in4 = 1877.71428, exp4 = 2016.0;
+<span class="lineNum">     567 </span>            : 
+<span class="lineNum">     568 </span><span class="lineCov">          1 :     char args5[] = &quot;+proj=unitconvert +t_in=yyyymmdd +t_out=yyyymmdd&quot;;</span>
+<span class="lineNum">     569 </span>            :     double in5 = 20170131;
+<span class="lineNum">     570 </span>            : 
+<span class="lineNum">     571 </span><span class="lineCov">          1 :     test_time(args1, 1e-6, in1, in1);</span>
+<span class="lineNum">     572 </span><span class="lineCov">          1 :     test_time(args2, 1e-6, in2, in2);</span>
+<span class="lineNum">     573 </span><span class="lineCov">          1 :     test_time(args3, 1e-6, in3, in3);</span>
+<span class="lineNum">     574 </span><span class="lineCov">          1 :     test_time(args4, 1e-6, in4, exp4);</span>
+<span class="lineNum">     575 </span><span class="lineCov">          1 :     test_time(args5, 1e-6, in5, in5);</span>
+<span class="lineNum">     576 </span><span class="lineCov">          1 : }</span>
+<span class="lineNum">     577 </span>            : 
+<span class="lineNum">     578 </span>            : static const char tc32_utm32[] = {
+<span class="lineNum">     579 </span>            :     &quot; +proj=horner&quot;
+<span class="lineNum">     580 </span>            :     &quot; +ellps=intl&quot;
+<span class="lineNum">     581 </span>            :     &quot; +range=500000&quot;
+<span class="lineNum">     582 </span>            :     &quot; +fwd_origin=877605.269066,6125810.306769&quot;
+<span class="lineNum">     583 </span>            :     &quot; +inv_origin=877605.760036,6125811.281773&quot;
+<span class="lineNum">     584 </span>            :     &quot; +deg=4&quot;
+<span class="lineNum">     585 </span>            :     &quot; +fwd_v=6.1258112678e+06,9.9999971567e-01,1.5372750011e-10,5.9300860915e-&quot;
+<span class="lineNum">     586 </span>            :     &quot;15,2.2609497633e-19,4.3188227445e-05,2.8225130416e-10,7.8740007114e-16,-1.&quot;
+<span class="lineNum">     587 </span>            :     &quot;7453997279e-19,1.6877465415e-10,-1.1234649773e-14,-1.7042333358e-18,-7.&quot;
+<span class="lineNum">     588 </span>            :     &quot;9303467953e-15,-5.2906832535e-19,3.9984284847e-19&quot;
+<span class="lineNum">     589 </span>            :     &quot; +fwd_u=8.7760574982e+05,9.9999752475e-01,2.8817299305e-10,5.5641310680e-&quot;
+<span class="lineNum">     590 </span>            :     &quot;15,-1.5544700949e-18,-4.1357045890e-05,4.2106213519e-11,2.8525551629e-14,-&quot;
+<span class="lineNum">     591 </span>            :     &quot;1.9107771273e-18,3.3615590093e-10,2.4380247154e-14,-2.0241230315e-18,1.&quot;
+<span class="lineNum">     592 </span>            :     &quot;2429019719e-15,5.3886155968e-19,-1.0167505000e-18&quot;
+<span class="lineNum">     593 </span>            :     &quot; +inv_v=6.1258103208e+06,1.0000002826e+00,-1.5372762184e-10,-5.&quot;
+<span class="lineNum">     594 </span>            :     &quot;9304261011e-15,-2.2612705361e-19,-4.3188331419e-05,-2.8225549995e-10,-7.&quot;
+<span class="lineNum">     595 </span>            :     &quot;8529116371e-16,1.7476576773e-19,-1.6875687989e-10,1.1236475299e-14,1.&quot;
+<span class="lineNum">     596 </span>            :     &quot;7042518057e-18,7.9300735257e-15,5.2881862699e-19,-3.9990736798e-19&quot;
+<span class="lineNum">     597 </span>            :     &quot; +inv_u=8.7760527928e+05,1.0000024735e+00,-2.8817540032e-10,-5.&quot;
+<span class="lineNum">     598 </span>            :     &quot;5627059451e-15,1.5543637570e-18,4.1357152105e-05,-4.2114813612e-11,-2.&quot;
+<span class="lineNum">     599 </span>            :     &quot;8523713454e-14,1.9109017837e-18,-3.3616407783e-10,-2.4382678126e-14,2.&quot;
+<span class="lineNum">     600 </span>            :     &quot;0245020199e-18,-1.2441377565e-15,-5.3885232238e-19,1.0167203661e-18&quot;};
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span>            : static const char sb_utm32[] = {
+<span class="lineNum">     603 </span>            :     &quot; +proj=horner&quot;
+<span class="lineNum">     604 </span>            :     &quot; +ellps=intl&quot;
+<span class="lineNum">     605 </span>            :     &quot; +range=500000&quot;
+<span class="lineNum">     606 </span>            :     &quot; +tolerance=0.0005&quot;
+<span class="lineNum">     607 </span>            :     &quot; +fwd_origin=4.94690026817276e+05,6.13342113183056e+06&quot;
+<span class="lineNum">     608 </span>            :     &quot; +inv_origin=6.19480258923588e+05,6.13258568148837e+06&quot;
+<span class="lineNum">     609 </span>            :     &quot; +deg=3&quot;
+<span class="lineNum">     610 </span>            :     &quot; +fwd_c=6.13258562111350e+06,6.19480105709997e+05,9.99378966275206e-01,-2.&quot;
+<span class="lineNum">     611 </span>            :     &quot;82153291753490e-02,-2.27089979140026e-10,-1.77019590701470e-09,1.&quot;
+<span class="lineNum">     612 </span>            :     &quot;08522286274070e-14,2.11430298751604e-15&quot;
+<span class="lineNum">     613 </span>            :     &quot; +inv_c=6.13342118787027e+06,4.94690181709311e+05,9.99824464710368e-01,2.&quot;
+<span class="lineNum">     614 </span>            :     &quot;82279070814774e-02,7.66123542220864e-11,1.78425334628927e-09,-1.&quot;
+<span class="lineNum">     615 </span>            :     &quot;05584823306400e-14,-3.32554258683744e-15&quot;};
+<span class="lineNum">     616 </span>            : 
+<a name="617"><span class="lineNum">     617 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     618 </span>            : 
+<span class="lineNum">     619 </span><span class="lineCov">          8 : TEST(gie, horner_selftest) {</span>
+<span class="lineNum">     620 </span>            : 
+<span class="lineNum">     621 </span>            :     PJ *P;
+<span class="lineNum">     622 </span>            :     PJ_COORD a, b, c;
+<span class="lineNum">     623 </span>            :     double dist;
+<span class="lineNum">     624 </span>            : 
+<span class="lineNum">     625 </span>            :     /* Real polynonia relating the technical coordinate system TC32 to &quot;System
+<span class="lineNum">     626 </span>            :      * 45 Bornholm&quot; */
+<span class="lineNum">     627 </span><span class="lineCov">          1 :     P = proj_create(PJ_DEFAULT_CTX, tc32_utm32);</span>
+<span class="lineNum">     628 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     629 </span>            : 
+<span class="lineNum">     630 </span><span class="lineCov">          1 :     a = b = proj_coord(0, 0, 0, 0);</span>
+<span class="lineNum">     631 </span><span class="lineCov">          1 :     a.uv.v = 6125305.4245;</span>
+<span class="lineNum">     632 </span><span class="lineCov">          1 :     a.uv.u = 878354.8539;</span>
+<span class="lineNum">     633 </span><span class="lineCov">          1 :     c = a;</span>
+<span class="lineNum">     634 </span>            : 
+<span class="lineNum">     635 </span>            :     /* Check roundtrip precision for 1 iteration each way, starting in forward
+<span class="lineNum">     636 </span>            :      * direction */
+<span class="lineNum">     637 </span><span class="lineCov">          1 :     dist = proj_roundtrip(P, PJ_FWD, 1, &amp;c);</span>
+<span class="lineNum">     638 </span><span class="lineCov">          2 :     EXPECT_LE(dist, 0.01);</span>
+<span class="lineNum">     639 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     640 </span>            : 
+<span class="lineNum">     641 </span>            :     /* The complex polynomial transformation between the &quot;System Storebaelt&quot; and
+<span class="lineNum">     642 </span>            :      * utm32/ed50 */
+<span class="lineNum">     643 </span><span class="lineCov">          1 :     P = proj_create(PJ_DEFAULT_CTX, sb_utm32);</span>
+<span class="lineNum">     644 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     645 </span>            : 
+<span class="lineNum">     646 </span>            :     /* Test value: utm32_ed50(620000, 6130000) = sb_ed50(495136.8544,
+<span class="lineNum">     647 </span>            :      * 6130821.2945) */
+<span class="lineNum">     648 </span><span class="lineCov">          1 :     a = b = c = proj_coord(0, 0, 0, 0);</span>
+<span class="lineNum">     649 </span><span class="lineCov">          1 :     a.uv.v = 6130821.2945;</span>
+<span class="lineNum">     650 </span><span class="lineCov">          1 :     a.uv.u = 495136.8544;</span>
+<span class="lineNum">     651 </span><span class="lineCov">          1 :     c.uv.v = 6130000.0000;</span>
+<span class="lineNum">     652 </span><span class="lineCov">          1 :     c.uv.u = 620000.0000;</span>
+<span class="lineNum">     653 </span>            : 
+<span class="lineNum">     654 </span>            :     /* Forward projection */
+<span class="lineNum">     655 </span><span class="lineCov">          1 :     b = proj_trans(P, PJ_FWD, a);</span>
+<span class="lineNum">     656 </span><span class="lineCov">          1 :     dist = proj_xy_dist(b, c);</span>
+<span class="lineNum">     657 </span><span class="lineCov">          2 :     EXPECT_LE(dist, 0.001);</span>
+<span class="lineNum">     658 </span>            : 
+<span class="lineNum">     659 </span>            :     /* Inverse projection */
+<span class="lineNum">     660 </span><span class="lineCov">          1 :     b = proj_trans(P, PJ_INV, c);</span>
+<span class="lineNum">     661 </span><span class="lineCov">          1 :     dist = proj_xy_dist(b, a);</span>
+<span class="lineNum">     662 </span><span class="lineCov">          2 :     EXPECT_LE(dist, 0.001);</span>
+<span class="lineNum">     663 </span>            : 
+<span class="lineNum">     664 </span>            :     /* Check roundtrip precision for 1 iteration each way */
+<span class="lineNum">     665 </span><span class="lineCov">          1 :     dist = proj_roundtrip(P, PJ_FWD, 1, &amp;a);</span>
+<span class="lineNum">     666 </span><span class="lineCov">          2 :     EXPECT_LE(dist, 0.01);</span>
+<span class="lineNum">     667 </span>            : 
+<span class="lineNum">     668 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     669 </span>            : }
+<span class="lineNum">     670 </span>            : 
+<a name="671"><span class="lineNum">     671 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     672 </span>            : 
+<span class="lineNum">     673 </span><span class="lineCov">          8 : TEST(gie, proj_create_crs_to_crs_PULKOVO42_ETRS89) {</span>
+<span class="lineNum">     674 </span>            :     auto P = proj_create_crs_to_crs(PJ_DEFAULT_CTX, &quot;EPSG:4179&quot;, &quot;EPSG:4258&quot;,
+<span class="lineNum">     675 </span><span class="lineCov">          1 :                                     nullptr);</span>
+<span class="lineNum">     676 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     677 </span>            :     PJ_COORD c;
+<span class="lineNum">     678 </span>            : 
+<span class="lineNum">     679 </span><span class="lineCov">          2 :     EXPECT_EQ(std::string(proj_pj_info(P).definition),</span>
+<span class="lineNum">     680 </span><span class="lineCov">          1 :               &quot;unavailable until proj_trans is called&quot;);</span>
+<span class="lineNum">     681 </span><span class="lineCov">          3 :     EXPECT_EQ(proj_get_name(P), nullptr);</span>
+<span class="lineNum">     682 </span><span class="lineCov">          3 :     EXPECT_EQ(P-&gt;fwd, nullptr);</span>
+<span class="lineNum">     683 </span><span class="lineCov">          3 :     EXPECT_EQ(P-&gt;fwd3d, nullptr);</span>
+<span class="lineNum">     684 </span><span class="lineCov">          3 :     EXPECT_EQ(P-&gt;fwd4d, nullptr);</span>
+<span class="lineNum">     685 </span>            : 
+<span class="lineNum">     686 </span>            :     // get source CRS even if the P object is in a dummy state
+<span class="lineNum">     687 </span><span class="lineCov">          1 :     auto src_crs = proj_get_source_crs(PJ_DEFAULT_CTX, P);</span>
+<span class="lineNum">     688 </span><span class="lineCov">          3 :     EXPECT_TRUE(src_crs != nullptr);</span>
+<span class="lineNum">     689 </span><span class="lineCov">          4 :     EXPECT_EQ(proj_get_name(src_crs), std::string(&quot;Pulkovo 1942(58)&quot;));</span>
+<span class="lineNum">     690 </span><span class="lineCov">          1 :     proj_destroy(src_crs);</span>
+<span class="lineNum">     691 </span>            : 
+<span class="lineNum">     692 </span>            :     // get target CRS even if the P object is in a dummy state
+<span class="lineNum">     693 </span><span class="lineCov">          1 :     auto target_crs = proj_get_target_crs(PJ_DEFAULT_CTX, P);</span>
+<span class="lineNum">     694 </span><span class="lineCov">          3 :     EXPECT_TRUE(target_crs != nullptr);</span>
+<span class="lineNum">     695 </span><span class="lineCov">          4 :     EXPECT_EQ(proj_get_name(target_crs), std::string(&quot;ETRS89&quot;));</span>
+<span class="lineNum">     696 </span><span class="lineCov">          1 :     proj_destroy(target_crs);</span>
+<span class="lineNum">     697 </span>            : 
+<span class="lineNum">     698 </span>            :     // Romania
+<span class="lineNum">     699 </span><span class="lineCov">          1 :     c.xyz.x = 45; // Lat</span>
+<span class="lineNum">     700 </span><span class="lineCov">          1 :     c.xyz.y = 25; // Long</span>
+<span class="lineNum">     701 </span><span class="lineCov">          1 :     c.xyz.z = 0;</span>
+<span class="lineNum">     702 </span><span class="lineCov">          1 :     c = proj_trans(P, PJ_FWD, c);</span>
+<span class="lineNum">     703 </span><span class="lineCov">          2 :     EXPECT_NEAR(c.xy.x, 44.999701238, 1e-9);</span>
+<span class="lineNum">     704 </span><span class="lineCov">          2 :     EXPECT_NEAR(c.xy.y, 24.998474948, 1e-9);</span>
+<span class="lineNum">     705 </span><span class="lineCov">          2 :     EXPECT_EQ(std::string(proj_pj_info(P).definition),</span>
+<span class="lineNum">     706 </span>            :               &quot;proj=pipeline step proj=axisswap order=2,1 &quot;
+<span class="lineNum">     707 </span>            :               &quot;step proj=unitconvert xy_in=deg xy_out=rad &quot;
+<span class="lineNum">     708 </span>            :               &quot;step proj=push v_3 &quot;
+<span class="lineNum">     709 </span>            :               &quot;step proj=cart &quot;
+<span class="lineNum">     710 </span>            :               &quot;ellps=krass step proj=helmert x=2.3287 y=-147.0425 z=-92.0802 &quot;
+<span class="lineNum">     711 </span>            :               &quot;rx=0.3092483 ry=-0.32482185 rz=-0.49729934 s=5.68906266 &quot;
+<span class="lineNum">     712 </span>            :               &quot;convention=coordinate_frame step inv proj=cart ellps=GRS80 &quot;
+<span class="lineNum">     713 </span>            :               &quot;step proj=pop v_3 &quot;
+<span class="lineNum">     714 </span>            :               &quot;step proj=unitconvert xy_in=rad xy_out=deg step proj=axisswap &quot;
+<span class="lineNum">     715 </span><span class="lineCov">          1 :               &quot;order=2,1&quot;);</span>
+<span class="lineNum">     716 </span>            : 
+<span class="lineNum">     717 </span><span class="lineCov">          1 :     c = proj_trans(P, PJ_INV, c);</span>
+<span class="lineNum">     718 </span><span class="lineCov">          2 :     EXPECT_NEAR(c.xy.x, 45, 1e-8);</span>
+<span class="lineNum">     719 </span><span class="lineCov">          2 :     EXPECT_NEAR(c.xy.y, 25, 1e-8);</span>
+<span class="lineNum">     720 </span>            : 
+<span class="lineNum">     721 </span><span class="lineCov">          1 :     c.xyz.x = 45; // Lat</span>
+<span class="lineNum">     722 </span><span class="lineCov">          1 :     c.xyz.y = 25; // Long</span>
+<span class="lineNum">     723 </span><span class="lineCov">          1 :     c.xyz.z = 0;</span>
+<span class="lineNum">     724 </span><span class="lineCov">          1 :     proj_trans_generic(P, PJ_FWD, &amp;(c.xyz.x), sizeof(double), 1, &amp;(c.xyz.y),</span>
+<span class="lineNum">     725 </span>            :                        sizeof(double), 1, &amp;(c.xyz.z), sizeof(double), 1,
+<span class="lineNum">     726 </span>            :                        nullptr, 0, 0);
+<span class="lineNum">     727 </span><span class="lineCov">          2 :     EXPECT_NEAR(c.xy.x, 44.999701238, 1e-9);</span>
+<span class="lineNum">     728 </span><span class="lineCov">          2 :     EXPECT_NEAR(c.xy.y, 24.998474948, 1e-9);</span>
+<span class="lineNum">     729 </span>            : 
+<span class="lineNum">     730 </span>            :     // Poland
+<span class="lineNum">     731 </span><span class="lineCov">          1 :     c.xyz.x = 52; // Lat</span>
+<span class="lineNum">     732 </span><span class="lineCov">          1 :     c.xyz.y = 20; // Long</span>
+<span class="lineNum">     733 </span><span class="lineCov">          1 :     c.xyz.z = 0;</span>
+<span class="lineNum">     734 </span><span class="lineCov">          1 :     c = proj_trans(P, PJ_FWD, c);</span>
+<span class="lineNum">     735 </span><span class="lineCov">          2 :     EXPECT_NEAR(c.xy.x, 51.999714150, 1e-9);</span>
+<span class="lineNum">     736 </span><span class="lineCov">          2 :     EXPECT_NEAR(c.xy.y, 19.998187811, 1e-9);</span>
+<span class="lineNum">     737 </span><span class="lineCov">          2 :     EXPECT_EQ(std::string(proj_pj_info(P).definition),</span>
+<span class="lineNum">     738 </span>            :               &quot;proj=pipeline step proj=axisswap order=2,1 &quot;
+<span class="lineNum">     739 </span>            :               &quot;step proj=unitconvert xy_in=deg xy_out=rad &quot;
+<span class="lineNum">     740 </span>            :               &quot;step proj=push v_3 &quot;
+<span class="lineNum">     741 </span>            :               &quot;step proj=cart &quot;
+<span class="lineNum">     742 </span>            :               &quot;ellps=krass step proj=helmert x=33.4 y=-146.6 z=-76.3 rx=-0.359 &quot;
+<span class="lineNum">     743 </span>            :               &quot;ry=-0.053 rz=0.844 s=-0.84 convention=position_vector step inv &quot;
+<span class="lineNum">     744 </span>            :               &quot;proj=cart ellps=GRS80 step proj=pop v_3 &quot;
+<span class="lineNum">     745 </span>            :               &quot;step proj=unitconvert xy_in=rad &quot;
+<span class="lineNum">     746 </span><span class="lineCov">          1 :               &quot;xy_out=deg step proj=axisswap order=2,1&quot;);</span>
+<span class="lineNum">     747 </span>            : 
+<span class="lineNum">     748 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     749 </span>            : }
+<span class="lineNum">     750 </span>            : 
+<a name="751"><span class="lineNum">     751 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     752 </span>            : 
+<span class="lineNum">     753 </span><span class="lineCov">          8 : TEST(gie, proj_create_crs_to_crs_outside_area_of_use) {</span>
+<span class="lineNum">     754 </span>            : 
+<span class="lineNum">     755 </span>            :     // See https://github.com/OSGeo/proj.4/issues/1329
+<span class="lineNum">     756 </span>            :     auto P = proj_create_crs_to_crs(PJ_DEFAULT_CTX, &quot;EPSG:4275&quot;, &quot;EPSG:4807&quot;,
+<span class="lineNum">     757 </span><span class="lineCov">          1 :                                     nullptr);</span>
+<span class="lineNum">     758 </span><span class="lineCov">          3 :     ASSERT_TRUE(P != nullptr);</span>
+<span class="lineNum">     759 </span>            :     PJ_COORD c;
+<span class="lineNum">     760 </span>            : 
+<span class="lineNum">     761 </span><span class="lineCov">          3 :     EXPECT_EQ(P-&gt;fwd, nullptr);</span>
+<span class="lineNum">     762 </span>            : 
+<span class="lineNum">     763 </span>            :     // Test point outside area of use of both candidate coordinate operations
+<span class="lineNum">     764 </span>            :     c.xyz.x = 58; // Lat in deg
+<span class="lineNum">     765 </span>            :     c.xyz.y = 5;  // Long in deg
+<span class="lineNum">     766 </span><span class="lineCov">          1 :     c.xyz.z = 0;</span>
+<span class="lineNum">     767 </span><span class="lineCov">          1 :     c = proj_trans(P, PJ_FWD, c);</span>
+<span class="lineNum">     768 </span><span class="lineCov">          2 :     EXPECT_NEAR(c.xy.x, 64.44444444444444, 1e-9); // Lat in grad</span>
+<span class="lineNum">     769 </span><span class="lineCov">          2 :     EXPECT_NEAR(c.xy.y, 2.958634259259258, 1e-9); // Long in grad</span>
+<span class="lineNum">     770 </span>            : 
+<span class="lineNum">     771 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     772 </span>            : }
+<span class="lineNum">     773 </span>            : 
+<a name="774"><span class="lineNum">     774 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     775 </span>            : 
+<span class="lineNum">     776 </span><span class="lineCov">          8 : TEST(gie, proj_trans_generic) {</span>
+<span class="lineNum">     777 </span>            :     // GDA2020 to WGS84 (G1762)
+<span class="lineNum">     778 </span>            :     auto P = proj_create(
+<span class="lineNum">     779 </span>            :         PJ_DEFAULT_CTX,
+<span class="lineNum">     780 </span>            :         &quot;+proj=pipeline +step +proj=axisswap +order=2,1 &quot;
+<span class="lineNum">     781 </span>            :         &quot;+step +proj=unitconvert +xy_in=deg +xy_out=rad &quot;
+<span class="lineNum">     782 </span>            :         &quot;+step +proj=cart +ellps=GRS80 &quot;
+<span class="lineNum">     783 </span>            :         &quot;+step +proj=helmert +x=0 +y=0 +z=0 +rx=0 +ry=0 +rz=0 +s=0 +dx=0 &quot;
+<span class="lineNum">     784 </span>            :         &quot;+dy=0 +dz=0 +drx=-0.00150379 +dry=-0.00118346 +drz=-0.00120716 &quot;
+<span class="lineNum">     785 </span>            :         &quot;+ds=0 +t_epoch=2020 +convention=coordinate_frame &quot;
+<span class="lineNum">     786 </span>            :         &quot;+step +inv +proj=cart +ellps=WGS84 &quot;
+<span class="lineNum">     787 </span>            :         &quot;+step +proj=unitconvert +xy_in=rad +xy_out=deg &quot;
+<span class="lineNum">     788 </span><span class="lineCov">          1 :         &quot;+step +proj=axisswap +order=2,1&quot;);</span>
+<span class="lineNum">     789 </span><span class="lineCov">          1 :     double lat = -60;</span>
+<span class="lineNum">     790 </span><span class="lineCov">          1 :     double lon = 120;</span>
+<span class="lineNum">     791 </span><span class="lineCov">          1 :     proj_trans_generic(P, PJ_FWD, &amp;lat, sizeof(double), 1, &amp;lon, sizeof(double),</span>
+<span class="lineNum">     792 </span>            :                        1, nullptr, 0, 0, nullptr, 0, 0);
+<span class="lineNum">     793 </span>            :     // Should be a no-op when the time is unknown (or equal to 2020)
+<span class="lineNum">     794 </span><span class="lineCov">          2 :     EXPECT_NEAR(lat, -60, 1e-9);</span>
+<span class="lineNum">     795 </span><span class="lineCov">          2 :     EXPECT_NEAR(lon, 120, 1e-9);</span>
+<span class="lineNum">     796 </span>            : 
+<span class="lineNum">     797 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<a name="798"><span class="lineNum">     798 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     799 </span>            : 
+<span class="lineNum">     800 </span><span class="lineCov">          3 : } // namespace</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

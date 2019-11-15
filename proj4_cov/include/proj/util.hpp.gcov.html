@@ -1,0 +1,812 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/proj/util.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/proj</a> - util.hpp<span style="font-size: 80%;"> (source / <a href="util.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">48</td>
+            <td class="headerCovTableEntry">59</td>
+            <td class="headerCovTableEntryMed">81.4 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /******************************************************************************</a>
+<span class="lineNum">       2 </span>            :  *
+<span class="lineNum">       3 </span>            :  * Project:  PROJ
+<span class="lineNum">       4 </span>            :  * Purpose:  ISO19111:2019 implementation
+<span class="lineNum">       5 </span>            :  * Author:   Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  ******************************************************************************
+<span class="lineNum">       8 </span>            :  * Copyright (c) 2018, Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      11 </span>            :  * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      12 </span>            :  * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      13 </span>            :  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      14 </span>            :  * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      15 </span>            :  * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      16 </span>            :  *
+<span class="lineNum">      17 </span>            :  * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      18 </span>            :  * in all copies or substantial portions of the Software.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      21 </span>            :  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      22 </span>            :  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      23 </span>            :  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      24 </span>            :  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      25 </span>            :  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      26 </span>            :  * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      27 </span>            :  ****************************************************************************/
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #ifndef UTIL_HH_INCLUDED
+<span class="lineNum">      30 </span>            : #define UTIL_HH_INCLUDED
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #if !(__cplusplus &gt;= 201103L || (defined(_MSC_VER) &amp;&amp; _MSC_VER &gt;= 1900))
+<span class="lineNum">      33 </span>            : #error Must have C++11 or newer.
+<span class="lineNum">      34 </span>            : #endif
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : #include &lt;exception&gt;
+<span class="lineNum">      37 </span>            : #include &lt;map&gt;
+<span class="lineNum">      38 </span>            : #include &lt;memory&gt;
+<span class="lineNum">      39 </span>            : #include &lt;string&gt;
+<span class="lineNum">      40 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : #ifndef NS_PROJ
+<span class="lineNum">      43 </span>            : /** osgeo namespace */
+<span class="lineNum">      44 </span>            : namespace osgeo {
+<span class="lineNum">      45 </span>            : /** osgeo.proj namespace */
+<span class="lineNum">      46 </span>            : namespace proj {}
+<span class="lineNum">      47 </span>            : } // namespace osgeo
+<span class="lineNum">      48 </span>            : #endif
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : //! @cond Doxygen_Suppress
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            : #ifndef PROJ_DLL
+<span class="lineNum">      53 </span>            : #ifdef PROJ_MSVC_DLL_EXPORT
+<span class="lineNum">      54 </span>            : #define PROJ_DLL __declspec(dllexport)
+<span class="lineNum">      55 </span>            : #elif defined(PROJ_MSVC_DLL_IMPORT)
+<span class="lineNum">      56 </span>            : #define PROJ_DLL __declspec(dllimport)
+<span class="lineNum">      57 </span>            : #elif defined(__GNUC__)
+<span class="lineNum">      58 </span>            : #define PROJ_DLL __attribute__((visibility(&quot;default&quot;)))
+<span class="lineNum">      59 </span>            : #else
+<span class="lineNum">      60 </span>            : #define PROJ_DLL
+<span class="lineNum">      61 </span>            : #endif
+<span class="lineNum">      62 </span>            : #endif
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : #ifndef PROJ_MSVC_DLL
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            : #ifdef PROJ_MSVC_DLL_EXPORT
+<span class="lineNum">      67 </span>            : #define PROJ_MSVC_DLL PROJ_DLL
+<span class="lineNum">      68 </span>            : #define PROJ_GCC_DLL
+<span class="lineNum">      69 </span>            : #define PROJ_INTERNAL
+<span class="lineNum">      70 </span>            : #elif defined(PROJ_MSVC_DLL_IMPORT)
+<span class="lineNum">      71 </span>            : #define PROJ_MSVC_DLL PROJ_DLL
+<span class="lineNum">      72 </span>            : #define PROJ_GCC_DLL
+<span class="lineNum">      73 </span>            : #define PROJ_INTERNAL
+<span class="lineNum">      74 </span>            : #elif defined(__GNUC__)
+<span class="lineNum">      75 </span>            : #define PROJ_MSVC_DLL
+<span class="lineNum">      76 </span>            : #define PROJ_GCC_DLL PROJ_DLL
+<span class="lineNum">      77 </span>            : #if !defined(__MINGW32__)
+<span class="lineNum">      78 </span>            : #define PROJ_INTERNAL __attribute__((visibility(&quot;hidden&quot;)))
+<span class="lineNum">      79 </span>            : #else
+<span class="lineNum">      80 </span>            : #define PROJ_INTERNAL
+<span class="lineNum">      81 </span>            : #endif
+<span class="lineNum">      82 </span>            : #else
+<span class="lineNum">      83 </span>            : #define PROJ_MSVC_DLL
+<span class="lineNum">      84 </span>            : #define PROJ_GCC_DLL
+<span class="lineNum">      85 </span>            : #define PROJ_INTERNAL
+<span class="lineNum">      86 </span>            : #endif
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            : #define PROJ_FOR_TEST PROJ_DLL
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            : #endif
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            : #include &quot;nn.hpp&quot;
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            : /* To allow customizing the base namespace of PROJ */
+<span class="lineNum">      95 </span>            : #ifndef NS_PROJ
+<span class="lineNum">      96 </span>            : #define NS_PROJ osgeo::proj
+<span class="lineNum">      97 </span>            : #define NS_PROJ_START                                                          \
+<span class="lineNum">      98 </span>            :     namespace osgeo {                                                          \
+<span class="lineNum">      99 </span>            :     namespace proj {
+<span class="lineNum">     100 </span>            : #define NS_PROJ_END                                                            \
+<span class="lineNum">     101 </span>            :     }                                                                          \
+<span class="lineNum">     102 </span>            :     }
+<span class="lineNum">     103 </span>            : #endif
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            : // Private-implementation (Pimpl) pattern
+<span class="lineNum">     106 </span>            : #define PROJ_OPAQUE_PRIVATE_DATA                                               \
+<span class="lineNum">     107 </span>            :   private:                                                                     \
+<span class="lineNum">     108 </span>            :     struct PROJ_INTERNAL Private;                                              \
+<span class="lineNum">     109 </span>            :     std::unique_ptr&lt;Private&gt; d;                                                \
+<span class="lineNum">     110 </span>            :                                                                                \
+<span class="lineNum">     111 </span>            :   protected:                                                                   \
+<span class="lineNum">     112 </span>            :     PROJ_INTERNAL Private *getPrivate() noexcept { return d.get(); }           \
+<span class="lineNum">     113 </span>            :     PROJ_INTERNAL const Private *getPrivate() const noexcept {                 \
+<span class="lineNum">     114 </span>            :         return d.get();                                                        \
+<span class="lineNum">     115 </span>            :     }                                                                          \
+<span class="lineNum">     116 </span>            :                                                                                \
+<span class="lineNum">     117 </span>            :   private:
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            : // To include in the protected/private section of a class definition,
+<span class="lineNum">     120 </span>            : // to be able to call make_shared on a protected/private constructor
+<span class="lineNum">     121 </span>            : #define INLINED_MAKE_SHARED                                                    \
+<span class="lineNum">     122 </span>            :     template &lt;typename T, typename... Args&gt;                                    \
+<span class="lineNum">     123 </span>            :     static std::shared_ptr&lt;T&gt; make_shared(Args &amp;&amp;... args) {                   \
+<span class="lineNum">     124 </span>            :         return std::shared_ptr&lt;T&gt;(new T(std::forward&lt;Args&gt;(args)...));         \
+<span class="lineNum">     125 </span>            :     }                                                                          \
+<span class="lineNum">     126 </span>            :     template &lt;typename T, typename... Args&gt;                                    \
+<span class="lineNum">     127 </span>            :     static util::nn_shared_ptr&lt;T&gt; nn_make_shared(Args &amp;&amp;... args) {            \
+<span class="lineNum">     128 </span>            :         return util::nn_shared_ptr&lt;T&gt;(                                         \
+<span class="lineNum">     129 </span>            :             util::i_promise_i_checked_for_null,                                \
+<span class="lineNum">     130 </span>            :             std::shared_ptr&lt;T&gt;(new T(std::forward&lt;Args&gt;(args)...)));           \
+<span class="lineNum">     131 </span>            :     }
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            : // To include in the protected/private section of a class definition,
+<span class="lineNum">     134 </span>            : // to be able to call make_unique on a protected/private constructor
+<span class="lineNum">     135 </span>            : #define INLINED_MAKE_UNIQUE                                                    \
+<span class="lineNum">     136 </span>            :     template &lt;typename T, typename... Args&gt;                                    \
+<span class="lineNum">     137 </span>            :     static std::unique_ptr&lt;T&gt; make_unique(Args &amp;&amp;... args) {                   \
+<span class="lineNum">     138 </span>            :         return std::unique_ptr&lt;T&gt;(new T(std::forward&lt;Args&gt;(args)...));         \
+<span class="lineNum">     139 </span>            :     }
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            : #ifdef DOXYGEN_ENABLED
+<span class="lineNum">     142 </span>            : #define PROJ_FRIEND(mytype)
+<span class="lineNum">     143 </span>            : #define PROJ_FRIEND_OPTIONAL(mytype)
+<span class="lineNum">     144 </span>            : #else
+<span class="lineNum">     145 </span>            : #define PROJ_FRIEND(mytype) friend class mytype
+<span class="lineNum">     146 </span>            : #define PROJ_FRIEND_OPTIONAL(mytype) friend class util::optional&lt;mytype&gt;
+<span class="lineNum">     147 </span>            : #endif
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            : #ifndef PROJ_PRIVATE
+<span class="lineNum">     150 </span>            : #define PROJ_PRIVATE public
+<span class="lineNum">     151 </span>            : #endif
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            : #if defined(__GNUC__)
+<span class="lineNum">     154 </span>            : #define PROJ_NO_INLINE __attribute__((noinline))
+<span class="lineNum">     155 </span>            : #define PROJ_NO_RETURN __attribute__((noreturn))
+<span class="lineNum">     156 </span>            : // Applies to a function that has no side effect.
+<span class="lineNum">     157 </span>            : #define PROJ_PURE_DECL const noexcept __attribute__((pure))
+<span class="lineNum">     158 </span>            : #else
+<span class="lineNum">     159 </span>            : #define PROJ_NO_RETURN
+<span class="lineNum">     160 </span>            : #define PROJ_NO_INLINE
+<span class="lineNum">     161 </span>            : #define PROJ_PURE_DECL const noexcept
+<span class="lineNum">     162 </span>            : #endif
+<span class="lineNum">     163 </span>            : #define PROJ_PURE_DEFN const noexcept
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            : //! @endcond
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            : NS_PROJ_START
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            : /** osgeo.proj.util namespace.
+<span class="lineNum">     170 </span>            :  *
+<span class="lineNum">     171 </span>            :  * \brief A set of base types from ISO 19103, \ref GeoAPI and other PROJ
+<span class="lineNum">     172 </span>            :  * specific classes.
+<span class="lineNum">     173 </span>            :  */
+<span class="lineNum">     174 </span>            : namespace util {
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span>            : //! @cond Doxygen_Suppress
+<span class="lineNum">     177 </span>            : // Import a few classes from nn.hpp to expose them under our ::util namespace
+<span class="lineNum">     178 </span>            : // for conveniency.
+<span class="lineNum">     179 </span>            : using ::dropbox::oxygen::i_promise_i_checked_for_null;
+<span class="lineNum">     180 </span>            : using ::dropbox::oxygen::nn;
+<span class="lineNum">     181 </span>            : using ::dropbox::oxygen::nn_dynamic_pointer_cast;
+<span class="lineNum">     182 </span>            : using ::dropbox::oxygen::nn_make_shared;
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            : // For return statements, to convert from derived type to base type
+<span class="lineNum">     185 </span>            : using ::dropbox::oxygen::nn_static_pointer_cast;
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span>            : template &lt;typename T&gt; using nn_shared_ptr = nn&lt;std::shared_ptr&lt;T&gt;&gt;;
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            : #define NN_NO_CHECK(p)                                                         \
+<span class="lineNum">     190 </span>            :     ::dropbox::oxygen::nn&lt;typename std::remove_const&lt;                          \
+<span class="lineNum">     191 </span>            :         typename std::remove_reference&lt;decltype(p)&gt;::type&gt;::type&gt;(             \
+<span class="lineNum">     192 </span>            :         dropbox::oxygen::i_promise_i_checked_for_null, (p))
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span>            : //! @endcond
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            : // To avoid formatting differences between clang-format 3.8 and 7
+<span class="lineNum">     197 </span>            : #define PROJ_NOEXCEPT noexcept
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span>            : /** \brief Loose transposition of [std::optional]
+<span class="lineNum">     200 </span>            :  * (https://en.cppreference.com/w/cpp/utility/optional) available from C++17. */
+<span class="lineNum">     201 </span><span class="lineCov">    2744120 : template &lt;class T&gt; class optional {</span>
+<a name="202"><span class="lineNum">     202 </span>            :   public:</a>
+<span class="lineNum">     203 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     204 </span><span class="lineCov">    3485753 :     inline optional() : hasVal_(false) {}</span>
+<span class="lineNum">     205 </span><span class="lineCov">       6047 :     inline explicit optional(const T &amp;val) : hasVal_(true), val_(val) {}</span>
+<span class="lineNum">     206 </span><span class="lineCov">        650 :     inline explicit optional(T &amp;&amp;val)</span>
+<span class="lineNum">     207 </span><span class="lineCov">        662 :         : hasVal_(true), val_(std::forward&lt;T&gt;(val)) {}</span>
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span><span class="lineCov">      41520 :     inline optional(const optional &amp;) = default;</span>
+<span class="lineNum">     210 </span>            :     inline optional(optional &amp;&amp;other) PROJ_NOEXCEPT
+<span class="lineNum">     211 </span>            :         : hasVal_(other.hasVal_),
+<span class="lineNum">     212 </span>            :           // cppcheck-suppress functionStatic
+<span class="lineNum">     213 </span>            :           val_(std::forward&lt;T&gt;(other.val_)) {
+<span class="lineNum">     214 </span>            :         other.hasVal_ = false;
+<span class="lineNum">     215 </span>            :     }
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            :     inline optional &amp;operator=(const T &amp;val) {
+<span class="lineNum">     218 </span><span class="lineCov">     360853 :         hasVal_ = true;</span>
+<span class="lineNum">     219 </span><span class="lineCov">     360848 :         val_ = val;</span>
+<span class="lineNum">     220 </span>            :         return *this;
+<span class="lineNum">     221 </span>            :     }
+<span class="lineNum">     222 </span>            :     inline optional &amp;operator=(T &amp;&amp;val) noexcept {
+<span class="lineNum">     223 </span><span class="lineCov">       1052 :         hasVal_ = true;</span>
+<span class="lineNum">     224 </span><span class="lineCov">         25 :         val_ = std::forward&lt;T&gt;(val);</span>
+<span class="lineNum">     225 </span>            :         return *this;
+<span class="lineNum">     226 </span>            :     }
+<span class="lineNum">     227 </span>            :     inline optional &amp;operator=(const optional &amp;) = default;
+<span class="lineNum">     228 </span>            :     inline optional &amp;operator=(optional &amp;&amp;other) noexcept {
+<span class="lineNum">     229 </span>            :         hasVal_ = other.hasVal_;
+<span class="lineNum">     230 </span>            :         val_ = std::forward&lt;T&gt;(other.val_);
+<span class="lineNum">     231 </span>            :         other.hasVal_ = false;
+<span class="lineNum">     232 </span>            :         return *this;
+<span class="lineNum">     233 </span>            :     }
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span>            :     inline T *operator-&gt;() { return &amp;val_; }
+<span class="lineNum">     236 </span><span class="lineCov">       2171 :     inline T &amp;operator*() { return val_; }</span>
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            :     //! @endcond
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            :     /** Returns a pointer to the contained value. */
+<span class="lineNum">     241 </span><span class="lineCov">         98 :     inline const T *operator-&gt;() const { return &amp;val_; }</span>
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            :     /** Returns a reference to the contained value. */
+<span class="lineNum">     244 </span><span class="lineCov">    3704385 :     inline const T &amp;operator*() const { return val_; }</span>
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span>            :     /** Return whether the optional has a value */
+<span class="lineNum">     247 </span>            :     inline explicit operator bool() const noexcept { return hasVal_; }
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :     /** Return whether the optional has a value */
+<span class="lineNum">     250 </span>            :     inline bool has_value() const noexcept { return hasVal_; }
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span>            :   private:
+<span class="lineNum">     253 </span>            :     bool hasVal_;
+<span class="lineNum">     254 </span>            :     T val_{};
+<span class="lineNum">     255 </span>            : };
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            : class BaseObject;
+<span class="lineNum">     260 </span>            : /** Shared pointer of BaseObject. */
+<span class="lineNum">     261 </span>            : using BaseObjectPtr = std::shared_ptr&lt;BaseObject&gt;;
+<span class="lineNum">     262 </span>            : #if 1
+<span class="lineNum">     263 </span>            : /** Non-null shared pointer of BaseObject. */
+<span class="lineNum">     264 </span><span class="lineCov">    2535020 : struct BaseObjectNNPtr : public util::nn&lt;BaseObjectPtr&gt; {</span>
+<span class="lineNum">     265 </span>            :     // This trick enables to avoid inlining of the destructor.
+<span class="lineNum">     266 </span>            :     // This is mostly an alias of the base class.
+<span class="lineNum">     267 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     268 </span>            :     template &lt;class T&gt;
+<span class="lineNum">     269 </span>            :     // cppcheck-suppress noExplicitConstructor
+<span class="lineNum">     270 </span>            :     BaseObjectNNPtr(const util::nn&lt;std::shared_ptr&lt;T&gt;&gt; &amp;x)
+<span class="lineNum">     271 </span>            :         : util::nn&lt;BaseObjectPtr&gt;(x) {}
+<span class="lineNum">     272 </span>            : 
+<a name="273"><span class="lineNum">     273 </span>            :     template &lt;class T&gt;</a>
+<span class="lineNum">     274 </span>            :     // cppcheck-suppress noExplicitConstructor
+<span class="lineNum">     275 </span><span class="lineCov">      17155 :     BaseObjectNNPtr(util::nn&lt;std::shared_ptr&lt;T&gt;&gt; &amp;&amp;x) noexcept</span>
+<span class="lineNum">     276 </span><span class="lineCov">      17346 :         : util::nn&lt;BaseObjectPtr&gt;(NN_NO_CHECK(std::move(x.as_nullable()))) {}</span>
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span>            :     explicit BaseObjectNNPtr(::dropbox::oxygen::i_promise_i_checked_for_null_t,
+<span class="lineNum">     279 </span>            :                              BaseObjectPtr &amp;&amp;arg) noexcept
+<span class="lineNum">     280 </span>            :         : util::nn&lt;BaseObjectPtr&gt;(i_promise_i_checked_for_null,
+<span class="lineNum">     281 </span>            :                                   std::move(arg)) {}
+<span class="lineNum">     282 </span>            :     BaseObjectNNPtr(const BaseObjectNNPtr &amp;) = default;
+<span class="lineNum">     283 </span>            :     BaseObjectNNPtr &amp;operator=(const BaseObjectNNPtr &amp;) = default;
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            :     PROJ_DLL ~BaseObjectNNPtr();
+<span class="lineNum">     286 </span>            :     //! @endcond
+<span class="lineNum">     287 </span>            : };
+<span class="lineNum">     288 </span>            : #else
+<span class="lineNum">     289 </span>            : using BaseObjectNNPtr = util::nn&lt;BaseObjectPtr&gt;;
+<span class="lineNum">     290 </span>            : #endif
+<span class="lineNum">     291 </span>            : 
+<a name="292"><span class="lineNum">     292 </span>            : /** \brief Class that can be derived from, to emulate Java's Object behaviour.</a>
+<span class="lineNum">     293 </span>            :  */
+<span class="lineNum">     294 </span><span class="lineCov">    6652344 : class PROJ_GCC_DLL BaseObject {</span>
+<span class="lineNum">     295 </span>            :   public:
+<span class="lineNum">     296 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     297 </span>            :     virtual PROJ_DLL ~BaseObject();
+<span class="lineNum">     298 </span>            :     //! @endcond
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     301 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     302 </span>            :         PROJ_INTERNAL BaseObjectNNPtr
+<span class="lineNum">     303 </span>            :         shared_from_this() const;
+<span class="lineNum">     304 </span>            :     //! @endcond
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span>            :   protected:
+<span class="lineNum">     307 </span>            :     PROJ_INTERNAL BaseObject();
+<span class="lineNum">     308 </span>            :     PROJ_INTERNAL void assignSelf(const BaseObjectNNPtr &amp;self);
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            :   private:
+<span class="lineNum">     311 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     312 </span>            : };
+<span class="lineNum">     313 </span>            : 
+<span class="lineNum">     314 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     315 </span>            : 
+<a name="316"><span class="lineNum">     316 </span>            : /** \brief Interface for an object that can be compared to another.</a>
+<span class="lineNum">     317 </span>            :  */
+<span class="lineNum">     318 </span><span class="lineCov">     523996 : class PROJ_GCC_DLL IComparable {</span>
+<span class="lineNum">     319 </span>            :   public:
+<span class="lineNum">     320 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     321 </span>            :     PROJ_DLL virtual ~IComparable();
+<span class="lineNum">     322 </span>            :     //! @endcond
+<span class="lineNum">     323 </span>            : 
+<span class="lineNum">     324 </span>            :     /** \brief Comparison criterion. */
+<span class="lineNum">     325 </span>            :     enum class PROJ_MSVC_DLL Criterion {
+<span class="lineNum">     326 </span>            :         /** All properties are identical. */
+<span class="lineNum">     327 </span>            :         STRICT,
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span>            :         /** The objects are equivalent for the purpose of coordinate
+<span class="lineNum">     330 </span>            :          * operations. They can differ by the name of their objects,
+<span class="lineNum">     331 </span>            :          * identifiers, other metadata.
+<span class="lineNum">     332 </span>            :          * Parameters may be expressed in different units, provided that the
+<span class="lineNum">     333 </span>            :          * value is (with some tolerance) the same once expressed in a
+<span class="lineNum">     334 </span>            :          * common unit.
+<span class="lineNum">     335 </span>            :          */
+<span class="lineNum">     336 </span>            :         EQUIVALENT,
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            :         /** Same as EQUIVALENT, relaxed with an exception that the axis order
+<span class="lineNum">     339 </span>            :          * of the base CRS of a DerivedCRS/ProjectedCRS or the axis order of
+<span class="lineNum">     340 </span>            :          * a GeographicCRS is ignored. Only to be used
+<span class="lineNum">     341 </span>            :          * with DerivedCRS/ProjectedCRS/GeographicCRS */
+<span class="lineNum">     342 </span>            :         EQUIVALENT_EXCEPT_AXIS_ORDER_GEOGCRS,
+<span class="lineNum">     343 </span>            :     };
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            :     PROJ_DLL bool isEquivalentTo(const IComparable *other,
+<span class="lineNum">     346 </span>            :                                  Criterion criterion = Criterion::STRICT) const;
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     351 </span>            :         PROJ_INTERNAL virtual bool
+<span class="lineNum">     352 </span>            :         _isEquivalentTo(const IComparable *other,
+<span class="lineNum">     353 </span>            :                         Criterion criterion = Criterion::STRICT) const = 0;
+<span class="lineNum">     354 </span>            :     //! @endcond
+<span class="lineNum">     355 </span>            : };
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     358 </span>            : 
+<a name="359"><span class="lineNum">     359 </span>            : /** \brief Encapsulate standard datatypes in an object.</a>
+<span class="lineNum">     360 </span>            :  */
+<span class="lineNum">     361 </span><span class="lineCov">    1019666 : class BoxedValue final : public BaseObject {</span>
+<span class="lineNum">     362 </span>            :   public:
+<span class="lineNum">     363 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     364 </span>            :     /** Type of data stored in the BoxedValue. */
+<span class="lineNum">     365 </span>            :     enum class Type {
+<span class="lineNum">     366 </span>            :         /** a std::string */
+<span class="lineNum">     367 </span>            :         STRING,
+<span class="lineNum">     368 </span>            :         /** an integer */
+<span class="lineNum">     369 </span>            :         INTEGER,
+<span class="lineNum">     370 </span>            :         /** a boolean */
+<span class="lineNum">     371 </span>            :         BOOLEAN
+<span class="lineNum">     372 </span>            :     };
+<span class="lineNum">     373 </span>            :     //! @endcond
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span>            :     // cppcheck-suppress noExplicitConstructor
+<span class="lineNum">     376 </span>            :     PROJ_DLL BoxedValue(const char *stringValueIn); // needed to avoid the bool
+<span class="lineNum">     377 </span>            :                                                     // constructor to be taken !
+<span class="lineNum">     378 </span>            :     // cppcheck-suppress noExplicitConstructor
+<span class="lineNum">     379 </span>            :     PROJ_DLL BoxedValue(const std::string &amp;stringValueIn);
+<span class="lineNum">     380 </span>            :     // cppcheck-suppress noExplicitConstructor
+<span class="lineNum">     381 </span>            :     PROJ_DLL BoxedValue(int integerValueIn);
+<span class="lineNum">     382 </span>            :     // cppcheck-suppress noExplicitConstructor
+<span class="lineNum">     383 </span>            :     PROJ_DLL BoxedValue(bool booleanValueIn);
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     386 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     387 </span>            :         PROJ_INTERNAL
+<span class="lineNum">     388 </span>            :         BoxedValue(const BoxedValue &amp;other);
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span>            :     PROJ_DLL ~BoxedValue() override;
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span>            :     PROJ_INTERNAL const Type &amp;type() const;
+<span class="lineNum">     393 </span>            :     PROJ_INTERNAL const std::string &amp;stringValue() const;
+<span class="lineNum">     394 </span>            :     PROJ_INTERNAL int integerValue() const;
+<span class="lineNum">     395 </span>            :     PROJ_INTERNAL bool booleanValue() const;
+<span class="lineNum">     396 </span>            :     //! @endcond
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span>            :   private:
+<span class="lineNum">     399 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     400 </span>            :     BoxedValue &amp;operator=(const BoxedValue &amp;) = delete;
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span>            :     PROJ_INTERNAL BoxedValue();
+<span class="lineNum">     403 </span>            : };
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span>            : /** Shared pointer of BoxedValue. */
+<span class="lineNum">     406 </span>            : using BoxedValuePtr = std::shared_ptr&lt;BoxedValue&gt;;
+<span class="lineNum">     407 </span>            : /** Non-null shared pointer of BoxedValue. */
+<span class="lineNum">     408 </span>            : using BoxedValueNNPtr = util::nn&lt;BoxedValuePtr&gt;;
+<span class="lineNum">     409 </span>            : 
+<span class="lineNum">     410 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     411 </span>            : 
+<span class="lineNum">     412 </span>            : class ArrayOfBaseObject;
+<span class="lineNum">     413 </span>            : /** Shared pointer of ArrayOfBaseObject. */
+<span class="lineNum">     414 </span>            : using ArrayOfBaseObjectPtr = std::shared_ptr&lt;ArrayOfBaseObject&gt;;
+<span class="lineNum">     415 </span>            : /** Non-null shared pointer of ArrayOfBaseObject. */
+<span class="lineNum">     416 </span>            : using ArrayOfBaseObjectNNPtr = util::nn&lt;ArrayOfBaseObjectPtr&gt;;
+<span class="lineNum">     417 </span>            : 
+<a name="418"><span class="lineNum">     418 </span>            : /** \brief Array of BaseObject.</a>
+<span class="lineNum">     419 </span>            :  */
+<span class="lineNum">     420 </span><span class="lineCov">      88632 : class ArrayOfBaseObject final : public BaseObject {</span>
+<span class="lineNum">     421 </span>            :   public:
+<span class="lineNum">     422 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     423 </span>            :     PROJ_DLL ~ArrayOfBaseObject() override;
+<span class="lineNum">     424 </span>            :     //! @endcond
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span>            :     PROJ_DLL void add(const BaseObjectNNPtr &amp;obj);
+<span class="lineNum">     427 </span>            : 
+<span class="lineNum">     428 </span>            :     PROJ_DLL static ArrayOfBaseObjectNNPtr create();
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     431 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     432 </span>            :         std::vector&lt;BaseObjectNNPtr&gt;::const_iterator
+<span class="lineNum">     433 </span>            :         begin() const;
+<span class="lineNum">     434 </span>            :     std::vector&lt;BaseObjectNNPtr&gt;::const_iterator end() const;
+<span class="lineNum">     435 </span>            :     bool empty() const;
+<span class="lineNum">     436 </span>            :     //! @endcond
+<span class="lineNum">     437 </span>            : 
+<span class="lineNum">     438 </span>            :   protected:
+<span class="lineNum">     439 </span>            :     ArrayOfBaseObject();
+<span class="lineNum">     440 </span><span class="lineCov">      88632 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     441 </span>            : 
+<span class="lineNum">     442 </span>            :   private:
+<span class="lineNum">     443 </span>            :     ArrayOfBaseObject(const ArrayOfBaseObject &amp;other) = delete;
+<span class="lineNum">     444 </span>            :     ArrayOfBaseObject &amp;operator=(const ArrayOfBaseObject &amp;other) = delete;
+<span class="lineNum">     445 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     446 </span>            : };
+<span class="lineNum">     447 </span>            : 
+<span class="lineNum">     448 </span>            : // ---------------------------------------------------------------------------
+<a name="449"><span class="lineNum">     449 </span>            : </a>
+<span class="lineNum">     450 </span>            : /** \brief Wrapper of a std::map&lt;std::string, BaseObjectNNPtr&gt; */
+<span class="lineNum">     451 </span><span class="lineCov">     548395 : class PropertyMap {</span>
+<span class="lineNum">     452 </span>            :   public:
+<span class="lineNum">     453 </span>            :     PROJ_DLL PropertyMap();
+<span class="lineNum">     454 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     455 </span>            :     PROJ_DLL PropertyMap(const PropertyMap &amp;other);
+<span class="lineNum">     456 </span>            :     PROJ_DLL ~PropertyMap();
+<span class="lineNum">     457 </span>            :     //! @endcond
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span>            :     PROJ_DLL PropertyMap &amp;set(const std::string &amp;key,
+<span class="lineNum">     460 </span>            :                               const BaseObjectNNPtr &amp;val);
+<span class="lineNum">     461 </span>            : 
+<a name="462"><span class="lineNum">     462 </span>            :     //! @cond Doxygen_Suppress</a>
+<span class="lineNum">     463 </span>            :     template &lt;class T&gt;
+<span class="lineNum">     464 </span><span class="lineCov">      65261 :     inline PropertyMap &amp;set(const std::string &amp;key,</span>
+<span class="lineNum">     465 </span>            :                             const nn_shared_ptr&lt;T&gt; &amp;val) {
+<span class="lineNum">     466 </span><span class="lineCov">      65275 :         return set(</span>
+<span class="lineNum">     467 </span>            :             key, BaseObjectNNPtr(i_promise_i_checked_for_null,
+<span class="lineNum">     468 </span><span class="lineCov">     130529 :                                  BaseObjectPtr(val.as_nullable(), val.get())));</span>
+<span class="lineNum">     469 </span>            :     }
+<span class="lineNum">     470 </span>            :     //! @endcond
+<span class="lineNum">     471 </span>            : 
+<span class="lineNum">     472 </span>            :     // needed to avoid the bool constructor to be taken !
+<span class="lineNum">     473 </span>            :     PROJ_DLL PropertyMap &amp;set(const std::string &amp;key, const char *val);
+<span class="lineNum">     474 </span>            : 
+<span class="lineNum">     475 </span>            :     PROJ_DLL PropertyMap &amp;set(const std::string &amp;key, const std::string &amp;val);
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span>            :     PROJ_DLL PropertyMap &amp;set(const std::string &amp;key, int val);
+<span class="lineNum">     478 </span>            : 
+<span class="lineNum">     479 </span>            :     PROJ_DLL PropertyMap &amp;set(const std::string &amp;key, bool val);
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span>            :     PROJ_DLL PropertyMap &amp;set(const std::string &amp;key,
+<span class="lineNum">     482 </span>            :                               const std::vector&lt;std::string&gt; &amp;array);
+<span class="lineNum">     483 </span>            : 
+<span class="lineNum">     484 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     485 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     486 </span>            :         const BaseObjectNNPtr *
+<span class="lineNum">     487 </span>            :         get(const std::string &amp;key) const;
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span>            :     // throw(InvalidValueTypeException)
+<span class="lineNum">     490 </span>            :     bool getStringValue(const std::string &amp;key, std::string &amp;outVal) const;
+<span class="lineNum">     491 </span>            :     bool getStringValue(const std::string &amp;key,
+<span class="lineNum">     492 </span>            :                         optional&lt;std::string&gt; &amp;outVal) const;
+<span class="lineNum">     493 </span>            :     void unset(const std::string &amp;key);
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span>            :     static PropertyMap createAndSetName(const char *name);
+<span class="lineNum">     496 </span>            :     static PropertyMap createAndSetName(const std::string &amp;name);
+<span class="lineNum">     497 </span>            :     //! @endcond
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span>            :   private:
+<span class="lineNum">     500 </span>            :     PropertyMap &amp;operator=(const PropertyMap &amp;) = delete;
+<span class="lineNum">     501 </span>            : 
+<span class="lineNum">     502 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     503 </span>            : };
+<span class="lineNum">     504 </span>            : 
+<span class="lineNum">     505 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     506 </span>            : 
+<span class="lineNum">     507 </span>            : class LocalName;
+<span class="lineNum">     508 </span>            : /** Shared pointer of LocalName. */
+<span class="lineNum">     509 </span>            : using LocalNamePtr = std::shared_ptr&lt;LocalName&gt;;
+<span class="lineNum">     510 </span>            : /** Non-null shared pointer of LocalName. */
+<span class="lineNum">     511 </span>            : using LocalNameNNPtr = util::nn&lt;LocalNamePtr&gt;;
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span>            : class NameSpace;
+<span class="lineNum">     514 </span>            : /** Shared pointer of NameSpace. */
+<span class="lineNum">     515 </span>            : using NameSpacePtr = std::shared_ptr&lt;NameSpace&gt;;
+<span class="lineNum">     516 </span>            : /** Non-null shared pointer of NameSpace. */
+<span class="lineNum">     517 </span>            : using NameSpaceNNPtr = util::nn&lt;NameSpacePtr&gt;;
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span>            : class GenericName;
+<span class="lineNum">     520 </span>            : /** Shared pointer of GenericName. */
+<span class="lineNum">     521 </span>            : using GenericNamePtr = std::shared_ptr&lt;GenericName&gt;;
+<span class="lineNum">     522 </span>            : /** Non-null shared pointer of GenericName. */
+<span class="lineNum">     523 </span>            : using GenericNameNNPtr = util::nn&lt;GenericNamePtr&gt;;
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     526 </span>            : 
+<span class="lineNum">     527 </span>            : /** \brief A sequence of identifiers rooted within the context of a namespace.
+<span class="lineNum">     528 </span>            :  *
+<span class="lineNum">     529 </span>            :  * \remark Simplified version of [GenericName]
+<span class="lineNum">     530 </span>            :  * (http://www.geoapi.org/3.0/javadoc/org/opengis/util/GenericName.html) from
+<a name="531"><span class="lineNum">     531 </span>            :  * \ref GeoAPI</a>
+<span class="lineNum">     532 </span>            :  */
+<span class="lineNum">     533 </span><span class="lineCov">       1308 : class GenericName : public BaseObject {</span>
+<span class="lineNum">     534 </span>            :   public:
+<span class="lineNum">     535 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     536 </span>            :     PROJ_DLL virtual ~GenericName() override;
+<span class="lineNum">     537 </span>            :     //! @endcond
+<span class="lineNum">     538 </span>            : 
+<span class="lineNum">     539 </span>            :     /** \brief Return the scope of the object, possibly a global one. */
+<span class="lineNum">     540 </span>            :     PROJ_DLL virtual const NameSpacePtr scope() const = 0;
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span>            :     /** \brief Return the LocalName as a string. */
+<span class="lineNum">     543 </span>            :     PROJ_DLL virtual std::string toString() const = 0;
+<span class="lineNum">     544 </span>            : 
+<span class="lineNum">     545 </span>            :     /** \brief Return a fully qualified name corresponding to the local name.
+<span class="lineNum">     546 </span>            :      *
+<span class="lineNum">     547 </span>            :      * The namespace of the resulting name is a global one.
+<span class="lineNum">     548 </span>            :      */
+<span class="lineNum">     549 </span>            :     PROJ_DLL virtual GenericNameNNPtr toFullyQualifiedName() const = 0;
+<span class="lineNum">     550 </span>            : 
+<span class="lineNum">     551 </span>            :   protected:
+<span class="lineNum">     552 </span>            :     GenericName();
+<span class="lineNum">     553 </span>            :     GenericName(const GenericName &amp;other);
+<span class="lineNum">     554 </span>            : 
+<span class="lineNum">     555 </span>            :   private:
+<span class="lineNum">     556 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     557 </span>            :     GenericName &amp;operator=(const GenericName &amp;other) = delete;
+<span class="lineNum">     558 </span>            : };
+<span class="lineNum">     559 </span>            : 
+<span class="lineNum">     560 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     561 </span>            : 
+<span class="lineNum">     562 </span>            : /** \brief A domain in which names given by strings are defined.
+<span class="lineNum">     563 </span>            :  *
+<span class="lineNum">     564 </span>            :  * \remark Simplified version of [NameSpace]
+<span class="lineNum">     565 </span>            :  * (http://www.geoapi.org/3.0/javadoc/org/opengis/util/NameSpace.html) from \ref
+<a name="566"><span class="lineNum">     566 </span>            :  * GeoAPI</a>
+<span class="lineNum">     567 </span>            :  */
+<span class="lineNum">     568 </span><span class="lineCov">        644 : class NameSpace {</span>
+<span class="lineNum">     569 </span>            :   public:
+<span class="lineNum">     570 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     571 </span>            :     PROJ_DLL ~NameSpace();
+<span class="lineNum">     572 </span>            :     //! @endcond
+<span class="lineNum">     573 </span>            : 
+<span class="lineNum">     574 </span>            :     PROJ_DLL bool isGlobal() const;
+<span class="lineNum">     575 </span>            :     PROJ_DLL const GenericNamePtr &amp;name() const;
+<span class="lineNum">     576 </span>            : 
+<span class="lineNum">     577 </span>            :   protected:
+<span class="lineNum">     578 </span>            :     PROJ_FRIEND(NameFactory);
+<span class="lineNum">     579 </span>            :     PROJ_FRIEND(LocalName);
+<span class="lineNum">     580 </span>            :     explicit NameSpace(const GenericNamePtr &amp;name);
+<span class="lineNum">     581 </span>            :     NameSpace(const NameSpace &amp;other);
+<span class="lineNum">     582 </span>            :     NameSpaceNNPtr getGlobalFromThis() const;
+<span class="lineNum">     583 </span>            :     const std::string &amp;separator() const;
+<span class="lineNum">     584 </span>            :     static const NameSpaceNNPtr GLOBAL;
+<span class="lineNum">     585 </span><span class="lineCov">       2572 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span>            :   private:
+<span class="lineNum">     588 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     589 </span>            :     NameSpace &amp;operator=(const NameSpace &amp;other) = delete;
+<span class="lineNum">     590 </span>            : 
+<span class="lineNum">     591 </span>            :     static NameSpaceNNPtr createGLOBAL();
+<span class="lineNum">     592 </span>            : };
+<span class="lineNum">     593 </span>            : 
+<span class="lineNum">     594 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     595 </span>            : 
+<span class="lineNum">     596 </span>            : /** \brief Identifier within a NameSpace for a local object.
+<span class="lineNum">     597 </span>            :  *
+<span class="lineNum">     598 </span>            :  * Local names are names which are directly accessible to and maintained by a
+<span class="lineNum">     599 </span>            :  * NameSpace within which they are local, indicated by the scope.
+<span class="lineNum">     600 </span>            :  *
+<span class="lineNum">     601 </span>            :  * \remark Simplified version of [LocalName]
+<span class="lineNum">     602 </span>            :  * (http://www.geoapi.org/3.0/javadoc/org/opengis/util/LocalName.html) from \ref
+<a name="603"><span class="lineNum">     603 </span>            :  * GeoAPI</a>
+<span class="lineNum">     604 </span>            :  */
+<span class="lineNum">     605 </span><span class="lineCov">       1308 : class LocalName : public GenericName {</span>
+<span class="lineNum">     606 </span>            :   public:
+<span class="lineNum">     607 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     608 </span>            :     PROJ_DLL ~LocalName() override;
+<span class="lineNum">     609 </span>            :     //! @endcond
+<span class="lineNum">     610 </span>            : 
+<span class="lineNum">     611 </span>            :     PROJ_DLL const NameSpacePtr scope() const override;
+<span class="lineNum">     612 </span>            :     PROJ_DLL std::string toString() const override;
+<span class="lineNum">     613 </span>            :     PROJ_DLL GenericNameNNPtr toFullyQualifiedName() const override;
+<span class="lineNum">     614 </span>            : 
+<span class="lineNum">     615 </span>            :   protected:
+<span class="lineNum">     616 </span>            :     PROJ_FRIEND(NameFactory);
+<span class="lineNum">     617 </span>            :     PROJ_FRIEND(NameSpace);
+<span class="lineNum">     618 </span>            :     explicit LocalName(const std::string &amp;nameIn);
+<span class="lineNum">     619 </span>            :     LocalName(const LocalName &amp;other);
+<span class="lineNum">     620 </span>            :     LocalName(const NameSpacePtr &amp;ns, const std::string &amp;name);
+<span class="lineNum">     621 </span><span class="lineCov">       1309 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     622 </span>            : 
+<span class="lineNum">     623 </span>            :   private:
+<span class="lineNum">     624 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     625 </span>            :     LocalName &amp;operator=(const LocalName &amp;other) = delete;
+<span class="lineNum">     626 </span>            : };
+<span class="lineNum">     627 </span>            : 
+<span class="lineNum">     628 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     629 </span>            : 
+<span class="lineNum">     630 </span>            : /** \brief Factory for generic names.
+<span class="lineNum">     631 </span>            :  *
+<span class="lineNum">     632 </span>            :  * \remark Simplified version of [NameFactory]
+<span class="lineNum">     633 </span>            :  * (http://www.geoapi.org/3.0/javadoc/org/opengis/util/NameFactory.html) from
+<span class="lineNum">     634 </span>            :  * \ref GeoAPI
+<span class="lineNum">     635 </span>            :  */
+<span class="lineNum">     636 </span>            : class NameFactory {
+<span class="lineNum">     637 </span>            :   public:
+<span class="lineNum">     638 </span>            :     PROJ_DLL static NameSpaceNNPtr
+<span class="lineNum">     639 </span>            :     createNameSpace(const GenericNameNNPtr &amp;name,
+<span class="lineNum">     640 </span>            :                     const PropertyMap &amp;properties);
+<span class="lineNum">     641 </span>            :     PROJ_DLL static LocalNameNNPtr createLocalName(const NameSpacePtr &amp;scope,
+<span class="lineNum">     642 </span>            :                                                    const std::string &amp;name);
+<span class="lineNum">     643 </span>            :     PROJ_DLL static GenericNameNNPtr
+<span class="lineNum">     644 </span>            :     createGenericName(const NameSpacePtr &amp;scope,
+<span class="lineNum">     645 </span>            :                       const std::vector&lt;std::string&gt; &amp;parsedNames);
+<span class="lineNum">     646 </span>            : };
+<span class="lineNum">     647 </span>            : 
+<span class="lineNum">     648 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     649 </span>            : 
+<a name="650"><span class="lineNum">     650 </span>            : /** \brief Abstract class to define an enumeration of values.</a>
+<span class="lineNum">     651 </span>            :  */
+<span class="lineNum">     652 </span><span class="lineCov">      65288 : class CodeList {</span>
+<span class="lineNum">     653 </span>            :   public:
+<span class="lineNum">     654 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     655 </span>            :     PROJ_DLL ~CodeList();
+<span class="lineNum">     656 </span>            :     //! @endcond
+<span class="lineNum">     657 </span>            : 
+<span class="lineNum">     658 </span>            :     /** Return the CodeList item as a string. */
+<span class="lineNum">     659 </span>            :     // cppcheck-suppress functionStatic
+<span class="lineNum">     660 </span><span class="lineCov">         70 :     inline const std::string &amp;toString() PROJ_PURE_DECL { return name_; }</span>
+<span class="lineNum">     661 </span>            : 
+<span class="lineNum">     662 </span>            :     /** Return the CodeList item as a string. */
+<span class="lineNum">     663 </span>            :     inline operator std::string() PROJ_PURE_DECL { return toString(); }
+<span class="lineNum">     664 </span>            : 
+<span class="lineNum">     665 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     666 </span>            :     inline bool operator==(const CodeList &amp;other) PROJ_PURE_DECL {
+<span class="lineNum">     667 </span><span class="lineCov">      35556 :         return name_ == other.name_;</span>
+<span class="lineNum">     668 </span>            :     }
+<span class="lineNum">     669 </span>            :     inline bool operator!=(const CodeList &amp;other) PROJ_PURE_DECL {
+<span class="lineNum">     670 </span><span class="lineCov">         39 :         return name_ != other.name_;</span>
+<span class="lineNum">     671 </span>            :     }
+<span class="lineNum">     672 </span>            :     //! @endcond
+<span class="lineNum">     673 </span>            :   protected:
+<span class="lineNum">     674 </span><span class="lineCov">      32643 :     explicit CodeList(const std::string &amp;nameIn) : name_(nameIn) {}</span>
+<span class="lineNum">     675 </span><span class="lineCov">          1 :     CodeList(const CodeList &amp;other) = default;</span>
+<span class="lineNum">     676 </span>            :     CodeList &amp;operator=(const CodeList &amp;other);
+<span class="lineNum">     677 </span>            : 
+<span class="lineNum">     678 </span>            :   private:
+<span class="lineNum">     679 </span>            :     std::string name_{};
+<span class="lineNum">     680 </span>            : };
+<span class="lineNum">     681 </span>            : 
+<span class="lineNum">     682 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     683 </span>            : 
+<a name="684"><span class="lineNum">     684 </span>            : /** \brief Root exception class.</a>
+<span class="lineNum">     685 </span>            :  */
+<span class="lineNum">     686 </span><span class="lineCov">      61112 : class PROJ_GCC_DLL Exception : public std::exception {</span>
+<span class="lineNum">     687 </span>            :     std::string msg_;
+<span class="lineNum">     688 </span>            : 
+<span class="lineNum">     689 </span>            :   public:
+<span class="lineNum">     690 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     691 </span>            :     PROJ_INTERNAL explicit Exception(const char *message);
+<span class="lineNum">     692 </span>            :     PROJ_INTERNAL explicit Exception(const std::string &amp;message);
+<span class="lineNum">     693 </span>            :     PROJ_DLL Exception(const Exception &amp;other);
+<span class="lineNum">     694 </span>            :     PROJ_DLL ~Exception() override;
+<span class="lineNum">     695 </span>            :     //! @endcond
+<span class="lineNum">     696 </span>            :     PROJ_DLL virtual const char *what() const noexcept override;
+<span class="lineNum">     697 </span>            : };
+<span class="lineNum">     698 </span>            : 
+<span class="lineNum">     699 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     700 </span>            : 
+<span class="lineNum">     701 </span>            : /** \brief Exception thrown when an invalid value type is set as the value of
+<a name="702"><span class="lineNum">     702 </span>            :  * a key of a PropertyMap.</a>
+<span class="lineNum">     703 </span>            :  */
+<span class="lineNum">     704 </span><span class="lineCov">          8 : class PROJ_GCC_DLL InvalidValueTypeException : public Exception {</span>
+<span class="lineNum">     705 </span>            :   public:
+<span class="lineNum">     706 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     707 </span>            :     PROJ_INTERNAL explicit InvalidValueTypeException(const char *message);
+<span class="lineNum">     708 </span>            :     PROJ_INTERNAL explicit InvalidValueTypeException(
+<span class="lineNum">     709 </span>            :         const std::string &amp;message);
+<span class="lineNum">     710 </span>            :     PROJ_DLL InvalidValueTypeException(const InvalidValueTypeException &amp;other);
+<span class="lineNum">     711 </span>            :     PROJ_DLL ~InvalidValueTypeException() override;
+<span class="lineNum">     712 </span>            :     //! @endcond
+<span class="lineNum">     713 </span>            : };
+<span class="lineNum">     714 </span>            : 
+<span class="lineNum">     715 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     716 </span>            : 
+<span class="lineNum">     717 </span>            : /** \brief Exception Thrown to indicate that the requested operation is not
+<a name="718"><span class="lineNum">     718 </span>            :  * supported.</a>
+<span class="lineNum">     719 </span>            :  */
+<span class="lineNum">     720 </span><span class="lineCov">          1 : class PROJ_GCC_DLL UnsupportedOperationException : public Exception {</span>
+<span class="lineNum">     721 </span>            :   public:
+<span class="lineNum">     722 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     723 </span>            :     PROJ_INTERNAL explicit UnsupportedOperationException(const char *message);
+<span class="lineNum">     724 </span>            :     PROJ_INTERNAL explicit UnsupportedOperationException(
+<span class="lineNum">     725 </span>            :         const std::string &amp;message);
+<span class="lineNum">     726 </span>            :     PROJ_DLL
+<span class="lineNum">     727 </span>            :     UnsupportedOperationException(const UnsupportedOperationException &amp;other);
+<span class="lineNum">     728 </span>            :     PROJ_DLL ~UnsupportedOperationException() override;
+<span class="lineNum">     729 </span>            :     //! @endcond
+<span class="lineNum">     730 </span>            : };
+<span class="lineNum">     731 </span>            : 
+<span class="lineNum">     732 </span>            : } // namespace util
+<span class="lineNum">     733 </span>            : 
+<span class="lineNum">     734 </span>            : NS_PROJ_END
+<span class="lineNum">     735 </span>            : 
+<span class="lineNum">     736 </span>            : #endif // UTIL_HH_INCLUDED
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

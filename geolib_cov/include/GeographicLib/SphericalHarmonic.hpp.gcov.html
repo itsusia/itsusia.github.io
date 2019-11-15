@@ -1,0 +1,430 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/SphericalHarmonic.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - SphericalHarmonic.hpp<span style="font-size: 80%;"> (source / <a href="SphericalHarmonic.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">34</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file SphericalHarmonic.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::SphericalHarmonic class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2011) &lt;charles@karney.com&gt; and licensed under
+<span class="lineNum">       6 </span>            :  * the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_SPHERICALHARMONIC_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_SPHERICALHARMONIC_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      14 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;GeographicLib/SphericalEngine.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;GeographicLib/CircularEngine.hpp&gt;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : namespace GeographicLib {
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            :   /**
+<span class="lineNum">      21 </span>            :    * \brief Spherical harmonic series
+<span class="lineNum">      22 </span>            :    *
+<span class="lineNum">      23 </span>            :    * This class evaluates the spherical harmonic sum \verbatim
+<span class="lineNum">      24 </span>            :    V(x, y, z) = sum(n = 0..N)[ q^(n+1) * sum(m = 0..n)[
+<span class="lineNum">      25 </span>            :      (C[n,m] * cos(m*lambda) + S[n,m] * sin(m*lambda)) *
+<span class="lineNum">      26 </span>            :      P[n,m](cos(theta)) ] ]
+<span class="lineNum">      27 </span>            :    \endverbatim
+<span class="lineNum">      28 </span>            :    * where
+<span class="lineNum">      29 </span>            :    * - &lt;i&gt;p&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; = &lt;i&gt;x&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; + &lt;i&gt;y&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;,
+<span class="lineNum">      30 </span>            :    * - &lt;i&gt;r&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; = &lt;i&gt;p&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; + &lt;i&gt;z&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt;,
+<span class="lineNum">      31 </span>            :    * - \e q = &lt;i&gt;a&lt;/i&gt;/&lt;i&gt;r&lt;/i&gt;,
+<span class="lineNum">      32 </span>            :    * - &amp;theta; = atan2(\e p, \e z) = the spherical \e colatitude,
+<span class="lineNum">      33 </span>            :    * - &amp;lambda; = atan2(\e y, \e x) = the longitude.
+<span class="lineNum">      34 </span>            :    * - P&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt;(\e t) is the associated Legendre polynomial of
+<span class="lineNum">      35 </span>            :    *   degree \e n and order \e m.
+<span class="lineNum">      36 </span>            :    *
+<span class="lineNum">      37 </span>            :    * Two normalizations are supported for P&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt;
+<span class="lineNum">      38 </span>            :    * - fully normalized denoted by SphericalHarmonic::FULL.
+<span class="lineNum">      39 </span>            :    * - Schmidt semi-normalized denoted by SphericalHarmonic::SCHMIDT.
+<span class="lineNum">      40 </span>            :    *
+<span class="lineNum">      41 </span>            :    * Clenshaw summation is used for the sums over both \e n and \e m.  This
+<span class="lineNum">      42 </span>            :    * allows the computation to be carried out without the need for any
+<span class="lineNum">      43 </span>            :    * temporary arrays.  See SphericalEngine.cpp for more information on the
+<span class="lineNum">      44 </span>            :    * implementation.
+<span class="lineNum">      45 </span>            :    *
+<span class="lineNum">      46 </span>            :    * References:
+<span class="lineNum">      47 </span>            :    * - C. W. Clenshaw,
+<span class="lineNum">      48 </span>            :    *   &lt;a href=&quot;https://doi.org/10.1090/S0025-5718-1955-0071856-0&quot;&gt;
+<span class="lineNum">      49 </span>            :    *   A note on the summation of Chebyshev series&lt;/a&gt;,
+<span class="lineNum">      50 </span>            :    *   %Math. Tables Aids Comput. 9(51), 118--120 (1955).
+<span class="lineNum">      51 </span>            :    * - R. E. Deakin, Derivatives of the earth's potentials, Geomatics
+<span class="lineNum">      52 </span>            :    *   Research Australasia 68, 31--60, (June 1998).
+<span class="lineNum">      53 </span>            :    * - W. A. Heiskanen and H. Moritz, Physical Geodesy, (Freeman, San
+<span class="lineNum">      54 </span>            :    *   Francisco, 1967).  (See Sec. 1-14, for a definition of Pbar.)
+<span class="lineNum">      55 </span>            :    * - S. A. Holmes and W. E. Featherstone,
+<span class="lineNum">      56 </span>            :    *   &lt;a href=&quot;https://doi.org/10.1007/s00190-002-0216-2&quot;&gt;
+<span class="lineNum">      57 </span>            :    *   A unified approach to the Clenshaw summation and the recursive
+<span class="lineNum">      58 </span>            :    *   computation of very high degree and order normalised associated Legendre
+<span class="lineNum">      59 </span>            :    *   functions&lt;/a&gt;, J. Geodesy 76(5), 279--299 (2002).
+<span class="lineNum">      60 </span>            :    * - C. C. Tscherning and K. Poder,
+<span class="lineNum">      61 </span>            :    *   &lt;a href=&quot;http://cct.gfy.ku.dk/publ_cct/cct80.pdf&quot;&gt;
+<span class="lineNum">      62 </span>            :    *   Some geodetic applications of Clenshaw summation&lt;/a&gt;,
+<span class="lineNum">      63 </span>            :    *   Boll. Geod. Sci. Aff. 41(4), 349--375 (1982).
+<span class="lineNum">      64 </span>            :    *
+<span class="lineNum">      65 </span>            :    * Example of use:
+<span class="lineNum">      66 </span>            :    * \include example-SphericalHarmonic.cpp
+<span class="lineNum">      67 </span>            :    **********************************************************************/
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :   class GEOGRAPHICLIB_EXPORT SphericalHarmonic {
+<span class="lineNum">      70 </span>            :   public:
+<span class="lineNum">      71 </span>            :     /**
+<span class="lineNum">      72 </span>            :      * Supported normalizations for the associated Legendre polynomials.
+<span class="lineNum">      73 </span>            :      **********************************************************************/
+<span class="lineNum">      74 </span>            :     enum normalization {
+<span class="lineNum">      75 </span>            :       /**
+<span class="lineNum">      76 </span>            :        * Fully normalized associated Legendre polynomials.
+<span class="lineNum">      77 </span>            :        *
+<span class="lineNum">      78 </span>            :        * These are defined by
+<span class="lineNum">      79 </span>            :        * &lt;i&gt;P&lt;/i&gt;&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt;&lt;sup&gt;full&lt;/sup&gt;(\e z)
+<span class="lineNum">      80 </span>            :        * = (&amp;minus;1)&lt;sup&gt;&lt;i&gt;m&lt;/i&gt;&lt;/sup&gt;
+<span class="lineNum">      81 </span>            :        * sqrt(\e k (2\e n + 1) (\e n &amp;minus; \e m)! / (\e n + \e m)!)
+<span class="lineNum">      82 </span>            :        * &lt;b&gt;P&lt;/b&gt;&lt;sub&gt;&lt;i&gt;n&lt;/i&gt;&lt;/sub&gt;&lt;sup&gt;&lt;i&gt;m&lt;/i&gt;&lt;/sup&gt;(\e z), where
+<span class="lineNum">      83 </span>            :        * &lt;b&gt;P&lt;/b&gt;&lt;sub&gt;&lt;i&gt;n&lt;/i&gt;&lt;/sub&gt;&lt;sup&gt;&lt;i&gt;m&lt;/i&gt;&lt;/sup&gt;(\e z) is Ferrers
+<span class="lineNum">      84 </span>            :        * function (also known as the Legendre function on the cut or the
+<span class="lineNum">      85 </span>            :        * associated Legendre polynomial) http://dlmf.nist.gov/14.7.E10 and \e k
+<span class="lineNum">      86 </span>            :        * = 1 for \e m = 0 and \e k = 2 otherwise.
+<span class="lineNum">      87 </span>            :        *
+<span class="lineNum">      88 </span>            :        * The mean squared value of
+<span class="lineNum">      89 </span>            :        * &lt;i&gt;P&lt;/i&gt;&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt;&lt;sup&gt;full&lt;/sup&gt;(cos&amp;theta;)
+<span class="lineNum">      90 </span>            :        * cos(&lt;i&gt;m&lt;/i&gt;&amp;lambda;) and
+<span class="lineNum">      91 </span>            :        * &lt;i&gt;P&lt;/i&gt;&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt;&lt;sup&gt;full&lt;/sup&gt;(cos&amp;theta;)
+<span class="lineNum">      92 </span>            :        * sin(&lt;i&gt;m&lt;/i&gt;&amp;lambda;) over the sphere is 1.
+<span class="lineNum">      93 </span>            :        *
+<span class="lineNum">      94 </span>            :        * @hideinitializer
+<span class="lineNum">      95 </span>            :        **********************************************************************/
+<span class="lineNum">      96 </span>            :       FULL = SphericalEngine::FULL,
+<span class="lineNum">      97 </span>            :       /**
+<span class="lineNum">      98 </span>            :        * Schmidt semi-normalized associated Legendre polynomials.
+<span class="lineNum">      99 </span>            :        *
+<span class="lineNum">     100 </span>            :        * These are defined by
+<span class="lineNum">     101 </span>            :        * &lt;i&gt;P&lt;/i&gt;&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt;&lt;sup&gt;schmidt&lt;/sup&gt;(\e z)
+<span class="lineNum">     102 </span>            :        * = (&amp;minus;1)&lt;sup&gt;&lt;i&gt;m&lt;/i&gt;&lt;/sup&gt;
+<span class="lineNum">     103 </span>            :        * sqrt(\e k (\e n &amp;minus; \e m)! / (\e n + \e m)!)
+<span class="lineNum">     104 </span>            :        * &lt;b&gt;P&lt;/b&gt;&lt;sub&gt;&lt;i&gt;n&lt;/i&gt;&lt;/sub&gt;&lt;sup&gt;&lt;i&gt;m&lt;/i&gt;&lt;/sup&gt;(\e z), where
+<span class="lineNum">     105 </span>            :        * &lt;b&gt;P&lt;/b&gt;&lt;sub&gt;&lt;i&gt;n&lt;/i&gt;&lt;/sub&gt;&lt;sup&gt;&lt;i&gt;m&lt;/i&gt;&lt;/sup&gt;(\e z) is Ferrers
+<span class="lineNum">     106 </span>            :        * function (also known as the Legendre function on the cut or the
+<span class="lineNum">     107 </span>            :        * associated Legendre polynomial) http://dlmf.nist.gov/14.7.E10 and \e k
+<span class="lineNum">     108 </span>            :        * = 1 for \e m = 0 and \e k = 2 otherwise.
+<span class="lineNum">     109 </span>            :        *
+<span class="lineNum">     110 </span>            :        * The mean squared value of
+<span class="lineNum">     111 </span>            :        * &lt;i&gt;P&lt;/i&gt;&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt;&lt;sup&gt;schmidt&lt;/sup&gt;(cos&amp;theta;)
+<span class="lineNum">     112 </span>            :        * cos(&lt;i&gt;m&lt;/i&gt;&amp;lambda;) and
+<span class="lineNum">     113 </span>            :        * &lt;i&gt;P&lt;/i&gt;&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt;&lt;sup&gt;schmidt&lt;/sup&gt;(cos&amp;theta;)
+<span class="lineNum">     114 </span>            :        * sin(&lt;i&gt;m&lt;/i&gt;&amp;lambda;) over the sphere is 1/(2\e n + 1).
+<span class="lineNum">     115 </span>            :        *
+<span class="lineNum">     116 </span>            :        * @hideinitializer
+<span class="lineNum">     117 </span>            :        **********************************************************************/
+<span class="lineNum">     118 </span>            :       SCHMIDT = SphericalEngine::SCHMIDT,
+<span class="lineNum">     119 </span>            :     };
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            :   private:
+<span class="lineNum">     122 </span>            :     typedef Math::real real;
+<span class="lineNum">     123 </span>            :     SphericalEngine::coeff _c[1];
+<span class="lineNum">     124 </span>            :     real _a;
+<span class="lineNum">     125 </span>            :     unsigned _norm;
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :   public:
+<span class="lineNum">     128 </span>            :     /**
+<span class="lineNum">     129 </span>            :      * Constructor with a full set of coefficients specified.
+<span class="lineNum">     130 </span>            :      *
+<span class="lineNum">     131 </span>            :      * @param[in] C the coefficients &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt;.
+<span class="lineNum">     132 </span>            :      * @param[in] S the coefficients &lt;i&gt;S&lt;/i&gt;&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt;.
+<span class="lineNum">     133 </span>            :      * @param[in] N the maximum degree and order of the sum
+<span class="lineNum">     134 </span>            :      * @param[in] a the reference radius appearing in the definition of the
+<span class="lineNum">     135 </span>            :      *   sum.
+<span class="lineNum">     136 </span>            :      * @param[in] norm the normalization for the associated Legendre
+<span class="lineNum">     137 </span>            :      *   polynomials, either SphericalHarmonic::FULL (the default) or
+<span class="lineNum">     138 </span>            :      *   SphericalHarmonic::SCHMIDT.
+<span class="lineNum">     139 </span>            :      * @exception GeographicErr if \e N does not satisfy \e N &amp;ge; &amp;minus;1.
+<span class="lineNum">     140 </span>            :      * @exception GeographicErr if \e C or \e S is not big enough to hold the
+<span class="lineNum">     141 </span>            :      *   coefficients.
+<span class="lineNum">     142 </span>            :      *
+<span class="lineNum">     143 </span>            :      * The coefficients &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt; and
+<span class="lineNum">     144 </span>            :      * &lt;i&gt;S&lt;/i&gt;&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt; are stored in the one-dimensional vectors
+<span class="lineNum">     145 </span>            :      * \e C and \e S which must contain (\e N + 1)(\e N + 2)/2 and \e N (\e N +
+<span class="lineNum">     146 </span>            :      * 1)/2 elements, respectively, stored in &quot;column-major&quot; order.  Thus for
+<span class="lineNum">     147 </span>            :      * \e N = 3, the order would be:
+<span class="lineNum">     148 </span>            :      * &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;00&lt;/sub&gt;,
+<span class="lineNum">     149 </span>            :      * &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;10&lt;/sub&gt;,
+<span class="lineNum">     150 </span>            :      * &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;20&lt;/sub&gt;,
+<span class="lineNum">     151 </span>            :      * &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;30&lt;/sub&gt;,
+<span class="lineNum">     152 </span>            :      * &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;11&lt;/sub&gt;,
+<span class="lineNum">     153 </span>            :      * &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;21&lt;/sub&gt;,
+<span class="lineNum">     154 </span>            :      * &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;31&lt;/sub&gt;,
+<span class="lineNum">     155 </span>            :      * &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;22&lt;/sub&gt;,
+<span class="lineNum">     156 </span>            :      * &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;32&lt;/sub&gt;,
+<span class="lineNum">     157 </span>            :      * &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;33&lt;/sub&gt;.
+<span class="lineNum">     158 </span>            :      * In general the (\e n,\e m) element is at index \e m \e N &amp;minus; \e m
+<span class="lineNum">     159 </span>            :      * (\e m &amp;minus; 1)/2 + \e n.  The layout of \e S is the same except that
+<span class="lineNum">     160 </span>            :      * the first column is omitted (since the \e m = 0 terms never contribute
+<span class="lineNum">     161 </span>            :      * to the sum) and the 0th element is &lt;i&gt;S&lt;/i&gt;&lt;sub&gt;11&lt;/sub&gt;
+<span class="lineNum">     162 </span>            :      *
+<span class="lineNum">     163 </span>            :      * The class stores &lt;i&gt;pointers&lt;/i&gt; to the first elements of \e C and \e S.
+<span class="lineNum">     164 </span>            :      * These arrays should not be altered or destroyed during the lifetime of a
+<span class="lineNum">     165 </span>            :      * SphericalHarmonic object.
+<span class="lineNum">     166 </span>            :      **********************************************************************/
+<span class="lineNum">     167 </span>            :     SphericalHarmonic(const std::vector&lt;real&gt;&amp; C,
+<span class="lineNum">     168 </span>            :                       const std::vector&lt;real&gt;&amp; S,
+<span class="lineNum">     169 </span>            :                       int N, real a, unsigned norm = FULL)
+<span class="lineNum">     170 </span>            :       : _a(a)
+<span class="lineNum">     171 </span>            :       , _norm(norm)
+<span class="lineNum">     172 </span>            :     { _c[0] = SphericalEngine::coeff(C, S, N); }
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            :     /**
+<span class="lineNum">     175 </span>            :      * Constructor with a subset of coefficients specified.
+<span class="lineNum">     176 </span>            :      *
+<span class="lineNum">     177 </span>            :      * @param[in] C the coefficients &lt;i&gt;C&lt;/i&gt;&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt;.
+<span class="lineNum">     178 </span>            :      * @param[in] S the coefficients &lt;i&gt;S&lt;/i&gt;&lt;sub&gt;&lt;i&gt;nm&lt;/i&gt;&lt;/sub&gt;.
+<span class="lineNum">     179 </span>            :      * @param[in] N the degree used to determine the layout of \e C and \e S.
+<span class="lineNum">     180 </span>            :      * @param[in] nmx the maximum degree used in the sum.  The sum over \e n is
+<span class="lineNum">     181 </span>            :      *   from 0 thru \e nmx.
+<span class="lineNum">     182 </span>            :      * @param[in] mmx the maximum order used in the sum.  The sum over \e m is
+<span class="lineNum">     183 </span>            :      *   from 0 thru min(\e n, \e mmx).
+<span class="lineNum">     184 </span>            :      * @param[in] a the reference radius appearing in the definition of the
+<span class="lineNum">     185 </span>            :      *   sum.
+<span class="lineNum">     186 </span>            :      * @param[in] norm the normalization for the associated Legendre
+<span class="lineNum">     187 </span>            :      *   polynomials, either SphericalHarmonic::FULL (the default) or
+<span class="lineNum">     188 </span>            :      *   SphericalHarmonic::SCHMIDT.
+<span class="lineNum">     189 </span>            :      * @exception GeographicErr if \e N, \e nmx, and \e mmx do not satisfy
+<span class="lineNum">     190 </span>            :      *   \e N &amp;ge; \e nmx &amp;ge; \e mmx &amp;ge; &amp;minus;1.
+<span class="lineNum">     191 </span>            :      * @exception GeographicErr if \e C or \e S is not big enough to hold the
+<span class="lineNum">     192 </span>            :      *   coefficients.
+<span class="lineNum">     193 </span>            :      *
+<span class="lineNum">     194 </span>            :      * The class stores &lt;i&gt;pointers&lt;/i&gt; to the first elements of \e C and \e S.
+<span class="lineNum">     195 </span>            :      * These arrays should not be altered or destroyed during the lifetime of a
+<a name="196"><span class="lineNum">     196 </span>            :      * SphericalHarmonic object.</a>
+<span class="lineNum">     197 </span>            :      **********************************************************************/
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :     SphericalHarmonic(const std::vector&lt;real&gt;&amp; C,</span>
+<span class="lineNum">     199 </span>            :                       const std::vector&lt;real&gt;&amp; S,
+<span class="lineNum">     200 </span>            :                       int N, int nmx, int mmx,
+<span class="lineNum">     201 </span>            :                       real a, unsigned norm = FULL)
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :       : _a(a)</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :       , _norm(norm)</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :     { _c[0] = SphericalEngine::coeff(C, S, N, nmx, mmx); }</span>
+<span class="lineNum">     205 </span>            : 
+<span class="lineNum">     206 </span>            :     /**
+<span class="lineNum">     207 </span>            :      * A default constructor so that the object can be created when the
+<span class="lineNum">     208 </span>            :      * constructor for another object is initialized.  This default object can
+<span class="lineNum">     209 </span>            :      * then be reset with the default copy assignment operator.
+<span class="lineNum">     210 </span>            :      **********************************************************************/
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :     SphericalHarmonic() {}</span>
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span>            :     /**
+<span class="lineNum">     214 </span>            :      * Compute the spherical harmonic sum.
+<span class="lineNum">     215 </span>            :      *
+<span class="lineNum">     216 </span>            :      * @param[in] x cartesian coordinate.
+<span class="lineNum">     217 </span>            :      * @param[in] y cartesian coordinate.
+<span class="lineNum">     218 </span>            :      * @param[in] z cartesian coordinate.
+<span class="lineNum">     219 </span>            :      * @return \e V the spherical harmonic sum.
+<span class="lineNum">     220 </span>            :      *
+<span class="lineNum">     221 </span>            :      * This routine requires constant memory and thus never throws an
+<a name="222"><span class="lineNum">     222 </span>            :      * exception.</a>
+<span class="lineNum">     223 </span>            :      **********************************************************************/
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :     Math::real operator()(real x, real y, real z) const {</span>
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :       real f[] = {1};</span>
+<span class="lineNum">     226 </span>            :       real v = 0;
+<span class="lineNum">     227 </span>            :       real dummy;
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :       switch (_norm) {</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :       case FULL:</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :         v = SphericalEngine::Value&lt;false, SphericalEngine::FULL, 1&gt;</span>
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :           (_c, f, x, y, z, _a, dummy, dummy, dummy);</span>
+<span class="lineNum">     232 </span>            :         break;
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :       case SCHMIDT:</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :         v = SphericalEngine::Value&lt;false, SphericalEngine::SCHMIDT, 1&gt;</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :           (_c, f, x, y, z, _a, dummy, dummy, dummy);</span>
+<span class="lineNum">     236 </span>            :         break;
+<span class="lineNum">     237 </span>            :       }
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :       return v;</span>
+<span class="lineNum">     239 </span>            :     }
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            :     /**
+<span class="lineNum">     242 </span>            :      * Compute a spherical harmonic sum and its gradient.
+<span class="lineNum">     243 </span>            :      *
+<span class="lineNum">     244 </span>            :      * @param[in] x cartesian coordinate.
+<span class="lineNum">     245 </span>            :      * @param[in] y cartesian coordinate.
+<span class="lineNum">     246 </span>            :      * @param[in] z cartesian coordinate.
+<span class="lineNum">     247 </span>            :      * @param[out] gradx \e x component of the gradient
+<span class="lineNum">     248 </span>            :      * @param[out] grady \e y component of the gradient
+<span class="lineNum">     249 </span>            :      * @param[out] gradz \e z component of the gradient
+<span class="lineNum">     250 </span>            :      * @return \e V the spherical harmonic sum.
+<span class="lineNum">     251 </span>            :      *
+<span class="lineNum">     252 </span>            :      * This is the same as the previous function, except that the components of
+<span class="lineNum">     253 </span>            :      * the gradients of the sum in the \e x, \e y, and \e z directions are
+<span class="lineNum">     254 </span>            :      * computed.  This routine requires constant memory and thus never throws
+<a name="255"><span class="lineNum">     255 </span>            :      * an exception.</a>
+<span class="lineNum">     256 </span>            :      **********************************************************************/
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :     Math::real operator()(real x, real y, real z,</span>
+<span class="lineNum">     258 </span>            :                           real&amp; gradx, real&amp; grady, real&amp; gradz) const {
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :       real f[] = {1};</span>
+<span class="lineNum">     260 </span>            :       real v = 0;
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :       switch (_norm) {</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :       case FULL:</span>
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :         v = SphericalEngine::Value&lt;true, SphericalEngine::FULL, 1&gt;</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :           (_c, f, x, y, z, _a, gradx, grady, gradz);</span>
+<span class="lineNum">     265 </span>            :         break;
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :       case SCHMIDT:</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :         v = SphericalEngine::Value&lt;true, SphericalEngine::SCHMIDT, 1&gt;</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :           (_c, f, x, y, z, _a, gradx, grady, gradz);</span>
+<span class="lineNum">     269 </span>            :         break;
+<span class="lineNum">     270 </span>            :       }
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :       return v;</span>
+<span class="lineNum">     272 </span>            :     }
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            :     /**
+<span class="lineNum">     275 </span>            :      * Create a CircularEngine to allow the efficient evaluation of several
+<span class="lineNum">     276 </span>            :      * points on a circle of latitude.
+<span class="lineNum">     277 </span>            :      *
+<span class="lineNum">     278 </span>            :      * @param[in] p the radius of the circle.
+<span class="lineNum">     279 </span>            :      * @param[in] z the height of the circle above the equatorial plane.
+<span class="lineNum">     280 </span>            :      * @param[in] gradp if true the returned object will be able to compute the
+<span class="lineNum">     281 </span>            :      *   gradient of the sum.
+<span class="lineNum">     282 </span>            :      * @exception std::bad_alloc if the memory for the CircularEngine can't be
+<span class="lineNum">     283 </span>            :      *   allocated.
+<span class="lineNum">     284 </span>            :      * @return the CircularEngine object.
+<span class="lineNum">     285 </span>            :      *
+<span class="lineNum">     286 </span>            :      * SphericalHarmonic::operator()() exchanges the order of the sums in the
+<span class="lineNum">     287 </span>            :      * definition, i.e., &amp;sum;&lt;sub&gt;&lt;i&gt;n&lt;/i&gt; = 0..&lt;i&gt;N&lt;/i&gt;&lt;/sub&gt;
+<span class="lineNum">     288 </span>            :      * &amp;sum;&lt;sub&gt;&lt;i&gt;m&lt;/i&gt; = 0..&lt;i&gt;n&lt;/i&gt;&lt;/sub&gt; becomes &amp;sum;&lt;sub&gt;&lt;i&gt;m&lt;/i&gt; =
+<span class="lineNum">     289 </span>            :      * 0..&lt;i&gt;N&lt;/i&gt;&lt;/sub&gt; &amp;sum;&lt;sub&gt;&lt;i&gt;n&lt;/i&gt; = &lt;i&gt;m&lt;/i&gt;..&lt;i&gt;N&lt;/i&gt;&lt;/sub&gt;.
+<span class="lineNum">     290 </span>            :      * SphericalHarmonic::Circle performs the inner sum over degree \e n (which
+<span class="lineNum">     291 </span>            :      * entails about &lt;i&gt;N&lt;/i&gt;&lt;sup&gt;2&lt;/sup&gt; operations).  Calling
+<span class="lineNum">     292 </span>            :      * CircularEngine::operator()() on the returned object performs the outer
+<span class="lineNum">     293 </span>            :      * sum over the order \e m (about \e N operations).
+<span class="lineNum">     294 </span>            :      *
+<span class="lineNum">     295 </span>            :      * Here's an example of computing the spherical sum at a sequence of
+<span class="lineNum">     296 </span>            :      * longitudes without using a CircularEngine object \code
+<span class="lineNum">     297 </span>            :      SphericalHarmonic h(...);     // Create the SphericalHarmonic object
+<span class="lineNum">     298 </span>            :      double r = 2, lat = 33, lon0 = 44, dlon = 0.01;
+<span class="lineNum">     299 </span>            :      double
+<span class="lineNum">     300 </span>            :        phi = lat * Math::degree&lt;double&gt;(),
+<span class="lineNum">     301 </span>            :        z = r * sin(phi), p = r * cos(phi);
+<span class="lineNum">     302 </span>            :      for (int i = 0; i &lt;= 100; ++i) {
+<span class="lineNum">     303 </span>            :        real
+<span class="lineNum">     304 </span>            :          lon = lon0 + i * dlon,
+<span class="lineNum">     305 </span>            :          lam = lon * Math::degree&lt;double&gt;();
+<span class="lineNum">     306 </span>            :        std::cout &lt;&lt; lon &lt;&lt; &quot; &quot; &lt;&lt; h(p * cos(lam), p * sin(lam), z) &lt;&lt; &quot;\n&quot;;
+<span class="lineNum">     307 </span>            :      }
+<span class="lineNum">     308 </span>            :      \endcode
+<span class="lineNum">     309 </span>            :      * Here is the same calculation done using a CircularEngine object.  This
+<span class="lineNum">     310 </span>            :      * will be about &lt;i&gt;N&lt;/i&gt;/2 times faster. \code
+<span class="lineNum">     311 </span>            :      SphericalHarmonic h(...);     // Create the SphericalHarmonic object
+<span class="lineNum">     312 </span>            :      double r = 2, lat = 33, lon0 = 44, dlon = 0.01;
+<span class="lineNum">     313 </span>            :      double
+<span class="lineNum">     314 </span>            :        phi = lat * Math::degree&lt;double&gt;(),
+<span class="lineNum">     315 </span>            :        z = r * sin(phi), p = r * cos(phi);
+<span class="lineNum">     316 </span>            :      CircularEngine c(h(p, z, false)); // Create the CircularEngine object
+<span class="lineNum">     317 </span>            :      for (int i = 0; i &lt;= 100; ++i) {
+<span class="lineNum">     318 </span>            :        real
+<span class="lineNum">     319 </span>            :          lon = lon0 + i * dlon;
+<span class="lineNum">     320 </span>            :        std::cout &lt;&lt; lon &lt;&lt; &quot; &quot; &lt;&lt; c(lon) &lt;&lt; &quot;\n&quot;;
+<span class="lineNum">     321 </span>            :      }
+<a name="322"><span class="lineNum">     322 </span>            :      \endcode</a>
+<span class="lineNum">     323 </span>            :      **********************************************************************/
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :     CircularEngine Circle(real p, real z, bool gradp) const {</span>
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :       real f[] = {1};</span>
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :       switch (_norm) {</span>
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :       case FULL:</span>
+<span class="lineNum">     328 </span>            :         return gradp ?
+<span class="lineNum">     329 </span>            :           SphericalEngine::Circle&lt;true, SphericalEngine::FULL, 1&gt;
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :           (_c, f, p, z, _a) :</span>
+<span class="lineNum">     331 </span>            :           SphericalEngine::Circle&lt;false, SphericalEngine::FULL, 1&gt;
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :           (_c, f, p, z, _a);</span>
+<span class="lineNum">     333 </span>            :         break;
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :       case SCHMIDT:</span>
+<span class="lineNum">     335 </span>            :       default:                  // To avoid compiler warnings
+<span class="lineNum">     336 </span>            :         return gradp ?
+<span class="lineNum">     337 </span>            :           SphericalEngine::Circle&lt;true, SphericalEngine::SCHMIDT, 1&gt;
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :           (_c, f, p, z, _a) :</span>
+<span class="lineNum">     339 </span>            :           SphericalEngine::Circle&lt;false, SphericalEngine::SCHMIDT, 1&gt;
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :           (_c, f, p, z, _a);</span>
+<span class="lineNum">     341 </span>            :         break;
+<span class="lineNum">     342 </span>            :       }
+<span class="lineNum">     343 </span>            :     }
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            :     /**
+<span class="lineNum">     346 </span>            :      * @return the zeroth SphericalEngine::coeff object.
+<span class="lineNum">     347 </span>            :      **********************************************************************/
+<span class="lineNum">     348 </span>            :     const SphericalEngine::coeff&amp; Coefficients() const
+<span class="lineNum">     349 </span>            :     { return _c[0]; }
+<span class="lineNum">     350 </span>            :   };
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span>            : } // namespace GeographicLib
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span>            : #endif  // GEOGRAPHICLIB_SPHERICALHARMONIC_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

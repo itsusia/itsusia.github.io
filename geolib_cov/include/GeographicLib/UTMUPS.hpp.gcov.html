@@ -1,0 +1,498 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/GeographicLib/UTMUPS.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/GeographicLib</a> - UTMUPS.hpp<span style="font-size: 80%;"> (source / <a href="UTMUPS.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file UTMUPS.hpp
+<span class="lineNum">       3 </span>            :  * \brief Header for GeographicLib::UTMUPS class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2008-2015) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #if !defined(GEOGRAPHICLIB_UTMUPS_HPP)
+<span class="lineNum">      11 </span>            : #define GEOGRAPHICLIB_UTMUPS_HPP 1
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;GeographicLib/Constants.hpp&gt;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : namespace GeographicLib {
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            :   /**
+<span class="lineNum">      18 </span>            :    * \brief Convert between geographic coordinates and UTM/UPS
+<span class="lineNum">      19 </span>            :    *
+<span class="lineNum">      20 </span>            :    * UTM and UPS are defined
+<span class="lineNum">      21 </span>            :    * - J. W. Hager, J. F. Behensky, and B. W. Drew,
+<span class="lineNum">      22 </span>            :    *   &lt;a href=&quot;http://earth-info.nga.mil/GandG/publications/tm8358.2/TM8358_2.pdf&quot;&gt;
+<span class="lineNum">      23 </span>            :    *   The Universal Grids: Universal Transverse Mercator (UTM) and Universal
+<span class="lineNum">      24 </span>            :    *   Polar Stereographic (UPS)&lt;/a&gt;, Defense Mapping Agency, Technical Manual
+<span class="lineNum">      25 </span>            :    *   TM8358.2 (1989).
+<span class="lineNum">      26 </span>            :    * .
+<span class="lineNum">      27 </span>            :    * Section 2-3 defines UTM and section 3-2.4 defines UPS.  This document also
+<span class="lineNum">      28 </span>            :    * includes approximate algorithms for the computation of the underlying
+<span class="lineNum">      29 </span>            :    * transverse Mercator and polar stereographic projections.  Here we
+<span class="lineNum">      30 </span>            :    * substitute much more accurate algorithms given by
+<span class="lineNum">      31 </span>            :    * GeographicLib:TransverseMercator and GeographicLib:PolarStereographic.
+<span class="lineNum">      32 </span>            :    * These are the algorithms recommended by the NGA document
+<span class="lineNum">      33 </span>            :    * - &lt;a href=&quot;http://earth-info.nga.mil/GandG/publications/NGA_SIG_0012_2_0_0_UTMUPS/NGA.SIG.0012_2.0.0_UTMUPS.pdf&quot;&gt;
+<span class="lineNum">      34 </span>            :    *   The Universal Grids and the Transverse Mercator and Polar Stereographic
+<span class="lineNum">      35 </span>            :    *   Map Projections&lt;/a&gt;, NGA.SIG.0012_2.0.0_UTMUPS (2014).
+<span class="lineNum">      36 </span>            :    *
+<span class="lineNum">      37 </span>            :    * In this implementation, the conversions are closed, i.e., output from
+<span class="lineNum">      38 </span>            :    * Forward is legal input for Reverse and vice versa.  The error is about 5nm
+<span class="lineNum">      39 </span>            :    * in each direction.  However, the conversion from legal UTM/UPS coordinates
+<span class="lineNum">      40 </span>            :    * to geographic coordinates and back might throw an error if the initial
+<span class="lineNum">      41 </span>            :    * point is within 5nm of the edge of the allowed range for the UTM/UPS
+<span class="lineNum">      42 </span>            :    * coordinates.
+<span class="lineNum">      43 </span>            :    *
+<span class="lineNum">      44 </span>            :    * The simplest way to guarantee the closed property is to define allowed
+<span class="lineNum">      45 </span>            :    * ranges for the eastings and northings for UTM and UPS coordinates.  The
+<span class="lineNum">      46 </span>            :    * UTM boundaries are the same for all zones.  (The only place the
+<span class="lineNum">      47 </span>            :    * exceptional nature of the zone boundaries is evident is when converting to
+<span class="lineNum">      48 </span>            :    * UTM/UPS coordinates requesting the standard zone.)  The MGRS lettering
+<span class="lineNum">      49 </span>            :    * scheme imposes natural limits on UTM/UPS coordinates which may be
+<span class="lineNum">      50 </span>            :    * converted into MGRS coordinates.  For the conversion to/from geographic
+<span class="lineNum">      51 </span>            :    * coordinates these ranges have been extended by 100km in order to provide a
+<span class="lineNum">      52 </span>            :    * generous overlap between UTM and UPS and between UTM zones.
+<span class="lineNum">      53 </span>            :    *
+<span class="lineNum">      54 </span>            :    * The &lt;a href=&quot;http://www.nga.mil&quot;&gt;NGA&lt;/a&gt; software package
+<span class="lineNum">      55 </span>            :    * &lt;a href=&quot;http://earth-info.nga.mil/GandG/geotrans/index.html&quot;&gt;geotrans&lt;/a&gt;
+<span class="lineNum">      56 </span>            :    * also provides conversions to and from UTM and UPS.  Version 2.4.2 (and
+<span class="lineNum">      57 </span>            :    * earlier) suffers from some drawbacks:
+<span class="lineNum">      58 </span>            :    * - Inconsistent rules are used to determine the whether a particular UTM or
+<span class="lineNum">      59 </span>            :    *   UPS coordinate is legal.  A more systematic approach is taken here.
+<span class="lineNum">      60 </span>            :    * - The underlying projections are not very accurately implemented.
+<span class="lineNum">      61 </span>            :    *
+<span class="lineNum">      62 </span>            :    * The GeographicLib::UTMUPS::EncodeZone encodes the UTM zone and hemisphere
+<span class="lineNum">      63 </span>            :    * to allow UTM/UPS coordinated to be displayed as, for example, &quot;38N 444500
+<span class="lineNum">      64 </span>            :    * 3688500&quot;.  According to NGA.SIG.0012_2.0.0_UTMUPS the use of &quot;N&quot; to denote
+<span class="lineNum">      65 </span>            :    * &quot;north&quot; in the context is not allowed (since a upper case letter in this
+<span class="lineNum">      66 </span>            :    * context denotes the MGRS latitude band).  Consequently, as of version
+<span class="lineNum">      67 </span>            :    * 1.36, EncodeZone uses the lower case letters &quot;n&quot; and &quot;s&quot; to denote the
+<span class="lineNum">      68 </span>            :    * hemisphere.  In addition EncodeZone accepts an optional final argument \e
+<span class="lineNum">      69 </span>            :    * abbrev, which, if false, results in the hemisphere being spelled out as in
+<span class="lineNum">      70 </span>            :    * &quot;38north&quot;.
+<span class="lineNum">      71 </span>            :    *
+<span class="lineNum">      72 </span>            :    * Example of use:
+<span class="lineNum">      73 </span>            :    * \include example-UTMUPS.cpp
+<span class="lineNum">      74 </span>            :    **********************************************************************/
+<span class="lineNum">      75 </span>            :   class GEOGRAPHICLIB_EXPORT UTMUPS {
+<span class="lineNum">      76 </span>            :   private:
+<span class="lineNum">      77 </span>            :     typedef Math::real real;
+<span class="lineNum">      78 </span>            :     static const int falseeasting_[4];
+<span class="lineNum">      79 </span>            :     static const int falsenorthing_[4];
+<span class="lineNum">      80 </span>            :     static const int mineasting_[4];
+<span class="lineNum">      81 </span>            :     static const int maxeasting_[4];
+<span class="lineNum">      82 </span>            :     static const int minnorthing_[4];
+<span class="lineNum">      83 </span>            :     static const int maxnorthing_[4];
+<span class="lineNum">      84 </span>            :     static const int epsg01N = 32601; // EPSG code for UTM 01N
+<span class="lineNum">      85 </span>            :     static const int epsg60N = 32660; // EPSG code for UTM 60N
+<span class="lineNum">      86 </span>            :     static const int epsgN   = 32661; // EPSG code for UPS   N
+<span class="lineNum">      87 </span>            :     static const int epsg01S = 32701; // EPSG code for UTM 01S
+<span class="lineNum">      88 </span>            :     static const int epsg60S = 32760; // EPSG code for UTM 60S
+<span class="lineNum">      89 </span>            :     static const int epsgS   = 32761; // EPSG code for UPS   S
+<span class="lineNum">      90 </span>            :     static real CentralMeridian(int zone)
+<span class="lineNum">      91 </span><span class="lineCov">         93 :     { return real(6 * zone - 183); }</span>
+<span class="lineNum">      92 </span>            :     // Throw an error if easting or northing are outside standard ranges.  If
+<span class="lineNum">      93 </span>            :     // throwp = false, return bool instead.
+<span class="lineNum">      94 </span>            :     static bool CheckCoords(bool utmp, bool northp, real x, real y,
+<span class="lineNum">      95 </span>            :                             bool msgrlimits = false, bool throwp = true);
+<span class="lineNum">      96 </span>            :     UTMUPS();                   // Disable constructor
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :   public:
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :     /**
+<span class="lineNum">     101 </span>            :      * In this class we bring together the UTM and UPS coordinates systems.
+<span class="lineNum">     102 </span>            :      * The UTM divides the earth between latitudes &amp;minus;80&amp;deg; and 84&amp;deg;
+<span class="lineNum">     103 </span>            :      * into 60 zones numbered 1 thru 60.  Zone assign zone number 0 to the UPS
+<span class="lineNum">     104 </span>            :      * regions, covering the two poles.  Within UTMUPS, non-negative zone
+<span class="lineNum">     105 </span>            :      * numbers refer to one of the &quot;physical&quot; zones, 0 for UPS and [1, 60] for
+<span class="lineNum">     106 </span>            :      * UTM.  Negative &quot;pseudo-zone&quot; numbers are used to select one of the
+<span class="lineNum">     107 </span>            :      * physical zones.
+<span class="lineNum">     108 </span>            :      **********************************************************************/
+<span class="lineNum">     109 </span>            :     enum zonespec {
+<span class="lineNum">     110 </span>            :       /**
+<span class="lineNum">     111 </span>            :        * The smallest pseudo-zone number.
+<span class="lineNum">     112 </span>            :        **********************************************************************/
+<span class="lineNum">     113 </span>            :       MINPSEUDOZONE = -4,
+<span class="lineNum">     114 </span>            :       /**
+<span class="lineNum">     115 </span>            :        * A marker for an undefined or invalid zone.  Equivalent to NaN.
+<span class="lineNum">     116 </span>            :        **********************************************************************/
+<span class="lineNum">     117 </span>            :       INVALID = -4,
+<span class="lineNum">     118 </span>            :       /**
+<span class="lineNum">     119 </span>            :        * If a coordinate already include zone information (e.g., it is an MGRS
+<span class="lineNum">     120 </span>            :        * coordinate), use that, otherwise apply the UTMUPS::STANDARD rules.
+<span class="lineNum">     121 </span>            :        **********************************************************************/
+<span class="lineNum">     122 </span>            :       MATCH = -3,
+<span class="lineNum">     123 </span>            :       /**
+<span class="lineNum">     124 </span>            :        * Apply the standard rules for UTM zone assigment extending the UTM zone
+<span class="lineNum">     125 </span>            :        * to each pole to give a zone number in [1, 60].  For example, use UTM
+<span class="lineNum">     126 </span>            :        * zone 38 for longitude in [42&amp;deg;, 48&amp;deg;).  The rules include the
+<span class="lineNum">     127 </span>            :        * Norway and Svalbard exceptions.
+<span class="lineNum">     128 </span>            :        **********************************************************************/
+<span class="lineNum">     129 </span>            :       UTM = -2,
+<span class="lineNum">     130 </span>            :       /**
+<span class="lineNum">     131 </span>            :        * Apply the standard rules for zone assignment to give a zone number in
+<span class="lineNum">     132 </span>            :        * [0, 60].  If the latitude is not in [&amp;minus;80&amp;deg;, 84&amp;deg;), then
+<span class="lineNum">     133 </span>            :        * use UTMUPS::UPS = 0, otherwise apply the rules for UTMUPS::UTM.  The
+<span class="lineNum">     134 </span>            :        * tests on latitudes and longitudes are all closed on the lower end open
+<span class="lineNum">     135 </span>            :        * on the upper.  Thus for UTM zone 38, latitude is in [&amp;minus;80&amp;deg;,
+<span class="lineNum">     136 </span>            :        * 84&amp;deg;) and longitude is in [42&amp;deg;, 48&amp;deg;).
+<span class="lineNum">     137 </span>            :        **********************************************************************/
+<span class="lineNum">     138 </span>            :       STANDARD = -1,
+<span class="lineNum">     139 </span>            :       /**
+<span class="lineNum">     140 </span>            :        * The largest pseudo-zone number.
+<span class="lineNum">     141 </span>            :        **********************************************************************/
+<span class="lineNum">     142 </span>            :       MAXPSEUDOZONE = -1,
+<span class="lineNum">     143 </span>            :       /**
+<span class="lineNum">     144 </span>            :        * The smallest physical zone number.
+<span class="lineNum">     145 </span>            :        **********************************************************************/
+<span class="lineNum">     146 </span>            :       MINZONE = 0,
+<span class="lineNum">     147 </span>            :       /**
+<span class="lineNum">     148 </span>            :        * The zone number used for UPS
+<span class="lineNum">     149 </span>            :        **********************************************************************/
+<span class="lineNum">     150 </span>            :       UPS = 0,
+<span class="lineNum">     151 </span>            :       /**
+<span class="lineNum">     152 </span>            :        * The smallest UTM zone number.
+<span class="lineNum">     153 </span>            :        **********************************************************************/
+<span class="lineNum">     154 </span>            :       MINUTMZONE = 1,
+<span class="lineNum">     155 </span>            :       /**
+<span class="lineNum">     156 </span>            :        * The largest UTM zone number.
+<span class="lineNum">     157 </span>            :        **********************************************************************/
+<span class="lineNum">     158 </span>            :       MAXUTMZONE = 60,
+<span class="lineNum">     159 </span>            :       /**
+<span class="lineNum">     160 </span>            :        * The largest physical zone number.
+<span class="lineNum">     161 </span>            :        **********************************************************************/
+<span class="lineNum">     162 </span>            :       MAXZONE = 60,
+<span class="lineNum">     163 </span>            :     };
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            :     /**
+<span class="lineNum">     166 </span>            :      * The standard zone.
+<span class="lineNum">     167 </span>            :      *
+<span class="lineNum">     168 </span>            :      * @param[in] lat latitude (degrees).
+<span class="lineNum">     169 </span>            :      * @param[in] lon longitude (degrees).
+<span class="lineNum">     170 </span>            :      * @param[in] setzone zone override (optional).  If omitted, use the
+<span class="lineNum">     171 </span>            :      *   standard rules for picking the zone.  If \e setzone is given then use
+<span class="lineNum">     172 </span>            :      *   that zone if it is non-negative, otherwise apply the rules given in
+<span class="lineNum">     173 </span>            :      *   UTMUPS::zonespec.
+<span class="lineNum">     174 </span>            :      * @exception GeographicErr if \e setzone is outside the range
+<span class="lineNum">     175 </span>            :      *   [UTMUPS::MINPSEUDOZONE, UTMUPS::MAXZONE] = [&amp;minus;4, 60].
+<span class="lineNum">     176 </span>            :      *
+<span class="lineNum">     177 </span>            :      * This is exact.
+<span class="lineNum">     178 </span>            :      **********************************************************************/
+<span class="lineNum">     179 </span>            :     static int StandardZone(real lat, real lon, int setzone = STANDARD);
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :     /**
+<span class="lineNum">     182 </span>            :      * Forward projection, from geographic to UTM/UPS.
+<span class="lineNum">     183 </span>            :      *
+<span class="lineNum">     184 </span>            :      * @param[in] lat latitude of point (degrees).
+<span class="lineNum">     185 </span>            :      * @param[in] lon longitude of point (degrees).
+<span class="lineNum">     186 </span>            :      * @param[out] zone the UTM zone (zero means UPS).
+<span class="lineNum">     187 </span>            :      * @param[out] northp hemisphere (true means north, false means south).
+<span class="lineNum">     188 </span>            :      * @param[out] x easting of point (meters).
+<span class="lineNum">     189 </span>            :      * @param[out] y northing of point (meters).
+<span class="lineNum">     190 </span>            :      * @param[out] gamma meridian convergence at point (degrees).
+<span class="lineNum">     191 </span>            :      * @param[out] k scale of projection at point.
+<span class="lineNum">     192 </span>            :      * @param[in] setzone zone override (optional).
+<span class="lineNum">     193 </span>            :      * @param[in] mgrslimits if true enforce the stricter MGRS limits on the
+<span class="lineNum">     194 </span>            :      *   coordinates (default = false).
+<span class="lineNum">     195 </span>            :      * @exception GeographicErr if \e lat is not in [&amp;minus;90&amp;deg;,
+<span class="lineNum">     196 </span>            :      *   90&amp;deg;].
+<span class="lineNum">     197 </span>            :      * @exception GeographicErr if the resulting \e x or \e y is out of allowed
+<span class="lineNum">     198 </span>            :      *   range (see Reverse); in this case, these arguments are unchanged.
+<span class="lineNum">     199 </span>            :      *
+<span class="lineNum">     200 </span>            :      * If \e setzone is omitted, use the standard rules for picking the zone.
+<span class="lineNum">     201 </span>            :      * If \e setzone is given then use that zone if it is non-negative,
+<span class="lineNum">     202 </span>            :      * otherwise apply the rules given in UTMUPS::zonespec.  The accuracy of
+<span class="lineNum">     203 </span>            :      * the conversion is about 5nm.
+<span class="lineNum">     204 </span>            :      *
+<span class="lineNum">     205 </span>            :      * The northing \e y jumps by UTMUPS::UTMShift() when crossing the equator
+<span class="lineNum">     206 </span>            :      * in the southerly direction.  Sometimes it is useful to remove this
+<span class="lineNum">     207 </span>            :      * discontinuity in \e y by extending the &quot;northern&quot; hemisphere using
+<span class="lineNum">     208 </span>            :      * UTMUPS::Transfer:
+<span class="lineNum">     209 </span>            :      * \code
+<span class="lineNum">     210 </span>            :      double lat = -1, lon = 123;
+<span class="lineNum">     211 </span>            :      int zone;
+<span class="lineNum">     212 </span>            :      bool northp;
+<span class="lineNum">     213 </span>            :      double x, y, gamma, k;
+<span class="lineNum">     214 </span>            :      GeographicLib::UTMUPS::Forward(lat, lon, zone, northp, x, y, gamma, k);
+<span class="lineNum">     215 </span>            :      GeographicLib::UTMUPS::Transfer(zone, northp, x, y,
+<span class="lineNum">     216 </span>            :                                      zone, true,   x, y, zone);
+<span class="lineNum">     217 </span>            :      northp = true;
+<span class="lineNum">     218 </span>            :      \endcode
+<span class="lineNum">     219 </span>            :      **********************************************************************/
+<span class="lineNum">     220 </span>            :     static void Forward(real lat, real lon,
+<span class="lineNum">     221 </span>            :                         int&amp; zone, bool&amp; northp, real&amp; x, real&amp; y,
+<span class="lineNum">     222 </span>            :                         real&amp; gamma, real&amp; k,
+<span class="lineNum">     223 </span>            :                         int setzone = STANDARD, bool mgrslimits = false);
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :     /**
+<span class="lineNum">     226 </span>            :      * Reverse projection, from  UTM/UPS to geographic.
+<span class="lineNum">     227 </span>            :      *
+<span class="lineNum">     228 </span>            :      * @param[in] zone the UTM zone (zero means UPS).
+<span class="lineNum">     229 </span>            :      * @param[in] northp hemisphere (true means north, false means south).
+<span class="lineNum">     230 </span>            :      * @param[in] x easting of point (meters).
+<span class="lineNum">     231 </span>            :      * @param[in] y northing of point (meters).
+<span class="lineNum">     232 </span>            :      * @param[out] lat latitude of point (degrees).
+<span class="lineNum">     233 </span>            :      * @param[out] lon longitude of point (degrees).
+<span class="lineNum">     234 </span>            :      * @param[out] gamma meridian convergence at point (degrees).
+<span class="lineNum">     235 </span>            :      * @param[out] k scale of projection at point.
+<span class="lineNum">     236 </span>            :      * @param[in] mgrslimits if true enforce the stricter MGRS limits on the
+<span class="lineNum">     237 </span>            :      *   coordinates (default = false).
+<span class="lineNum">     238 </span>            :      * @exception GeographicErr if \e zone, \e x, or \e y is out of allowed
+<span class="lineNum">     239 </span>            :      *   range; this this case the arguments are unchanged.
+<span class="lineNum">     240 </span>            :      *
+<span class="lineNum">     241 </span>            :      * The accuracy of the conversion is about 5nm.
+<span class="lineNum">     242 </span>            :      *
+<span class="lineNum">     243 </span>            :      * UTM eastings are allowed to be in the range [0km, 1000km], northings are
+<span class="lineNum">     244 </span>            :      * allowed to be in in [0km, 9600km] for the northern hemisphere and in
+<span class="lineNum">     245 </span>            :      * [900km, 10000km] for the southern hemisphere.  However UTM northings
+<span class="lineNum">     246 </span>            :      * can be continued across the equator.  So the actual limits on the
+<span class="lineNum">     247 </span>            :      * northings are [-9100km, 9600km] for the &quot;northern&quot; hemisphere and
+<span class="lineNum">     248 </span>            :      * [900km, 19600km] for the &quot;southern&quot; hemisphere.
+<span class="lineNum">     249 </span>            :      *
+<span class="lineNum">     250 </span>            :      * UPS eastings and northings are allowed to be in the range [1200km,
+<span class="lineNum">     251 </span>            :      * 2800km] in the northern hemisphere and in [700km, 3300km] in the
+<span class="lineNum">     252 </span>            :      * southern hemisphere.
+<span class="lineNum">     253 </span>            :      *
+<span class="lineNum">     254 </span>            :      * These ranges are 100km larger than allowed for the conversions to MGRS.
+<span class="lineNum">     255 </span>            :      * (100km is the maximum extra padding consistent with eastings remaining
+<span class="lineNum">     256 </span>            :      * non-negative.)  This allows generous overlaps between zones and UTM and
+<span class="lineNum">     257 </span>            :      * UPS.  If \e mgrslimits = true, then all the ranges are shrunk by 100km
+<span class="lineNum">     258 </span>            :      * so that they agree with the stricter MGRS ranges.  No checks are
+<span class="lineNum">     259 </span>            :      * performed besides these (e.g., to limit the distance outside the
+<span class="lineNum">     260 </span>            :      * standard zone boundaries).
+<span class="lineNum">     261 </span>            :      **********************************************************************/
+<span class="lineNum">     262 </span>            :     static void Reverse(int zone, bool northp, real x, real y,
+<span class="lineNum">     263 </span>            :                         real&amp; lat, real&amp; lon, real&amp; gamma, real&amp; k,
+<span class="lineNum">     264 </span>            :                         bool mgrslimits = false);
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            :     /**
+<span class="lineNum">     267 </span>            :      * UTMUPS::Forward without returning convergence and scale.
+<span class="lineNum">     268 </span>            :      **********************************************************************/
+<span class="lineNum">     269 </span>            :     static void Forward(real lat, real lon,
+<span class="lineNum">     270 </span>            :                         int&amp; zone, bool&amp; northp, real&amp; x, real&amp; y,
+<span class="lineNum">     271 </span>            :                         int setzone = STANDARD, bool mgrslimits = false) {
+<span class="lineNum">     272 </span>            :       real gamma, k;
+<span class="lineNum">     273 </span><span class="lineCov">          2 :       Forward(lat, lon, zone, northp, x, y, gamma, k, setzone, mgrslimits);</span>
+<span class="lineNum">     274 </span>            :     }
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span>            :     /**
+<span class="lineNum">     277 </span>            :      * UTMUPS::Reverse without returning convergence and scale.
+<span class="lineNum">     278 </span>            :      **********************************************************************/
+<span class="lineNum">     279 </span>            :     static void Reverse(int zone, bool northp, real x, real y,
+<span class="lineNum">     280 </span>            :                         real&amp; lat, real&amp; lon, bool mgrslimits = false) {
+<span class="lineNum">     281 </span>            :       real gamma, k;
+<span class="lineNum">     282 </span><span class="lineCov">         53 :       Reverse(zone, northp, x, y, lat, lon, gamma, k, mgrslimits);</span>
+<span class="lineNum">     283 </span>            :     }
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            :     /**
+<span class="lineNum">     286 </span>            :      * Transfer UTM/UPS coordinated from one zone to another.
+<span class="lineNum">     287 </span>            :      *
+<span class="lineNum">     288 </span>            :      * @param[in] zonein the UTM zone for \e xin and \e yin (or zero for UPS).
+<span class="lineNum">     289 </span>            :      * @param[in] northpin hemisphere for \e xin and \e yin (true means north,
+<span class="lineNum">     290 </span>            :      *   false means south).
+<span class="lineNum">     291 </span>            :      * @param[in] xin easting of point (meters) in \e zonein.
+<span class="lineNum">     292 </span>            :      * @param[in] yin northing of point (meters) in \e zonein.
+<span class="lineNum">     293 </span>            :      * @param[in] zoneout the requested UTM zone for \e xout and \e yout (or
+<span class="lineNum">     294 </span>            :      *   zero for UPS).
+<span class="lineNum">     295 </span>            :      * @param[in] northpout hemisphere for \e xout output and \e yout.
+<span class="lineNum">     296 </span>            :      * @param[out] xout easting of point (meters) in \e zoneout.
+<span class="lineNum">     297 </span>            :      * @param[out] yout northing of point (meters) in \e zoneout.
+<span class="lineNum">     298 </span>            :      * @param[out] zone the actual UTM zone for \e xout and \e yout (or zero
+<span class="lineNum">     299 </span>            :      *   for UPS); this equals \e zoneout if \e zoneout &amp;ge; 0.
+<span class="lineNum">     300 </span>            :      * @exception GeographicErr if \e zonein is out of range (see below).
+<span class="lineNum">     301 </span>            :      * @exception GeographicErr if \e zoneout is out of range (see below).
+<span class="lineNum">     302 </span>            :      * @exception GeographicErr if \e xin or \e yin fall outside their allowed
+<span class="lineNum">     303 </span>            :      *   ranges (see UTMUPS::Reverse).
+<span class="lineNum">     304 </span>            :      * @exception GeographicErr if \e xout or \e yout fall outside their
+<span class="lineNum">     305 </span>            :      *   allowed ranges (see UTMUPS::Reverse).
+<span class="lineNum">     306 </span>            :      *
+<span class="lineNum">     307 </span>            :      * \e zonein must be in the range [UTMUPS::MINZONE, UTMUPS::MAXZONE] = [0,
+<span class="lineNum">     308 </span>            :      * 60] with \e zonein = UTMUPS::UPS, 0, indicating UPS.  \e zonein may
+<span class="lineNum">     309 </span>            :      * also be UTMUPS::INVALID.
+<span class="lineNum">     310 </span>            :      *
+<span class="lineNum">     311 </span>            :      * \e zoneout must be in the range [UTMUPS::MINPSEUDOZONE, UTMUPS::MAXZONE]
+<span class="lineNum">     312 </span>            :      * = [-4, 60].  If \e zoneout &amp;lt; UTMUPS::MINZONE then the rules give in
+<span class="lineNum">     313 </span>            :      * the documentation of UTMUPS::zonespec are applied, and \e zone is set to
+<span class="lineNum">     314 </span>            :      * the actual zone used for output.
+<span class="lineNum">     315 </span>            :      *
+<span class="lineNum">     316 </span>            :      * (\e xout, \e yout) can overlap with (\e xin, \e yin).
+<span class="lineNum">     317 </span>            :      **********************************************************************/
+<span class="lineNum">     318 </span>            :     static void Transfer(int zonein, bool northpin, real xin, real yin,
+<span class="lineNum">     319 </span>            :                          int zoneout, bool northpout, real&amp; xout, real&amp; yout,
+<span class="lineNum">     320 </span>            :                          int&amp; zone);
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            :     /**
+<span class="lineNum">     323 </span>            :      * Decode a UTM/UPS zone string.
+<span class="lineNum">     324 </span>            :      *
+<span class="lineNum">     325 </span>            :      * @param[in] zonestr string representation of zone and hemisphere.
+<span class="lineNum">     326 </span>            :      * @param[out] zone the UTM zone (zero means UPS).
+<span class="lineNum">     327 </span>            :      * @param[out] northp hemisphere (true means north, false means south).
+<span class="lineNum">     328 </span>            :      * @exception GeographicErr if \e zonestr is malformed.
+<span class="lineNum">     329 </span>            :      *
+<span class="lineNum">     330 </span>            :      * For UTM, \e zonestr has the form of a zone number in the range
+<span class="lineNum">     331 </span>            :      * [UTMUPS::MINUTMZONE, UTMUPS::MAXUTMZONE] = [1, 60] followed by a
+<span class="lineNum">     332 </span>            :      * hemisphere letter, n or s (or &quot;north&quot; or &quot;south&quot; spelled out).  For UPS,
+<span class="lineNum">     333 </span>            :      * it consists just of the hemisphere letter (or the spelled out
+<span class="lineNum">     334 </span>            :      * hemisphere).  The returned value of \e zone is UTMUPS::UPS = 0 for UPS.
+<span class="lineNum">     335 </span>            :      * Note well that &quot;38s&quot; indicates the southern hemisphere of zone 38 and
+<span class="lineNum">     336 </span>            :      * not latitude band S, 32&amp;deg; &amp;le; \e lat &amp;lt; 40&amp;deg;.  n, 01s, 2n, 38s,
+<span class="lineNum">     337 </span>            :      * south, 3north are legal.  0n, 001s, +3n, 61n, 38P are illegal.  INV is a
+<span class="lineNum">     338 </span>            :      * special value for which the returned value of \e is UTMUPS::INVALID.
+<span class="lineNum">     339 </span>            :      **********************************************************************/
+<span class="lineNum">     340 </span>            :     static void DecodeZone(const std::string&amp; zonestr,
+<span class="lineNum">     341 </span>            :                            int&amp; zone, bool&amp; northp);
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span>            :     /**
+<span class="lineNum">     344 </span>            :      * Encode a UTM/UPS zone string.
+<span class="lineNum">     345 </span>            :      *
+<span class="lineNum">     346 </span>            :      * @param[in] zone the UTM zone (zero means UPS).
+<span class="lineNum">     347 </span>            :      * @param[in] northp hemisphere (true means north, false means south).
+<span class="lineNum">     348 </span>            :      * @param[in] abbrev if true (the default) use abbreviated (n/s) notation
+<span class="lineNum">     349 </span>            :      *   for hemisphere; otherwise spell out the hemisphere (north/south)
+<span class="lineNum">     350 </span>            :      * @exception GeographicErr if \e zone is out of range (see below).
+<span class="lineNum">     351 </span>            :      * @exception std::bad_alloc if memoy for the string can't be allocated.
+<span class="lineNum">     352 </span>            :      * @return string representation of zone and hemisphere.
+<span class="lineNum">     353 </span>            :      *
+<span class="lineNum">     354 </span>            :      * \e zone must be in the range [UTMUPS::MINZONE, UTMUPS::MAXZONE] = [0,
+<span class="lineNum">     355 </span>            :      * 60] with \e zone = UTMUPS::UPS, 0, indicating UPS (but the resulting
+<span class="lineNum">     356 </span>            :      * string does not contain &quot;0&quot;).  \e zone may also be UTMUPS::INVALID, in
+<span class="lineNum">     357 </span>            :      * which case the returned string is &quot;inv&quot;.  This reverses
+<span class="lineNum">     358 </span>            :      * UTMUPS::DecodeZone.
+<span class="lineNum">     359 </span>            :      **********************************************************************/
+<span class="lineNum">     360 </span>            :     static std::string EncodeZone(int zone, bool northp, bool abbrev = true);
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span>            :     /**
+<span class="lineNum">     363 </span>            :      * Decode EPSG.
+<span class="lineNum">     364 </span>            :      *
+<span class="lineNum">     365 </span>            :      * @param[in] epsg the EPSG code.
+<span class="lineNum">     366 </span>            :      * @param[out] zone the UTM zone (zero means UPS).
+<span class="lineNum">     367 </span>            :      * @param[out] northp hemisphere (true means north, false means south).
+<span class="lineNum">     368 </span>            :      *
+<span class="lineNum">     369 </span>            :      * EPSG (European Petroleum Survery Group) codes are a way to refer to many
+<span class="lineNum">     370 </span>            :      * different projections.  DecodeEPSG decodes those refering to UTM or UPS
+<span class="lineNum">     371 </span>            :      * projections for the WGS84 ellipsoid.  If the code does not refer to one
+<span class="lineNum">     372 </span>            :      * of these projections, \e zone is set to UTMUPS::INVALID.  See
+<span class="lineNum">     373 </span>            :      * http://spatialreference.org/ref/epsg/
+<span class="lineNum">     374 </span>            :      **********************************************************************/
+<span class="lineNum">     375 </span>            :     static void DecodeEPSG(int epsg, int&amp; zone, bool&amp; northp);
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span>            :     /**
+<span class="lineNum">     378 </span>            :      * Encode zone as EPSG.
+<span class="lineNum">     379 </span>            :      *
+<span class="lineNum">     380 </span>            :      * @param[in] zone the UTM zone (zero means UPS).
+<span class="lineNum">     381 </span>            :      * @param[in] northp hemisphere (true means north, false means south).
+<span class="lineNum">     382 </span>            :      * @return EPSG code (or -1 if \e zone is not in the range
+<span class="lineNum">     383 </span>            :      *   [UTMUPS::MINZONE, UTMUPS::MAXZONE] = [0, 60])
+<span class="lineNum">     384 </span>            :      *
+<span class="lineNum">     385 </span>            :      * Convert \e zone and \e northp to the corresponding EPSG (European
+<span class="lineNum">     386 </span>            :      * Petroleum Survery Group) codes
+<span class="lineNum">     387 </span>            :      **********************************************************************/
+<span class="lineNum">     388 </span>            :     static int EncodeEPSG(int zone, bool northp);
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span>            :     /**
+<span class="lineNum">     391 </span>            :      * @return shift (meters) necessary to align north and south halves of a
+<span class="lineNum">     392 </span>            :      * UTM zone (10&lt;sup&gt;7&lt;/sup&gt;).
+<span class="lineNum">     393 </span>            :      **********************************************************************/
+<span class="lineNum">     394 </span>            :     static Math::real UTMShift();
+<span class="lineNum">     395 </span>            : 
+<span class="lineNum">     396 </span>            :     /** \name Inspector functions
+<span class="lineNum">     397 </span>            :      **********************************************************************/
+<span class="lineNum">     398 </span>            :     ///@{
+<span class="lineNum">     399 </span>            :     /**
+<span class="lineNum">     400 </span>            :      * @return \e a the equatorial radius of the WGS84 ellipsoid (meters).
+<span class="lineNum">     401 </span>            :      *
+<span class="lineNum">     402 </span>            :      * (The WGS84 value is returned because the UTM and UPS projections are
+<span class="lineNum">     403 </span>            :      * based on this ellipsoid.)
+<span class="lineNum">     404 </span>            :      **********************************************************************/
+<span class="lineNum">     405 </span>            :     static Math::real MajorRadius()
+<span class="lineNum">     406 </span>            :     { return Constants::WGS84_a(); }
+<span class="lineNum">     407 </span>            : 
+<span class="lineNum">     408 </span>            :     /**
+<span class="lineNum">     409 </span>            :      * @return \e f the flattening of the WGS84 ellipsoid.
+<span class="lineNum">     410 </span>            :      *
+<span class="lineNum">     411 </span>            :      * (The WGS84 value is returned because the UTM and UPS projections are
+<span class="lineNum">     412 </span>            :      * based on this ellipsoid.)
+<span class="lineNum">     413 </span>            :      **********************************************************************/
+<span class="lineNum">     414 </span>            :     static Math::real Flattening()
+<span class="lineNum">     415 </span>            :     { return Constants::WGS84_f(); }
+<span class="lineNum">     416 </span>            :     ///@}
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span>            :   };
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span>            : } // namespace GeographicLib
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span>            : #endif  // GEOGRAPHICLIB_UTMUPS_HPP
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

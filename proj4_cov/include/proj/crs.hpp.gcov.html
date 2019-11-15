@@ -1,0 +1,1553 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/proj/crs.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/proj</a> - crs.hpp<span style="font-size: 80%;"> (source / <a href="crs.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">47</td>
+            <td class="headerCovTableEntry">49</td>
+            <td class="headerCovTableEntryHi">95.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">83</td>
+            <td class="headerCovTableEntry">98</td>
+            <td class="headerCovTableEntryMed">84.7 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /******************************************************************************</a>
+<span class="lineNum">       2 </span>            :  *
+<span class="lineNum">       3 </span>            :  * Project:  PROJ
+<span class="lineNum">       4 </span>            :  * Purpose:  ISO19111:2019 implementation
+<span class="lineNum">       5 </span>            :  * Author:   Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  ******************************************************************************
+<span class="lineNum">       8 </span>            :  * Copyright (c) 2018, Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      11 </span>            :  * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      12 </span>            :  * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      13 </span>            :  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      14 </span>            :  * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      15 </span>            :  * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      16 </span>            :  *
+<span class="lineNum">      17 </span>            :  * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      18 </span>            :  * in all copies or substantial portions of the Software.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      21 </span>            :  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      22 </span>            :  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      23 </span>            :  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      24 </span>            :  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      25 </span>            :  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      26 </span>            :  * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      27 </span>            :  ****************************************************************************/
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #ifndef CRS_HH_INCLUDED
+<span class="lineNum">      30 </span>            : #define CRS_HH_INCLUDED
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #include &lt;memory&gt;
+<span class="lineNum">      33 </span>            : #include &lt;string&gt;
+<span class="lineNum">      34 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : #include &quot;common.hpp&quot;
+<span class="lineNum">      37 </span>            : #include &quot;coordinateoperation.hpp&quot;
+<span class="lineNum">      38 </span>            : #include &quot;coordinatesystem.hpp&quot;
+<span class="lineNum">      39 </span>            : #include &quot;datum.hpp&quot;
+<span class="lineNum">      40 </span>            : #include &quot;io.hpp&quot;
+<span class="lineNum">      41 </span>            : #include &quot;util.hpp&quot;
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : NS_PROJ_START
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : /** osgeo.proj.crs namespace
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :     \brief CRS (coordinate reference system = coordinate system with a datum).
+<span class="lineNum">      48 </span>            : */
+<span class="lineNum">      49 </span>            : namespace crs {
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : class GeographicCRS;
+<span class="lineNum">      54 </span>            : /** Shared pointer of GeographicCRS */
+<span class="lineNum">      55 </span>            : using GeographicCRSPtr = std::shared_ptr&lt;GeographicCRS&gt;;
+<span class="lineNum">      56 </span>            : /** Non-null shared pointer of GeographicCRS */
+<span class="lineNum">      57 </span>            : using GeographicCRSNNPtr = util::nn&lt;GeographicCRSPtr&gt;;
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            : class VerticalCRS;
+<span class="lineNum">      60 </span>            : /** Shared pointer of VerticalCRS */
+<span class="lineNum">      61 </span>            : using VerticalCRSPtr = std::shared_ptr&lt;VerticalCRS&gt;;
+<span class="lineNum">      62 </span>            : /** Non-null shared pointer of VerticalCRS */
+<span class="lineNum">      63 </span>            : using VerticalCRSNNPtr = util::nn&lt;VerticalCRSPtr&gt;;
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            : class BoundCRS;
+<span class="lineNum">      66 </span>            : /** Shared pointer of BoundCRS */
+<span class="lineNum">      67 </span>            : using BoundCRSPtr = std::shared_ptr&lt;BoundCRS&gt;;
+<span class="lineNum">      68 </span>            : /** Non-null shared pointer of BoundCRS */
+<span class="lineNum">      69 </span>            : using BoundCRSNNPtr = util::nn&lt;BoundCRSPtr&gt;;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            : class CRS;
+<span class="lineNum">      74 </span>            : /** Shared pointer of CRS */
+<span class="lineNum">      75 </span>            : using CRSPtr = std::shared_ptr&lt;CRS&gt;;
+<span class="lineNum">      76 </span>            : /** Non-null shared pointer of CRS */
+<span class="lineNum">      77 </span>            : using CRSNNPtr = util::nn&lt;CRSPtr&gt;;
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            : /** \brief Abstract class modelling a coordinate reference system which is
+<span class="lineNum">      80 </span>            :  * usually single but may be compound.
+<span class="lineNum">      81 </span>            :  *
+<a name="82"><span class="lineNum">      82 </span>            :  * \remark Implements CRS from \ref ISO_19111_2019</a>
+<span class="lineNum">      83 </span>            :  */
+<span class="lineNum">      84 </span><span class="lineCov">      10964 : class PROJ_GCC_DLL CRS : public common::ObjectUsage,</span>
+<span class="lineNum">      85 </span>            :                          public io::IJSONExportable {
+<span class="lineNum">      86 </span>            :   public:
+<span class="lineNum">      87 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">      88 </span>            :     PROJ_DLL ~CRS() override;
+<span class="lineNum">      89 </span>            :     //! @endcond
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :     // Non-standard
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :     PROJ_DLL GeodeticCRSPtr extractGeodeticCRS() const;
+<span class="lineNum">      94 </span>            :     PROJ_DLL GeographicCRSPtr extractGeographicCRS() const;
+<span class="lineNum">      95 </span>            :     PROJ_DLL VerticalCRSPtr extractVerticalCRS() const;
+<span class="lineNum">      96 </span>            :     PROJ_DLL CRSNNPtr createBoundCRSToWGS84IfPossible(
+<span class="lineNum">      97 </span>            :         const io::DatabaseContextPtr &amp;dbContext,
+<span class="lineNum">      98 </span>            :         operation::CoordinateOperationContext::IntermediateCRSUse
+<span class="lineNum">      99 </span>            :             allowIntermediateCRSUse) const;
+<span class="lineNum">     100 </span>            :     PROJ_DLL CRSNNPtr stripVerticalComponent() const;
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :     PROJ_DLL const BoundCRSPtr &amp;canonicalBoundCRS() PROJ_PURE_DECL;
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            :     PROJ_DLL std::list&lt;std::pair&lt;CRSNNPtr, int&gt;&gt;
+<span class="lineNum">     105 </span>            :     identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const;
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :     PROJ_DLL std::list&lt;CRSNNPtr&gt;
+<span class="lineNum">     108 </span>            :     getNonDeprecated(const io::DatabaseContextNNPtr &amp;dbContext) const;
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            :     PROJ_DLL CRSNNPtr
+<span class="lineNum">     111 </span>            :     promoteTo3D(const std::string &amp;newName,
+<span class="lineNum">     112 </span>            :                 const io::DatabaseContextPtr &amp;dbContext) const;
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :     PROJ_DLL CRSNNPtr demoteTo2D(const std::string &amp;newName,
+<span class="lineNum">     115 </span>            :                                  const io::DatabaseContextPtr &amp;dbContext) const;
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     118 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     119 </span>            :         PROJ_INTERNAL const GeodeticCRS *
+<span class="lineNum">     120 </span>            :         extractGeodeticCRSRaw() const;
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            :     PROJ_FOR_TEST CRSNNPtr shallowClone() const;
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            :     PROJ_FOR_TEST CRSNNPtr alterName(const std::string &amp;newName) const;
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            :     PROJ_FOR_TEST CRSNNPtr alterId(const std::string &amp;authName,
+<span class="lineNum">     127 </span>            :                                    const std::string &amp;code) const;
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            :     PROJ_INTERNAL const std::string &amp;getExtensionProj4() const noexcept;
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span>            :     PROJ_FOR_TEST CRSNNPtr
+<span class="lineNum">     132 </span>            :     alterGeodeticCRS(const GeodeticCRSNNPtr &amp;newGeodCRS) const;
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :     PROJ_FOR_TEST CRSNNPtr
+<span class="lineNum">     135 </span>            :     alterCSLinearUnit(const common::UnitOfMeasure &amp;unit) const;
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            :     PROJ_INTERNAL bool mustAxisOrderBeSwitchedForVisualization() const;
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            :     PROJ_INTERNAL CRSNNPtr normalizeForVisualization() const;
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :     //! @endcond
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :   protected:
+<span class="lineNum">     144 </span>            :     PROJ_INTERNAL CRS();
+<span class="lineNum">     145 </span>            :     PROJ_INTERNAL CRS(const CRS &amp;other);
+<span class="lineNum">     146 </span>            :     friend class BoundCRS;
+<span class="lineNum">     147 </span>            :     PROJ_INTERNAL void setCanonicalBoundCRS(const BoundCRSNNPtr &amp;boundCRS);
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            :     PROJ_INTERNAL virtual CRSNNPtr _shallowClone() const = 0;
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span>            :     PROJ_INTERNAL virtual std::list&lt;std::pair&lt;CRSNNPtr, int&gt;&gt;
+<span class="lineNum">     152 </span>            :     _identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const;
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            :   private:
+<span class="lineNum">     155 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     156 </span>            : };
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            : /** \brief Abstract class modelling a coordinate reference system consisting of
+<span class="lineNum">     161 </span>            :  * one Coordinate System and either one datum::Datum or one
+<span class="lineNum">     162 </span>            :  * datum::DatumEnsemble.
+<span class="lineNum">     163 </span>            :  *
+<a name="164"><span class="lineNum">     164 </span>            :  * \remark Implements SingleCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">     165 </span>            :  */
+<span class="lineNum">     166 </span><span class="lineCov">      10613 : class PROJ_GCC_DLL SingleCRS : public CRS {</span>
+<span class="lineNum">     167 </span>            :   public:
+<span class="lineNum">     168 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     169 </span>            :     PROJ_DLL ~SingleCRS() override;
+<span class="lineNum">     170 </span>            :     //! @endcond
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            :     PROJ_DLL const datum::DatumPtr &amp;datum() PROJ_PURE_DECL;
+<span class="lineNum">     173 </span>            :     PROJ_DLL const datum::DatumEnsemblePtr &amp;datumEnsemble() PROJ_PURE_DECL;
+<span class="lineNum">     174 </span>            :     PROJ_DLL const cs::CoordinateSystemNNPtr &amp;coordinateSystem() PROJ_PURE_DECL;
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     177 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     178 </span>            :         PROJ_INTERNAL void
+<span class="lineNum">     179 </span>            :         exportDatumOrDatumEnsembleToWkt(io::WKTFormatter *formatter)
+<span class="lineNum">     180 </span>            :             const; // throw(io::FormattingException)
+<span class="lineNum">     181 </span>            :                    //! @endcond
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            :   protected:
+<span class="lineNum">     184 </span>            :     PROJ_INTERNAL SingleCRS(const datum::DatumPtr &amp;datumIn,
+<span class="lineNum">     185 </span>            :                             const datum::DatumEnsemblePtr &amp;datumEnsembleIn,
+<span class="lineNum">     186 </span>            :                             const cs::CoordinateSystemNNPtr &amp;csIn);
+<span class="lineNum">     187 </span>            :     PROJ_INTERNAL SingleCRS(const SingleCRS &amp;other);
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     190 </span>            :     baseIsEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     191 </span>            :                        util::IComparable::Criterion criterion =
+<span class="lineNum">     192 </span>            :                            util::IComparable::Criterion::STRICT) const;
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span>            :   private:
+<span class="lineNum">     195 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     196 </span>            :     SingleCRS &amp;operator=(const SingleCRS &amp;other) = delete;
+<span class="lineNum">     197 </span>            : };
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span>            : /** Shared pointer of SingleCRS */
+<span class="lineNum">     200 </span>            : using SingleCRSPtr = std::shared_ptr&lt;SingleCRS&gt;;
+<span class="lineNum">     201 </span>            : /** Non-null shared pointer of SingleCRS */
+<span class="lineNum">     202 </span>            : using SingleCRSNNPtr = util::nn&lt;SingleCRSPtr&gt;;
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     205 </span>            : 
+<span class="lineNum">     206 </span>            : class GeodeticCRS;
+<span class="lineNum">     207 </span>            : /** Shared pointer of GeodeticCRS */
+<span class="lineNum">     208 </span>            : using GeodeticCRSPtr = std::shared_ptr&lt;GeodeticCRS&gt;;
+<span class="lineNum">     209 </span>            : /** Non-null shared pointer of GeodeticCRS */
+<span class="lineNum">     210 </span>            : using GeodeticCRSNNPtr = util::nn&lt;GeodeticCRSPtr&gt;;
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            : /** \brief A coordinate reference system associated with a geodetic reference
+<span class="lineNum">     213 </span>            :  * frame and a three-dimensional Cartesian or spherical coordinate system.
+<span class="lineNum">     214 </span>            :  *
+<span class="lineNum">     215 </span>            :  * If the geodetic reference frame is dynamic or if the geodetic CRS has an
+<span class="lineNum">     216 </span>            :  * association to a velocity model then the geodetic CRS is dynamic, else it
+<span class="lineNum">     217 </span>            :  * is static.
+<span class="lineNum">     218 </span>            :  *
+<a name="219"><span class="lineNum">     219 </span>            :  * \remark Implements GeodeticCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">     220 </span>            :  */
+<span class="lineNum">     221 </span><span class="lineCov">      10181 : class PROJ_GCC_DLL GeodeticCRS : virtual public SingleCRS,</span>
+<span class="lineNum">     222 </span>            :                                  public io::IPROJStringExportable {
+<span class="lineNum">     223 </span>            :   public:
+<span class="lineNum">     224 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     225 </span>            :     PROJ_DLL ~GeodeticCRS() override;
+<span class="lineNum">     226 </span>            :     //! @endcond
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            :     PROJ_DLL const datum::GeodeticReferenceFramePtr &amp;datum() PROJ_PURE_DECL;
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            :     PROJ_DLL const datum::PrimeMeridianNNPtr &amp;primeMeridian() PROJ_PURE_DECL;
+<span class="lineNum">     231 </span>            :     PROJ_DLL const datum::EllipsoidNNPtr &amp;ellipsoid() PROJ_PURE_DECL;
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span>            :     // coordinateSystem() returns either a EllipsoidalCS, SphericalCS or
+<span class="lineNum">     234 </span>            :     // CartesianCS
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span>            :     PROJ_DLL const std::vector&lt;operation::PointMotionOperationNNPtr&gt; &amp;
+<span class="lineNum">     237 </span>            :     velocityModel() PROJ_PURE_DECL;
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            :     // Non-standard
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            :     PROJ_DLL bool isGeocentric() PROJ_PURE_DECL;
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            :     PROJ_DLL static GeodeticCRSNNPtr
+<span class="lineNum">     244 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     245 </span>            :            const datum::GeodeticReferenceFrameNNPtr &amp;datum,
+<span class="lineNum">     246 </span>            :            const cs::SphericalCSNNPtr &amp;cs);
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span>            :     PROJ_DLL static GeodeticCRSNNPtr
+<span class="lineNum">     249 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     250 </span>            :            const datum::GeodeticReferenceFrameNNPtr &amp;datum,
+<span class="lineNum">     251 </span>            :            const cs::CartesianCSNNPtr &amp;cs);
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            :     PROJ_DLL static GeodeticCRSNNPtr
+<span class="lineNum">     254 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     255 </span>            :            const datum::GeodeticReferenceFramePtr &amp;datum,
+<span class="lineNum">     256 </span>            :            const datum::DatumEnsemblePtr &amp;datumEnsemble,
+<span class="lineNum">     257 </span>            :            const cs::SphericalCSNNPtr &amp;cs);
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            :     PROJ_DLL static GeodeticCRSNNPtr
+<span class="lineNum">     260 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     261 </span>            :            const datum::GeodeticReferenceFramePtr &amp;datum,
+<span class="lineNum">     262 </span>            :            const datum::DatumEnsemblePtr &amp;datumEnsemble,
+<span class="lineNum">     263 </span>            :            const cs::CartesianCSNNPtr &amp;cs);
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span>            :     PROJ_DLL static const GeodeticCRSNNPtr EPSG_4978; // WGS 84 Geocentric
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span>            :     PROJ_DLL std::list&lt;std::pair&lt;GeodeticCRSNNPtr, int&gt;&gt;
+<span class="lineNum">     268 </span>            :     identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const;
+<span class="lineNum">     269 </span>            : 
+<span class="lineNum">     270 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     271 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     272 </span>            :         PROJ_INTERNAL void
+<span class="lineNum">     273 </span>            :         addDatumInfoToPROJString(io::PROJStringFormatter *formatter) const;
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span>            :     PROJ_INTERNAL void addGeocentricUnitConversionIntoPROJString(
+<span class="lineNum">     276 </span>            :         io::PROJStringFormatter *formatter) const;
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">     279 </span>            :         const override; // throw(io::FormattingException)
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span>            :     PROJ_INTERNAL void _exportToPROJString(io::PROJStringFormatter *formatter)
+<span class="lineNum">     282 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span>            :     PROJ_INTERNAL void _exportToJSON(io::JSONFormatter *formatter)
+<span class="lineNum">     285 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     288 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     289 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     290 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span>            :     //! @endcond
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            :   protected:
+<span class="lineNum">     295 </span>            :     PROJ_INTERNAL GeodeticCRS(const datum::GeodeticReferenceFramePtr &amp;datumIn,
+<span class="lineNum">     296 </span>            :                               const datum::DatumEnsemblePtr &amp;datumEnsembleIn,
+<span class="lineNum">     297 </span>            :                               const cs::EllipsoidalCSNNPtr &amp;csIn);
+<span class="lineNum">     298 </span>            :     PROJ_INTERNAL GeodeticCRS(const datum::GeodeticReferenceFramePtr &amp;datumIn,
+<span class="lineNum">     299 </span>            :                               const datum::DatumEnsemblePtr &amp;datumEnsembleIn,
+<span class="lineNum">     300 </span>            :                               const cs::SphericalCSNNPtr &amp;csIn);
+<span class="lineNum">     301 </span>            :     PROJ_INTERNAL GeodeticCRS(const datum::GeodeticReferenceFramePtr &amp;datumIn,
+<span class="lineNum">     302 </span>            :                               const datum::DatumEnsemblePtr &amp;datumEnsembleIn,
+<span class="lineNum">     303 </span>            :                               const cs::CartesianCSNNPtr &amp;csIn);
+<span class="lineNum">     304 </span>            :     PROJ_INTERNAL GeodeticCRS(const GeodeticCRS &amp;other);
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span>            :     PROJ_INTERNAL static GeodeticCRSNNPtr createEPSG_4978();
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            :     PROJ_INTERNAL std::list&lt;std::pair&lt;CRSNNPtr, int&gt;&gt;
+<span class="lineNum">     311 </span>            :     _identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const override;
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span><span class="lineCov">       2176 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     314 </span>            : 
+<span class="lineNum">     315 </span>            :   private:
+<span class="lineNum">     316 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span>            :     GeodeticCRS &amp;operator=(const GeodeticCRS &amp;other) = delete;
+<span class="lineNum">     319 </span>            : };
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span>            : /** \brief A coordinate reference system associated with a geodetic reference
+<span class="lineNum">     324 </span>            :  * frame and a two- or three-dimensional ellipsoidal coordinate system.
+<span class="lineNum">     325 </span>            :  *
+<span class="lineNum">     326 </span>            :  * If the geodetic reference frame is dynamic or if the geographic CRS has an
+<span class="lineNum">     327 </span>            :  * association to a velocity model then the geodetic CRS is dynamic, else it is
+<span class="lineNum">     328 </span>            :  * static.
+<span class="lineNum">     329 </span>            :  *
+<a name="330"><span class="lineNum">     330 </span>            :  * \remark Implements GeographicCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">     331 </span>            :  */
+<span class="lineNum">     332 </span><span class="lineCov">      23973 : class PROJ_GCC_DLL GeographicCRS : public GeodeticCRS {</span>
+<span class="lineNum">     333 </span>            :   public:
+<span class="lineNum">     334 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     335 </span>            :     PROJ_DLL ~GeographicCRS() override;
+<span class="lineNum">     336 </span>            :     //! @endcond
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            :     PROJ_DLL const cs::EllipsoidalCSNNPtr &amp;coordinateSystem() PROJ_PURE_DECL;
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span>            :     // Non-standard
+<span class="lineNum">     341 </span>            :     PROJ_DLL static GeographicCRSNNPtr
+<span class="lineNum">     342 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     343 </span>            :            const datum::GeodeticReferenceFrameNNPtr &amp;datum,
+<span class="lineNum">     344 </span>            :            const cs::EllipsoidalCSNNPtr &amp;cs);
+<span class="lineNum">     345 </span>            :     PROJ_DLL static GeographicCRSNNPtr
+<span class="lineNum">     346 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     347 </span>            :            const datum::GeodeticReferenceFramePtr &amp;datum,
+<span class="lineNum">     348 </span>            :            const datum::DatumEnsemblePtr &amp;datumEnsemble,
+<span class="lineNum">     349 </span>            :            const cs::EllipsoidalCSNNPtr &amp;cs);
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span>            :     PROJ_DLL GeographicCRSNNPtr
+<span class="lineNum">     352 </span>            :     demoteTo2D(const std::string &amp;newName,
+<span class="lineNum">     353 </span>            :                const io::DatabaseContextPtr &amp;dbContext) const;
+<span class="lineNum">     354 </span>            : 
+<span class="lineNum">     355 </span>            :     PROJ_DLL static const GeographicCRSNNPtr EPSG_4267; // NAD27
+<span class="lineNum">     356 </span>            :     PROJ_DLL static const GeographicCRSNNPtr EPSG_4269; // NAD83
+<span class="lineNum">     357 </span>            :     PROJ_DLL static const GeographicCRSNNPtr EPSG_4326; // WGS 84 2D
+<span class="lineNum">     358 </span>            :     PROJ_DLL static const GeographicCRSNNPtr OGC_CRS84; // CRS84 (Long, Lat)
+<span class="lineNum">     359 </span>            :     PROJ_DLL static const GeographicCRSNNPtr EPSG_4807; // NTF Paris
+<span class="lineNum">     360 </span>            :     PROJ_DLL static const GeographicCRSNNPtr EPSG_4979; // WGS 84 3D
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     363 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     364 </span>            :         PROJ_INTERNAL void
+<span class="lineNum">     365 </span>            :         addAngularUnitConvertAndAxisSwap(
+<span class="lineNum">     366 </span>            :             io::PROJStringFormatter *formatter) const;
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span>            :     PROJ_INTERNAL void _exportToPROJString(io::PROJStringFormatter *formatter)
+<span class="lineNum">     369 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span>            :     PROJ_INTERNAL void _exportToJSON(io::JSONFormatter *formatter)
+<span class="lineNum">     372 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span>            :     PROJ_DLL bool
+<span class="lineNum">     375 </span>            :     is2DPartOf3D(util::nn&lt;const GeographicCRS *&gt; other) PROJ_PURE_DECL;
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     378 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     379 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     380 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span>            :     //! @endcond
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span>            :   protected:
+<span class="lineNum">     385 </span>            :     PROJ_INTERNAL GeographicCRS(const datum::GeodeticReferenceFramePtr &amp;datumIn,
+<span class="lineNum">     386 </span>            :                                 const datum::DatumEnsemblePtr &amp;datumEnsembleIn,
+<span class="lineNum">     387 </span>            :                                 const cs::EllipsoidalCSNNPtr &amp;csIn);
+<span class="lineNum">     388 </span>            :     PROJ_INTERNAL GeographicCRS(const GeographicCRS &amp;other);
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span>            :     PROJ_INTERNAL static GeographicCRSNNPtr createEPSG_4267();
+<span class="lineNum">     391 </span>            :     PROJ_INTERNAL static GeographicCRSNNPtr createEPSG_4269();
+<span class="lineNum">     392 </span>            :     PROJ_INTERNAL static GeographicCRSNNPtr createEPSG_4326();
+<span class="lineNum">     393 </span>            :     PROJ_INTERNAL static GeographicCRSNNPtr createOGC_CRS84();
+<span class="lineNum">     394 </span>            :     PROJ_INTERNAL static GeographicCRSNNPtr createEPSG_4807();
+<span class="lineNum">     395 </span>            :     PROJ_INTERNAL static GeographicCRSNNPtr createEPSG_4979();
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span><span class="lineCov">      15948 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            :   private:
+<span class="lineNum">     402 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     403 </span>            : 
+<span class="lineNum">     404 </span>            :     GeographicCRS &amp;operator=(const GeographicCRS &amp;other) = delete;
+<span class="lineNum">     405 </span>            : };
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span>            : /** \brief A coordinate reference system having a vertical reference frame and
+<span class="lineNum">     410 </span>            :  * a one-dimensional vertical coordinate system used for recording
+<span class="lineNum">     411 </span>            :  * gravity-related heights or depths.
+<span class="lineNum">     412 </span>            :  *
+<span class="lineNum">     413 </span>            :  * Vertical CRSs make use of the direction of gravity to define the concept of
+<span class="lineNum">     414 </span>            :  * height or depth, but the relationship with gravity may not be
+<span class="lineNum">     415 </span>            :  * straightforward. If the vertical reference frame is dynamic or if the
+<span class="lineNum">     416 </span>            :  * vertical CRS has an association to a velocity model then the CRS is dynamic,
+<span class="lineNum">     417 </span>            :  * else it is static.
+<span class="lineNum">     418 </span>            :  *
+<span class="lineNum">     419 </span>            :  * \note Ellipsoidal heights cannot be captured in a vertical coordinate
+<span class="lineNum">     420 </span>            :  * reference system. They exist only as an inseparable part of a 3D coordinate
+<span class="lineNum">     421 </span>            :  * tuple defined in a geographic 3D coordinate reference system.
+<span class="lineNum">     422 </span>            :  *
+<a name="423"><span class="lineNum">     423 </span>            :  * \remark Implements VerticalCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">     424 </span>            :  */
+<span class="lineNum">     425 </span><span class="lineCov">        842 : class PROJ_GCC_DLL VerticalCRS : virtual public SingleCRS,</span>
+<span class="lineNum">     426 </span>            :                                  public io::IPROJStringExportable {
+<span class="lineNum">     427 </span>            :   public:
+<span class="lineNum">     428 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     429 </span>            :     PROJ_DLL ~VerticalCRS() override;
+<span class="lineNum">     430 </span>            :     //! @endcond
+<span class="lineNum">     431 </span>            : 
+<span class="lineNum">     432 </span>            :     PROJ_DLL const datum::VerticalReferenceFramePtr datum() const;
+<span class="lineNum">     433 </span>            :     PROJ_DLL const cs::VerticalCSNNPtr coordinateSystem() const;
+<span class="lineNum">     434 </span>            :     PROJ_DLL const std::vector&lt;operation::TransformationNNPtr&gt; &amp;
+<span class="lineNum">     435 </span>            :     geoidModel() PROJ_PURE_DECL;
+<span class="lineNum">     436 </span>            :     PROJ_DLL const std::vector&lt;operation::PointMotionOperationNNPtr&gt; &amp;
+<span class="lineNum">     437 </span>            :     velocityModel() PROJ_PURE_DECL;
+<span class="lineNum">     438 </span>            : 
+<span class="lineNum">     439 </span>            :     PROJ_DLL static VerticalCRSNNPtr
+<span class="lineNum">     440 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     441 </span>            :            const datum::VerticalReferenceFrameNNPtr &amp;datumIn,
+<span class="lineNum">     442 </span>            :            const cs::VerticalCSNNPtr &amp;csIn);
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span>            :     PROJ_DLL static VerticalCRSNNPtr
+<span class="lineNum">     445 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     446 </span>            :            const datum::VerticalReferenceFramePtr &amp;datumIn,
+<span class="lineNum">     447 </span>            :            const datum::DatumEnsemblePtr &amp;datumEnsembleIn,
+<span class="lineNum">     448 </span>            :            const cs::VerticalCSNNPtr &amp;csIn);
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span>            :     PROJ_DLL std::list&lt;std::pair&lt;VerticalCRSNNPtr, int&gt;&gt;
+<span class="lineNum">     451 </span>            :     identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const;
+<span class="lineNum">     452 </span>            : 
+<span class="lineNum">     453 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     454 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     455 </span>            :         PROJ_INTERNAL void
+<span class="lineNum">     456 </span>            :         addLinearUnitConvert(io::PROJStringFormatter *formatter) const;
+<span class="lineNum">     457 </span>            : 
+<span class="lineNum">     458 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">     459 </span>            :         const override; // throw(io::FormattingException)
+<span class="lineNum">     460 </span>            : 
+<span class="lineNum">     461 </span>            :     PROJ_INTERNAL void _exportToPROJString(io::PROJStringFormatter *formatter)
+<span class="lineNum">     462 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     463 </span>            : 
+<span class="lineNum">     464 </span>            :     PROJ_INTERNAL void _exportToJSON(io::JSONFormatter *formatter)
+<span class="lineNum">     465 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     468 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     469 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     470 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     471 </span>            : 
+<span class="lineNum">     472 </span>            :     //! @endcond
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span>            :   protected:
+<span class="lineNum">     475 </span>            :     PROJ_INTERNAL VerticalCRS(const datum::VerticalReferenceFramePtr &amp;datumIn,
+<span class="lineNum">     476 </span>            :                               const datum::DatumEnsemblePtr &amp;datumEnsembleIn,
+<span class="lineNum">     477 </span>            :                               const cs::VerticalCSNNPtr &amp;csIn);
+<span class="lineNum">     478 </span>            :     PROJ_INTERNAL VerticalCRS(const VerticalCRS &amp;other);
+<span class="lineNum">     479 </span>            : 
+<span class="lineNum">     480 </span>            :     PROJ_INTERNAL std::list&lt;std::pair&lt;CRSNNPtr, int&gt;&gt;
+<span class="lineNum">     481 </span>            :     _identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const override;
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span><span class="lineCov">        554 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     484 </span>            : 
+<span class="lineNum">     485 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">     486 </span>            : 
+<span class="lineNum">     487 </span>            :   private:
+<span class="lineNum">     488 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     489 </span>            :     VerticalCRS &amp;operator=(const VerticalCRS &amp;other) = delete;
+<span class="lineNum">     490 </span>            : };
+<span class="lineNum">     491 </span>            : 
+<span class="lineNum">     492 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     493 </span>            : 
+<span class="lineNum">     494 </span>            : /** \brief Abstract class modelling a single coordinate reference system that
+<span class="lineNum">     495 </span>            :  * is defined through the application of a specified coordinate conversion to
+<span class="lineNum">     496 </span>            :  * the definition of a previously established single coordinate reference
+<span class="lineNum">     497 </span>            :  * system referred to as the base CRS.
+<span class="lineNum">     498 </span>            :  *
+<span class="lineNum">     499 </span>            :  * A derived coordinate reference system inherits its datum (or datum ensemble)
+<span class="lineNum">     500 </span>            :  * from its base CRS. The coordinate conversion between the base and derived
+<span class="lineNum">     501 </span>            :  * coordinate reference system is implemented using the parameters and
+<span class="lineNum">     502 </span>            :  * formula(s) specified in the definition of the coordinate conversion.
+<span class="lineNum">     503 </span>            :  *
+<a name="504"><span class="lineNum">     504 </span>            :  * \remark Implements DerivedCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">     505 </span>            :  */
+<span class="lineNum">     506 </span><span class="lineCov">       1216 : class PROJ_GCC_DLL DerivedCRS : virtual public SingleCRS {</span>
+<span class="lineNum">     507 </span>            :   public:
+<span class="lineNum">     508 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     509 </span>            :     PROJ_DLL ~DerivedCRS() override;
+<span class="lineNum">     510 </span>            :     //! @endcond
+<span class="lineNum">     511 </span>            : 
+<span class="lineNum">     512 </span>            :     PROJ_DLL const SingleCRSNNPtr &amp;baseCRS() PROJ_PURE_DECL;
+<span class="lineNum">     513 </span>            :     PROJ_DLL const operation::ConversionNNPtr derivingConversion() const;
+<span class="lineNum">     514 </span>            : 
+<span class="lineNum">     515 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     516 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     517 </span>            :         PROJ_INTERNAL const operation::ConversionNNPtr &amp;
+<span class="lineNum">     518 </span>            :         derivingConversionRef() PROJ_PURE_DECL;
+<span class="lineNum">     519 </span>            : 
+<span class="lineNum">     520 </span>            :     PROJ_INTERNAL void _exportToJSON(io::JSONFormatter *formatter)
+<span class="lineNum">     521 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     522 </span>            : 
+<span class="lineNum">     523 </span>            :     //! @endcond
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span>            :   protected:
+<span class="lineNum">     526 </span>            :     PROJ_INTERNAL
+<span class="lineNum">     527 </span>            :     DerivedCRS(const SingleCRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">     528 </span>            :                const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">     529 </span>            :                const cs::CoordinateSystemNNPtr &amp;cs);
+<span class="lineNum">     530 </span>            :     PROJ_INTERNAL DerivedCRS(const DerivedCRS &amp;other);
+<span class="lineNum">     531 </span>            : 
+<span class="lineNum">     532 </span>            :     PROJ_INTERNAL void setDerivingConversionCRS();
+<span class="lineNum">     533 </span>            : 
+<span class="lineNum">     534 </span>            :     PROJ_INTERNAL void baseExportToWKT(
+<span class="lineNum">     535 </span>            :         io::WKTFormatter *formatter, const std::string &amp;keyword,
+<span class="lineNum">     536 </span>            :         const std::string &amp;baseKeyword) const; // throw(FormattingException)
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     539 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     540 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     541 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     542 </span>            : 
+<span class="lineNum">     543 </span>            :     PROJ_INTERNAL virtual const char *className() const = 0;
+<span class="lineNum">     544 </span>            : 
+<span class="lineNum">     545 </span>            :   private:
+<span class="lineNum">     546 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     547 </span>            :     DerivedCRS &amp;operator=(const DerivedCRS &amp;other) = delete;
+<span class="lineNum">     548 </span>            : };
+<span class="lineNum">     549 </span>            : 
+<span class="lineNum">     550 </span>            : /** Shared pointer of DerivedCRS */
+<span class="lineNum">     551 </span>            : using DerivedCRSPtr = std::shared_ptr&lt;DerivedCRS&gt;;
+<span class="lineNum">     552 </span>            : /** Non-null shared pointer of DerivedCRS */
+<span class="lineNum">     553 </span>            : using DerivedCRSNNPtr = util::nn&lt;DerivedCRSPtr&gt;;
+<span class="lineNum">     554 </span>            : 
+<span class="lineNum">     555 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     556 </span>            : 
+<span class="lineNum">     557 </span>            : class ProjectedCRS;
+<span class="lineNum">     558 </span>            : /** Shared pointer of ProjectedCRS */
+<span class="lineNum">     559 </span>            : using ProjectedCRSPtr = std::shared_ptr&lt;ProjectedCRS&gt;;
+<span class="lineNum">     560 </span>            : /** Non-null shared pointer of ProjectedCRS */
+<span class="lineNum">     561 </span>            : using ProjectedCRSNNPtr = util::nn&lt;ProjectedCRSPtr&gt;;
+<span class="lineNum">     562 </span>            : 
+<span class="lineNum">     563 </span>            : /** \brief A derived coordinate reference system which has a geodetic
+<span class="lineNum">     564 </span>            :  * (usually geographic) coordinate reference system as its base CRS, thereby
+<span class="lineNum">     565 </span>            :  * inheriting a geodetic reference frame, and is converted using a map
+<span class="lineNum">     566 </span>            :  * projection.
+<span class="lineNum">     567 </span>            :  *
+<span class="lineNum">     568 </span>            :  * It has a Cartesian coordinate system, usually two-dimensional but may be
+<span class="lineNum">     569 </span>            :  * three-dimensional; in the 3D case the base geographic CRSs ellipsoidal
+<span class="lineNum">     570 </span>            :  * height is passed through unchanged and forms the vertical axis of the
+<span class="lineNum">     571 </span>            :  * projected CRS's Cartesian coordinate system.
+<span class="lineNum">     572 </span>            :  *
+<a name="573"><span class="lineNum">     573 </span>            :  * \remark Implements ProjectedCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">     574 </span>            :  */
+<span class="lineNum">     575 </span><span class="lineCov">       2296 : class PROJ_GCC_DLL ProjectedCRS final : public DerivedCRS,</span>
+<span class="lineNum">     576 </span>            :                                         public io::IPROJStringExportable {
+<span class="lineNum">     577 </span>            :   public:
+<span class="lineNum">     578 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     579 </span>            :     PROJ_DLL ~ProjectedCRS() override;
+<span class="lineNum">     580 </span>            :     //! @endcond
+<span class="lineNum">     581 </span>            : 
+<span class="lineNum">     582 </span>            :     PROJ_DLL const GeodeticCRSNNPtr &amp;baseCRS() PROJ_PURE_DECL;
+<span class="lineNum">     583 </span>            :     PROJ_DLL const cs::CartesianCSNNPtr &amp;coordinateSystem() PROJ_PURE_DECL;
+<span class="lineNum">     584 </span>            : 
+<span class="lineNum">     585 </span>            :     PROJ_DLL static ProjectedCRSNNPtr
+<span class="lineNum">     586 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     587 </span>            :            const GeodeticCRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">     588 </span>            :            const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">     589 </span>            :            const cs::CartesianCSNNPtr &amp;csIn);
+<span class="lineNum">     590 </span>            : 
+<span class="lineNum">     591 </span>            :     PROJ_DLL std::list&lt;std::pair&lt;ProjectedCRSNNPtr, int&gt;&gt;
+<span class="lineNum">     592 </span>            :     identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const;
+<span class="lineNum">     593 </span>            : 
+<span class="lineNum">     594 </span>            :     PROJ_DLL ProjectedCRSNNPtr
+<span class="lineNum">     595 </span>            :     demoteTo2D(const std::string &amp;newName,
+<span class="lineNum">     596 </span>            :                const io::DatabaseContextPtr &amp;dbContext) const;
+<span class="lineNum">     597 </span>            : 
+<span class="lineNum">     598 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     599 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     600 </span>            :         PROJ_INTERNAL void
+<span class="lineNum">     601 </span>            :         addUnitConvertAndAxisSwap(io::PROJStringFormatter *formatter,
+<span class="lineNum">     602 </span>            :                                   bool axisSpecFound) const;
+<span class="lineNum">     603 </span>            : 
+<span class="lineNum">     604 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">     605 </span>            :         const override; // throw(io::FormattingException)
+<span class="lineNum">     606 </span>            : 
+<span class="lineNum">     607 </span>            :     PROJ_INTERNAL void _exportToJSON(io::JSONFormatter *formatter)
+<span class="lineNum">     608 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     609 </span>            : 
+<span class="lineNum">     610 </span>            :     PROJ_FOR_TEST ProjectedCRSNNPtr alterParametersLinearUnit(
+<span class="lineNum">     611 </span>            :         const common::UnitOfMeasure &amp;unit, bool convertToNewUnit) const;
+<span class="lineNum">     612 </span>            : 
+<span class="lineNum">     613 </span>            :     //! @endcond
+<span class="lineNum">     614 </span>            : 
+<span class="lineNum">     615 </span>            :   protected:
+<span class="lineNum">     616 </span>            :     PROJ_INTERNAL
+<span class="lineNum">     617 </span>            :     ProjectedCRS(const GeodeticCRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">     618 </span>            :                  const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">     619 </span>            :                  const cs::CartesianCSNNPtr &amp;csIn);
+<span class="lineNum">     620 </span>            :     PROJ_INTERNAL ProjectedCRS(const ProjectedCRS &amp;other);
+<span class="lineNum">     621 </span>            : 
+<span class="lineNum">     622 </span>            :     PROJ_INTERNAL void _exportToPROJString(io::PROJStringFormatter *formatter)
+<span class="lineNum">     623 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     624 </span>            : 
+<span class="lineNum">     625 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     626 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     627 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     628 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     629 </span>            : 
+<span class="lineNum">     630 </span>            :     PROJ_INTERNAL std::list&lt;std::pair&lt;CRSNNPtr, int&gt;&gt;
+<a name="631"><span class="lineNum">     631 </span>            :     _identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const override;</a>
+<span class="lineNum">     632 </span>            : 
+<span class="lineNum">     633 </span><span class="lineNoCov">          0 :     PROJ_INTERNAL const char *className() const override {</span>
+<span class="lineNum">     634 </span><span class="lineNoCov">          0 :         return &quot;ProjectedCRS&quot;;</span>
+<span class="lineNum">     635 </span>            :     }
+<span class="lineNum">     636 </span>            : 
+<span class="lineNum">     637 </span><span class="lineCov">       2296 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     638 </span>            : 
+<span class="lineNum">     639 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">     640 </span>            : 
+<span class="lineNum">     641 </span>            :   private:
+<span class="lineNum">     642 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     643 </span>            :     ProjectedCRS &amp;operator=(const ProjectedCRS &amp;other) = delete;
+<span class="lineNum">     644 </span>            : };
+<span class="lineNum">     645 </span>            : 
+<span class="lineNum">     646 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     647 </span>            : 
+<span class="lineNum">     648 </span>            : class TemporalCRS;
+<span class="lineNum">     649 </span>            : /** Shared pointer of TemporalCRS */
+<span class="lineNum">     650 </span>            : using TemporalCRSPtr = std::shared_ptr&lt;TemporalCRS&gt;;
+<span class="lineNum">     651 </span>            : /** Non-null shared pointer of TemporalCRS */
+<span class="lineNum">     652 </span>            : using TemporalCRSNNPtr = util::nn&lt;TemporalCRSPtr&gt;;
+<span class="lineNum">     653 </span>            : 
+<span class="lineNum">     654 </span>            : /** \brief A coordinate reference system associated with a temporal datum and a
+<span class="lineNum">     655 </span>            :  * one-dimensional temporal coordinate system.
+<span class="lineNum">     656 </span>            :  *
+<a name="657"><span class="lineNum">     657 </span>            :  * \remark Implements TemporalCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">     658 </span>            :  */
+<span class="lineNum">     659 </span><span class="lineCov">         75 : class PROJ_GCC_DLL TemporalCRS : virtual public SingleCRS {</span>
+<span class="lineNum">     660 </span>            :   public:
+<span class="lineNum">     661 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     662 </span>            :     PROJ_DLL ~TemporalCRS() override;
+<span class="lineNum">     663 </span>            :     //! @endcond
+<span class="lineNum">     664 </span>            : 
+<span class="lineNum">     665 </span>            :     PROJ_DLL const datum::TemporalDatumNNPtr datum() const;
+<span class="lineNum">     666 </span>            : 
+<span class="lineNum">     667 </span>            :     PROJ_DLL const cs::TemporalCSNNPtr coordinateSystem() const;
+<span class="lineNum">     668 </span>            : 
+<span class="lineNum">     669 </span>            :     PROJ_DLL static TemporalCRSNNPtr
+<span class="lineNum">     670 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     671 </span>            :            const datum::TemporalDatumNNPtr &amp;datumIn,
+<span class="lineNum">     672 </span>            :            const cs::TemporalCSNNPtr &amp;csIn);
+<span class="lineNum">     673 </span>            : 
+<span class="lineNum">     674 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     675 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">     676 </span>            :         const override; // throw(io::FormattingException)
+<span class="lineNum">     677 </span>            : 
+<span class="lineNum">     678 </span>            :     PROJ_INTERNAL void _exportToJSON(io::JSONFormatter *formatter)
+<span class="lineNum">     679 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     680 </span>            : 
+<span class="lineNum">     681 </span>            :     //! @endcond
+<span class="lineNum">     682 </span>            : 
+<span class="lineNum">     683 </span>            :   protected:
+<span class="lineNum">     684 </span>            :     PROJ_INTERNAL TemporalCRS(const datum::TemporalDatumNNPtr &amp;datumIn,
+<span class="lineNum">     685 </span>            :                               const cs::TemporalCSNNPtr &amp;csIn);
+<span class="lineNum">     686 </span>            :     PROJ_INTERNAL TemporalCRS(const TemporalCRS &amp;other);
+<span class="lineNum">     687 </span>            : 
+<span class="lineNum">     688 </span><span class="lineCov">         42 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     689 </span>            : 
+<span class="lineNum">     690 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">     691 </span>            : 
+<span class="lineNum">     692 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     693 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     694 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     695 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     696 </span>            : 
+<span class="lineNum">     697 </span>            :   private:
+<span class="lineNum">     698 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     699 </span>            :     TemporalCRS &amp;operator=(const TemporalCRS &amp;other) = delete;
+<span class="lineNum">     700 </span>            : };
+<span class="lineNum">     701 </span>            : 
+<span class="lineNum">     702 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     703 </span>            : 
+<span class="lineNum">     704 </span>            : class EngineeringCRS;
+<span class="lineNum">     705 </span>            : /** Shared pointer of EngineeringCRS */
+<span class="lineNum">     706 </span>            : using EngineeringCRSPtr = std::shared_ptr&lt;EngineeringCRS&gt;;
+<span class="lineNum">     707 </span>            : /** Non-null shared pointer of EngineeringCRS */
+<span class="lineNum">     708 </span>            : using EngineeringCRSNNPtr = util::nn&lt;EngineeringCRSPtr&gt;;
+<span class="lineNum">     709 </span>            : 
+<span class="lineNum">     710 </span>            : /** \brief Contextually local coordinate reference system associated with an
+<span class="lineNum">     711 </span>            :  * engineering datum.
+<span class="lineNum">     712 </span>            :  *
+<span class="lineNum">     713 </span>            :  * It is applied either to activities on or near the surface of the Earth
+<span class="lineNum">     714 </span>            :  * without geodetic corrections, or on moving platforms such as road vehicles,
+<span class="lineNum">     715 </span>            :  * vessels, aircraft or spacecraft, or as the internal CRS of an image.
+<span class="lineNum">     716 </span>            :  *
+<span class="lineNum">     717 </span>            :  * In \ref WKT2, it maps to a ENGINEERINGCRS / ENGCRS keyword. In \ref WKT1,
+<span class="lineNum">     718 </span>            :  * it maps to a LOCAL_CS keyword.
+<span class="lineNum">     719 </span>            :  *
+<a name="720"><span class="lineNum">     720 </span>            :  * \remark Implements EngineeringCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">     721 </span>            :  */
+<span class="lineNum">     722 </span><span class="lineCov">         83 : class PROJ_GCC_DLL EngineeringCRS : virtual public SingleCRS {</span>
+<span class="lineNum">     723 </span>            :   public:
+<span class="lineNum">     724 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     725 </span>            :     PROJ_DLL ~EngineeringCRS() override;
+<span class="lineNum">     726 </span>            :     //! @endcond
+<span class="lineNum">     727 </span>            : 
+<span class="lineNum">     728 </span>            :     PROJ_DLL const datum::EngineeringDatumNNPtr datum() const;
+<span class="lineNum">     729 </span>            : 
+<span class="lineNum">     730 </span>            :     PROJ_DLL static EngineeringCRSNNPtr
+<span class="lineNum">     731 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     732 </span>            :            const datum::EngineeringDatumNNPtr &amp;datumIn,
+<span class="lineNum">     733 </span>            :            const cs::CoordinateSystemNNPtr &amp;csIn);
+<span class="lineNum">     734 </span>            : 
+<span class="lineNum">     735 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     736 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">     737 </span>            :         const override; // throw(io::FormattingException)
+<span class="lineNum">     738 </span>            : 
+<span class="lineNum">     739 </span>            :     PROJ_INTERNAL void _exportToJSON(io::JSONFormatter *formatter)
+<span class="lineNum">     740 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     741 </span>            : 
+<span class="lineNum">     742 </span>            :     //! @endcond
+<span class="lineNum">     743 </span>            : 
+<span class="lineNum">     744 </span>            :   protected:
+<span class="lineNum">     745 </span>            :     PROJ_INTERNAL EngineeringCRS(const datum::EngineeringDatumNNPtr &amp;datumIn,
+<span class="lineNum">     746 </span>            :                                  const cs::CoordinateSystemNNPtr &amp;csIn);
+<span class="lineNum">     747 </span>            :     PROJ_INTERNAL EngineeringCRS(const EngineeringCRS &amp;other);
+<span class="lineNum">     748 </span>            : 
+<span class="lineNum">     749 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">     750 </span>            : 
+<span class="lineNum">     751 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     752 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     753 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     754 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     755 </span>            : 
+<span class="lineNum">     756 </span><span class="lineCov">         46 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     757 </span>            : 
+<span class="lineNum">     758 </span>            :   private:
+<span class="lineNum">     759 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     760 </span>            :     EngineeringCRS &amp;operator=(const EngineeringCRS &amp;other) = delete;
+<span class="lineNum">     761 </span>            : };
+<span class="lineNum">     762 </span>            : 
+<span class="lineNum">     763 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     764 </span>            : 
+<span class="lineNum">     765 </span>            : class ParametricCRS;
+<span class="lineNum">     766 </span>            : /** Shared pointer of ParametricCRS */
+<span class="lineNum">     767 </span>            : using ParametricCRSPtr = std::shared_ptr&lt;ParametricCRS&gt;;
+<span class="lineNum">     768 </span>            : /** Non-null shared pointer of ParametricCRS */
+<span class="lineNum">     769 </span>            : using ParametricCRSNNPtr = util::nn&lt;ParametricCRSPtr&gt;;
+<span class="lineNum">     770 </span>            : 
+<span class="lineNum">     771 </span>            : /** \brief Contextually local coordinate reference system associated with an
+<span class="lineNum">     772 </span>            :  * engineering datum.
+<span class="lineNum">     773 </span>            :  *
+<span class="lineNum">     774 </span>            :  * This is applied either to activities on or near the surface of the Earth
+<span class="lineNum">     775 </span>            :  * without geodetic corrections, or on moving platforms such as road vehicles
+<span class="lineNum">     776 </span>            :  * vessels, aircraft or spacecraft, or as the internal CRS of an image.
+<span class="lineNum">     777 </span>            :  *
+<a name="778"><span class="lineNum">     778 </span>            :  * \remark Implements ParametricCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">     779 </span>            :  */
+<span class="lineNum">     780 </span><span class="lineCov">         60 : class PROJ_GCC_DLL ParametricCRS : virtual public SingleCRS {</span>
+<span class="lineNum">     781 </span>            :   public:
+<span class="lineNum">     782 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     783 </span>            :     PROJ_DLL ~ParametricCRS() override;
+<span class="lineNum">     784 </span>            :     //! @endcond
+<span class="lineNum">     785 </span>            : 
+<span class="lineNum">     786 </span>            :     PROJ_DLL const datum::ParametricDatumNNPtr datum() const;
+<span class="lineNum">     787 </span>            : 
+<span class="lineNum">     788 </span>            :     PROJ_DLL const cs::ParametricCSNNPtr coordinateSystem() const;
+<span class="lineNum">     789 </span>            : 
+<span class="lineNum">     790 </span>            :     PROJ_DLL static ParametricCRSNNPtr
+<span class="lineNum">     791 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     792 </span>            :            const datum::ParametricDatumNNPtr &amp;datumIn,
+<span class="lineNum">     793 </span>            :            const cs::ParametricCSNNPtr &amp;csIn);
+<span class="lineNum">     794 </span>            : 
+<span class="lineNum">     795 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     796 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">     797 </span>            :         const override; // throw(io::FormattingException)
+<span class="lineNum">     798 </span>            : 
+<span class="lineNum">     799 </span>            :     PROJ_INTERNAL void _exportToJSON(io::JSONFormatter *formatter)
+<span class="lineNum">     800 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     801 </span>            : 
+<span class="lineNum">     802 </span>            :     //! @endcond
+<span class="lineNum">     803 </span>            : 
+<span class="lineNum">     804 </span>            :   protected:
+<span class="lineNum">     805 </span>            :     PROJ_INTERNAL ParametricCRS(const datum::ParametricDatumNNPtr &amp;datumIn,
+<span class="lineNum">     806 </span>            :                                 const cs::ParametricCSNNPtr &amp;csIn);
+<span class="lineNum">     807 </span>            :     PROJ_INTERNAL ParametricCRS(const ParametricCRS &amp;other);
+<span class="lineNum">     808 </span>            : 
+<span class="lineNum">     809 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">     810 </span>            : 
+<span class="lineNum">     811 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     812 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     813 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     814 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     815 </span>            : 
+<span class="lineNum">     816 </span><span class="lineCov">         32 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     817 </span>            : 
+<span class="lineNum">     818 </span>            :   private:
+<span class="lineNum">     819 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     820 </span>            :     ParametricCRS &amp;operator=(const ParametricCRS &amp;other) = delete;
+<span class="lineNum">     821 </span>            : };
+<span class="lineNum">     822 </span>            : 
+<span class="lineNum">     823 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     824 </span>            : 
+<span class="lineNum">     825 </span>            : class CompoundCRS;
+<span class="lineNum">     826 </span>            : /** Shared pointer of CompoundCRS */
+<span class="lineNum">     827 </span>            : using CompoundCRSPtr = std::shared_ptr&lt;CompoundCRS&gt;;
+<span class="lineNum">     828 </span>            : /** Non-null shared pointer of CompoundCRS */
+<span class="lineNum">     829 </span>            : using CompoundCRSNNPtr = util::nn&lt;CompoundCRSPtr&gt;;
+<span class="lineNum">     830 </span>            : 
+<span class="lineNum">     831 </span>            : /** \brief A coordinate reference system describing the position of points
+<span class="lineNum">     832 </span>            :  * through two or more independent single coordinate reference systems.
+<span class="lineNum">     833 </span>            :  *
+<span class="lineNum">     834 </span>            :  * \note Two coordinate reference systems are independent of each other
+<span class="lineNum">     835 </span>            :  * if coordinate values in one cannot be converted or transformed into
+<span class="lineNum">     836 </span>            :  * coordinate values in the other.
+<span class="lineNum">     837 </span>            :  *
+<span class="lineNum">     838 </span>            :  * \note As a departure to \ref ISO_19111_2019, we allow to build a CompoundCRS
+<span class="lineNum">     839 </span>            :  * from CRS objects, whereas ISO19111:2019 restricts the components to
+<span class="lineNum">     840 </span>            :  * SingleCRS.
+<span class="lineNum">     841 </span>            :  *
+<a name="842"><span class="lineNum">     842 </span>            :  * \remark Implements CompoundCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">     843 </span>            :  */
+<span class="lineNum">     844 </span><span class="lineCov">        332 : class PROJ_GCC_DLL CompoundCRS final : public CRS,</span>
+<span class="lineNum">     845 </span>            :                                        public io::IPROJStringExportable {
+<span class="lineNum">     846 </span>            :   public:
+<span class="lineNum">     847 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     848 </span>            :     PROJ_DLL ~CompoundCRS() override;
+<span class="lineNum">     849 </span>            :     //! @endcond
+<span class="lineNum">     850 </span>            : 
+<span class="lineNum">     851 </span>            :     PROJ_DLL const std::vector&lt;CRSNNPtr&gt; &amp;
+<span class="lineNum">     852 </span>            :     componentReferenceSystems() PROJ_PURE_DECL;
+<span class="lineNum">     853 </span>            : 
+<span class="lineNum">     854 </span>            :     PROJ_DLL std::list&lt;std::pair&lt;CompoundCRSNNPtr, int&gt;&gt;
+<span class="lineNum">     855 </span>            :     identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const;
+<span class="lineNum">     856 </span>            : 
+<span class="lineNum">     857 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     858 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">     859 </span>            :         const override; // throw(io::FormattingException)
+<span class="lineNum">     860 </span>            :     //! @endcond
+<span class="lineNum">     861 </span>            : 
+<span class="lineNum">     862 </span>            :     PROJ_DLL static CompoundCRSNNPtr
+<span class="lineNum">     863 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">     864 </span>            :            const std::vector&lt;CRSNNPtr&gt; &amp;components);
+<span class="lineNum">     865 </span>            : 
+<span class="lineNum">     866 </span>            :   protected:
+<span class="lineNum">     867 </span>            :     // relaxed: standard say SingleCRSNNPtr
+<span class="lineNum">     868 </span>            :     PROJ_INTERNAL explicit CompoundCRS(const std::vector&lt;CRSNNPtr&gt; &amp;components);
+<span class="lineNum">     869 </span>            :     PROJ_INTERNAL CompoundCRS(const CompoundCRS &amp;other);
+<span class="lineNum">     870 </span>            : 
+<span class="lineNum">     871 </span>            :     PROJ_INTERNAL void _exportToPROJString(io::PROJStringFormatter *formatter)
+<span class="lineNum">     872 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     873 </span>            : 
+<span class="lineNum">     874 </span>            :     PROJ_INTERNAL void _exportToJSON(io::JSONFormatter *formatter)
+<span class="lineNum">     875 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     876 </span>            : 
+<span class="lineNum">     877 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">     878 </span>            : 
+<span class="lineNum">     879 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     880 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     881 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     882 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     883 </span>            : 
+<span class="lineNum">     884 </span>            :     PROJ_INTERNAL std::list&lt;std::pair&lt;CRSNNPtr, int&gt;&gt;
+<span class="lineNum">     885 </span>            :     _identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const override;
+<span class="lineNum">     886 </span>            : 
+<span class="lineNum">     887 </span><span class="lineCov">        332 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     888 </span>            : 
+<span class="lineNum">     889 </span>            :   private:
+<span class="lineNum">     890 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     891 </span>            :     CompoundCRS &amp;operator=(const CompoundCRS &amp;other) = delete;
+<span class="lineNum">     892 </span>            : };
+<span class="lineNum">     893 </span>            : 
+<span class="lineNum">     894 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     895 </span>            : 
+<span class="lineNum">     896 </span>            : /** \brief A coordinate reference system with an associated transformation to
+<span class="lineNum">     897 </span>            :  * a target/hub CRS.
+<span class="lineNum">     898 </span>            :  *
+<span class="lineNum">     899 </span>            :  * The definition of a CRS is not dependent upon any relationship to an
+<span class="lineNum">     900 </span>            :  * independent CRS. However in an implementation that merges datasets
+<span class="lineNum">     901 </span>            :  * referenced to differing CRSs, it is sometimes useful to associate the
+<span class="lineNum">     902 </span>            :  * definition of the transformation that has been used with the CRS definition.
+<span class="lineNum">     903 </span>            :  * This facilitates the interrelationship of CRS by concatenating
+<span class="lineNum">     904 </span>            :  * transformations via a common or hub CRS. This is sometimes referred to as
+<span class="lineNum">     905 </span>            :  * &quot;early-binding&quot;. \ref WKT2 permits the association of an abridged coordinate
+<span class="lineNum">     906 </span>            :  * transformation description with a coordinate reference system description in
+<span class="lineNum">     907 </span>            :  * a single text string. In a BoundCRS, the abridged coordinate transformation
+<span class="lineNum">     908 </span>            :  * is applied to the source CRS with the target CRS being the common or hub
+<span class="lineNum">     909 </span>            :  * system.
+<span class="lineNum">     910 </span>            :  *
+<span class="lineNum">     911 </span>            :  * Coordinates referring to a BoundCRS are expressed into its source/base CRS.
+<span class="lineNum">     912 </span>            :  *
+<span class="lineNum">     913 </span>            :  * This abstraction can for example model the concept of TOWGS84 datum shift
+<span class="lineNum">     914 </span>            :  * present in \ref WKT1.
+<span class="lineNum">     915 </span>            :  *
+<span class="lineNum">     916 </span>            :  * \note Contrary to other CRS classes of this package, there is no
+<span class="lineNum">     917 </span>            :  * \ref ISO_19111_2019 modelling of a BoundCRS.
+<span class="lineNum">     918 </span>            :  *
+<a name="919"><span class="lineNum">     919 </span>            :  * \remark Implements BoundCRS from \ref WKT2</a>
+<span class="lineNum">     920 </span>            :  */
+<span class="lineNum">     921 </span><span class="lineCov">        368 : class PROJ_GCC_DLL BoundCRS final : public CRS,</span>
+<span class="lineNum">     922 </span>            :                                     public io::IPROJStringExportable {
+<span class="lineNum">     923 </span>            :   public:
+<span class="lineNum">     924 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     925 </span>            :     PROJ_DLL ~BoundCRS() override;
+<span class="lineNum">     926 </span>            :     //! @endcond
+<span class="lineNum">     927 </span>            : 
+<span class="lineNum">     928 </span>            :     PROJ_DLL const CRSNNPtr &amp;baseCRS() PROJ_PURE_DECL;
+<span class="lineNum">     929 </span>            :     PROJ_DLL CRSNNPtr baseCRSWithCanonicalBoundCRS() const;
+<span class="lineNum">     930 </span>            : 
+<span class="lineNum">     931 </span>            :     PROJ_DLL const CRSNNPtr &amp;hubCRS() PROJ_PURE_DECL;
+<span class="lineNum">     932 </span>            :     PROJ_DLL const operation::TransformationNNPtr &amp;
+<span class="lineNum">     933 </span>            :     transformation() PROJ_PURE_DECL;
+<span class="lineNum">     934 </span>            : 
+<span class="lineNum">     935 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     936 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">     937 </span>            :         const override; // throw(io::FormattingException)
+<span class="lineNum">     938 </span>            :     //! @endcond
+<span class="lineNum">     939 </span>            : 
+<span class="lineNum">     940 </span>            :     PROJ_DLL static BoundCRSNNPtr
+<span class="lineNum">     941 </span>            :     create(const CRSNNPtr &amp;baseCRSIn, const CRSNNPtr &amp;hubCRSIn,
+<span class="lineNum">     942 </span>            :            const operation::TransformationNNPtr &amp;transformationIn);
+<span class="lineNum">     943 </span>            : 
+<span class="lineNum">     944 </span>            :     PROJ_DLL static BoundCRSNNPtr
+<span class="lineNum">     945 </span>            :     createFromTOWGS84(const CRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">     946 </span>            :                       const std::vector&lt;double&gt; &amp;TOWGS84Parameters);
+<span class="lineNum">     947 </span>            : 
+<span class="lineNum">     948 </span>            :     PROJ_DLL static BoundCRSNNPtr
+<span class="lineNum">     949 </span>            :     createFromNadgrids(const CRSNNPtr &amp;baseCRSIn, const std::string &amp;filename);
+<span class="lineNum">     950 </span>            : 
+<span class="lineNum">     951 </span>            :   protected:
+<span class="lineNum">     952 </span>            :     PROJ_INTERNAL
+<span class="lineNum">     953 </span>            :     BoundCRS(const CRSNNPtr &amp;baseCRSIn, const CRSNNPtr &amp;hubCRSIn,
+<span class="lineNum">     954 </span>            :              const operation::TransformationNNPtr &amp;transformationIn);
+<span class="lineNum">     955 </span>            :     PROJ_INTERNAL BoundCRS(const BoundCRS &amp;other);
+<span class="lineNum">     956 </span>            : 
+<span class="lineNum">     957 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">     958 </span>            : 
+<span class="lineNum">     959 </span>            :     PROJ_INTERNAL void _exportToPROJString(io::PROJStringFormatter *formatter)
+<span class="lineNum">     960 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     961 </span>            : 
+<span class="lineNum">     962 </span>            :     PROJ_INTERNAL void _exportToJSON(io::JSONFormatter *formatter)
+<span class="lineNum">     963 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">     964 </span>            : 
+<span class="lineNum">     965 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     966 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     967 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     968 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     969 </span>            : 
+<span class="lineNum">     970 </span>            :     PROJ_INTERNAL BoundCRSNNPtr shallowCloneAsBoundCRS() const;
+<span class="lineNum">     971 </span>            :     PROJ_INTERNAL bool isTOWGS84Compatible() const;
+<span class="lineNum">     972 </span>            :     PROJ_INTERNAL std::string getHDatumPROJ4GRIDS() const;
+<span class="lineNum">     973 </span>            :     PROJ_INTERNAL std::string getVDatumPROJ4GRIDS() const;
+<span class="lineNum">     974 </span>            : 
+<span class="lineNum">     975 </span>            :     PROJ_INTERNAL std::list&lt;std::pair&lt;CRSNNPtr, int&gt;&gt;
+<span class="lineNum">     976 </span>            :     _identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const override;
+<span class="lineNum">     977 </span>            : 
+<span class="lineNum">     978 </span><span class="lineCov">        368 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     979 </span>            : 
+<span class="lineNum">     980 </span>            :   private:
+<span class="lineNum">     981 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     982 </span>            :     BoundCRS &amp;operator=(const BoundCRS &amp;other) = delete;
+<span class="lineNum">     983 </span>            : };
+<span class="lineNum">     984 </span>            : 
+<span class="lineNum">     985 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     986 </span>            : 
+<span class="lineNum">     987 </span>            : class DerivedGeodeticCRS;
+<span class="lineNum">     988 </span>            : /** Shared pointer of DerivedGeodeticCRS */
+<span class="lineNum">     989 </span>            : using DerivedGeodeticCRSPtr = std::shared_ptr&lt;DerivedGeodeticCRS&gt;;
+<span class="lineNum">     990 </span>            : /** Non-null shared pointer of DerivedGeodeticCRS */
+<span class="lineNum">     991 </span>            : using DerivedGeodeticCRSNNPtr = util::nn&lt;DerivedGeodeticCRSPtr&gt;;
+<span class="lineNum">     992 </span>            : 
+<span class="lineNum">     993 </span>            : /** \brief A derived coordinate reference system which has either a geodetic
+<span class="lineNum">     994 </span>            :  * or a geographic coordinate reference system as its base CRS, thereby
+<span class="lineNum">     995 </span>            :  * inheriting a geodetic reference frame, and associated with a 3D Cartesian
+<span class="lineNum">     996 </span>            :  * or spherical coordinate system.
+<span class="lineNum">     997 </span>            :  *
+<a name="998"><span class="lineNum">     998 </span>            :  * \remark Implements DerivedGeodeticCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">     999 </span>            :  */
+<span class="lineNum">    1000 </span><span class="lineCov">         21 : class PROJ_GCC_DLL DerivedGeodeticCRS final : public GeodeticCRS,</span>
+<span class="lineNum">    1001 </span>            :                                               public DerivedCRS {
+<span class="lineNum">    1002 </span>            :   public:
+<span class="lineNum">    1003 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">    1004 </span>            :     PROJ_DLL ~DerivedGeodeticCRS() override;
+<span class="lineNum">    1005 </span>            :     //! @endcond
+<span class="lineNum">    1006 </span>            : 
+<span class="lineNum">    1007 </span>            :     PROJ_DLL const GeodeticCRSNNPtr baseCRS() const;
+<span class="lineNum">    1008 </span>            : 
+<span class="lineNum">    1009 </span>            :     PROJ_DLL static DerivedGeodeticCRSNNPtr
+<span class="lineNum">    1010 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">    1011 </span>            :            const GeodeticCRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">    1012 </span>            :            const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">    1013 </span>            :            const cs::CartesianCSNNPtr &amp;csIn);
+<span class="lineNum">    1014 </span>            : 
+<span class="lineNum">    1015 </span>            :     PROJ_DLL static DerivedGeodeticCRSNNPtr
+<span class="lineNum">    1016 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">    1017 </span>            :            const GeodeticCRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">    1018 </span>            :            const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">    1019 </span>            :            const cs::SphericalCSNNPtr &amp;csIn);
+<span class="lineNum">    1020 </span>            : 
+<span class="lineNum">    1021 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">    1022 </span>            :     void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">    1023 </span>            :         const override; // throw(io::FormattingException)
+<a name="1024"><span class="lineNum">    1024 </span>            : </a>
+<span class="lineNum">    1025 </span>            :     PROJ_INTERNAL void
+<span class="lineNum">    1026 </span><span class="lineCov">          1 :     _exportToJSON(io::JSONFormatter *formatter) const override {</span>
+<span class="lineNum">    1027 </span><span class="lineCov">          1 :         return DerivedCRS::_exportToJSON(formatter);</span>
+<span class="lineNum">    1028 </span>            :     }
+<span class="lineNum">    1029 </span>            : 
+<span class="lineNum">    1030 </span>            :     //! @endcond
+<span class="lineNum">    1031 </span>            : 
+<span class="lineNum">    1032 </span>            :   protected:
+<span class="lineNum">    1033 </span>            :     PROJ_INTERNAL
+<span class="lineNum">    1034 </span>            :     DerivedGeodeticCRS(const GeodeticCRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">    1035 </span>            :                        const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">    1036 </span>            :                        const cs::CartesianCSNNPtr &amp;csIn);
+<span class="lineNum">    1037 </span>            :     PROJ_INTERNAL
+<span class="lineNum">    1038 </span>            :     DerivedGeodeticCRS(const GeodeticCRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">    1039 </span>            :                        const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">    1040 </span>            :                        const cs::SphericalCSNNPtr &amp;csIn);
+<span class="lineNum">    1041 </span>            :     PROJ_INTERNAL DerivedGeodeticCRS(const DerivedGeodeticCRS &amp;other);
+<span class="lineNum">    1042 </span>            : 
+<span class="lineNum">    1043 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">    1044 </span>            : 
+<span class="lineNum">    1045 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">    1046 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">    1047 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">    1048 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">    1049 </span>            : 
+<span class="lineNum">    1050 </span>            :     PROJ_INTERNAL std::list&lt;std::pair&lt;CRSNNPtr, int&gt;&gt;
+<span class="lineNum">    1051 </span>            :     _identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const override;
+<span class="lineNum">    1052 </span>            : 
+<span class="lineNum">    1053 </span>            :     // cppcheck-suppress functionStatic
+<span class="lineNum">    1054 </span>            :     PROJ_INTERNAL void _exportToPROJString(io::PROJStringFormatter *formatter)
+<a name="1055"><span class="lineNum">    1055 </span>            :         const override; // throw(FormattingException)</a>
+<span class="lineNum">    1056 </span>            : 
+<span class="lineNum">    1057 </span><span class="lineCov">          1 :     PROJ_INTERNAL const char *className() const override {</span>
+<span class="lineNum">    1058 </span><span class="lineCov">          1 :         return &quot;DerivedGeodeticCRS&quot;;</span>
+<span class="lineNum">    1059 </span>            :     }
+<span class="lineNum">    1060 </span>            : 
+<span class="lineNum">    1061 </span><span class="lineCov">         14 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">    1062 </span>            : 
+<span class="lineNum">    1063 </span>            :   private:
+<span class="lineNum">    1064 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">    1065 </span>            :     DerivedGeodeticCRS &amp;operator=(const DerivedGeodeticCRS &amp;other) = delete;
+<span class="lineNum">    1066 </span>            : };
+<span class="lineNum">    1067 </span>            : 
+<span class="lineNum">    1068 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">    1069 </span>            : 
+<span class="lineNum">    1070 </span>            : class DerivedGeographicCRS;
+<span class="lineNum">    1071 </span>            : /** Shared pointer of DerivedGeographicCRS */
+<span class="lineNum">    1072 </span>            : using DerivedGeographicCRSPtr = std::shared_ptr&lt;DerivedGeographicCRS&gt;;
+<span class="lineNum">    1073 </span>            : /** Non-null shared pointer of DerivedGeographicCRS */
+<span class="lineNum">    1074 </span>            : using DerivedGeographicCRSNNPtr = util::nn&lt;DerivedGeographicCRSPtr&gt;;
+<span class="lineNum">    1075 </span>            : 
+<span class="lineNum">    1076 </span>            : /** \brief A derived coordinate reference system which has either a geodetic or
+<span class="lineNum">    1077 </span>            :  * a geographic coordinate reference system as its base CRS, thereby inheriting
+<span class="lineNum">    1078 </span>            :  * a geodetic reference frame, and an ellipsoidal coordinate system.
+<span class="lineNum">    1079 </span>            :  *
+<span class="lineNum">    1080 </span>            :  * A derived geographic CRS can be based on a geodetic CRS only if that
+<span class="lineNum">    1081 </span>            :  * geodetic CRS definition includes an ellipsoid.
+<span class="lineNum">    1082 </span>            :  *
+<a name="1083"><span class="lineNum">    1083 </span>            :  * \remark Implements DerivedGeographicCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">    1084 </span>            :  */
+<span class="lineNum">    1085 </span><span class="lineCov">         81 : class PROJ_GCC_DLL DerivedGeographicCRS final : public GeographicCRS,</span>
+<span class="lineNum">    1086 </span>            :                                                 public DerivedCRS {
+<span class="lineNum">    1087 </span>            :   public:
+<span class="lineNum">    1088 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">    1089 </span>            :     PROJ_DLL ~DerivedGeographicCRS() override;
+<span class="lineNum">    1090 </span>            :     //! @endcond
+<span class="lineNum">    1091 </span>            : 
+<span class="lineNum">    1092 </span>            :     PROJ_DLL const GeodeticCRSNNPtr baseCRS() const;
+<span class="lineNum">    1093 </span>            : 
+<span class="lineNum">    1094 </span>            :     PROJ_DLL static DerivedGeographicCRSNNPtr
+<span class="lineNum">    1095 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">    1096 </span>            :            const GeodeticCRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">    1097 </span>            :            const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">    1098 </span>            :            const cs::EllipsoidalCSNNPtr &amp;csIn);
+<span class="lineNum">    1099 </span>            : 
+<span class="lineNum">    1100 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">    1101 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">    1102 </span>            :         const override; // throw(io::FormattingException)
+<a name="1103"><span class="lineNum">    1103 </span>            : </a>
+<span class="lineNum">    1104 </span>            :     PROJ_INTERNAL void
+<span class="lineNum">    1105 </span><span class="lineCov">          1 :     _exportToJSON(io::JSONFormatter *formatter) const override {</span>
+<span class="lineNum">    1106 </span><span class="lineCov">          1 :         return DerivedCRS::_exportToJSON(formatter);</span>
+<span class="lineNum">    1107 </span>            :     }
+<span class="lineNum">    1108 </span>            : 
+<span class="lineNum">    1109 </span>            :     //! @endcond
+<span class="lineNum">    1110 </span>            : 
+<span class="lineNum">    1111 </span>            :   protected:
+<span class="lineNum">    1112 </span>            :     PROJ_INTERNAL
+<span class="lineNum">    1113 </span>            :     DerivedGeographicCRS(const GeodeticCRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">    1114 </span>            :                          const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">    1115 </span>            :                          const cs::EllipsoidalCSNNPtr &amp;csIn);
+<span class="lineNum">    1116 </span>            :     PROJ_INTERNAL DerivedGeographicCRS(const DerivedGeographicCRS &amp;other);
+<span class="lineNum">    1117 </span>            : 
+<span class="lineNum">    1118 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">    1119 </span>            : 
+<span class="lineNum">    1120 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">    1121 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">    1122 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">    1123 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">    1124 </span>            : 
+<span class="lineNum">    1125 </span>            :     PROJ_INTERNAL std::list&lt;std::pair&lt;CRSNNPtr, int&gt;&gt;
+<a name="1126"><span class="lineNum">    1126 </span>            :     _identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const override;</a>
+<span class="lineNum">    1127 </span>            : 
+<span class="lineNum">    1128 </span><span class="lineCov">          1 :     PROJ_INTERNAL const char *className() const override {</span>
+<span class="lineNum">    1129 </span><span class="lineCov">          1 :         return &quot;DerivedGeographicCRS&quot;;</span>
+<span class="lineNum">    1130 </span>            :     }
+<span class="lineNum">    1131 </span>            : 
+<span class="lineNum">    1132 </span>            :     // cppcheck-suppress functionStatic
+<span class="lineNum">    1133 </span>            :     PROJ_INTERNAL void _exportToPROJString(io::PROJStringFormatter *formatter)
+<span class="lineNum">    1134 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">    1135 </span>            : 
+<span class="lineNum">    1136 </span><span class="lineCov">         54 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">    1137 </span>            : 
+<span class="lineNum">    1138 </span>            :   private:
+<span class="lineNum">    1139 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">    1140 </span>            :     DerivedGeographicCRS &amp;operator=(const DerivedGeographicCRS &amp;other) = delete;
+<span class="lineNum">    1141 </span>            : };
+<span class="lineNum">    1142 </span>            : 
+<span class="lineNum">    1143 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">    1144 </span>            : 
+<span class="lineNum">    1145 </span>            : class DerivedProjectedCRS;
+<span class="lineNum">    1146 </span>            : /** Shared pointer of DerivedProjectedCRS */
+<span class="lineNum">    1147 </span>            : using DerivedProjectedCRSPtr = std::shared_ptr&lt;DerivedProjectedCRS&gt;;
+<span class="lineNum">    1148 </span>            : /** Non-null shared pointer of DerivedProjectedCRS */
+<span class="lineNum">    1149 </span>            : using DerivedProjectedCRSNNPtr = util::nn&lt;DerivedProjectedCRSPtr&gt;;
+<span class="lineNum">    1150 </span>            : 
+<span class="lineNum">    1151 </span>            : /** \brief A derived coordinate reference system which has a projected
+<span class="lineNum">    1152 </span>            :  * coordinate reference system as its base CRS, thereby inheriting a geodetic
+<span class="lineNum">    1153 </span>            :  * reference frame, but also inheriting the distortion characteristics of the
+<span class="lineNum">    1154 </span>            :  * base projected CRS.
+<span class="lineNum">    1155 </span>            :  *
+<span class="lineNum">    1156 </span>            :  * A DerivedProjectedCRS is not a ProjectedCRS.
+<span class="lineNum">    1157 </span>            :  *
+<a name="1158"><span class="lineNum">    1158 </span>            :  * \remark Implements DerivedProjectedCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">    1159 </span>            :  */
+<span class="lineNum">    1160 </span><span class="lineCov">         24 : class PROJ_GCC_DLL DerivedProjectedCRS final : public DerivedCRS {</span>
+<span class="lineNum">    1161 </span>            :   public:
+<span class="lineNum">    1162 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">    1163 </span>            :     PROJ_DLL ~DerivedProjectedCRS() override;
+<span class="lineNum">    1164 </span>            :     //! @endcond
+<span class="lineNum">    1165 </span>            : 
+<span class="lineNum">    1166 </span>            :     PROJ_DLL const ProjectedCRSNNPtr baseCRS() const;
+<span class="lineNum">    1167 </span>            : 
+<span class="lineNum">    1168 </span>            :     PROJ_DLL static DerivedProjectedCRSNNPtr
+<span class="lineNum">    1169 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">    1170 </span>            :            const ProjectedCRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">    1171 </span>            :            const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">    1172 </span>            :            const cs::CoordinateSystemNNPtr &amp;csIn);
+<span class="lineNum">    1173 </span>            : 
+<span class="lineNum">    1174 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">    1175 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">    1176 </span>            :         const override; // throw(io::FormattingException)
+<span class="lineNum">    1177 </span>            :                         //! @endcond
+<span class="lineNum">    1178 </span>            : 
+<span class="lineNum">    1179 </span>            :   protected:
+<span class="lineNum">    1180 </span>            :     PROJ_INTERNAL
+<span class="lineNum">    1181 </span>            :     DerivedProjectedCRS(const ProjectedCRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">    1182 </span>            :                         const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">    1183 </span>            :                         const cs::CoordinateSystemNNPtr &amp;csIn);
+<span class="lineNum">    1184 </span>            :     PROJ_INTERNAL DerivedProjectedCRS(const DerivedProjectedCRS &amp;other);
+<span class="lineNum">    1185 </span>            : 
+<span class="lineNum">    1186 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">    1187 </span>            : 
+<span class="lineNum">    1188 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">    1189 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">    1190 </span>            :                     util::IComparable::Criterion criterion =
+<a name="1191"><span class="lineNum">    1191 </span>            :                         util::IComparable::Criterion::STRICT) const override;</a>
+<span class="lineNum">    1192 </span>            : 
+<span class="lineNum">    1193 </span><span class="lineCov">          1 :     PROJ_INTERNAL const char *className() const override {</span>
+<span class="lineNum">    1194 </span><span class="lineCov">          1 :         return &quot;DerivedProjectedCRS&quot;;</span>
+<span class="lineNum">    1195 </span>            :     }
+<span class="lineNum">    1196 </span>            : 
+<span class="lineNum">    1197 </span><span class="lineCov">         16 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">    1198 </span>            : 
+<span class="lineNum">    1199 </span>            :   private:
+<span class="lineNum">    1200 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">    1201 </span>            :     DerivedProjectedCRS &amp;operator=(const DerivedProjectedCRS &amp;other) = delete;
+<span class="lineNum">    1202 </span>            : };
+<span class="lineNum">    1203 </span>            : 
+<span class="lineNum">    1204 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">    1205 </span>            : 
+<span class="lineNum">    1206 </span>            : class DerivedVerticalCRS;
+<span class="lineNum">    1207 </span>            : /** Shared pointer of DerivedVerticalCRS */
+<span class="lineNum">    1208 </span>            : using DerivedVerticalCRSPtr = std::shared_ptr&lt;DerivedVerticalCRS&gt;;
+<span class="lineNum">    1209 </span>            : /** Non-null shared pointer of DerivedVerticalCRS */
+<span class="lineNum">    1210 </span>            : using DerivedVerticalCRSNNPtr = util::nn&lt;DerivedVerticalCRSPtr&gt;;
+<span class="lineNum">    1211 </span>            : 
+<span class="lineNum">    1212 </span>            : /** \brief A derived coordinate reference system which has a vertical
+<span class="lineNum">    1213 </span>            :  * coordinate reference system as its base CRS, thereby inheriting a vertical
+<span class="lineNum">    1214 </span>            :  * reference frame, and a vertical coordinate system.
+<span class="lineNum">    1215 </span>            :  *
+<a name="1216"><span class="lineNum">    1216 </span>            :  * \remark Implements DerivedVerticalCRS from \ref ISO_19111_2019</a>
+<span class="lineNum">    1217 </span>            :  */
+<span class="lineNum">    1218 </span><span class="lineCov">         21 : class PROJ_GCC_DLL DerivedVerticalCRS final : public VerticalCRS,</span>
+<span class="lineNum">    1219 </span>            :                                               public DerivedCRS {
+<span class="lineNum">    1220 </span>            :   public:
+<span class="lineNum">    1221 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">    1222 </span>            :     PROJ_DLL ~DerivedVerticalCRS() override;
+<span class="lineNum">    1223 </span>            :     //! @endcond
+<span class="lineNum">    1224 </span>            : 
+<span class="lineNum">    1225 </span>            :     PROJ_DLL const VerticalCRSNNPtr baseCRS() const;
+<span class="lineNum">    1226 </span>            : 
+<span class="lineNum">    1227 </span>            :     PROJ_DLL static DerivedVerticalCRSNNPtr
+<span class="lineNum">    1228 </span>            :     create(const util::PropertyMap &amp;properties,
+<span class="lineNum">    1229 </span>            :            const VerticalCRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">    1230 </span>            :            const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">    1231 </span>            :            const cs::VerticalCSNNPtr &amp;csIn);
+<span class="lineNum">    1232 </span>            : 
+<span class="lineNum">    1233 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">    1234 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">    1235 </span>            :         const override; // throw(io::FormattingException)
+<a name="1236"><span class="lineNum">    1236 </span>            : </a>
+<span class="lineNum">    1237 </span>            :     PROJ_INTERNAL void
+<span class="lineNum">    1238 </span><span class="lineCov">          1 :     _exportToJSON(io::JSONFormatter *formatter) const override {</span>
+<span class="lineNum">    1239 </span><span class="lineCov">          1 :         return DerivedCRS::_exportToJSON(formatter);</span>
+<span class="lineNum">    1240 </span>            :     }
+<span class="lineNum">    1241 </span>            : 
+<span class="lineNum">    1242 </span>            :     //! @endcond
+<span class="lineNum">    1243 </span>            : 
+<span class="lineNum">    1244 </span>            :   protected:
+<span class="lineNum">    1245 </span>            :     PROJ_INTERNAL
+<span class="lineNum">    1246 </span>            :     DerivedVerticalCRS(const VerticalCRSNNPtr &amp;baseCRSIn,
+<span class="lineNum">    1247 </span>            :                        const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">    1248 </span>            :                        const cs::VerticalCSNNPtr &amp;csIn);
+<span class="lineNum">    1249 </span>            :     PROJ_INTERNAL DerivedVerticalCRS(const DerivedVerticalCRS &amp;other);
+<span class="lineNum">    1250 </span>            : 
+<span class="lineNum">    1251 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">    1252 </span>            : 
+<span class="lineNum">    1253 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">    1254 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">    1255 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">    1256 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">    1257 </span>            : 
+<span class="lineNum">    1258 </span>            :     PROJ_INTERNAL std::list&lt;std::pair&lt;CRSNNPtr, int&gt;&gt;
+<a name="1259"><span class="lineNum">    1259 </span>            :     _identify(const io::AuthorityFactoryPtr &amp;authorityFactory) const override;</a>
+<span class="lineNum">    1260 </span>            : 
+<span class="lineNum">    1261 </span><span class="lineCov">          1 :     PROJ_INTERNAL const char *className() const override {</span>
+<span class="lineNum">    1262 </span><span class="lineCov">          1 :         return &quot;DerivedVerticalCRS&quot;;</span>
+<span class="lineNum">    1263 </span>            :     }
+<span class="lineNum">    1264 </span>            : 
+<span class="lineNum">    1265 </span>            :     // cppcheck-suppress functionStatic
+<span class="lineNum">    1266 </span>            :     PROJ_INTERNAL void _exportToPROJString(io::PROJStringFormatter *formatter)
+<span class="lineNum">    1267 </span>            :         const override; // throw(FormattingException)
+<span class="lineNum">    1268 </span>            : 
+<span class="lineNum">    1269 </span><span class="lineCov">         14 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">    1270 </span>            : 
+<span class="lineNum">    1271 </span>            :   private:
+<span class="lineNum">    1272 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">    1273 </span>            :     DerivedVerticalCRS &amp;operator=(const DerivedVerticalCRS &amp;other) = delete;
+<span class="lineNum">    1274 </span>            : };
+<span class="lineNum">    1275 </span>            : 
+<span class="lineNum">    1276 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">    1277 </span>            : 
+<span class="lineNum">    1278 </span>            : /** \brief Template representing a derived coordinate reference system.
+<a name="1279"><span class="lineNum">    1279 </span>            :  */</a>
+<span class="lineNum">    1280 </span>            : template &lt;class DerivedCRSTraits&gt;
+<span class="lineNum">    1281 </span><span class="lineCov">         57 : class PROJ_GCC_DLL DerivedCRSTemplate final : public DerivedCRSTraits::BaseType,</span>
+<span class="lineNum">    1282 </span>            :                                               public DerivedCRS {
+<span class="lineNum">    1283 </span>            :   protected:
+<span class="lineNum">    1284 </span>            :     /** Base type */
+<span class="lineNum">    1285 </span>            :     typedef typename DerivedCRSTraits::BaseType BaseType;
+<span class="lineNum">    1286 </span>            :     /** CSType */
+<span class="lineNum">    1287 </span>            :     typedef typename DerivedCRSTraits::CSType CSType;
+<span class="lineNum">    1288 </span>            : 
+<span class="lineNum">    1289 </span>            :   public:
+<span class="lineNum">    1290 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">    1291 </span>            :     PROJ_DLL ~DerivedCRSTemplate() override;
+<span class="lineNum">    1292 </span>            :     //! @endcond
+<span class="lineNum">    1293 </span>            : 
+<span class="lineNum">    1294 </span>            :     /** Non-null shared pointer of DerivedCRSTemplate */
+<span class="lineNum">    1295 </span>            :     typedef typename util::nn&lt;std::shared_ptr&lt;DerivedCRSTemplate&gt;&gt; NNPtr;
+<span class="lineNum">    1296 </span>            :     /** Non-null shared pointer of BaseType */
+<span class="lineNum">    1297 </span>            :     typedef util::nn&lt;std::shared_ptr&lt;BaseType&gt;&gt; BaseNNPtr;
+<span class="lineNum">    1298 </span>            :     /** Non-null shared pointer of CSType */
+<span class="lineNum">    1299 </span>            :     typedef util::nn&lt;std::shared_ptr&lt;CSType&gt;&gt; CSNNPtr;
+<span class="lineNum">    1300 </span>            : 
+<span class="lineNum">    1301 </span>            :     /** \brief Return the base CRS of a DerivedCRSTemplate.
+<span class="lineNum">    1302 </span>            :      *
+<span class="lineNum">    1303 </span>            :      * @return the base CRS.
+<span class="lineNum">    1304 </span>            :      */
+<span class="lineNum">    1305 </span>            :     PROJ_DLL const BaseNNPtr baseCRS() const;
+<span class="lineNum">    1306 </span>            : 
+<span class="lineNum">    1307 </span>            :     /** \brief Instantiate a DerivedCRSTemplate from a base CRS, a deriving
+<span class="lineNum">    1308 </span>            :      * conversion and a cs::CoordinateSystem.
+<span class="lineNum">    1309 </span>            :      *
+<span class="lineNum">    1310 </span>            :      * @param properties See \ref general_properties.
+<span class="lineNum">    1311 </span>            :      * At minimum the name should be defined.
+<span class="lineNum">    1312 </span>            :      * @param baseCRSIn base CRS.
+<span class="lineNum">    1313 </span>            :      * @param derivingConversionIn the deriving conversion from the base CRS to
+<span class="lineNum">    1314 </span>            :      * this
+<span class="lineNum">    1315 </span>            :      * CRS.
+<span class="lineNum">    1316 </span>            :      * @param csIn the coordinate system.
+<span class="lineNum">    1317 </span>            :      * @return new DerivedCRSTemplate.
+<span class="lineNum">    1318 </span>            :      */
+<span class="lineNum">    1319 </span>            :     PROJ_DLL static NNPtr
+<span class="lineNum">    1320 </span>            :     create(const util::PropertyMap &amp;properties, const BaseNNPtr &amp;baseCRSIn,
+<span class="lineNum">    1321 </span>            :            const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">    1322 </span>            :            const CSNNPtr &amp;csIn);
+<span class="lineNum">    1323 </span>            : 
+<span class="lineNum">    1324 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">    1325 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">    1326 </span>            :         const override; // throw(io::FormattingException)
+<a name="1327"><span class="lineNum">    1327 </span>            : </a>
+<span class="lineNum">    1328 </span>            :     PROJ_INTERNAL void
+<span class="lineNum">    1329 </span><span class="lineCov">          3 :     _exportToJSON(io::JSONFormatter *formatter) const override {</span>
+<span class="lineNum">    1330 </span><span class="lineCov">          3 :         return DerivedCRS::_exportToJSON(formatter);</span>
+<span class="lineNum">    1331 </span>            :     }
+<span class="lineNum">    1332 </span>            :     //! @endcond
+<span class="lineNum">    1333 </span>            : 
+<span class="lineNum">    1334 </span>            :   protected:
+<span class="lineNum">    1335 </span>            :     PROJ_INTERNAL
+<span class="lineNum">    1336 </span>            :     DerivedCRSTemplate(const BaseNNPtr &amp;baseCRSIn,
+<span class="lineNum">    1337 </span>            :                        const operation::ConversionNNPtr &amp;derivingConversionIn,
+<span class="lineNum">    1338 </span>            :                        const CSNNPtr &amp;csIn);
+<span class="lineNum">    1339 </span>            :     PROJ_INTERNAL DerivedCRSTemplate(const DerivedCRSTemplate &amp;other);
+<span class="lineNum">    1340 </span>            : 
+<span class="lineNum">    1341 </span>            :     PROJ_INTERNAL CRSNNPtr _shallowClone() const override;
+<span class="lineNum">    1342 </span>            : 
+<span class="lineNum">    1343 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">    1344 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">    1345 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">    1346 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">    1347 </span>            : 
+<span class="lineNum">    1348 </span>            :     PROJ_INTERNAL const char *className() const override;
+<span class="lineNum">    1349 </span>            : 
+<span class="lineNum">    1350 </span><span class="lineCov">         38 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">    1351 </span>            : 
+<span class="lineNum">    1352 </span>            :   private:
+<span class="lineNum">    1353 </span>            :     struct PROJ_INTERNAL Private;
+<span class="lineNum">    1354 </span>            :     std::unique_ptr&lt;Private&gt; d;
+<span class="lineNum">    1355 </span>            : 
+<span class="lineNum">    1356 </span>            :     DerivedCRSTemplate &amp;operator=(const DerivedCRSTemplate &amp;other) = delete;
+<span class="lineNum">    1357 </span>            : };
+<span class="lineNum">    1358 </span>            : 
+<span class="lineNum">    1359 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">    1360 </span>            : 
+<span class="lineNum">    1361 </span>            : //! @cond Doxygen_Suppress
+<span class="lineNum">    1362 </span>            : struct PROJ_GCC_DLL DerivedEngineeringCRSTraits {
+<span class="lineNum">    1363 </span>            :     typedef EngineeringCRS BaseType;
+<span class="lineNum">    1364 </span>            :     typedef cs::CoordinateSystem CSType;
+<span class="lineNum">    1365 </span>            :     // old x86_64-w64-mingw32-g++ has issues with static variables. use method
+<span class="lineNum">    1366 </span>            :     // instead
+<span class="lineNum">    1367 </span>            :     inline static const std::string &amp;CRSName();
+<span class="lineNum">    1368 </span>            :     inline static const std::string &amp;WKTKeyword();
+<span class="lineNum">    1369 </span>            :     inline static const std::string &amp;WKTBaseKeyword();
+<span class="lineNum">    1370 </span>            :     static const bool wkt2_2019_only = true;
+<span class="lineNum">    1371 </span>            : };
+<span class="lineNum">    1372 </span>            : //! @endcond
+<span class="lineNum">    1373 </span>            : 
+<span class="lineNum">    1374 </span>            : /** \brief A derived coordinate reference system which has an engineering
+<span class="lineNum">    1375 </span>            :  * coordinate reference system as its base CRS, thereby inheriting an
+<span class="lineNum">    1376 </span>            :  * engineering datum, and is associated with one of the coordinate system
+<span class="lineNum">    1377 </span>            :  * types for an EngineeringCRS
+<span class="lineNum">    1378 </span>            :  *
+<span class="lineNum">    1379 </span>            :  * \remark Implements DerivedEngineeringCRS from \ref ISO_19111_2019
+<span class="lineNum">    1380 </span>            :  */
+<span class="lineNum">    1381 </span>            : #ifdef DOXYGEN_ENABLED
+<span class="lineNum">    1382 </span>            : class DerivedEngineeringCRS
+<span class="lineNum">    1383 </span>            :     : public DerivedCRSTemplate&lt;DerivedEngineeringCRSTraits&gt; {};
+<span class="lineNum">    1384 </span>            : #else
+<span class="lineNum">    1385 </span>            : using DerivedEngineeringCRS = DerivedCRSTemplate&lt;DerivedEngineeringCRSTraits&gt;;
+<span class="lineNum">    1386 </span>            : #endif
+<span class="lineNum">    1387 </span>            : 
+<span class="lineNum">    1388 </span>            : #ifndef DO_NOT_DEFINE_EXTERN_DERIVED_CRS_TEMPLATE
+<span class="lineNum">    1389 </span>            : extern template class DerivedCRSTemplate&lt;DerivedEngineeringCRSTraits&gt;;
+<span class="lineNum">    1390 </span>            : #endif
+<span class="lineNum">    1391 </span>            : 
+<span class="lineNum">    1392 </span>            : /** Shared pointer of DerivedEngineeringCRS */
+<span class="lineNum">    1393 </span>            : using DerivedEngineeringCRSPtr = std::shared_ptr&lt;DerivedEngineeringCRS&gt;;
+<span class="lineNum">    1394 </span>            : /** Non-null shared pointer of DerivedEngineeringCRS */
+<span class="lineNum">    1395 </span>            : using DerivedEngineeringCRSNNPtr = util::nn&lt;DerivedEngineeringCRSPtr&gt;;
+<span class="lineNum">    1396 </span>            : 
+<span class="lineNum">    1397 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">    1398 </span>            : 
+<span class="lineNum">    1399 </span>            : //! @cond Doxygen_Suppress
+<span class="lineNum">    1400 </span>            : struct PROJ_GCC_DLL DerivedParametricCRSTraits {
+<span class="lineNum">    1401 </span>            :     typedef ParametricCRS BaseType;
+<span class="lineNum">    1402 </span>            :     typedef cs::ParametricCS CSType;
+<span class="lineNum">    1403 </span>            :     // old x86_64-w64-mingw32-g++ has issues with static variables. use method
+<span class="lineNum">    1404 </span>            :     // instead
+<span class="lineNum">    1405 </span>            :     inline static const std::string &amp;CRSName();
+<span class="lineNum">    1406 </span>            :     inline static const std::string &amp;WKTKeyword();
+<span class="lineNum">    1407 </span>            :     inline static const std::string &amp;WKTBaseKeyword();
+<span class="lineNum">    1408 </span>            :     static const bool wkt2_2019_only = false;
+<span class="lineNum">    1409 </span>            : };
+<span class="lineNum">    1410 </span>            : //! @endcond
+<span class="lineNum">    1411 </span>            : 
+<span class="lineNum">    1412 </span>            : /** \brief A derived coordinate reference system which has a parametric
+<span class="lineNum">    1413 </span>            :  * coordinate reference system as its base CRS, thereby inheriting a parametric
+<span class="lineNum">    1414 </span>            :  * datum, and a parametric coordinate system.
+<span class="lineNum">    1415 </span>            :  *
+<span class="lineNum">    1416 </span>            :  * \remark Implements DerivedParametricCRS from \ref ISO_19111_2019
+<span class="lineNum">    1417 </span>            :  */
+<span class="lineNum">    1418 </span>            : #ifdef DOXYGEN_ENABLED
+<span class="lineNum">    1419 </span>            : class DerivedParametricCRS
+<span class="lineNum">    1420 </span>            :     : public DerivedCRSTemplate&lt;DerivedParametricCRSTraits&gt; {};
+<span class="lineNum">    1421 </span>            : #else
+<span class="lineNum">    1422 </span>            : using DerivedParametricCRS = DerivedCRSTemplate&lt;DerivedParametricCRSTraits&gt;;
+<span class="lineNum">    1423 </span>            : #endif
+<span class="lineNum">    1424 </span>            : 
+<span class="lineNum">    1425 </span>            : #ifndef DO_NOT_DEFINE_EXTERN_DERIVED_CRS_TEMPLATE
+<span class="lineNum">    1426 </span>            : extern template class DerivedCRSTemplate&lt;DerivedParametricCRSTraits&gt;;
+<span class="lineNum">    1427 </span>            : #endif
+<span class="lineNum">    1428 </span>            : 
+<span class="lineNum">    1429 </span>            : /** Shared pointer of DerivedParametricCRS */
+<span class="lineNum">    1430 </span>            : using DerivedParametricCRSPtr = std::shared_ptr&lt;DerivedParametricCRS&gt;;
+<span class="lineNum">    1431 </span>            : /** Non-null shared pointer of DerivedParametricCRS */
+<span class="lineNum">    1432 </span>            : using DerivedParametricCRSNNPtr = util::nn&lt;DerivedParametricCRSPtr&gt;;
+<span class="lineNum">    1433 </span>            : 
+<span class="lineNum">    1434 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">    1435 </span>            : 
+<span class="lineNum">    1436 </span>            : //! @cond Doxygen_Suppress
+<span class="lineNum">    1437 </span>            : struct PROJ_GCC_DLL DerivedTemporalCRSTraits {
+<span class="lineNum">    1438 </span>            :     typedef TemporalCRS BaseType;
+<span class="lineNum">    1439 </span>            :     typedef cs::TemporalCS CSType;
+<span class="lineNum">    1440 </span>            :     // old x86_64-w64-mingw32-g++ has issues with static variables. use method
+<span class="lineNum">    1441 </span>            :     // instead
+<span class="lineNum">    1442 </span>            :     inline static const std::string &amp;CRSName();
+<span class="lineNum">    1443 </span>            :     inline static const std::string &amp;WKTKeyword();
+<span class="lineNum">    1444 </span>            :     inline static const std::string &amp;WKTBaseKeyword();
+<span class="lineNum">    1445 </span>            :     static const bool wkt2_2019_only = false;
+<span class="lineNum">    1446 </span>            : };
+<span class="lineNum">    1447 </span>            : //! @endcond
+<span class="lineNum">    1448 </span>            : 
+<span class="lineNum">    1449 </span>            : /** \brief A derived coordinate reference system which has a temporal
+<span class="lineNum">    1450 </span>            :  * coordinate reference system as its base CRS, thereby inheriting a temporal
+<span class="lineNum">    1451 </span>            :  * datum, and a temporal coordinate system.
+<span class="lineNum">    1452 </span>            :  *
+<span class="lineNum">    1453 </span>            :  * \remark Implements DerivedTemporalCRS from \ref ISO_19111_2019
+<span class="lineNum">    1454 </span>            :  */
+<span class="lineNum">    1455 </span>            : #ifdef DOXYGEN_ENABLED
+<span class="lineNum">    1456 </span>            : class DerivedTemporalCRS : public DerivedCRSTemplate&lt;DerivedTemporalCRSTraits&gt; {
+<span class="lineNum">    1457 </span>            : };
+<span class="lineNum">    1458 </span>            : #else
+<span class="lineNum">    1459 </span>            : using DerivedTemporalCRS = DerivedCRSTemplate&lt;DerivedTemporalCRSTraits&gt;;
+<span class="lineNum">    1460 </span>            : #endif
+<span class="lineNum">    1461 </span>            : 
+<span class="lineNum">    1462 </span>            : #ifndef DO_NOT_DEFINE_EXTERN_DERIVED_CRS_TEMPLATE
+<span class="lineNum">    1463 </span>            : extern template class DerivedCRSTemplate&lt;DerivedTemporalCRSTraits&gt;;
+<span class="lineNum">    1464 </span>            : #endif
+<span class="lineNum">    1465 </span>            : 
+<span class="lineNum">    1466 </span>            : /** Shared pointer of DerivedTemporalCRS */
+<span class="lineNum">    1467 </span>            : using DerivedTemporalCRSPtr = std::shared_ptr&lt;DerivedTemporalCRS&gt;;
+<span class="lineNum">    1468 </span>            : /** Non-null shared pointer of DerivedTemporalCRS */
+<span class="lineNum">    1469 </span>            : using DerivedTemporalCRSNNPtr = util::nn&lt;DerivedTemporalCRSPtr&gt;;
+<span class="lineNum">    1470 </span>            : 
+<span class="lineNum">    1471 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">    1472 </span>            : 
+<span class="lineNum">    1473 </span>            : } // namespace crs
+<span class="lineNum">    1474 </span>            : 
+<span class="lineNum">    1475 </span>            : NS_PROJ_END
+<span class="lineNum">    1476 </span>            : 
+<span class="lineNum">    1477 </span>            : #endif //  CRS_HH_INCLUDED
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

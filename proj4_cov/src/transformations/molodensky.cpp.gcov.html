@@ -1,0 +1,428 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/transformations/molodensky.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/transformations</a> - molodensky.cpp<span style="font-size: 80%;"> (source / <a href="molodensky.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">107</td>
+            <td class="headerCovTableEntry">127</td>
+            <td class="headerCovTableEntryMed">84.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryMed">83.3 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /***********************************************************************</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :                   (Abridged) Molodensky Transform
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :                     Kristian Evers, 2017-07-07
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : ************************************************************************
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            :     Implements the (abridged) Molodensky transformations for 2D and 3D
+<span class="lineNum">      10 </span>            :     data.
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            :     Primarily useful for implementation of datum shifts in transformation
+<span class="lineNum">      13 </span>            :     pipelines.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :     The code in this file is mostly based on
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            :         The Standard and Abridged Molodensky Coordinate Transformation
+<span class="lineNum">      18 </span>            :         Formulae, 2004, R.E. Deaking,
+<span class="lineNum">      19 </span>            :         http://www.mygeodesy.id.au/documents/Molodensky%20V2.pdf
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : ************************************************************************
+<span class="lineNum">      24 </span>            : * Copyright (c) 2017, Kristian Evers / SDFE
+<span class="lineNum">      25 </span>            : *
+<span class="lineNum">      26 </span>            : * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      27 </span>            : * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      28 </span>            : * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      29 </span>            : * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      30 </span>            : * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      31 </span>            : * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      32 </span>            : *
+<span class="lineNum">      33 </span>            : * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      34 </span>            : * in all copies or substantial portions of the Software.
+<span class="lineNum">      35 </span>            : *
+<span class="lineNum">      36 </span>            : * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      37 </span>            : * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      38 </span>            : * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      39 </span>            : * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      40 </span>            : * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      41 </span>            : * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      42 </span>            : * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      43 </span>            : *
+<span class="lineNum">      44 </span>            : ***********************************************************************/
+<span class="lineNum">      45 </span>            : #define PJ_LIB__
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      48 </span>            : #include &lt;math.h&gt;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : #include &quot;proj.h&quot;
+<span class="lineNum">      51 </span>            : #include &quot;proj_internal.h&quot;
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : PROJ_HEAD(molodensky, &quot;Molodensky transform&quot;);
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            : static PJ_XYZ forward_3d(PJ_LPZ lpz, PJ *P);
+<span class="lineNum">      56 </span>            : static PJ_LPZ reverse_3d(PJ_XYZ xyz, PJ *P);
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            : namespace { // anonymous namespace
+<span class="lineNum">      59 </span>            : struct pj_opaque_molodensky {
+<span class="lineNum">      60 </span>            :     double dx;
+<span class="lineNum">      61 </span>            :     double dy;
+<span class="lineNum">      62 </span>            :     double dz;
+<span class="lineNum">      63 </span>            :     double da;
+<span class="lineNum">      64 </span>            :     double df;
+<span class="lineNum">      65 </span>            :     int    abridged;
+<span class="lineNum">      66 </span>            : };
+<span class="lineNum">      67 </span>            : } // anonymous namespace
+<a name="68"><span class="lineNum">      68 </span>            : </a>
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span><span class="lineCov">        405 : static double RN (double a, double es, double phi) {</span>
+<span class="lineNum">      71 </span>            : /**********************************************************
+<span class="lineNum">      72 </span>            :     N(phi) - prime vertical radius of curvature
+<span class="lineNum">      73 </span>            :     -------------------------------------------
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :     This is basically the same function as in PJ_cart.c
+<span class="lineNum">      76 </span>            :     should probably be refactored into it's own file at some
+<span class="lineNum">      77 </span>            :     point.
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            : **********************************************************/
+<span class="lineNum">      80 </span><span class="lineCov">        405 :     double s = sin(phi);</span>
+<span class="lineNum">      81 </span><span class="lineCov">        405 :     if (es==0)</span>
+<span class="lineNum">      82 </span>            :         return a;
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineCov">        405 :     return a / sqrt (1 - es*s*s);</span>
+<span class="lineNum">      85 </span>            : }
+<a name="86"><span class="lineNum">      86 </span>            : </a>
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span><span class="lineCov">        405 : static double RM (double a, double es, double phi) {</span>
+<span class="lineNum">      89 </span>            : /**********************************************************
+<span class="lineNum">      90 </span>            :     M(phi) - Meridian radius of curvature
+<span class="lineNum">      91 </span>            :     -------------------------------------
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :     Source:
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :         E.J Krakiwsky &amp; D.B. Thomson, 1974,
+<span class="lineNum">      96 </span>            :         GEODETIC POSITION COMPUTATIONS,
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :         Fredericton NB, Canada:
+<span class="lineNum">      99 </span>            :         University of New Brunswick,
+<span class="lineNum">     100 </span>            :         Department of Geodesy and Geomatics Engineering,
+<span class="lineNum">     101 </span>            :         Lecture Notes No. 39,
+<span class="lineNum">     102 </span>            :         99 pp.
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            :         http://www2.unb.ca/gge/Pubs/LN39.pdf
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            : **********************************************************/
+<span class="lineNum">     107 </span><span class="lineCov">        405 :     double s = sin(phi);</span>
+<span class="lineNum">     108 </span><span class="lineCov">        405 :     if (es==0)</span>
+<span class="lineNum">     109 </span>            :         return a;
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :     /* eq. 13a */
+<span class="lineNum">     112 </span><span class="lineCov">        405 :     if (phi == 0)</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :         return a * (1-es);</span>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            :     /* eq. 13b */
+<span class="lineNum">     116 </span><span class="lineCov">        405 :     if (fabs(phi) == M_PI_2)</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :         return a / sqrt(1-es);</span>
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :     /* eq. 13 */
+<span class="lineNum">     120 </span><span class="lineCov">        405 :     return (a * (1 - es) ) / pow(1 - es*s*s, 1.5);</span>
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            : }
+<a name="123"><span class="lineNum">     123 </span>            : </a>
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span><span class="lineCov">        204 : static PJ_LPZ calc_standard_params(PJ_LPZ lpz, PJ *P) {</span>
+<span class="lineNum">     126 </span><span class="lineCov">        204 :     struct pj_opaque_molodensky *Q = (struct pj_opaque_molodensky *) P-&gt;opaque;</span>
+<span class="lineNum">     127 </span>            :     double dphi, dlam, dh;
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            :     /* sines and cosines */
+<span class="lineNum">     130 </span><span class="lineCov">        204 :     double slam = sin(lpz.lam);</span>
+<span class="lineNum">     131 </span><span class="lineCov">        204 :     double clam = cos(lpz.lam);</span>
+<span class="lineNum">     132 </span><span class="lineCov">        204 :     double sphi = sin(lpz.phi);</span>
+<span class="lineNum">     133 </span><span class="lineCov">        204 :     double cphi = cos(lpz.phi);</span>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            :     /* ellipsoid parameters and differences */
+<span class="lineNum">     136 </span><span class="lineCov">        204 :     double f = P-&gt;f, a = P-&gt;a;</span>
+<span class="lineNum">     137 </span><span class="lineCov">        204 :     double dx = Q-&gt;dx, dy = Q-&gt;dy, dz = Q-&gt;dz;</span>
+<span class="lineNum">     138 </span><span class="lineCov">        204 :     double da = Q-&gt;da, df = Q-&gt;df;</span>
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span>            :     /* ellipsoid radii of curvature */
+<span class="lineNum">     141 </span><span class="lineCov">        204 :     double rho = RM(a, P-&gt;es, lpz.phi);</span>
+<span class="lineNum">     142 </span><span class="lineCov">        204 :     double nu  = RN(a, P-&gt;es, lpz.phi);</span>
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span>            :     /* delta phi */
+<span class="lineNum">     145 </span><span class="lineCov">        408 :     dphi  = (-dx*sphi*clam) - (dy*sphi*slam) + (dz*cphi)</span>
+<span class="lineNum">     146 </span><span class="lineCov">        204 :             + ((nu * P-&gt;es * sphi * cphi * da) / a)</span>
+<span class="lineNum">     147 </span><span class="lineCov">        204 :             + (sphi*cphi * ( rho/(1-f) + nu*(1-f))*df);</span>
+<span class="lineNum">     148 </span><span class="lineCov">        204 :     const double dphi_denom = rho + lpz.z;</span>
+<span class="lineNum">     149 </span><span class="lineCov">        204 :     if( dphi_denom == 0.0 ) {</span>
+<span class="lineNum">     150 </span>            :         lpz.lam = HUGE_VAL;
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :         return lpz;</span>
+<span class="lineNum">     152 </span>            :     }
+<span class="lineNum">     153 </span><span class="lineCov">        204 :     dphi /= dphi_denom;</span>
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            :     /* delta lambda */
+<span class="lineNum">     156 </span><span class="lineCov">        204 :     const double dlam_denom = (nu+lpz.z)*cphi;</span>
+<span class="lineNum">     157 </span><span class="lineCov">        204 :     if( dlam_denom == 0.0 ) {</span>
+<span class="lineNum">     158 </span>            :         lpz.lam = HUGE_VAL;
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :         return lpz;</span>
+<span class="lineNum">     160 </span>            :     }
+<span class="lineNum">     161 </span><span class="lineCov">        204 :     dlam = (-dx*slam + dy*clam) / dlam_denom;</span>
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            :     /* delta h */
+<span class="lineNum">     164 </span><span class="lineCov">        204 :     dh = dx*cphi*clam + dy*cphi*slam + dz*sphi - (a/nu)*da + nu*(1-f)*sphi*sphi*df;</span>
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :     lpz.phi = dphi;
+<span class="lineNum">     167 </span>            :     lpz.lam = dlam;
+<span class="lineNum">     168 </span>            :     lpz.z   = dh;
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span><span class="lineCov">        204 :     return lpz;</span>
+<span class="lineNum">     171 </span>            : }
+<a name="172"><span class="lineNum">     172 </span>            : </a>
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span><span class="lineCov">        201 : static PJ_LPZ calc_abridged_params(PJ_LPZ lpz, PJ *P) {</span>
+<span class="lineNum">     175 </span><span class="lineCov">        201 :     struct pj_opaque_molodensky *Q = (struct pj_opaque_molodensky *) P-&gt;opaque;</span>
+<span class="lineNum">     176 </span>            :     double dphi, dlam, dh;
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span>            :     /* sines and cosines */
+<span class="lineNum">     179 </span><span class="lineCov">        201 :     double slam = sin(lpz.lam);</span>
+<span class="lineNum">     180 </span><span class="lineCov">        201 :     double clam = cos(lpz.lam);</span>
+<span class="lineNum">     181 </span><span class="lineCov">        201 :     double sphi = sin(lpz.phi);</span>
+<span class="lineNum">     182 </span><span class="lineCov">        201 :     double cphi = cos(lpz.phi);</span>
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            :     /* ellipsoid parameters and differences */
+<span class="lineNum">     185 </span><span class="lineCov">        201 :     double dx = Q-&gt;dx, dy = Q-&gt;dy, dz = Q-&gt;dz;</span>
+<span class="lineNum">     186 </span><span class="lineCov">        201 :     double da = Q-&gt;da, df = Q-&gt;df;</span>
+<span class="lineNum">     187 </span><span class="lineCov">        201 :     double adffda = (P-&gt;a*df + P-&gt;f*da);</span>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :     /* delta phi */
+<span class="lineNum">     190 </span><span class="lineCov">        201 :     dphi = -dx*sphi*clam - dy*sphi*slam + dz*cphi + adffda*sin(2*lpz.phi);</span>
+<span class="lineNum">     191 </span><span class="lineCov">        201 :     dphi /= RM(P-&gt;a, P-&gt;es, lpz.phi);</span>
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span>            :     /* delta lambda */
+<span class="lineNum">     194 </span><span class="lineCov">        201 :     dlam = -dx*slam + dy*clam;</span>
+<span class="lineNum">     195 </span><span class="lineCov">        201 :     const double dlam_denom = RN(P-&gt;a, P-&gt;es, lpz.phi)*cphi;</span>
+<span class="lineNum">     196 </span><span class="lineCov">        201 :     if( dlam_denom == 0.0 ) {</span>
+<span class="lineNum">     197 </span>            :         lpz.lam = HUGE_VAL;
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :         return lpz;</span>
+<span class="lineNum">     199 </span>            :     }
+<span class="lineNum">     200 </span><span class="lineCov">        201 :     dlam /= dlam_denom;</span>
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span>            :     /* delta h */
+<span class="lineNum">     203 </span><span class="lineCov">        201 :     dh = dx*cphi*clam + dy*cphi*slam + dz*sphi - da + adffda*sphi*sphi;</span>
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span>            :     /* offset coordinate */
+<span class="lineNum">     206 </span>            :     lpz.phi = dphi;
+<span class="lineNum">     207 </span>            :     lpz.lam = dlam;
+<span class="lineNum">     208 </span>            :     lpz.z   = dh;
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span><span class="lineCov">        201 :     return lpz;</span>
+<span class="lineNum">     211 </span>            : }
+<a name="212"><span class="lineNum">     212 </span>            : </a>
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 : static PJ_XY forward_2d(PJ_LP lp, PJ *P) {</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :     PJ_COORD point = {{0,0,0,0}};</span>
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :     point.lp = lp;</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :     point.xyz = forward_3d(point.lpz, P);</span>
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :     return point.xy;</span>
+<span class="lineNum">     221 </span>            : }
+<a name="222"><span class="lineNum">     222 </span>            : </a>
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 : static PJ_LP reverse_2d(PJ_XY xy, PJ *P) {</span>
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :     PJ_COORD point = {{0,0,0,0}};</span>
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :     point.xy = xy;</span>
+<span class="lineNum">     228 </span>            :     point.xyz.z = 0;
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :     point.lpz = reverse_3d(point.xyz, P);</span>
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :     return point.lp;</span>
+<span class="lineNum">     232 </span>            : }
+<a name="233"><span class="lineNum">     233 </span>            : </a>
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">        204 : static PJ_XYZ forward_3d(PJ_LPZ lpz, PJ *P) {</span>
+<span class="lineNum">     236 </span><span class="lineCov">        204 :     struct pj_opaque_molodensky *Q = (struct pj_opaque_molodensky *) P-&gt;opaque;</span>
+<span class="lineNum">     237 </span>            :     PJ_COORD point = {{0,0,0,0}};
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            :     point.lpz = lpz;
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            :     /* calculate parameters depending on the mode we are in */
+<span class="lineNum">     242 </span><span class="lineCov">        204 :     if (Q-&gt;abridged) {</span>
+<span class="lineNum">     243 </span><span class="lineCov">        101 :         lpz = calc_abridged_params(lpz, P);</span>
+<span class="lineNum">     244 </span>            :     } else {
+<span class="lineNum">     245 </span><span class="lineCov">        103 :         lpz = calc_standard_params(lpz, P);</span>
+<span class="lineNum">     246 </span>            :     }
+<span class="lineNum">     247 </span><span class="lineCov">        204 :     if( lpz.lam == HUGE_VAL ) {</span>
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :         proj_errno_set(P, PJD_ERR_TOLERANCE_CONDITION);</span>
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :         return proj_coord_error().xyz;</span>
+<span class="lineNum">     250 </span>            :     }
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span>            :     /* offset coordinate */
+<span class="lineNum">     253 </span><span class="lineCov">        204 :     point.lpz.phi += lpz.phi;</span>
+<span class="lineNum">     254 </span><span class="lineCov">        204 :     point.lpz.lam += lpz.lam;</span>
+<span class="lineNum">     255 </span><span class="lineCov">        204 :     point.lpz.z   += lpz.z;</span>
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span><span class="lineCov">        204 :     return point.xyz;</span>
+<span class="lineNum">     258 </span>            : }
+<a name="259"><span class="lineNum">     259 </span>            : </a>
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span><span class="lineCov">        204 : static PJ_COORD forward_4d(PJ_COORD obs, PJ *P) {</span>
+<span class="lineNum">     262 </span><span class="lineCov">        204 :     obs.xyz = forward_3d(obs.lpz, P);</span>
+<span class="lineNum">     263 </span><span class="lineCov">        204 :     return obs;</span>
+<span class="lineNum">     264 </span>            : }
+<a name="265"><span class="lineNum">     265 </span>            : </a>
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span><span class="lineCov">        201 : static PJ_LPZ reverse_3d(PJ_XYZ xyz, PJ *P) {</span>
+<span class="lineNum">     268 </span><span class="lineCov">        201 :     struct pj_opaque_molodensky *Q = (struct pj_opaque_molodensky *) P-&gt;opaque;</span>
+<span class="lineNum">     269 </span>            :     PJ_COORD point = {{0,0,0,0}};
+<span class="lineNum">     270 </span>            :     PJ_LPZ lpz;
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span>            :     /* calculate parameters depending on the mode we are in */
+<span class="lineNum">     273 </span><span class="lineCov">        201 :     point.xyz = xyz;</span>
+<span class="lineNum">     274 </span><span class="lineCov">        201 :     if (Q-&gt;abridged)</span>
+<span class="lineNum">     275 </span><span class="lineCov">        100 :         lpz = calc_abridged_params(point.lpz, P);</span>
+<span class="lineNum">     276 </span>            :     else
+<span class="lineNum">     277 </span><span class="lineCov">        101 :         lpz = calc_standard_params(point.lpz, P);</span>
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span><span class="lineCov">        201 :     if( lpz.lam == HUGE_VAL ) {</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :         proj_errno_set(P, PJD_ERR_TOLERANCE_CONDITION);</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :         return proj_coord_error().lpz;</span>
+<span class="lineNum">     282 </span>            :     }
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span>            :     /* offset coordinate */
+<span class="lineNum">     285 </span><span class="lineCov">        201 :     point.lpz.phi -= lpz.phi;</span>
+<span class="lineNum">     286 </span><span class="lineCov">        201 :     point.lpz.lam -= lpz.lam;</span>
+<span class="lineNum">     287 </span><span class="lineCov">        201 :     point.lpz.z   -= lpz.z;</span>
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span><span class="lineCov">        201 :     return point.lpz;</span>
+<span class="lineNum">     290 </span>            : }
+<a name="291"><span class="lineNum">     291 </span>            : </a>
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span><span class="lineCov">        201 : static PJ_COORD reverse_4d(PJ_COORD obs, PJ *P) {</span>
+<span class="lineNum">     294 </span><span class="lineCov">        201 :     obs.lpz = reverse_3d(obs.xyz, P);</span>
+<span class="lineNum">     295 </span><span class="lineCov">        201 :     return obs;</span>
+<span class="lineNum">     296 </span>            : }
+<a name="297"><span class="lineNum">     297 </span>            : </a>
+<span class="lineNum">     298 </span>            : 
+<span class="lineNum">     299 </span><span class="lineCov">         30 : PJ *TRANSFORMATION(molodensky,1) {</span>
+<span class="lineNum">     300 </span>            :     int count_required_params = 0;
+<span class="lineNum">     301 </span><span class="lineCov">         10 :     struct pj_opaque_molodensky *Q = static_cast&lt;struct pj_opaque_molodensky*&gt;(pj_calloc(1, sizeof(struct pj_opaque_molodensky)));</span>
+<span class="lineNum">     302 </span><span class="lineCov">         10 :     if (nullptr==Q)</span>
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :         return pj_default_destructor(P, ENOMEM);</span>
+<span class="lineNum">     304 </span><span class="lineCov">         10 :     P-&gt;opaque = (void *) Q;</span>
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span><span class="lineCov">         10 :     P-&gt;fwd4d = forward_4d;</span>
+<span class="lineNum">     307 </span><span class="lineCov">         10 :     P-&gt;inv4d = reverse_4d;</span>
+<span class="lineNum">     308 </span><span class="lineCov">         10 :     P-&gt;fwd3d  = forward_3d;</span>
+<span class="lineNum">     309 </span><span class="lineCov">         10 :     P-&gt;inv3d  = reverse_3d;</span>
+<span class="lineNum">     310 </span><span class="lineCov">         10 :     P-&gt;fwd    = forward_2d;</span>
+<span class="lineNum">     311 </span><span class="lineCov">         10 :     P-&gt;inv    = reverse_2d;</span>
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span><span class="lineCov">         10 :     P-&gt;left   = PJ_IO_UNITS_RADIANS;</span>
+<span class="lineNum">     314 </span><span class="lineCov">         10 :     P-&gt;right  = PJ_IO_UNITS_RADIANS;</span>
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :     /* read args */
+<span class="lineNum">     317 </span><span class="lineCov">         10 :     if (pj_param(P-&gt;ctx, P-&gt;params, &quot;tdx&quot;).i) {</span>
+<span class="lineNum">     318 </span>            :         count_required_params ++;
+<span class="lineNum">     319 </span><span class="lineCov">          9 :         Q-&gt;dx = pj_param(P-&gt;ctx, P-&gt;params, &quot;ddx&quot;).f;</span>
+<span class="lineNum">     320 </span>            :     }
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span><span class="lineCov">         10 :     if (pj_param(P-&gt;ctx, P-&gt;params, &quot;tdy&quot;).i) {</span>
+<span class="lineNum">     323 </span><span class="lineCov">          8 :         count_required_params ++;</span>
+<span class="lineNum">     324 </span><span class="lineCov">          8 :         Q-&gt;dy = pj_param(P-&gt;ctx, P-&gt;params, &quot;ddy&quot;).f;</span>
+<span class="lineNum">     325 </span>            :     }
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span><span class="lineCov">         10 :     if (pj_param(P-&gt;ctx, P-&gt;params, &quot;tdz&quot;).i) {</span>
+<span class="lineNum">     328 </span><span class="lineCov">          8 :         count_required_params ++;</span>
+<span class="lineNum">     329 </span><span class="lineCov">          8 :         Q-&gt;dz = pj_param(P-&gt;ctx, P-&gt;params, &quot;ddz&quot;).f;</span>
+<span class="lineNum">     330 </span>            :     }
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span><span class="lineCov">         10 :     if (pj_param(P-&gt;ctx, P-&gt;params, &quot;tda&quot;).i) {</span>
+<span class="lineNum">     333 </span><span class="lineCov">          8 :         count_required_params ++;</span>
+<span class="lineNum">     334 </span><span class="lineCov">          8 :         Q-&gt;da = pj_param(P-&gt;ctx, P-&gt;params, &quot;dda&quot;).f;</span>
+<span class="lineNum">     335 </span>            :     }
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span><span class="lineCov">         10 :     if (pj_param(P-&gt;ctx, P-&gt;params, &quot;tdf&quot;).i) {</span>
+<span class="lineNum">     338 </span><span class="lineCov">          8 :         count_required_params ++;</span>
+<span class="lineNum">     339 </span><span class="lineCov">          8 :         Q-&gt;df = pj_param(P-&gt;ctx, P-&gt;params, &quot;ddf&quot;).f;</span>
+<span class="lineNum">     340 </span>            :     }
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span><span class="lineCov">         10 :     Q-&gt;abridged = pj_param(P-&gt;ctx, P-&gt;params, &quot;tabridged&quot;).i;</span>
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            :     /* We want all parameters (except +abridged) to be set */
+<span class="lineNum">     345 </span><span class="lineCov">         10 :     if (count_required_params == 0)</span>
+<span class="lineNum">     346 </span><span class="lineCov">          1 :         return pj_default_destructor(P, PJD_ERR_NO_ARGS);</span>
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span><span class="lineCov">          9 :     if (count_required_params != 5)</span>
+<span class="lineNum">     349 </span><span class="lineCov">          1 :         return pj_default_destructor(P, PJD_ERR_MISSING_ARGS);</span>
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span>            :     return P;
+<span class="lineNum">     352 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

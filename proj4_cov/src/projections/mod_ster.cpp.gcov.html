@@ -1,0 +1,363 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/projections/mod_ster.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/projections</a> - mod_ster.cpp<span style="font-size: 80%;"> (source / <a href="mod_ster.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">116</td>
+            <td class="headerCovTableEntry">125</td>
+            <td class="headerCovTableEntryHi">92.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* based upon Snyder and Linck, USGS-NMD */</a>
+<span class="lineNum">       2 </span>            : #define PJ_LIB__
+<span class="lineNum">       3 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">       4 </span>            : #include &quot;proj.h&quot;
+<span class="lineNum">       5 </span>            : #include &quot;proj_internal.h&quot;
+<span class="lineNum">       6 </span>            : #include &lt;math.h&gt;
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : PROJ_HEAD(mil_os, &quot;Miller Oblated Stereographic&quot;) &quot;\n\tAzi(mod)&quot;;
+<span class="lineNum">       9 </span>            : PROJ_HEAD(lee_os, &quot;Lee Oblated Stereographic&quot;) &quot;\n\tAzi(mod)&quot;;
+<span class="lineNum">      10 </span>            : PROJ_HEAD(gs48, &quot;Mod. Stereographic of 48 U.S.&quot;) &quot;\n\tAzi(mod)&quot;;
+<span class="lineNum">      11 </span>            : PROJ_HEAD(alsk, &quot;Mod. Stereographic of Alaska&quot;) &quot;\n\tAzi(mod)&quot;;
+<span class="lineNum">      12 </span>            : PROJ_HEAD(gs50, &quot;Mod. Stereographic of 50 U.S.&quot;) &quot;\n\tAzi(mod)&quot;;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #define EPSLN 1e-12
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : namespace { // anonymous namespace
+<span class="lineNum">      17 </span>            : struct pj_opaque {
+<span class="lineNum">      18 </span>            :     const COMPLEX *zcoeff; \
+<span class="lineNum">      19 </span>            :     double  cchio, schio; \
+<span class="lineNum">      20 </span>            :     int     n;
+<span class="lineNum">      21 </span>            : };
+<span class="lineNum">      22 </span>            : } // anonymous namespace
+<a name="23"><span class="lineNum">      23 </span>            : </a>
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span><span class="lineCov">         28 : static PJ_XY mod_ster_e_forward (PJ_LP lp, PJ *P) {          /* Ellipsoidal, forward */</span>
+<span class="lineNum">      26 </span>            :     PJ_XY xy = {0.0,0.0};
+<span class="lineNum">      27 </span><span class="lineCov">         28 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">      28 </span>            :     double sinlon, coslon, esphi, chi, schi, cchi, s;
+<span class="lineNum">      29 </span>            :     COMPLEX p;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineCov">         28 :     sinlon = sin(lp.lam);</span>
+<span class="lineNum">      32 </span><span class="lineCov">         28 :     coslon = cos(lp.lam);</span>
+<span class="lineNum">      33 </span><span class="lineCov">         28 :     esphi = P-&gt;e * sin(lp.phi);</span>
+<span class="lineNum">      34 </span><span class="lineCov">         56 :     chi = 2. * atan(tan((M_HALFPI + lp.phi) * .5) *</span>
+<span class="lineNum">      35 </span><span class="lineCov">         28 :         pow((1. - esphi) / (1. + esphi), P-&gt;e * .5)) - M_HALFPI;</span>
+<span class="lineNum">      36 </span><span class="lineCov">         28 :     schi = sin(chi);</span>
+<span class="lineNum">      37 </span><span class="lineCov">         28 :     cchi = cos(chi);</span>
+<span class="lineNum">      38 </span><span class="lineCov">         28 :     const double denom = 1. + Q-&gt;schio * schi + Q-&gt;cchio * cchi * coslon;</span>
+<span class="lineNum">      39 </span><span class="lineCov">         28 :     if( denom == 0 ) {</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :         proj_errno_set(P, PJD_ERR_TOLERANCE_CONDITION);</span>
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :         return xy;</span>
+<span class="lineNum">      42 </span>            :     }
+<span class="lineNum">      43 </span><span class="lineCov">         28 :     s = 2. / denom;</span>
+<span class="lineNum">      44 </span><span class="lineCov">         28 :     p.r = s * cchi * sinlon;</span>
+<span class="lineNum">      45 </span><span class="lineCov">         28 :     p.i = s * (Q-&gt;cchio * schi - Q-&gt;schio * cchi * coslon);</span>
+<span class="lineNum">      46 </span><span class="lineCov">         28 :     p = pj_zpoly1(p, Q-&gt;zcoeff, Q-&gt;n);</span>
+<span class="lineNum">      47 </span>            :     xy.x = p.r;
+<span class="lineNum">      48 </span>            :     xy.y = p.i;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span><span class="lineCov">         28 :     return xy;</span>
+<span class="lineNum">      51 </span>            : }
+<a name="52"><span class="lineNum">      52 </span>            : </a>
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span><span class="lineCov">         28 : static PJ_LP mod_ster_e_inverse (PJ_XY xy, PJ *P) {          /* Ellipsoidal, inverse */</span>
+<span class="lineNum">      55 </span>            :     PJ_LP lp = {0.0,0.0};
+<span class="lineNum">      56 </span><span class="lineCov">         28 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">      57 </span>            :     int nn;
+<span class="lineNum">      58 </span>            :     COMPLEX p, fxy, fpxy, dp;
+<span class="lineNum">      59 </span>            :     double den, rh = 0.0, z, sinz = 0.0, cosz = 0.0, chi, phi = 0.0, esphi;
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :     p.r = xy.x;
+<span class="lineNum">      62 </span>            :     p.i = xy.y;
+<span class="lineNum">      63 </span><span class="lineCov">        138 :     for (nn = 20; nn ;--nn) {</span>
+<span class="lineNum">      64 </span><span class="lineCov">         83 :         fxy = pj_zpolyd1(p, Q-&gt;zcoeff, Q-&gt;n, &amp;fpxy);</span>
+<span class="lineNum">      65 </span><span class="lineCov">         83 :         fxy.r -= xy.x;</span>
+<span class="lineNum">      66 </span><span class="lineCov">         83 :         fxy.i -= xy.y;</span>
+<span class="lineNum">      67 </span><span class="lineCov">         83 :         den = fpxy.r * fpxy.r + fpxy.i * fpxy.i;</span>
+<span class="lineNum">      68 </span><span class="lineCov">         83 :         dp.r = -(fxy.r * fpxy.r + fxy.i * fpxy.i) / den;</span>
+<span class="lineNum">      69 </span><span class="lineCov">         83 :         dp.i = -(fxy.i * fpxy.r - fxy.r * fpxy.i) / den;</span>
+<span class="lineNum">      70 </span><span class="lineCov">         83 :         p.r += dp.r;</span>
+<span class="lineNum">      71 </span><span class="lineCov">         83 :         p.i += dp.i;</span>
+<span class="lineNum">      72 </span><span class="lineCov">         83 :         if ((fabs(dp.r) + fabs(dp.i)) &lt;= EPSLN)</span>
+<span class="lineNum">      73 </span>            :             break;
+<span class="lineNum">      74 </span>            :     }
+<span class="lineNum">      75 </span><span class="lineCov">         28 :     if (nn) {</span>
+<span class="lineNum">      76 </span><span class="lineCov">         28 :         rh = hypot(p.r, p.i);</span>
+<span class="lineNum">      77 </span><span class="lineCov">         28 :         z = 2. * atan(.5 * rh);</span>
+<span class="lineNum">      78 </span><span class="lineCov">         28 :         sinz = sin(z);</span>
+<span class="lineNum">      79 </span><span class="lineCov">         28 :         cosz = cos(z);</span>
+<span class="lineNum">      80 </span><span class="lineCov">         28 :         if (fabs(rh) &lt;= EPSLN) {</span>
+<span class="lineNum">      81 </span>            :             /* if we end up here input coordinates were (0,0).
+<span class="lineNum">      82 </span>            :              * pj_inv() adds P-&gt;lam0 to lp.lam, this way we are
+<span class="lineNum">      83 </span>            :              * sure to get the correct offset */
+<span class="lineNum">      84 </span>            :             lp.lam = 0.0;
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :             lp.phi = P-&gt;phi0;</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :             return lp;</span>
+<span class="lineNum">      87 </span>            :         }
+<span class="lineNum">      88 </span><span class="lineCov">         28 :         chi = aasin(P-&gt;ctx, cosz * Q-&gt;schio + p.i * sinz * Q-&gt;cchio / rh);</span>
+<span class="lineNum">      89 </span>            :         phi = chi;
+<span class="lineNum">      90 </span><span class="lineCov">         94 :         for (nn = 20; nn ;--nn) {</span>
+<span class="lineNum">      91 </span>            :             double dphi;
+<span class="lineNum">      92 </span><span class="lineCov">         61 :             esphi = P-&gt;e * sin(phi);</span>
+<span class="lineNum">      93 </span><span class="lineCov">        183 :             dphi = 2. * atan(tan((M_HALFPI + chi) * .5) *</span>
+<span class="lineNum">      94 </span><span class="lineCov">        122 :                 pow((1. + esphi) / (1. - esphi), P-&gt;e * .5)) - M_HALFPI - phi;</span>
+<span class="lineNum">      95 </span><span class="lineCov">         61 :             phi += dphi;</span>
+<span class="lineNum">      96 </span><span class="lineCov">         61 :             if (fabs(dphi) &lt;= EPSLN)</span>
+<span class="lineNum">      97 </span>            :                 break;
+<span class="lineNum">      98 </span>            :         }
+<span class="lineNum">      99 </span>            :     }
+<span class="lineNum">     100 </span><span class="lineCov">         28 :     if (nn) {</span>
+<span class="lineNum">     101 </span>            :         lp.phi = phi;
+<span class="lineNum">     102 </span><span class="lineCov">         84 :         lp.lam = atan2(p.r * sinz, rh * Q-&gt;cchio * cosz - p.i *</span>
+<span class="lineNum">     103 </span><span class="lineCov">         56 :             Q-&gt;schio * sinz);</span>
+<span class="lineNum">     104 </span>            :     } else
+<span class="lineNum">     105 </span>            :         lp.lam = lp.phi = HUGE_VAL;
+<span class="lineNum">     106 </span><span class="lineCov">         28 :     return lp;</span>
+<span class="lineNum">     107 </span>            : }
+<a name="108"><span class="lineNum">     108 </span>            : </a>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineCov">         14 : static PJ *setup(PJ *P) { /* general initialization */</span>
+<span class="lineNum">     111 </span><span class="lineCov">         14 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(P-&gt;opaque);</span>
+<span class="lineNum">     112 </span>            :     double esphi, chio;
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineCov">         14 :     if (P-&gt;es != 0.0) {</span>
+<span class="lineNum">     115 </span><span class="lineCov">          4 :         esphi = P-&gt;e * sin(P-&gt;phi0);</span>
+<span class="lineNum">     116 </span><span class="lineCov">          8 :         chio = 2. * atan(tan((M_HALFPI + P-&gt;phi0) * .5) *</span>
+<span class="lineNum">     117 </span><span class="lineCov">          4 :             pow((1. - esphi) / (1. + esphi), P-&gt;e * .5)) - M_HALFPI;</span>
+<span class="lineNum">     118 </span>            :     } else
+<span class="lineNum">     119 </span><span class="lineCov">         10 :         chio = P-&gt;phi0;</span>
+<span class="lineNum">     120 </span><span class="lineCov">         14 :     Q-&gt;schio = sin(chio);</span>
+<span class="lineNum">     121 </span><span class="lineCov">         14 :     Q-&gt;cchio = cos(chio);</span>
+<span class="lineNum">     122 </span><span class="lineCov">         14 :     P-&gt;inv = mod_ster_e_inverse;</span>
+<span class="lineNum">     123 </span><span class="lineCov">         14 :     P-&gt;fwd = mod_ster_e_forward;</span>
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span><span class="lineCov">         14 :     return P;</span>
+<span class="lineNum">     126 </span>            : }
+<span class="lineNum">     127 </span>            : 
+<a name="128"><span class="lineNum">     128 </span>            : </a>
+<span class="lineNum">     129 </span>            : /* Miller Oblated Stereographic */
+<span class="lineNum">     130 </span><span class="lineCov">          6 : PJ *PROJECTION(mil_os) {</span>
+<span class="lineNum">     131 </span>            :     static const COMPLEX AB[] = {
+<span class="lineNum">     132 </span>            :         {0.924500, 0.},
+<span class="lineNum">     133 </span>            :         {0.,       0.},
+<span class="lineNum">     134 </span>            :         {0.019430, 0.}
+<span class="lineNum">     135 </span>            :     };
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span><span class="lineCov">          2 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(pj_calloc (1, sizeof (struct pj_opaque)));</span>
+<span class="lineNum">     138 </span><span class="lineCov">          2 :     if (nullptr==Q)</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :         return pj_default_destructor (P, ENOMEM);</span>
+<span class="lineNum">     140 </span><span class="lineCov">          2 :     P-&gt;opaque = Q;</span>
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span><span class="lineCov">          2 :     Q-&gt;n = 2;</span>
+<span class="lineNum">     143 </span><span class="lineCov">          2 :     P-&gt;lam0 = DEG_TO_RAD * 20.;</span>
+<span class="lineNum">     144 </span><span class="lineCov">          2 :     P-&gt;phi0 = DEG_TO_RAD * 18.;</span>
+<span class="lineNum">     145 </span><span class="lineCov">          2 :     Q-&gt;zcoeff = AB;</span>
+<span class="lineNum">     146 </span><span class="lineCov">          2 :     P-&gt;es = 0.;</span>
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span><span class="lineCov">          2 :     return setup(P);</span>
+<span class="lineNum">     149 </span>            : }
+<span class="lineNum">     150 </span>            : 
+<a name="151"><span class="lineNum">     151 </span>            : </a>
+<span class="lineNum">     152 </span>            : /* Lee Oblated Stereographic */
+<span class="lineNum">     153 </span><span class="lineCov">          6 : PJ *PROJECTION(lee_os) {</span>
+<span class="lineNum">     154 </span>            :     static const COMPLEX AB[] = {
+<span class="lineNum">     155 </span>            :         {0.721316,    0.},
+<span class="lineNum">     156 </span>            :         {0.,          0.},
+<span class="lineNum">     157 </span>            :         {-0.0088162, -0.00617325}
+<span class="lineNum">     158 </span>            :     };
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span><span class="lineCov">          2 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(pj_calloc (1, sizeof (struct pj_opaque)));</span>
+<span class="lineNum">     161 </span><span class="lineCov">          2 :     if (nullptr==Q)</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :         return pj_default_destructor (P, ENOMEM);</span>
+<span class="lineNum">     163 </span><span class="lineCov">          2 :     P-&gt;opaque = Q;</span>
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span><span class="lineCov">          2 :     Q-&gt;n = 2;</span>
+<span class="lineNum">     166 </span><span class="lineCov">          2 :     P-&gt;lam0 = DEG_TO_RAD * -165.;</span>
+<span class="lineNum">     167 </span><span class="lineCov">          2 :     P-&gt;phi0 = DEG_TO_RAD * -10.;</span>
+<span class="lineNum">     168 </span><span class="lineCov">          2 :     Q-&gt;zcoeff = AB;</span>
+<span class="lineNum">     169 </span><span class="lineCov">          2 :     P-&gt;es = 0.;</span>
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span><span class="lineCov">          2 :    return setup(P);</span>
+<span class="lineNum">     172 </span>            : }
+<a name="173"><span class="lineNum">     173 </span>            : </a>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineCov">          6 : PJ *PROJECTION(gs48) {</span>
+<span class="lineNum">     176 </span>            :     static const COMPLEX /* 48 United States */
+<span class="lineNum">     177 </span>            :     AB[] = {
+<span class="lineNum">     178 </span>            :         {0.98879,   0.},
+<span class="lineNum">     179 </span>            :         {0.,        0.},
+<span class="lineNum">     180 </span>            :         {-0.050909, 0.},
+<span class="lineNum">     181 </span>            :         {0.,        0.},
+<span class="lineNum">     182 </span>            :         {0.075528,  0.}
+<span class="lineNum">     183 </span>            :     };
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineCov">          2 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(pj_calloc (1, sizeof (struct pj_opaque)));</span>
+<span class="lineNum">     186 </span><span class="lineCov">          2 :     if (nullptr==Q)</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :         return pj_default_destructor (P, ENOMEM);</span>
+<span class="lineNum">     188 </span><span class="lineCov">          2 :     P-&gt;opaque = Q;</span>
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span><span class="lineCov">          2 :     Q-&gt;n = 4;</span>
+<span class="lineNum">     191 </span><span class="lineCov">          2 :     P-&gt;lam0 = DEG_TO_RAD * -96.;</span>
+<span class="lineNum">     192 </span><span class="lineCov">          2 :     P-&gt;phi0 = DEG_TO_RAD * 39.;</span>
+<span class="lineNum">     193 </span><span class="lineCov">          2 :     Q-&gt;zcoeff = AB;</span>
+<span class="lineNum">     194 </span><span class="lineCov">          2 :     P-&gt;es = 0.;</span>
+<span class="lineNum">     195 </span><span class="lineCov">          2 :     P-&gt;a = 6370997.;</span>
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span><span class="lineCov">          2 :     return setup(P);</span>
+<span class="lineNum">     198 </span>            : }
+<a name="199"><span class="lineNum">     199 </span>            : </a>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span><span class="lineCov">         12 : PJ *PROJECTION(alsk) {</span>
+<span class="lineNum">     202 </span>            :     static const COMPLEX  ABe[] = { /* Alaska ellipsoid */
+<span class="lineNum">     203 </span>            :         { .9945303, 0.},
+<span class="lineNum">     204 </span>            :         { .0052083, -.0027404},
+<span class="lineNum">     205 </span>            :         { .0072721,  .0048181},
+<span class="lineNum">     206 </span>            :         {-.0151089, -.1932526},
+<span class="lineNum">     207 </span>            :         { .0642675, -.1381226},
+<span class="lineNum">     208 </span>            :         { .3582802, -.2884586},
+<span class="lineNum">     209 </span>            :     };
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :     static const COMPLEX ABs[] = { /* Alaska sphere */
+<span class="lineNum">     212 </span>            :         { .9972523, 0.},
+<span class="lineNum">     213 </span>            :         { .0052513, -.0041175},
+<span class="lineNum">     214 </span>            :         { .0074606,  .0048125},
+<span class="lineNum">     215 </span>            :         {-.0153783, -.1968253},
+<span class="lineNum">     216 </span>            :         { .0636871, -.1408027},
+<span class="lineNum">     217 </span>            :         { .3660976, -.2937382}
+<span class="lineNum">     218 </span>            :     };
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span><span class="lineCov">          4 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(pj_calloc (1, sizeof (struct pj_opaque)));</span>
+<span class="lineNum">     221 </span><span class="lineCov">          4 :     if (nullptr==Q)</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :         return pj_default_destructor (P, ENOMEM);</span>
+<span class="lineNum">     223 </span><span class="lineCov">          4 :     P-&gt;opaque = Q;</span>
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span><span class="lineCov">          4 :     Q-&gt;n = 5;</span>
+<span class="lineNum">     226 </span><span class="lineCov">          4 :     P-&gt;lam0 = DEG_TO_RAD * -152.;</span>
+<span class="lineNum">     227 </span><span class="lineCov">          4 :     P-&gt;phi0 = DEG_TO_RAD * 64.;</span>
+<span class="lineNum">     228 </span><span class="lineCov">          4 :     if (P-&gt;es != 0.0) { /* fixed ellipsoid/sphere */</span>
+<span class="lineNum">     229 </span><span class="lineCov">          2 :         Q-&gt;zcoeff = ABe;</span>
+<span class="lineNum">     230 </span><span class="lineCov">          2 :         P-&gt;a = 6378206.4;</span>
+<span class="lineNum">     231 </span><span class="lineCov">          2 :         P-&gt;e = sqrt(P-&gt;es = 0.00676866);</span>
+<span class="lineNum">     232 </span>            :     } else {
+<span class="lineNum">     233 </span><span class="lineCov">          2 :         Q-&gt;zcoeff = ABs;</span>
+<span class="lineNum">     234 </span><span class="lineCov">          2 :         P-&gt;a = 6370997.;</span>
+<span class="lineNum">     235 </span>            :     }
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span><span class="lineCov">          4 :     return setup(P);</span>
+<span class="lineNum">     238 </span>            : }
+<a name="239"><span class="lineNum">     239 </span>            : </a>
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span><span class="lineCov">         12 : PJ *PROJECTION(gs50) {</span>
+<span class="lineNum">     242 </span>            :     static const COMPLEX  ABe[] = { /* GS50 ellipsoid */
+<span class="lineNum">     243 </span>            :         { .9827497, 0.},
+<span class="lineNum">     244 </span>            :         { .0210669,  .0053804},
+<span class="lineNum">     245 </span>            :         {-.1031415, -.0571664},
+<span class="lineNum">     246 </span>            :         {-.0323337, -.0322847},
+<span class="lineNum">     247 </span>            :         { .0502303,  .1211983},
+<span class="lineNum">     248 </span>            :         { .0251805,  .0895678},
+<span class="lineNum">     249 </span>            :         {-.0012315, -.1416121},
+<span class="lineNum">     250 </span>            :         { .0072202, -.1317091},
+<span class="lineNum">     251 </span>            :         {-.0194029,  .0759677},
+<span class="lineNum">     252 </span>            :         {-.0210072,  .0834037}
+<span class="lineNum">     253 </span>            :     };
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            :     static const COMPLEX ABs[] = { /* GS50 sphere */
+<span class="lineNum">     256 </span>            :         { .9842990, 0.},
+<span class="lineNum">     257 </span>            :         { .0211642,  .0037608},
+<span class="lineNum">     258 </span>            :         {-.1036018, -.0575102},
+<span class="lineNum">     259 </span>            :         {-.0329095, -.0320119},
+<span class="lineNum">     260 </span>            :         { .0499471,  .1223335},
+<span class="lineNum">     261 </span>            :         { .0260460,  .0899805},
+<span class="lineNum">     262 </span>            :         { .0007388, -.1435792},
+<span class="lineNum">     263 </span>            :         { .0075848, -.1334108},
+<span class="lineNum">     264 </span>            :         {-.0216473,  .0776645},
+<span class="lineNum">     265 </span>            :         {-.0225161,  .0853673}
+<span class="lineNum">     266 </span>            :     };
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span><span class="lineCov">          4 :     struct pj_opaque *Q = static_cast&lt;struct pj_opaque*&gt;(pj_calloc (1, sizeof (struct pj_opaque)));</span>
+<span class="lineNum">     269 </span><span class="lineCov">          4 :     if (nullptr==Q)</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :         return pj_default_destructor (P, ENOMEM);</span>
+<span class="lineNum">     271 </span><span class="lineCov">          4 :     P-&gt;opaque = Q;</span>
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span><span class="lineCov">          4 :     Q-&gt;n = 9;</span>
+<span class="lineNum">     274 </span><span class="lineCov">          4 :     P-&gt;lam0 = DEG_TO_RAD * -120.;</span>
+<span class="lineNum">     275 </span><span class="lineCov">          4 :     P-&gt;phi0 = DEG_TO_RAD * 45.;</span>
+<span class="lineNum">     276 </span><span class="lineCov">          4 :     if (P-&gt;es != 0.0) { /* fixed ellipsoid/sphere */</span>
+<span class="lineNum">     277 </span><span class="lineCov">          2 :         Q-&gt;zcoeff = ABe;</span>
+<span class="lineNum">     278 </span><span class="lineCov">          2 :         P-&gt;a = 6378206.4;</span>
+<span class="lineNum">     279 </span><span class="lineCov">          2 :         P-&gt;e = sqrt(P-&gt;es = 0.00676866);</span>
+<span class="lineNum">     280 </span>            :     } else {
+<span class="lineNum">     281 </span><span class="lineCov">          2 :         Q-&gt;zcoeff = ABs;</span>
+<span class="lineNum">     282 </span><span class="lineCov">          2 :         P-&gt;a = 6370997.;</span>
+<span class="lineNum">     283 </span>            :     }
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span><span class="lineCov">          4 :     return setup(P);</span>
+<span class="lineNum">     286 </span>            : }
+<span class="lineNum">     287 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

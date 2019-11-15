@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - test/unit/proj_context_test.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">test/unit</a> - proj_context_test.cpp<span style="font-size: 80%;"> (source / <a href="proj_context_test.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">38</td>
+            <td class="headerCovTableEntry">38</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryMed">83.3 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /******************************************************************************</a>
+<span class="lineNum">       2 </span>            :  *
+<span class="lineNum">       3 </span>            :  * Project:  PROJ
+<span class="lineNum">       4 </span>            :  * Purpose:  Test functions in proj_context namespae
+<span class="lineNum">       5 </span>            :  * Author:   Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  ******************************************************************************
+<span class="lineNum">       8 </span>            :  * Copyright (c) 2019, Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      11 </span>            :  * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      12 </span>            :  * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      13 </span>            :  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      14 </span>            :  * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      15 </span>            :  * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      16 </span>            :  *
+<span class="lineNum">      17 </span>            :  * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      18 </span>            :  * in all copies or substantial portions of the Software.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      21 </span>            :  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      22 </span>            :  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      23 </span>            :  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      24 </span>            :  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      25 </span>            :  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      26 </span>            :  * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      27 </span>            :  ****************************************************************************/
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      30 </span>            : #ifdef _MSC_VER
+<span class="lineNum">      31 </span>            : #include &lt;io.h&gt;
+<span class="lineNum">      32 </span>            : #else
+<span class="lineNum">      33 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      34 </span>            : #endif
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : #include &quot;proj.h&quot;
+<span class="lineNum">      37 </span>            : #include &quot;proj_internal.h&quot;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : #include &quot;gtest_include.h&quot;
+<span class="lineNum">      40 </span>            : 
+<a name="41"><span class="lineNum">      41 </span>            : namespace {</a>
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span><span class="lineCov">          2 : static std::string createTempDict(std::string &amp;dirname) {</span>
+<span class="lineNum">      44 </span><span class="lineCov">          2 :     const char *temp_dir = getenv(&quot;TEMP&quot;);</span>
+<span class="lineNum">      45 </span><span class="lineCov">          2 :     if (!temp_dir) {</span>
+<span class="lineNum">      46 </span><span class="lineCov">          2 :         temp_dir = getenv(&quot;TMP&quot;);</span>
+<span class="lineNum">      47 </span>            :     }
+<span class="lineNum">      48 </span>            : #ifndef WIN32
+<span class="lineNum">      49 </span><span class="lineCov">          2 :     if (!temp_dir) {</span>
+<span class="lineNum">      50 </span>            :         temp_dir = &quot;/tmp&quot;;
+<span class="lineNum">      51 </span>            :     }
+<span class="lineNum">      52 </span>            : #endif
+<span class="lineNum">      53 </span><span class="lineCov">          2 :     if (!temp_dir)</span>
+<span class="lineNum">      54 </span>            :         return std::string();
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :     dirname = temp_dir;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :     std::string tmpFilename;
+<span class="lineNum">      59 </span>            :     tmpFilename = temp_dir;
+<span class="lineNum">      60 </span>            :     tmpFilename += DIR_CHAR;
+<span class="lineNum">      61 </span>            :     tmpFilename += &quot;temp_proj_dic&quot;;
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span><span class="lineCov">          2 :     FILE *f = fopen(tmpFilename.c_str(), &quot;wt&quot;);</span>
+<span class="lineNum">      64 </span><span class="lineCov">          2 :     if (!f)</span>
+<span class="lineNum">      65 </span>            :         return std::string();
+<span class="lineNum">      66 </span>            :     fprintf(
+<span class="lineNum">      67 </span>            :         f,
+<span class="lineNum">      68 </span>            :         &quot;&lt;MY_PIPELINE&gt; +proj=pipeline +step +proj=utm +zone=31 +ellps=GRS80\n&quot;);
+<span class="lineNum">      69 </span><span class="lineCov">          2 :     fclose(f);</span>
+<span class="lineNum">      70 </span>            :     return tmpFilename;
+<span class="lineNum">      71 </span>            : }
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            : static int MyUnlink(const std::string &amp;filename) {
+<span class="lineNum">      76 </span>            : #ifdef _MSC_VER
+<span class="lineNum">      77 </span>            :     return _unlink(filename.c_str());
+<span class="lineNum">      78 </span>            : #else
+<span class="lineNum">      79 </span><span class="lineCov">          1 :     return unlink(filename.c_str());</span>
+<span class="lineNum">      80 </span>            : #endif
+<span class="lineNum">      81 </span>            : }
+<span class="lineNum">      82 </span>            : 
+<a name="83"><span class="lineNum">      83 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span><span class="lineCov">          8 : TEST(proj_context, proj_context_set_file_finder) {</span>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :     std::string dirname;
+<span class="lineNum">      88 </span><span class="lineCov">          1 :     auto filename = createTempDict(dirname);</span>
+<span class="lineNum">      89 </span><span class="lineCov">          1 :     if (filename.empty())</span>
+<span class="lineNum">      90 </span>            :         return;
+<span class="lineNum">      91 </span>            : 
+<a name="92"><span class="lineNum">      92 </span><span class="lineCov">          1 :     auto ctx = proj_context_create();</span></a>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineCov">          3 :     struct FinderData {</span>
+<span class="lineNum">      95 </span>            :         PJ_CONTEXT *got_ctx = nullptr;
+<span class="lineNum">      96 </span>            :         std::string dirname{};
+<span class="lineNum">      97 </span>            :         std::string tmpFilename{};
+<span class="lineNum">      98 </span>            :     };
+<a name="99"><span class="lineNum">      99 </span>            : </a>
+<span class="lineNum">     100 </span>            :     const auto finder = [](PJ_CONTEXT *got_ctx, const char *file,
+<span class="lineNum">     101 </span><span class="lineCov">          8 :                            void *user_data) -&gt; const char * {</span>
+<span class="lineNum">     102 </span>            :         auto finderData = static_cast&lt;FinderData *&gt;(user_data);
+<span class="lineNum">     103 </span><span class="lineCov">          4 :         finderData-&gt;got_ctx = got_ctx;</span>
+<span class="lineNum">     104 </span><span class="lineCov">          4 :         finderData-&gt;tmpFilename = finderData-&gt;dirname;</span>
+<span class="lineNum">     105 </span>            :         finderData-&gt;tmpFilename += DIR_CHAR;
+<span class="lineNum">     106 </span>            :         finderData-&gt;tmpFilename += file;
+<span class="lineNum">     107 </span><span class="lineCov">          4 :         return finderData-&gt;tmpFilename.c_str();</span>
+<span class="lineNum">     108 </span><span class="lineCov">          4 :     };</span>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineCov">          1 :     FinderData finderData;</span>
+<span class="lineNum">     111 </span>            :     finderData.dirname = dirname;
+<span class="lineNum">     112 </span><span class="lineCov">          1 :     proj_context_set_file_finder(ctx, finder, &amp;finderData);</span>
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineCov">          1 :     auto P = proj_create(ctx, &quot;+init=temp_proj_dic:MY_PIPELINE&quot;);</span>
+<span class="lineNum">     115 </span><span class="lineCov">          2 :     EXPECT_NE(P, nullptr);</span>
+<span class="lineNum">     116 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span><span class="lineCov">          2 :     EXPECT_EQ(finderData.got_ctx, ctx);</span>
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span><span class="lineCov">          1 :     proj_context_destroy(ctx);</span>
+<span class="lineNum">     121 </span>            : }
+<span class="lineNum">     122 </span>            : 
+<a name="123"><span class="lineNum">     123 </span>            : // ---------------------------------------------------------------------------</a>
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span><span class="lineCov">          8 : TEST(proj_context, proj_context_set_search_paths) {</span>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :     std::string dirname;
+<span class="lineNum">     128 </span><span class="lineCov">          1 :     auto filename = createTempDict(dirname);</span>
+<span class="lineNum">     129 </span><span class="lineCov">          1 :     if (filename.empty())</span>
+<span class="lineNum">     130 </span>            :         return;
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span><span class="lineCov">          1 :     auto ctx = proj_context_create();</span>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span><span class="lineCov">          1 :     const char *path = dirname.c_str();</span>
+<span class="lineNum">     135 </span><span class="lineCov">          1 :     proj_context_set_search_paths(ctx, 1, &amp;path);</span>
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span><span class="lineCov">          1 :     auto P = proj_create(ctx, &quot;+init=temp_proj_dic:MY_PIPELINE&quot;);</span>
+<span class="lineNum">     138 </span><span class="lineCov">          2 :     EXPECT_NE(P, nullptr);</span>
+<span class="lineNum">     139 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span><span class="lineCov">          1 :     proj_context_destroy(ctx);</span>
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :     MyUnlink(filename);
+<a name="144"><span class="lineNum">     144 </span>            : }</a>
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span><span class="lineCov">          3 : } // namespace</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/apps/cct.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/apps</a> - cct.cpp<span style="font-size: 80%;"> (source / <a href="cct.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">94</td>
+            <td class="headerCovTableEntry">149</td>
+            <td class="headerCovTableEntryLo">63.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /***********************************************************************</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :                  The cct 4D Transformation program
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : ************************************************************************
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : cct is a 4D equivalent to the &quot;proj&quot; projection program.
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : cct is an acronym meaning &quot;Coordinate Conversion and Transformation&quot;.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : The acronym refers to definitions given in the OGC 08-015r2/ISO-19111
+<span class="lineNum">      12 </span>            : standard &quot;Geographical Information -- Spatial Referencing by Coordinates&quot;,
+<span class="lineNum">      13 </span>            : which defines two different classes of coordinate operations:
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : *Coordinate Conversions*, which are coordinate operations where input
+<span class="lineNum">      16 </span>            : and output datum are identical (e.g. conversion from geographical to
+<span class="lineNum">      17 </span>            : cartesian coordinates) and
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : *Coordinate Transformations*, which are coordinate operations where
+<span class="lineNum">      20 </span>            : input and output datums differ (e.g. change of reference frame).
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : cct, however, also refers to Carl Christian Tscherning (1942--2014),
+<span class="lineNum">      23 </span>            : professor of Geodesy at the University of Copenhagen, mentor and advisor
+<span class="lineNum">      24 </span>            : for a generation of Danish geodesists, colleague and collaborator for
+<span class="lineNum">      25 </span>            : two generations of global geodesists, Secretary General for the
+<span class="lineNum">      26 </span>            : International Association of Geodesy, IAG (1995--2007), fellow of the
+<span class="lineNum">      27 </span>            : American Geophysical Union (1991), recipient of the IAG Levallois Medal
+<span class="lineNum">      28 </span>            : (2007), the European Geosciences Union Vening Meinesz Medal (2008), and
+<span class="lineNum">      29 </span>            : of numerous other honours.
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : cct, or Christian, as he was known to most of us, was recognized for his
+<span class="lineNum">      32 </span>            : good mood, his sharp wit, his tireless work, and his great commitment to
+<span class="lineNum">      33 </span>            : the development of geodesy - both through his scientific contributions,
+<span class="lineNum">      34 </span>            : comprising more than 250 publications, and by his mentoring and teaching
+<span class="lineNum">      35 </span>            : of the next generations of geodesists.
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : As Christian was an avid Fortran programmer, and a keen Unix connoisseur,
+<span class="lineNum">      38 </span>            : he would have enjoyed to know that his initials would be used to name a
+<span class="lineNum">      39 </span>            : modest Unix style transformation filter, hinting at the tireless aspect
+<span class="lineNum">      40 </span>            : of his personality, which was certainly one of the reasons he accomplished
+<span class="lineNum">      41 </span>            : so much, and meant so much to so many people.
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : Hence, in honour of cct (the geodesist) this is cct (the program).
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : ************************************************************************
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            : Thomas Knudsen, thokn@sdfe.dk, 2016-05-25/2017-10-26
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : ************************************************************************
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : * Copyright (c) 2016, 2017 Thomas Knudsen
+<span class="lineNum">      52 </span>            : * Copyright (c) 2017, SDFE
+<span class="lineNum">      53 </span>            : *
+<span class="lineNum">      54 </span>            : * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      55 </span>            : * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      56 </span>            : * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      57 </span>            : * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      58 </span>            : * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      59 </span>            : * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      60 </span>            : *
+<span class="lineNum">      61 </span>            : * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      62 </span>            : * in all copies or substantial portions of the Software.
+<span class="lineNum">      63 </span>            : *
+<span class="lineNum">      64 </span>            : * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      65 </span>            : * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      66 </span>            : * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      67 </span>            : * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      68 </span>            : * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      69 </span>            : * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      70 </span>            : * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            : ***********************************************************************/
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            : #include &lt;ctype.h&gt;
+<span class="lineNum">      75 </span>            : #include &lt;math.h&gt;
+<span class="lineNum">      76 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      77 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      78 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      79 </span>            : #include &lt;stdarg.h&gt;
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            : #include &quot;proj.h&quot;
+<span class="lineNum">      82 </span>            : #include &quot;proj_internal.h&quot;
+<span class="lineNum">      83 </span>            : #include &quot;proj_strtod.h&quot;
+<span class="lineNum">      84 </span>            : #include &quot;optargpm.h&quot;
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            : static void logger(void *data, int level, const char *msg);
+<span class="lineNum">      88 </span>            : static void print(PJ_LOG_LEVEL log_level, const char *fmt, ...);
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            : /* Prototypes from functions in this file */
+<span class="lineNum">      91 </span>            : char *column (char *buf, int n);
+<span class="lineNum">      92 </span>            : PJ_COORD parse_input_line (char *buf, int *columns, double fixed_height, double fixed_time);
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            : static const char usage[] = {
+<span class="lineNum">      96 </span>            :     &quot;--------------------------------------------------------------------------------\n&quot;
+<span class="lineNum">      97 </span>            :     &quot;Usage: %s [-options]... [+operator_specs]... infile...\n&quot;
+<span class="lineNum">      98 </span>            :     &quot;--------------------------------------------------------------------------------\n&quot;
+<span class="lineNum">      99 </span>            :     &quot;Options:\n&quot;
+<span class="lineNum">     100 </span>            :     &quot;--------------------------------------------------------------------------------\n&quot;
+<span class="lineNum">     101 </span>            :     &quot;    -c x,y,z,t        Specify input columns for (up to) 4 input parameters.\n&quot;
+<span class="lineNum">     102 </span>            :     &quot;                      Defaults to 1,2,3,4\n&quot;
+<span class="lineNum">     103 </span>            :     &quot;    -d n              Specify number of decimals in output.\n&quot;
+<span class="lineNum">     104 </span>            :     &quot;    -I                Do the inverse transformation\n&quot;
+<span class="lineNum">     105 </span>            :     &quot;    -o /path/to/file  Specify output file name\n&quot;
+<span class="lineNum">     106 </span>            :     &quot;    -t value          Provide a fixed t value for all input data (e.g. -t 0)\n&quot;
+<span class="lineNum">     107 </span>            :     &quot;    -z value          Provide a fixed z value for all input data (e.g. -z 0)\n&quot;
+<span class="lineNum">     108 </span>            :     &quot;    -s n              Skip n first lines of a infile\n&quot;
+<span class="lineNum">     109 </span>            :     &quot;    -v                Verbose: Provide non-essential informational output.\n&quot;
+<span class="lineNum">     110 </span>            :     &quot;                      Repeat -v for more verbosity (e.g. -vv)\n&quot;
+<span class="lineNum">     111 </span>            :     &quot;--------------------------------------------------------------------------------\n&quot;
+<span class="lineNum">     112 </span>            :     &quot;Long Options:\n&quot;
+<span class="lineNum">     113 </span>            :     &quot;--------------------------------------------------------------------------------\n&quot;
+<span class="lineNum">     114 </span>            :     &quot;    --output          Alias for -o\n&quot;
+<span class="lineNum">     115 </span>            :     &quot;    --columns         Alias for -c\n&quot;
+<span class="lineNum">     116 </span>            :     &quot;    --decimals        Alias for -d\n&quot;
+<span class="lineNum">     117 </span>            :     &quot;    --height          Alias for -z\n&quot;
+<span class="lineNum">     118 </span>            :     &quot;    --time            Alias for -t\n&quot;
+<span class="lineNum">     119 </span>            :     &quot;    --verbose         Alias for -v\n&quot;
+<span class="lineNum">     120 </span>            :     &quot;    --inverse         Alias for -I\n&quot;
+<span class="lineNum">     121 </span>            :     &quot;    --skip-lines      Alias for -s\n&quot;
+<span class="lineNum">     122 </span>            :     &quot;    --help            Alias for -h\n&quot;
+<span class="lineNum">     123 </span>            :     &quot;    --version         Print version number\n&quot;
+<span class="lineNum">     124 </span>            :     &quot;--------------------------------------------------------------------------------\n&quot;
+<span class="lineNum">     125 </span>            :     &quot;Operator Specs:\n&quot;
+<span class="lineNum">     126 </span>            :     &quot;--------------------------------------------------------------------------------\n&quot;
+<span class="lineNum">     127 </span>            :     &quot;The operator specs describe the action to be performed by cct, e.g:\n&quot;
+<span class="lineNum">     128 </span>            :     &quot;\n&quot;
+<span class="lineNum">     129 </span>            :     &quot;        +proj=utm  +ellps=GRS80  +zone=32\n&quot;
+<span class="lineNum">     130 </span>            :     &quot;\n&quot;
+<span class="lineNum">     131 </span>            :     &quot;instructs cct to convert input data to Universal Transverse Mercator, zone 32\n&quot;
+<span class="lineNum">     132 </span>            :     &quot;coordinates, based on the GRS80 ellipsoid.\n&quot;
+<span class="lineNum">     133 </span>            :     &quot;\n&quot;
+<span class="lineNum">     134 </span>            :     &quot;Hence, the command\n&quot;
+<span class="lineNum">     135 </span>            :     &quot;\n&quot;
+<span class="lineNum">     136 </span>            :     &quot;        echo 12 55 | cct -z0 -t0 +proj=utm +zone=32 +ellps=GRS80\n&quot;
+<span class="lineNum">     137 </span>            :     &quot;\n&quot;
+<span class="lineNum">     138 </span>            :     &quot;Should give results comparable to the classic proj command\n&quot;
+<span class="lineNum">     139 </span>            :     &quot;\n&quot;
+<span class="lineNum">     140 </span>            :     &quot;        echo 12 55 | proj +proj=utm +zone=32 +ellps=GRS80\n&quot;
+<span class="lineNum">     141 </span>            :     &quot;--------------------------------------------------------------------------------\n&quot;
+<span class="lineNum">     142 </span>            :     &quot;Examples:\n&quot;
+<span class="lineNum">     143 </span>            :     &quot;--------------------------------------------------------------------------------\n&quot;
+<span class="lineNum">     144 </span>            :     &quot;1. convert geographical input to UTM zone 32 on the GRS80 ellipsoid:\n&quot;
+<span class="lineNum">     145 </span>            :     &quot;    cct +proj=utm +ellps=GRS80 +zone=32\n&quot;
+<span class="lineNum">     146 </span>            :     &quot;2. roundtrip accuracy check for the case above:\n&quot;
+<span class="lineNum">     147 </span>            :     &quot;    cct +proj=pipeline +proj=utm +ellps=GRS80 +zone=32 +step +step +inv\n&quot;
+<span class="lineNum">     148 </span>            :     &quot;3. as (1) but specify input columns for longitude, latitude, height and time:\n&quot;
+<span class="lineNum">     149 </span>            :     &quot;    cct -c 5,2,1,4  +proj=utm +ellps=GRS80 +zone=32\n&quot;
+<span class="lineNum">     150 </span>            :     &quot;4. as (1) but specify fixed height and time, hence needing only 2 cols in input:\n&quot;
+<span class="lineNum">     151 </span>            :     &quot;    cct -t 0 -z 0  +proj=utm  +ellps=GRS80  +zone=32\n&quot;
+<span class="lineNum">     152 </span>            :     &quot;--------------------------------------------------------------------------------\n&quot;
+<span class="lineNum">     153 </span>            : };
+<a name="154"><span class="lineNum">     154 </span>            : </a>
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span><span class="lineCov">          3 : static void logger(void *data, int level, const char *msg) {</span>
+<span class="lineNum">     157 </span>            :     FILE *stream;
+<span class="lineNum">     158 </span><span class="lineCov">          3 :     int log_tell = proj_log_level(PJ_DEFAULT_CTX, PJ_LOG_TELL);</span>
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            :     stream  = (FILE *) data;
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            :     /* if we use PJ_LOG_NONE we always want to print stuff to stream */
+<span class="lineNum">     163 </span><span class="lineCov">          3 :     if (level == PJ_LOG_NONE) {</span>
+<span class="lineNum">     164 </span>            :         fprintf(stream, &quot;%s&quot;, msg);
+<span class="lineNum">     165 </span>            :         return;
+<span class="lineNum">     166 </span>            :     }
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            :     /* should always print to stderr if level == PJ_LOG_ERROR */
+<span class="lineNum">     169 </span><span class="lineCov">          2 :     if (level == PJ_LOG_ERROR) {</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :         fprintf(stderr, &quot;%s&quot;, msg);</span>
+<span class="lineNum">     171 </span>            :         return;
+<span class="lineNum">     172 </span>            :     }
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            :     /* otherwise only print if log level set by user is high enough */
+<span class="lineNum">     175 </span><span class="lineCov">          2 :     if (level &lt;= log_tell)</span>
+<span class="lineNum">     176 </span>            :         fprintf(stream, &quot;%s&quot;, msg);
+<span class="lineNum">     177 </span>            : }
+<span class="lineNum">     178 </span>            : 
+<a name="179"><span class="lineNum">     179 </span>            : FILE *fout;</a>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineCov">          3 : static void print(PJ_LOG_LEVEL log_level, const char *fmt, ...) {</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            :     va_list args;
+<span class="lineNum">     184 </span>            :     char *msg_buf;
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineCov">          3 :     va_start( args, fmt );</span>
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span><span class="lineCov">          3 :     msg_buf = (char *) malloc(100000);</span>
+<span class="lineNum">     189 </span><span class="lineCov">          3 :     if( msg_buf == nullptr ) {</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :         va_end( args );</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :         return;</span>
+<span class="lineNum">     192 </span>            :     }
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span>            :     vsprintf( msg_buf, fmt, args );
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span><span class="lineCov">          3 :     logger((void *) fout, log_level, msg_buf);</span>
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span><span class="lineCov">          3 :     va_end( args );</span>
+<span class="lineNum">     199 </span><span class="lineCov">          3 :     free( msg_buf );</span>
+<span class="lineNum">     200 </span>            : }
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span><span class="lineCov">          1 : int main(int argc, char **argv) {</span>
+<span class="lineNum">     204 </span>            :     PJ *P;
+<span class="lineNum">     205 </span>            :     PJ_COORD point;
+<span class="lineNum">     206 </span>            :     PJ_PROJ_INFO info;
+<span class="lineNum">     207 </span>            :     OPTARGS *o;
+<span class="lineNum">     208 </span><span class="lineCov">          1 :     char blank_comment[] = &quot;&quot;;</span>
+<span class="lineNum">     209 </span><span class="lineCov">          1 :     char whitespace[] = &quot; &quot;;</span>
+<span class="lineNum">     210 </span>            :     char *comment;
+<span class="lineNum">     211 </span>            :     char *comment_delimiter;
+<span class="lineNum">     212 </span>            :     char *buf;
+<span class="lineNum">     213 </span>            :     int i, nfields = 4, skip_lines = 0, verbose;
+<span class="lineNum">     214 </span>            :     double fixed_z = HUGE_VAL, fixed_time = HUGE_VAL;
+<span class="lineNum">     215 </span>            :     int decimals_angles = 10;
+<span class="lineNum">     216 </span>            :     int decimals_distances = 4;
+<span class="lineNum">     217 </span><span class="lineCov">          1 :     int columns_xyzt[] = {1, 2, 3, 4};</span>
+<span class="lineNum">     218 </span><span class="lineCov">          1 :     const char *longflags[]  = {&quot;v=verbose&quot;, &quot;h=help&quot;, &quot;I=inverse&quot;, &quot;version&quot;, nullptr};</span>
+<span class="lineNum">     219 </span><span class="lineCov">          1 :     const char *longkeys[]   = {</span>
+<span class="lineNum">     220 </span>            :         &quot;o=output&quot;,
+<span class="lineNum">     221 </span>            :         &quot;c=columns&quot;,
+<span class="lineNum">     222 </span>            :         &quot;d=decimals&quot;,
+<span class="lineNum">     223 </span>            :         &quot;z=height&quot;,
+<span class="lineNum">     224 </span>            :         &quot;t=time&quot;,
+<span class="lineNum">     225 </span>            :         &quot;s=skip-lines&quot;,
+<span class="lineNum">     226 </span>            :         nullptr};
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">          1 :     fout = stdout;</span>
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            :     /* coverity[tainted_data] */
+<span class="lineNum">     231 </span><span class="lineCov">          1 :     o = opt_parse (argc, argv, &quot;hvI&quot;, &quot;cdozts&quot;, longflags, longkeys);</span>
+<span class="lineNum">     232 </span><span class="lineCov">          1 :     if (nullptr==o)</span>
+<span class="lineNum">     233 </span>            :         return 0;
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">          1 :     if (opt_given (o, &quot;h&quot;) || argc==1) {</span>
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :         printf (usage, o-&gt;progname);</span>
+<span class="lineNum">     237 </span>            :         return 0;
+<span class="lineNum">     238 </span>            :     }
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span><span class="lineCov">          1 :     PJ_DIRECTION direction = opt_given (o, &quot;I&quot;)? PJ_INV: PJ_FWD;</span>
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span><span class="lineCov">          1 :     verbose   = MIN(opt_given (o, &quot;v&quot;), 3); /* log level can't be larger than 3 */</span>
+<span class="lineNum">     243 </span><span class="lineCov">          1 :     proj_log_level (PJ_DEFAULT_CTX, static_cast&lt;PJ_LOG_LEVEL&gt;(verbose));</span>
+<span class="lineNum">     244 </span><span class="lineCov">          1 :     proj_log_func  (PJ_DEFAULT_CTX, (void *) fout, logger);</span>
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span><span class="lineCov">          1 :     if (opt_given (o, &quot;version&quot;)) {</span>
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :         print (PJ_LOG_NONE, &quot;%s: %s\n&quot;, o-&gt;progname, pj_get_release ());</span>
+<span class="lineNum">     248 </span>            :         return 0;
+<span class="lineNum">     249 </span>            :     }
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span><span class="lineCov">          1 :     if (opt_given (o, &quot;o&quot;))</span>
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :         fout = fopen (opt_arg (o, &quot;output&quot;), &quot;wt&quot;);</span>
+<span class="lineNum">     253 </span><span class="lineCov">          1 :     if (nullptr==fout) {</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :         print (PJ_LOG_ERROR, &quot;%s: Cannot open '%s' for output\n&quot;, o-&gt;progname, opt_arg (o, &quot;output&quot;));</span>
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :         free (o);</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :         return 1;</span>
+<span class="lineNum">     257 </span>            :     }
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span><span class="lineCov">          1 :     print (PJ_LOG_TRACE, &quot;%s: Running in very verbose mode\n&quot;, o-&gt;progname);</span>
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span><span class="lineCov">          1 :     if (opt_given (o, &quot;z&quot;)) {</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :         fixed_z = proj_atof (opt_arg (o, &quot;z&quot;));</span>
+<span class="lineNum">     263 </span>            :         nfields--;
+<span class="lineNum">     264 </span>            :     }
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span><span class="lineCov">          1 :     if (opt_given (o, &quot;t&quot;)) {</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :         fixed_time = proj_atof (opt_arg (o, &quot;t&quot;));</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :         nfields--;</span>
+<span class="lineNum">     269 </span>            :     }
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span><span class="lineCov">          1 :      if (opt_given (o, &quot;d&quot;)) {</span>
+<span class="lineNum">     272 </span>            :         int dec = atoi (opt_arg (o, &quot;d&quot;));
+<span class="lineNum">     273 </span>            :         decimals_angles = dec;
+<span class="lineNum">     274 </span>            :         decimals_distances = dec;
+<span class="lineNum">     275 </span>            :     }
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span><span class="lineCov">          1 :     if (opt_given (o, &quot;s&quot;)) {</span>
+<span class="lineNum">     278 </span>            :         skip_lines = atoi (opt_arg(o, &quot;s&quot;));
+<span class="lineNum">     279 </span>            :     }
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span><span class="lineCov">          1 :     if (opt_given (o, &quot;c&quot;)) {</span>
+<span class="lineNum">     282 </span>            :         int ncols;
+<span class="lineNum">     283 </span>            :         /* reset column numbers to ease comment output later on */
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :         for (i=0; i&lt;4; i++)</span>
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :             columns_xyzt[i] = 0;</span>
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            :         /* cppcheck-suppress invalidscanf */
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :         ncols = sscanf (opt_arg (o, &quot;c&quot;), &quot;%d,%d,%d,%d&quot;, columns_xyzt, columns_xyzt+1, columns_xyzt+2, columns_xyzt+3);</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :         if (ncols != nfields) {</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :             print (PJ_LOG_ERROR, &quot;%s: Too few input columns given: '%s'\n&quot;, o-&gt;progname, opt_arg (o, &quot;c&quot;));</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :             free (o);</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :             if (stdout != fout)</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :                 fclose (fout);</span>
+<span class="lineNum">     294 </span>            :             return 1;
+<span class="lineNum">     295 </span>            :         }
+<span class="lineNum">     296 </span>            :     }
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            :     /* Setup transformation */
+<span class="lineNum">     299 </span><span class="lineCov">          1 :     P = proj_create_argv (nullptr, o-&gt;pargc, o-&gt;pargv);</span>
+<span class="lineNum">     300 </span><span class="lineCov">          1 :     if ((nullptr==P) || (0==o-&gt;pargc)) {</span>
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :         print (PJ_LOG_ERROR, &quot;%s: Bad transformation arguments - (%s)\n    '%s -h' for help\n&quot;,</span>
+<span class="lineNum">     302 </span>            :                  o-&gt;progname, pj_strerrno (proj_errno(P)), o-&gt;progname);
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :         free (o);</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :         if (stdout != fout)</span>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :             fclose (fout);</span>
+<span class="lineNum">     306 </span>            :         return 1;
+<span class="lineNum">     307 </span>            :     }
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span><span class="lineCov">          1 :     info = proj_pj_info (P);</span>
+<span class="lineNum">     310 </span><span class="lineCov">          1 :     print (PJ_LOG_TRACE, &quot;Final: %s argc=%d pargc=%d\n&quot;, info.definition, argc, o-&gt;pargc);</span>
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span><span class="lineCov">          1 :     if (direction== PJ_INV) {</span>
+<span class="lineNum">     313 </span>            :         /* fail if an inverse operation is not available */
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :         if (!info.has_inverse) {</span>
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :             print (PJ_LOG_ERROR, &quot;Inverse operation not available\n&quot;);</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :             if (stdout != fout)</span>
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :                 fclose (fout);</span>
+<span class="lineNum">     318 </span>            :             return 1;
+<span class="lineNum">     319 </span>            :         }
+<span class="lineNum">     320 </span>            :         /* We have no API call for inverting an operation, so we brute force it. */
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :         P-&gt;inverted = !(P-&gt;inverted);</span>
+<span class="lineNum">     322 </span>            :     }
+<span class="lineNum">     323 </span>            :     direction = PJ_FWD;
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            :     /* Allocate input buffer */
+<span class="lineNum">     326 </span><span class="lineCov">          1 :     buf = static_cast&lt;char*&gt;(calloc (1, 10000));</span>
+<span class="lineNum">     327 </span><span class="lineCov">          1 :     if (nullptr==buf) {</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :         print (PJ_LOG_ERROR, &quot;%s: Out of memory\n&quot;, o-&gt;progname);</span>
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :         pj_free (P);</span>
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :         free (o);</span>
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :         if (stdout != fout)</span>
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :             fclose (fout);</span>
+<span class="lineNum">     333 </span>            :         return 1;
+<span class="lineNum">     334 </span>            :     }
+<span class="lineNum">     335 </span>            : 
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span>            :     /* Loop over all records of all input files */
+<span class="lineNum">     338 </span><span class="lineCov">          3 :     while (opt_input_loop (o, optargs_file_format_text)) {</span>
+<span class="lineNum">     339 </span>            :         int err;
+<span class="lineNum">     340 </span><span class="lineCov">          2 :         void *ret = fgets (buf, 10000, o-&gt;input);</span>
+<span class="lineNum">     341 </span><span class="lineCov">          2 :         char *c = column (buf, 1);</span>
+<span class="lineNum">     342 </span><span class="lineCov">          2 :         opt_eof_handler (o);</span>
+<span class="lineNum">     343 </span><span class="lineCov">          1 :         if (nullptr==ret) {</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :             print (PJ_LOG_ERROR, &quot;Read error in record %d\n&quot;, (int) o-&gt;record_index);</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :             continue;</span>
+<span class="lineNum">     346 </span>            :         }
+<span class="lineNum">     347 </span><span class="lineCov">          1 :         point = parse_input_line (buf, columns_xyzt, fixed_z, fixed_time);</span>
+<span class="lineNum">     348 </span><span class="lineCov">          1 :         if (skip_lines &gt; 0) {</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :             skip_lines--;</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :             continue;</span>
+<span class="lineNum">     351 </span>            :         }
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span>            :         /* if it's a comment or blank line, we reflect it */
+<span class="lineNum">     354 </span><span class="lineCov">          1 :         if (c &amp;&amp; ((*c=='\0') || (*c=='#'))) {</span>
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :             fprintf (fout, &quot;%s&quot;, buf);</span>
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :             continue;</span>
+<span class="lineNum">     357 </span>            :         }
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span><span class="lineCov">          1 :         if (HUGE_VAL==point.xyzt.x) {</span>
+<span class="lineNum">     360 </span>            :             /* otherwise, it must be a syntax error */
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :             print (PJ_LOG_NONE, &quot;# Record %d UNREADABLE: %s&quot;, (int) o-&gt;record_index, buf);</span>
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :             print (PJ_LOG_ERROR, &quot;%s: Could not parse file '%s' line %d\n&quot;, o-&gt;progname, opt_filename (o), opt_record (o));</span>
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :             continue;</span>
+<span class="lineNum">     364 </span>            :         }
+<span class="lineNum">     365 </span>            : 
+<span class="lineNum">     366 </span><span class="lineCov">          1 :         if (proj_angular_input (P, direction)) {</span>
+<span class="lineNum">     367 </span><span class="lineCov">          1 :             point.lpzt.lam = proj_torad (point.lpzt.lam);</span>
+<span class="lineNum">     368 </span><span class="lineCov">          1 :             point.lpzt.phi = proj_torad (point.lpzt.phi);</span>
+<span class="lineNum">     369 </span>            :         }
+<span class="lineNum">     370 </span><span class="lineCov">          1 :         err = proj_errno_reset (P);</span>
+<span class="lineNum">     371 </span>            :         /* coverity[returned_value] */
+<span class="lineNum">     372 </span><span class="lineCov">          1 :         point = proj_trans (P, direction, point);</span>
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span><span class="lineCov">          1 :         if (HUGE_VAL==point.xyzt.x) {</span>
+<span class="lineNum">     375 </span>            :             /* transformation error */
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :             print (PJ_LOG_NONE, &quot;# Record %d TRANSFORMATION ERROR: %s (%s)&quot;,</span>
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 :                    (int) o-&gt;record_index, buf, pj_strerrno (proj_errno(P)));</span>
+<span class="lineNum">     378 </span><span class="lineNoCov">          0 :             proj_errno_restore (P, err);</span>
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :             continue;</span>
+<span class="lineNum">     380 </span>            :         }
+<span class="lineNum">     381 </span><span class="lineCov">          1 :         proj_errno_restore (P, err);</span>
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            :         /* handle comment string */
+<span class="lineNum">     384 </span><span class="lineCov">          1 :         comment = column(buf, nfields+1);</span>
+<span class="lineNum">     385 </span><span class="lineCov">          1 :         if (opt_given(o, &quot;c&quot;)) {</span>
+<span class="lineNum">     386 </span>            :             /* what number is the last coordinate column in the input data? */
+<span class="lineNum">     387 </span>            :             int colmax = 0;
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :             for (i=0; i&lt;4; i++)</span>
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :                 colmax = MAX(colmax, columns_xyzt[i]);</span>
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :             comment = column(buf, colmax+1);</span>
+<span class="lineNum">     391 </span>            :         }
+<span class="lineNum">     392 </span><span class="lineCov">          1 :         comment_delimiter = (comment &amp;&amp; *comment) ? whitespace : blank_comment;</span>
+<span class="lineNum">     393 </span>            : 
+<span class="lineNum">     394 </span>            :         /* Time to print the result */
+<span class="lineNum">     395 </span><span class="lineCov">          1 :         if (proj_angular_output (P, direction)) {</span>
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :             point.lpzt.lam = proj_todeg (point.lpzt.lam);</span>
+<span class="lineNum">     397 </span><span class="lineNoCov">          0 :             point.lpzt.phi = proj_todeg (point.lpzt.phi);</span>
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :             print (PJ_LOG_NONE, &quot;%14.*f  %14.*f  %12.*f  %12.4f%s%s\n&quot;,</span>
+<span class="lineNum">     399 </span>            :                    decimals_angles, point.xyzt.x,
+<span class="lineNum">     400 </span>            :                    decimals_angles, point.xyzt.y,
+<span class="lineNum">     401 </span>            :                    decimals_distances, point.xyzt.z,
+<span class="lineNum">     402 </span>            :                    point.xyzt.t, comment_delimiter, comment
+<span class="lineNum">     403 </span>            :             );
+<span class="lineNum">     404 </span>            :         }
+<span class="lineNum">     405 </span>            :         else
+<span class="lineNum">     406 </span><span class="lineCov">          1 :             print (PJ_LOG_NONE, &quot;%13.*f  %13.*f  %12.*f  %12.4f%s%s\n&quot;,</span>
+<span class="lineNum">     407 </span>            :                    decimals_distances, point.xyzt.x,
+<span class="lineNum">     408 </span>            :                    decimals_distances, point.xyzt.y,
+<span class="lineNum">     409 </span>            :                    decimals_distances, point.xyzt.z,
+<span class="lineNum">     410 </span>            :                    point.xyzt.t, comment_delimiter, comment
+<span class="lineNum">     411 </span>            :             );
+<span class="lineNum">     412 </span>            :     }
+<span class="lineNum">     413 </span>            : 
+<span class="lineNum">     414 </span><span class="lineCov">          1 :     proj_destroy(P);</span>
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span><span class="lineCov">          1 :     if (stdout != fout)</span>
+<span class="lineNum">     417 </span><span class="lineNoCov">          0 :         fclose (fout);</span>
+<span class="lineNum">     418 </span><span class="lineCov">          1 :     free (o);</span>
+<span class="lineNum">     419 </span><span class="lineCov">          1 :     free (buf);</span>
+<span class="lineNum">     420 </span><span class="lineCov">          1 :     return 0;</span>
+<span class="lineNum">     421 </span>            : }
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span>            : 
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span>            : 
+<a name="426"><span class="lineNum">     426 </span>            : </a>
+<span class="lineNum">     427 </span>            : /* return a pointer to the n'th column of buf */
+<span class="lineNum">     428 </span><span class="lineCov">          7 : char *column (char *buf, int n) {</span>
+<span class="lineNum">     429 </span>            :     int i;
+<span class="lineNum">     430 </span><span class="lineCov">          7 :     if (n &lt;= 0)</span>
+<span class="lineNum">     431 </span>            :         return buf;
+<span class="lineNum">     432 </span><span class="lineCov">         27 :     for (i = 0;  i &lt; n;  i++) {</span>
+<span class="lineNum">     433 </span><span class="lineCov">         61 :         while (isspace(*buf))</span>
+<span class="lineNum">     434 </span><span class="lineCov">          9 :             buf++;</span>
+<span class="lineNum">     435 </span><span class="lineCov">         17 :         if (i == n - 1)</span>
+<span class="lineNum">     436 </span>            :             break;
+<span class="lineNum">     437 </span><span class="lineCov">         67 :         while ((0 != *buf) &amp;&amp; !isspace(*buf))</span>
+<span class="lineNum">     438 </span><span class="lineCov">         16 :             buf++;</span>
+<span class="lineNum">     439 </span>            :     }
+<span class="lineNum">     440 </span>            :     return buf;
+<span class="lineNum">     441 </span>            : }
+<a name="442"><span class="lineNum">     442 </span>            : </a>
+<span class="lineNum">     443 </span>            : /* column to double */
+<span class="lineNum">     444 </span><span class="lineCov">          4 : static double cold (char *args, int col) {</span>
+<span class="lineNum">     445 </span>            :     char *endp;
+<span class="lineNum">     446 </span>            :     char *target;
+<span class="lineNum">     447 </span>            :     double d;
+<span class="lineNum">     448 </span><span class="lineCov">          4 :     target = column (args, col);</span>
+<span class="lineNum">     449 </span><span class="lineCov">          4 :     d = proj_strtod (target, &amp;endp);</span>
+<span class="lineNum">     450 </span><span class="lineCov">          4 :     if (endp==target)</span>
+<span class="lineNum">     451 </span>            :         return HUGE_VAL;
+<span class="lineNum">     452 </span><span class="lineCov">          3 :     return d;</span>
+<a name="453"><span class="lineNum">     453 </span>            : }</a>
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span><span class="lineCov">          1 : PJ_COORD parse_input_line (char *buf, int *columns, double fixed_height, double fixed_time) {</span>
+<span class="lineNum">     456 </span><span class="lineCov">          1 :     PJ_COORD err = proj_coord (HUGE_VAL, HUGE_VAL, HUGE_VAL, HUGE_VAL);</span>
+<span class="lineNum">     457 </span>            :     PJ_COORD result = err;
+<span class="lineNum">     458 </span><span class="lineCov">          1 :     int prev_errno = errno;</span>
+<span class="lineNum">     459 </span><span class="lineCov">          1 :     errno = 0;</span>
+<span class="lineNum">     460 </span>            : 
+<span class="lineNum">     461 </span>            :     result.xyzt.z = fixed_height;
+<span class="lineNum">     462 </span>            :     result.xyzt.t = fixed_time;
+<span class="lineNum">     463 </span><span class="lineCov">          1 :     result.xyzt.x = cold (buf, columns[0]);</span>
+<span class="lineNum">     464 </span><span class="lineCov">          1 :     result.xyzt.y = cold (buf, columns[1]);</span>
+<span class="lineNum">     465 </span><span class="lineCov">          1 :     if (result.xyzt.z==HUGE_VAL)</span>
+<span class="lineNum">     466 </span><span class="lineCov">          1 :         result.xyzt.z = cold (buf, columns[2]);</span>
+<span class="lineNum">     467 </span><span class="lineCov">          1 :     if (result.xyzt.t==HUGE_VAL)</span>
+<span class="lineNum">     468 </span><span class="lineCov">          1 :         result.xyzt.t = cold (buf, columns[3]);</span>
+<span class="lineNum">     469 </span>            : 
+<span class="lineNum">     470 </span><span class="lineCov">          1 :     if (0!=errno)</span>
+<span class="lineNum">     471 </span><span class="lineNoCov">          0 :         return err;</span>
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span><span class="lineCov">          1 :     errno = prev_errno;</span>
+<span class="lineNum">     474 </span><span class="lineCov">          1 :     return result;</span>
+<span class="lineNum">     475 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

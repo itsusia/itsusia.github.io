@@ -1,0 +1,552 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - include/proj/common.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/proj</a> - common.hpp<span style="font-size: 80%;"> (source / <a href="common.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:24:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">24</td>
+            <td class="headerCovTableEntryMed">75.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /******************************************************************************</a>
+<span class="lineNum">       2 </span>            :  *
+<span class="lineNum">       3 </span>            :  * Project:  PROJ
+<span class="lineNum">       4 </span>            :  * Purpose:  ISO19111:2019 implementation
+<span class="lineNum">       5 </span>            :  * Author:   Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  ******************************************************************************
+<span class="lineNum">       8 </span>            :  * Copyright (c) 2018, Even Rouault &lt;even dot rouault at spatialys dot com&gt;
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  * Permission is hereby granted, free of charge, to any person obtaining a
+<span class="lineNum">      11 </span>            :  * copy of this software and associated documentation files (the &quot;Software&quot;),
+<span class="lineNum">      12 </span>            :  * to deal in the Software without restriction, including without limitation
+<span class="lineNum">      13 </span>            :  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+<span class="lineNum">      14 </span>            :  * and/or sell copies of the Software, and to permit persons to whom the
+<span class="lineNum">      15 </span>            :  * Software is furnished to do so, subject to the following conditions:
+<span class="lineNum">      16 </span>            :  *
+<span class="lineNum">      17 </span>            :  * The above copyright notice and this permission notice shall be included
+<span class="lineNum">      18 </span>            :  * in all copies or substantial portions of the Software.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+<span class="lineNum">      21 </span>            :  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class="lineNum">      22 </span>            :  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+<span class="lineNum">      23 </span>            :  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class="lineNum">      24 </span>            :  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class="lineNum">      25 </span>            :  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+<span class="lineNum">      26 </span>            :  * DEALINGS IN THE SOFTWARE.
+<span class="lineNum">      27 </span>            :  ****************************************************************************/
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #ifndef COMMON_HH_INCLUDED
+<span class="lineNum">      30 </span>            : #define COMMON_HH_INCLUDED
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #include &lt;memory&gt;
+<span class="lineNum">      33 </span>            : #include &lt;string&gt;
+<span class="lineNum">      34 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : #include &quot;io.hpp&quot;
+<span class="lineNum">      37 </span>            : #include &quot;metadata.hpp&quot;
+<span class="lineNum">      38 </span>            : #include &quot;util.hpp&quot;
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : NS_PROJ_START
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : /** osgeo.proj.common namespace
+<span class="lineNum">      43 </span>            :  *
+<span class="lineNum">      44 </span>            :  * \brief Common classes.
+<span class="lineNum">      45 </span>            :  */
+<span class="lineNum">      46 </span>            : namespace common {
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : class UnitOfMeasure;
+<span class="lineNum">      51 </span>            : /** Shared pointer of UnitOfMeasure. */
+<span class="lineNum">      52 </span>            : using UnitOfMeasurePtr = std::shared_ptr&lt;UnitOfMeasure&gt;;
+<span class="lineNum">      53 </span>            : /** Non-null shared pointer of UnitOfMeasure. */
+<span class="lineNum">      54 </span>            : using UnitOfMeasureNNPtr = util::nn&lt;UnitOfMeasurePtr&gt;;
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            : /** \brief Unit of measure.
+<span class="lineNum">      57 </span>            :  *
+<a name="58"><span class="lineNum">      58 </span>            :  * This is a mutable object.</a>
+<span class="lineNum">      59 </span>            :  */
+<span class="lineNum">      60 </span><span class="lineCov">     641463 : class PROJ_GCC_DLL UnitOfMeasure : public util::BaseObject {</span>
+<span class="lineNum">      61 </span>            :   public:
+<span class="lineNum">      62 </span>            :     /** \brief Type of unit of measure. */
+<span class="lineNum">      63 </span>            :     enum class PROJ_MSVC_DLL Type {
+<span class="lineNum">      64 </span>            :         /** Unknown unit of measure */
+<span class="lineNum">      65 </span>            :         UNKNOWN,
+<span class="lineNum">      66 </span>            :         /** No unit of measure */
+<span class="lineNum">      67 </span>            :         NONE,
+<span class="lineNum">      68 </span>            :         /** Angular unit of measure */
+<span class="lineNum">      69 </span>            :         ANGULAR,
+<span class="lineNum">      70 </span>            :         /** Linear unit of measure */
+<span class="lineNum">      71 </span>            :         LINEAR,
+<span class="lineNum">      72 </span>            :         /** Scale unit of measure */
+<span class="lineNum">      73 </span>            :         SCALE,
+<span class="lineNum">      74 </span>            :         /** Time unit of measure */
+<span class="lineNum">      75 </span>            :         TIME,
+<span class="lineNum">      76 </span>            :         /** Parametric unit of measure */
+<span class="lineNum">      77 </span>            :         PARAMETRIC,
+<span class="lineNum">      78 </span>            :     };
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :     PROJ_DLL UnitOfMeasure(const std::string &amp;nameIn = std::string(),
+<span class="lineNum">      81 </span>            :                            double toSIIn = 1.0, Type typeIn = Type::UNKNOWN,
+<span class="lineNum">      82 </span>            :                            const std::string &amp;codeSpaceIn = std::string(),
+<span class="lineNum">      83 </span>            :                            const std::string &amp;codeIn = std::string());
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">      86 </span>            :     PROJ_DLL UnitOfMeasure(const UnitOfMeasure &amp;other);
+<span class="lineNum">      87 </span>            :     PROJ_DLL ~UnitOfMeasure() override;
+<span class="lineNum">      88 </span>            :     PROJ_DLL UnitOfMeasure &amp;operator=(const UnitOfMeasure &amp;other);
+<span class="lineNum">      89 </span>            :     PROJ_INTERNAL static UnitOfMeasureNNPtr create(const UnitOfMeasure &amp;other);
+<span class="lineNum">      90 </span>            :     //! @endcond
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :     PROJ_DLL const std::string &amp;name() PROJ_PURE_DECL;
+<span class="lineNum">      93 </span>            :     PROJ_DLL double conversionToSI() PROJ_PURE_DECL;
+<span class="lineNum">      94 </span>            :     PROJ_DLL Type type() PROJ_PURE_DECL;
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :     PROJ_DLL const std::string &amp;codeSpace() PROJ_PURE_DECL;
+<span class="lineNum">      97 </span>            :     PROJ_DLL const std::string &amp;code() PROJ_PURE_DECL;
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            :     PROJ_DLL bool operator==(const UnitOfMeasure &amp;other) PROJ_PURE_DECL;
+<span class="lineNum">     100 </span>            :     PROJ_DLL bool operator!=(const UnitOfMeasure &amp;other) PROJ_PURE_DECL;
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     103 </span>            :     PROJ_INTERNAL void _exportToWKT(io::WKTFormatter *formatter,
+<span class="lineNum">     104 </span>            :                                     const std::string &amp;unitType = std::string())
+<span class="lineNum">     105 </span>            :         const; // throw(io::FormattingException)
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :     PROJ_INTERNAL void _exportToJSON(
+<span class="lineNum">     108 </span>            :         io::JSONFormatter *formatter) const; // throw(io::FormattingException)
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            :     PROJ_INTERNAL std::string exportToPROJString() const;
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     113 </span>            :     _isEquivalentTo(const UnitOfMeasure &amp;other,
+<span class="lineNum">     114 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     115 </span>            :                         util::IComparable::Criterion::STRICT) const;
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            :     //! @endcond
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :     PROJ_DLL static const UnitOfMeasure NONE;
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            :     PROJ_DLL static const UnitOfMeasure SCALE_UNITY;
+<span class="lineNum">     122 </span>            :     PROJ_DLL static const UnitOfMeasure PARTS_PER_MILLION;
+<span class="lineNum">     123 </span>            :     PROJ_DLL static const UnitOfMeasure PPM_PER_YEAR;
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span>            :     PROJ_DLL static const UnitOfMeasure METRE;
+<span class="lineNum">     126 </span>            :     PROJ_DLL static const UnitOfMeasure METRE_PER_YEAR;
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span>            :     PROJ_DLL static const UnitOfMeasure RADIAN;
+<span class="lineNum">     129 </span>            :     PROJ_DLL static const UnitOfMeasure MICRORADIAN;
+<span class="lineNum">     130 </span>            :     PROJ_DLL static const UnitOfMeasure DEGREE;
+<span class="lineNum">     131 </span>            :     PROJ_DLL static const UnitOfMeasure ARC_SECOND;
+<span class="lineNum">     132 </span>            :     PROJ_DLL static const UnitOfMeasure GRAD;
+<span class="lineNum">     133 </span>            :     PROJ_DLL static const UnitOfMeasure ARC_SECOND_PER_YEAR;
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            :     PROJ_DLL static const UnitOfMeasure SECOND;
+<span class="lineNum">     136 </span>            :     PROJ_DLL static const UnitOfMeasure YEAR;
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            :   private:
+<span class="lineNum">     139 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     140 </span>            : };
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            : // ---------------------------------------------------------------------------
+<a name="143"><span class="lineNum">     143 </span>            : </a>
+<span class="lineNum">     144 </span>            : /** \brief Numeric value associated with a UnitOfMeasure. */
+<span class="lineNum">     145 </span><span class="lineCov">     524080 : class Measure : public util::BaseObject {</span>
+<span class="lineNum">     146 </span>            :   public:
+<span class="lineNum">     147 </span>            :     PROJ_DLL Measure(double valueIn = 0.0,
+<span class="lineNum">     148 </span>            :                      const UnitOfMeasure &amp;unitIn = UnitOfMeasure());
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     151 </span>            :     PROJ_DLL Measure(const Measure &amp;other);
+<span class="lineNum">     152 </span>            :     PROJ_DLL ~Measure();
+<span class="lineNum">     153 </span>            :     //! @endcond
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            :     PROJ_DLL const UnitOfMeasure &amp;unit() PROJ_PURE_DECL;
+<span class="lineNum">     156 </span>            :     PROJ_DLL double getSIValue() PROJ_PURE_DECL;
+<span class="lineNum">     157 </span>            :     PROJ_DLL double value() PROJ_PURE_DECL;
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            :     PROJ_DLL double
+<span class="lineNum">     160 </span>            :     convertToUnit(const UnitOfMeasure &amp;otherUnit) PROJ_PURE_DECL;
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            :     PROJ_DLL bool operator==(const Measure &amp;other) PROJ_PURE_DECL;
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            :     /** Default maximum resulative error. */
+<span class="lineNum">     165 </span>            :     static constexpr double DEFAULT_MAX_REL_ERROR = 1e-10;
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     168 </span>            :     _isEquivalentTo(const Measure &amp;other,
+<span class="lineNum">     169 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     170 </span>            :                         util::IComparable::Criterion::STRICT,
+<span class="lineNum">     171 </span>            :                     double maxRelativeError = DEFAULT_MAX_REL_ERROR) const;
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            :   private:
+<span class="lineNum">     174 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     175 </span>            :     Measure &amp;operator=(const Measure &amp;) = delete;
+<span class="lineNum">     176 </span>            : };
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span>            : // ---------------------------------------------------------------------------
+<a name="179"><span class="lineNum">     179 </span>            : </a>
+<span class="lineNum">     180 </span>            : /** \brief Numeric value, without a physical unit of measure. */
+<span class="lineNum">     181 </span><span class="lineCov">      11490 : class Scale : public Measure {</span>
+<span class="lineNum">     182 </span>            :   public:
+<span class="lineNum">     183 </span>            :     PROJ_DLL explicit Scale(double valueIn = 0.0);
+<span class="lineNum">     184 </span>            :     PROJ_DLL explicit Scale(double valueIn, const UnitOfMeasure &amp;unitIn);
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     187 </span>            :     explicit Scale(const Measure &amp;other) : Scale(other.value(), other.unit()) {}
+<span class="lineNum">     188 </span>            :     PROJ_DLL Scale(const Scale &amp;other);
+<span class="lineNum">     189 </span>            :     PROJ_DLL ~Scale() override;
+<span class="lineNum">     190 </span>            :     //! @endcond
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            :   protected:
+<span class="lineNum">     193 </span>            :     PROJ_FRIEND_OPTIONAL(Scale);
+<span class="lineNum">     194 </span>            :     Scale &amp;operator=(const Scale &amp;) = delete;
+<span class="lineNum">     195 </span>            : };
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span>            : // ---------------------------------------------------------------------------
+<a name="198"><span class="lineNum">     198 </span>            : </a>
+<span class="lineNum">     199 </span>            : /** \brief Numeric value, with a angular unit of measure. */
+<span class="lineNum">     200 </span><span class="lineCov">      40739 : class Angle : public Measure {</span>
+<span class="lineNum">     201 </span>            :   public:
+<span class="lineNum">     202 </span>            :     PROJ_DLL explicit Angle(double valueIn = 0.0);
+<span class="lineNum">     203 </span>            :     PROJ_DLL Angle(double valueIn, const UnitOfMeasure &amp;unitIn);
+<a name="204"><span class="lineNum">     204 </span>            : </a>
+<span class="lineNum">     205 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     206 </span><span class="lineCov">        502 :     explicit Angle(const Measure &amp;other) : Angle(other.value(), other.unit()) {}</span>
+<span class="lineNum">     207 </span>            :     PROJ_DLL Angle(const Angle &amp;other);
+<span class="lineNum">     208 </span>            :     PROJ_DLL ~Angle() override;
+<span class="lineNum">     209 </span>            :     //! @endcond
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :   protected:
+<span class="lineNum">     212 </span>            :     PROJ_FRIEND_OPTIONAL(Angle);
+<span class="lineNum">     213 </span>            :     Angle &amp;operator=(const Angle &amp;) = delete;
+<span class="lineNum">     214 </span>            : };
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            : // ---------------------------------------------------------------------------
+<a name="217"><span class="lineNum">     217 </span>            : </a>
+<span class="lineNum">     218 </span>            : /** \brief Numeric value, with a linear unit of measure. */
+<span class="lineNum">     219 </span><span class="lineCov">     198114 : class Length : public Measure {</span>
+<span class="lineNum">     220 </span>            :   public:
+<span class="lineNum">     221 </span>            :     PROJ_DLL explicit Length(double valueIn = 0.0);
+<span class="lineNum">     222 </span>            :     PROJ_DLL Length(double valueIn, const UnitOfMeasure &amp;unitIn);
+<a name="223"><span class="lineNum">     223 </span>            : </a>
+<span class="lineNum">     224 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     225 </span><span class="lineCov">        507 :     explicit Length(const Measure &amp;other)</span>
+<span class="lineNum">     226 </span><span class="lineCov">        507 :         : Length(other.value(), other.unit()) {}</span>
+<span class="lineNum">     227 </span>            :     PROJ_DLL Length(const Length &amp;other);
+<span class="lineNum">     228 </span>            :     PROJ_DLL ~Length() override;
+<span class="lineNum">     229 </span>            :     //! @endcond
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span>            :   protected:
+<span class="lineNum">     232 </span>            :     PROJ_FRIEND_OPTIONAL(Length);
+<span class="lineNum">     233 </span>            :     Length &amp;operator=(const Length &amp;) = delete;
+<span class="lineNum">     234 </span>            : };
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     237 </span>            : 
+<a name="238"><span class="lineNum">     238 </span>            : /** \brief Date-time value, as a ISO:8601 encoded string, or other string</a>
+<span class="lineNum">     239 </span>            :  * encoding */
+<span class="lineNum">     240 </span><span class="lineCov">      12104 : class DateTime {</span>
+<span class="lineNum">     241 </span>            :   public:
+<span class="lineNum">     242 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     243 </span>            :     PROJ_DLL DateTime(const DateTime &amp;other);
+<span class="lineNum">     244 </span>            :     PROJ_DLL ~DateTime();
+<span class="lineNum">     245 </span>            :     //! @endcond
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span>            :     PROJ_DLL bool isISO_8601() const;
+<span class="lineNum">     248 </span>            :     PROJ_DLL std::string toString() const;
+<span class="lineNum">     249 </span>            : 
+<span class="lineNum">     250 </span>            :     PROJ_DLL static DateTime
+<span class="lineNum">     251 </span>            :     create(const std::string &amp;str); // may throw Exception
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            :   protected:
+<span class="lineNum">     254 </span>            :     DateTime();
+<span class="lineNum">     255 </span>            :     PROJ_FRIEND_OPTIONAL(DateTime);
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            :   private:
+<span class="lineNum">     258 </span>            :     explicit DateTime(const std::string &amp;str);
+<span class="lineNum">     259 </span>            :     DateTime &amp;operator=(const DateTime &amp;other) = delete;
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     262 </span>            : };
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span>            : // ---------------------------------------------------------------------------
+<a name="265"><span class="lineNum">     265 </span>            : </a>
+<span class="lineNum">     266 </span>            : /** \brief Data epoch */
+<span class="lineNum">     267 </span><span class="lineCov">     101532 : class DataEpoch {</span>
+<span class="lineNum">     268 </span>            :   public:
+<span class="lineNum">     269 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     270 </span>            :     PROJ_DLL explicit DataEpoch(const Measure &amp;coordinateEpochIn);
+<span class="lineNum">     271 </span>            :     PROJ_DLL DataEpoch(const DataEpoch &amp;other);
+<span class="lineNum">     272 </span>            :     PROJ_DLL ~DataEpoch();
+<span class="lineNum">     273 </span>            :     //! @endcond
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span>            :     PROJ_DLL const Measure &amp;coordinateEpoch() const;
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span>            :   protected:
+<span class="lineNum">     278 </span>            :     DataEpoch();
+<span class="lineNum">     279 </span>            :     PROJ_FRIEND_OPTIONAL(DataEpoch);
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span>            :   private:
+<span class="lineNum">     282 </span>            :     DataEpoch &amp;operator=(const DataEpoch &amp;other) = delete;
+<span class="lineNum">     283 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     284 </span>            : };
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span>            : class IdentifiedObject;
+<span class="lineNum">     289 </span>            : /** Shared pointer of IdentifiedObject. */
+<span class="lineNum">     290 </span>            : using IdentifiedObjectPtr = std::shared_ptr&lt;IdentifiedObject&gt;;
+<span class="lineNum">     291 </span>            : /** Non-null shared pointer of IdentifiedObject. */
+<span class="lineNum">     292 </span>            : using IdentifiedObjectNNPtr = util::nn&lt;IdentifiedObjectPtr&gt;;
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            : /** \brief Abstract class representating a CRS-related object that has an
+<span class="lineNum">     295 </span>            :  * identification.
+<span class="lineNum">     296 </span>            :  *
+<a name="297"><span class="lineNum">     297 </span>            :  * \remark Implements IdentifiedObject from \ref ISO_19111_2019</a>
+<span class="lineNum">     298 </span>            :  */
+<span class="lineNum">     299 </span><span class="lineCov">     203445 : class PROJ_GCC_DLL IdentifiedObject : public util::BaseObject,</span>
+<span class="lineNum">     300 </span>            :                                       public util::IComparable,
+<span class="lineNum">     301 </span>            :                                       public io::IWKTExportable {
+<span class="lineNum">     302 </span>            :   public:
+<span class="lineNum">     303 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     304 </span>            :     PROJ_DLL ~IdentifiedObject() override;
+<span class="lineNum">     305 </span>            :     //! @endcond
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            :     PROJ_DLL static const std::string NAME_KEY;
+<span class="lineNum">     308 </span>            :     PROJ_DLL static const std::string IDENTIFIERS_KEY;
+<span class="lineNum">     309 </span>            :     PROJ_DLL static const std::string ALIAS_KEY;
+<span class="lineNum">     310 </span>            :     PROJ_DLL static const std::string REMARKS_KEY;
+<span class="lineNum">     311 </span>            :     PROJ_DLL static const std::string DEPRECATED_KEY;
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span>            :     // in practice only name().description() is used
+<span class="lineNum">     314 </span>            :     PROJ_DLL const metadata::IdentifierNNPtr &amp;name() PROJ_PURE_DECL;
+<span class="lineNum">     315 </span>            :     PROJ_DLL const std::string &amp;nameStr() PROJ_PURE_DECL;
+<span class="lineNum">     316 </span>            :     PROJ_DLL const std::vector&lt;metadata::IdentifierNNPtr&gt; &amp;
+<span class="lineNum">     317 </span>            :     identifiers() PROJ_PURE_DECL;
+<span class="lineNum">     318 </span>            :     PROJ_DLL const std::vector&lt;util::GenericNameNNPtr&gt; &amp;
+<span class="lineNum">     319 </span>            :     aliases() PROJ_PURE_DECL;
+<span class="lineNum">     320 </span>            :     PROJ_DLL const std::string &amp;remarks() PROJ_PURE_DECL;
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            :     // from Apache SIS AbstractIdentifiedObject
+<span class="lineNum">     323 </span>            :     PROJ_DLL bool isDeprecated() PROJ_PURE_DECL;
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            :     // Non-standard
+<span class="lineNum">     326 </span>            :     PROJ_DLL std::string alias() PROJ_PURE_DECL;
+<span class="lineNum">     327 </span>            :     PROJ_DLL int getEPSGCode() PROJ_PURE_DECL;
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     330 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     331 </span>            :         void
+<span class="lineNum">     332 </span>            :         formatID(io::WKTFormatter *formatter) const;
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span>            :     PROJ_INTERNAL void formatID(io::JSONFormatter *formatter) const;
+<span class="lineNum">     335 </span>            : 
+<span class="lineNum">     336 </span>            :     PROJ_INTERNAL void formatRemarks(io::WKTFormatter *formatter) const;
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            :     PROJ_INTERNAL void formatRemarks(io::JSONFormatter *formatter) const;
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     341 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     342 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     343 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            :     PROJ_INTERNAL bool
+<span class="lineNum">     346 </span>            :     _isEquivalentTo(const IdentifiedObject *other,
+<span class="lineNum">     347 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     348 </span>            :                         util::IComparable::Criterion::STRICT) PROJ_PURE_DECL;
+<span class="lineNum">     349 </span>            :     //! @endcond
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span>            :   protected:
+<span class="lineNum">     352 </span>            :     PROJ_FRIEND_OPTIONAL(IdentifiedObject);
+<span class="lineNum">     353 </span>            :     INLINED_MAKE_SHARED
+<span class="lineNum">     354 </span>            :     IdentifiedObject();
+<span class="lineNum">     355 </span>            :     IdentifiedObject(const IdentifiedObject &amp;other);
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span>            :     void setProperties(const util::PropertyMap
+<span class="lineNum">     358 </span>            :                            &amp;properties); // throw(InvalidValueTypeException)
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span>            :   private:
+<span class="lineNum">     361 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     362 </span>            :     IdentifiedObject &amp;operator=(const IdentifiedObject &amp;other) = delete;
+<span class="lineNum">     363 </span>            : };
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span>            : class ObjectDomain;
+<span class="lineNum">     368 </span>            : /** Shared pointer of ObjectDomain. */
+<span class="lineNum">     369 </span>            : using ObjectDomainPtr = std::shared_ptr&lt;ObjectDomain&gt;;
+<span class="lineNum">     370 </span>            : /** Non-null shared pointer of ObjectDomain. */
+<span class="lineNum">     371 </span>            : using ObjectDomainNNPtr = util::nn&lt;ObjectDomainPtr&gt;;
+<span class="lineNum">     372 </span>            : 
+<span class="lineNum">     373 </span>            : /** \brief The scope and validity of a CRS-related object.
+<span class="lineNum">     374 </span>            :  *
+<a name="375"><span class="lineNum">     375 </span>            :  * \remark Implements ObjectDomain from \ref ISO_19111_2019</a>
+<span class="lineNum">     376 </span>            :  */
+<span class="lineNum">     377 </span><span class="lineCov">      64242 : class PROJ_GCC_DLL ObjectDomain : public util::BaseObject,</span>
+<span class="lineNum">     378 </span>            :                                   public util::IComparable {
+<span class="lineNum">     379 </span>            :   public:
+<span class="lineNum">     380 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     381 </span>            :     PROJ_DLL ~ObjectDomain() override;
+<span class="lineNum">     382 </span>            :     //! @endcond
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span>            :     // In ISO_19111:2018, scope and domain are compulsory, but in WKT2:2015,
+<span class="lineNum">     385 </span>            :     // they
+<span class="lineNum">     386 </span>            :     // are not necessarily both specified
+<span class="lineNum">     387 </span>            :     PROJ_DLL const util::optional&lt;std::string&gt; &amp;scope() PROJ_PURE_DECL;
+<span class="lineNum">     388 </span>            :     PROJ_DLL const metadata::ExtentPtr &amp;domainOfValidity() PROJ_PURE_DECL;
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span>            :     PROJ_DLL static ObjectDomainNNPtr
+<span class="lineNum">     391 </span>            :     create(const util::optional&lt;std::string&gt; &amp;scopeIn,
+<span class="lineNum">     392 </span>            :            const metadata::ExtentPtr &amp;extent);
+<span class="lineNum">     393 </span>            : 
+<span class="lineNum">     394 </span>            :     PROJ_PRIVATE :
+<span class="lineNum">     395 </span>            :         //! @cond Doxygen_Suppress
+<span class="lineNum">     396 </span>            :         void
+<span class="lineNum">     397 </span>            :         _exportToWKT(io::WKTFormatter *formatter)
+<span class="lineNum">     398 </span>            :             const; // throw(io::FormattingException)
+<span class="lineNum">     399 </span>            : 
+<span class="lineNum">     400 </span>            :     PROJ_INTERNAL void _exportToJSON(
+<span class="lineNum">     401 </span>            :         io::JSONFormatter *formatter) const; // throw(FormattingException)
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span>            :     bool
+<span class="lineNum">     404 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     405 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     406 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     407 </span>            :     //! @endcond
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span>            :   protected:
+<span class="lineNum">     410 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     411 </span>            :     ObjectDomain(const util::optional&lt;std::string&gt; &amp;scopeIn,
+<span class="lineNum">     412 </span>            :                  const metadata::ExtentPtr &amp;extent);
+<span class="lineNum">     413 </span>            :     //! @endcond
+<a name="414"><span class="lineNum">     414 </span>            : </a>
+<span class="lineNum">     415 </span>            :     ObjectDomain(const ObjectDomain &amp;other);
+<span class="lineNum">     416 </span><span class="lineCov">      64242 :     INLINED_MAKE_SHARED</span>
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span>            :   private:
+<span class="lineNum">     419 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     420 </span>            :     ObjectDomain &amp;operator=(const ObjectDomain &amp;other) = delete;
+<span class="lineNum">     421 </span>            : };
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span>            : // ---------------------------------------------------------------------------
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span>            : class ObjectUsage;
+<span class="lineNum">     426 </span>            : /** Shared pointer of ObjectUsage. */
+<span class="lineNum">     427 </span>            : using ObjectUsagePtr = std::shared_ptr&lt;ObjectUsage&gt;;
+<span class="lineNum">     428 </span>            : /** Non-null shared pointer of ObjectUsage. */
+<span class="lineNum">     429 </span>            : using ObjectUsageNNPtr = util::nn&lt;ObjectUsagePtr&gt;;
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span>            : /** \brief Abstract class of a CRS-related object that has usages.
+<span class="lineNum">     432 </span>            :  *
+<a name="433"><span class="lineNum">     433 </span>            :  * \remark Implements ObjectUsage from \ref ISO_19111_2019</a>
+<span class="lineNum">     434 </span>            :  */
+<span class="lineNum">     435 </span><span class="lineCov">      67727 : class PROJ_GCC_DLL ObjectUsage : public IdentifiedObject {</span>
+<span class="lineNum">     436 </span>            :   public:
+<span class="lineNum">     437 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     438 </span>            :     PROJ_DLL ~ObjectUsage() override;
+<span class="lineNum">     439 </span>            :     //! @endcond
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span>            :     PROJ_DLL const std::vector&lt;ObjectDomainNNPtr&gt; &amp;domains() PROJ_PURE_DECL;
+<span class="lineNum">     442 </span>            : 
+<span class="lineNum">     443 </span>            :     PROJ_DLL static const std::string SCOPE_KEY;
+<span class="lineNum">     444 </span>            :     PROJ_DLL static const std::string DOMAIN_OF_VALIDITY_KEY;
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span>            :     PROJ_DLL static const std::string OBJECT_DOMAIN_KEY;
+<span class="lineNum">     447 </span>            : 
+<span class="lineNum">     448 </span>            :     //! @cond Doxygen_Suppress
+<span class="lineNum">     449 </span>            :     bool
+<span class="lineNum">     450 </span>            :     _isEquivalentTo(const util::IComparable *other,
+<span class="lineNum">     451 </span>            :                     util::IComparable::Criterion criterion =
+<span class="lineNum">     452 </span>            :                         util::IComparable::Criterion::STRICT) const override;
+<span class="lineNum">     453 </span>            :     //! @endcond
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span>            :   protected:
+<span class="lineNum">     456 </span>            :     ObjectUsage();
+<span class="lineNum">     457 </span>            :     ObjectUsage(const ObjectUsage &amp;other);
+<span class="lineNum">     458 </span>            :     void setProperties(const util::PropertyMap
+<span class="lineNum">     459 </span>            :                            &amp;properties); // throw(InvalidValueTypeException)
+<span class="lineNum">     460 </span>            : 
+<span class="lineNum">     461 </span>            :     void baseExportToWKT(
+<span class="lineNum">     462 </span>            :         io::WKTFormatter *formatter) const; // throw(io::FormattingException)
+<span class="lineNum">     463 </span>            : 
+<span class="lineNum">     464 </span>            :     void baseExportToJSON(
+<span class="lineNum">     465 </span>            :         io::JSONFormatter *formatter) const; // throw(io::FormattingException)
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span>            :   private:
+<span class="lineNum">     468 </span>            :     PROJ_OPAQUE_PRIVATE_DATA
+<span class="lineNum">     469 </span>            :     ObjectUsage &amp;operator=(const ObjectUsage &amp;other) = delete;
+<span class="lineNum">     470 </span>            : };
+<span class="lineNum">     471 </span>            : 
+<span class="lineNum">     472 </span>            : } // namespace common
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span>            : NS_PROJ_END
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span>            : #endif //  COMMON_HH_INCLUDED
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - main_coverage.info - src/Math.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - Math.cpp<span style="font-size: 80%;"> (source / <a href="Math.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">main_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-14 17:15:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  * \file Math.cpp
+<span class="lineNum">       3 </span>            :  * \brief Implementation for GeographicLib::Math class
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  * Copyright (c) Charles Karney (2015) &lt;charles@karney.com&gt; and licensed
+<span class="lineNum">       6 </span>            :  * under the MIT/X11 License.  For more information, see
+<span class="lineNum">       7 </span>            :  * https://geographiclib.sourceforge.io/
+<span class="lineNum">       8 </span>            :  **********************************************************************/
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;GeographicLib/Math.hpp&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      13 </span>            : // Squelch warnings about constant conditional expressions
+<span class="lineNum">      14 </span>            : #  pragma warning (disable: 4127)
+<span class="lineNum">      15 </span>            : #endif
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : namespace GeographicLib {
+<span class="lineNum">      18 </span>            : 
+<a name="19"><span class="lineNum">      19 </span>            :   using namespace std;</a>
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span><span class="lineCov">        440 :   template&lt;typename T&gt; T Math::eatanhe(T x, T es)  {</span>
+<span class="lineNum">      22 </span><span class="lineCov">        854 :     return es &gt; T(0) ? es * atanh(es * x) : -es * atan(es * x);</span>
+<a name="23"><span class="lineNum">      23 </span>            :   }</a>
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span><span class="lineCov">        240 :   template&lt;typename T&gt; T Math::taupf(T tau, T es) {</span>
+<span class="lineNum">      26 </span>            :     T tau1 = hypot(T(1), tau),
+<span class="lineNum">      27 </span><span class="lineCov">        240 :       sig = sinh( eatanhe(tau / tau1, es ) );</span>
+<span class="lineNum">      28 </span><span class="lineCov">        240 :     return hypot(T(1), sig) * tau - sig * tau1;</span>
+<a name="29"><span class="lineNum">      29 </span>            :   }</a>
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineCov">         81 :   template&lt;typename T&gt; T Math::tauf(T taup, T es) {</span>
+<span class="lineNum">      32 </span>            :     static const int numit = 5;
+<span class="lineNum">      33 </span>            :     static const T tol = sqrt(numeric_limits&lt;T&gt;::epsilon()) / T(10);
+<span class="lineNum">      34 </span><span class="lineCov">         81 :     T e2m = T(1) - sq(es),</span>
+<span class="lineNum">      35 </span>            :       // To lowest order in e^2, taup = (1 - e^2) * tau = _e2m * tau; so use
+<span class="lineNum">      36 </span>            :       // tau = taup/_e2m as a starting guess.  (This starting guess is the
+<span class="lineNum">      37 </span>            :       // geocentric latitude which, to first order in the flattening, is equal
+<span class="lineNum">      38 </span>            :       // to the conformal latitude.)  Only 1 iteration is needed for |lat| &lt;
+<span class="lineNum">      39 </span>            :       // 3.35 deg, otherwise 2 iterations are needed.  If, instead, tau = taup
+<span class="lineNum">      40 </span>            :       // is used the mean number of iterations increases to 1.99 (2 iterations
+<span class="lineNum">      41 </span>            :       // are needed except near tau = 0).
+<span class="lineNum">      42 </span><span class="lineCov">         81 :       tau = taup/e2m,</span>
+<span class="lineNum">      43 </span><span class="lineCov">        162 :       stol = tol * max(T(1), abs(taup));</span>
+<span class="lineNum">      44 </span>            :     // min iterations = 1, max iterations = 2; mean = 1.94
+<span class="lineNum">      45 </span><span class="lineCov">        231 :     for (int i = 0; i &lt; numit || GEOGRAPHICLIB_PANIC; ++i) {</span>
+<span class="lineNum">      46 </span><span class="lineCov">        156 :       T taupa = taupf(tau, es),</span>
+<span class="lineNum">      47 </span><span class="lineCov">        468 :         dtau = (taup - taupa) * (1 + e2m * sq(tau)) /</span>
+<span class="lineNum">      48 </span><span class="lineCov">        312 :         ( e2m * hypot(T(1), tau) * hypot(T(1), taupa) );</span>
+<span class="lineNum">      49 </span><span class="lineCov">        156 :       tau += dtau;</span>
+<span class="lineNum">      50 </span><span class="lineCov">        156 :       if (!(abs(dtau) &gt;= stol))</span>
+<span class="lineNum">      51 </span>            :         break;
+<span class="lineNum">      52 </span>            :     }
+<span class="lineNum">      53 </span><span class="lineCov">         81 :     return tau;</span>
+<span class="lineNum">      54 </span>            :   }
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :   /// \cond SKIP
+<span class="lineNum">      57 </span>            :   // Instantiate
+<span class="lineNum">      58 </span>            :   template Math::real Math::eatanhe&lt;Math::real&gt;(Math::real, Math::real);
+<span class="lineNum">      59 </span>            :   template Math::real Math::taupf&lt;Math::real&gt;(Math::real, Math::real);
+<span class="lineNum">      60 </span>            :   template Math::real Math::tauf&lt;Math::real&gt;(Math::real, Math::real);
+<span class="lineNum">      61 </span>            :   /// \endcond
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            : } // namespace GeographicLib
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
